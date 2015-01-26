@@ -84,7 +84,6 @@ char		*gPlatformName = gCacheNameAdler;
 
 char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
-char		gMacOSVersion[8];
 int		bvCount = 0;
 int		gDeviceCount = 0;
 //int		menucount = 0;
@@ -869,6 +868,12 @@ bool checkOSVersion(const char * version)
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 	}
+}
+
+uint32_t getMacOSVerCurrent()
+{
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	return MacOSVerCurrent;
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

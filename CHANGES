@@ -1,3 +1,5 @@
+- Bungo : Added MacOSVerCurrent and MacOSVer2Int function to use instead of macros.
+- Bungo : Fixed bug in gDarwinBuildVerStr extracting.
 - Bungo : Fixed fixedUUID function (convert.c smbios.c).
 - Bungo : Added Logging start time.
 - Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service.

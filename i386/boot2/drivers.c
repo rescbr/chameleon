@@ -116,8 +116,8 @@ static char	*gDriverSpec;
 static char	*gFileSpec;
 static char	*gTempSpec;
 static char	*gFileName;
-// Bungo
-char *gDarwinBuildVerStr = "Darwin Kernel Version";
+// Bungo:
+char gDarwinBuildVerStr[256] = "Darwin Kernel Version";
 
 /*static*/ unsigned long
 Adler32( unsigned char *buffer, long length )
@@ -981,12 +981,21 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		ret = ThinFatFile(&binary, &len);
 	}
 
-	// Bungo: no range checking, sorry
-	size = 0;
-	while (memcmp((uint8_t *)binary + size, (uint8_t *)gDarwinBuildVerStr, 21)) {
-		size++;
+	// Bungo: scan binary for Darwin Kernel Version string
+	uint32_t offset = 0;
+	strncpy(gDarwinBuildVerStr, "Darwin Kernel Version", sizeof(gDarwinBuildVerStr));
+	while ((offset < 0xFFFFFFFF - (uint32_t)binary - 256) && memcmp(binary + offset, gDarwinBuildVerStr, 21))
+	{
+		offset++;
 	}
-	gDarwinBuildVerStr = (char *)binary + size;
+	if (offset < 0xFFFFFFFF - (uint32_t)binary - 256)
+	{
+		strncpy(gDarwinBuildVerStr, (char *)(binary + offset), sizeof(gDarwinBuildVerStr));
+	}
+	else
+	{
+		strcat(gDarwinBuildVerStr, ": Unknown");
+	}
 
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void *)binary, NULL, NULL, NULL);

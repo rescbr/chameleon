@@ -38,6 +38,8 @@
 #define DBG(x...)	msglog(x)
 #endif
 
+char		gMacOSVersion[OSVERSTRLEN];
+uint32_t	MacOSVerCurrent = 0;
 bool		showBootBanner = true; //Azi:showinfo
 static bool	shouldboot = false;
 
@@ -62,6 +64,53 @@ enum {
 extern char *msgbuf;
 
 void showTextBuffer(char *buf_orig, int size);
+
+//==========================================================================
+
+// MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
+uint32_t MacOSVer2Int(const char *osver)
+{
+	uint32_t    result = 0;
+	uint8_t    *resptr = (uint8_t *)&result;
+	uint8_t     len = strlen(osver);
+	uint8_t     i, j, m;
+#define CHR2UINT(c) ((uint8_t)(c - '0'))
+#define ISDIGIT(c)  ((c >= '0') && (c <= '9'))
+#define ISDOT(c)    (c == '.')
+
+	if (!osver || (len < 4) || (len > OSVERSTRLEN - 1) || !ISDIGIT(osver[0]) || !ISDOT(osver[2]) || !ISDIGIT(osver[len - 1]))
+	{
+		verbose("ERROR: wrong Mac OS version string syntax: '%s'\n", osver);
+		return 0;
+	}
+
+	for (i = 0, j = 3, m = 1; i < len; i++)
+	{
+		if (ISDIGIT(osver[i]))
+		{
+			resptr[j] = resptr[j] * m + CHR2UINT(osver[i]);
+			m = 10;
+		}
+		else if (ISDOT(osver[i]))
+		{
+			if (j > 0)
+			{
+				j--;
+			}
+			else
+			{
+				return 0;
+			}
+			m = 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	return result;
+}
 
 //==========================================================================
 

@@ -231,7 +231,9 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-bool checkOSVersion(const char * version);
+extern bool checkOSVersion(const char * version);
+extern uint32_t getMacOSVerCurrent();
+
 /*
  * usb.c
  */
@@ -277,8 +279,8 @@ extern long LoadExtraDrivers(char * dirSpec);
 extern long LoadDrivers(char * dirSpec);
 extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize);
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
-// Bungo
-extern char *gDarwinBuildVerStr;
+// Bungo:
+extern char gDarwinBuildVerStr[256];
 
 /*!
     Hookable function pointer called during the driver loading phase that
