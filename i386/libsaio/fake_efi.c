@@ -724,7 +724,7 @@ void setupChosenNode()
 
 	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
 
-	if(YOSEMITE)
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
 	{
 		//
 		// Pike R. Alpha - 12 October 2014

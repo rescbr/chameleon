@@ -1316,37 +1316,25 @@ int processBootOptions()
 		}
 		else
 		{
-			if( YOSEMITE ) // is 10.10
+			if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OS X is 10.10 or newer
 			{
 				strlcpy( bootInfo->bootFile, kOSXKernel, sizeof(bootInfo->bootFile) );
 			}
 			else
-			{ // OSX is not 10.10
-
+			{
+				// or 10.9 and previous
 				strlcpy( bootInfo->bootFile, kDefaultKernel, sizeof(bootInfo->bootFile) );
 			}
 		}
 	}
 
-	if (!YOSEMITE) // not 10.10 so 10.9 and previus
+	if ((strcmp( bootInfo->bootFile, kDefaultKernel ) != 0) && (strcmp( bootInfo->bootFile, kOSXKernel ) != 0))
 	{
-		if (strcmp( bootInfo->bootFile, kDefaultKernel ) != 0)
-		{
-	        	//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
-	}
-	else
-	{ // OSX is 10.10
-		if (strcmp( bootInfo->bootFile, kOSXKernel ) != 0)
-		{
-        		//printf(HEADER "org.chameleon.Boot.plist found path for custom '%s' found!\n", bootInfo->bootFile);
-			gOverrideKernel = true;
-		}
+		gOverrideKernel = true;
 	}
 
 	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
-	if( YOSEMITE ) // is 10.10
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OS X is 10.10 or newer
 	{
 		addBootArg("kext-dev-mode=1");
 	}

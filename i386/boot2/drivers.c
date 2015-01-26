@@ -249,7 +249,7 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				if ( MAVERICKS || YOSEMITE ) // issue 352
+				if (MacOSVerCurrent >= MacOSVer2Int("10.9")) // issue 352
 				{
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");

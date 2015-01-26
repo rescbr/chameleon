@@ -219,15 +219,7 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if (TIGER || LEOPARD || SNOW_LEOPARD)
-	{
-		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
-
-		startprog( kernelEntry, bootArgsPreLion );
-
-	}
-	else
+	if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
 	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
@@ -237,6 +229,13 @@ static int ExecKernel(void *binary)
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
 
 		startprog( kernelEntry, bootArgs );
+	}
+	else
+	{
+		// Notify modules that the kernel is about to be started
+		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
+
+		startprog( kernelEntry, bootArgsPreLion );
 	}
 
 	// Not reached
@@ -269,21 +268,19 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 	else
 	{
-		// Leopard prelink kernel cache file
-		if (TIGER || LEOPARD)
+		// Lion, Mountain Lion, Mavericks and Yosemite prelink kernel cache file
+		if (MacOSVerCurrent >= MacOSVer2Int("10.7")) // OSX is Lion (10.7) or newer
 		{
-			// Reset cache name.
-			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-			snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
-			adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
-			verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);;
+			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 		}
 		// Snow Leopard prelink kernel cache file
-		else if ( SNOW_LEOPARD )
+		else
 		{
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
-				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
+			if (MacOSVerCurrent >= MacOSVer2Int("10.6"))  // OSX is Snow (10.6)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
+					(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
 
 				int	lnam = strlen(kernelCacheFile) + 9; //with adler32
 				char	*name;
@@ -309,10 +306,14 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 			}
 			else
 			{
-			// Lion, Mountain Lion, Mavericks, and Yosemite prelink kernel cache file
-			// for 10.7 10.8 10.9 10.10
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);;
+				// Leopard prelink kernel cache file
+				// Reset cache name.
+				bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+				snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+				adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
+				verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);
+			}
 		}
 	}
 
@@ -744,13 +745,13 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE )
+				if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OSX is 10.10 or newer
 				{
-					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
+					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos "%s", bootInfo->bootFile); // Yosemite
 				}
 				else
 				{
-					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite
+					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading '/'
 				}
 			}
 			else
