@@ -1,3 +1,5 @@
+- Micky1979 - Update Chameleon pkg Installer (Allow install on ESP).
+
 - Micky1979 - Add sectorsize is a tiny command line made to detect the Physical and logical sector size of your hard disk.
 
 - JrCs - boot1-install can show ntfs volume.

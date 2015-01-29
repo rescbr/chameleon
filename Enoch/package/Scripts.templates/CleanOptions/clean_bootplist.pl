@@ -27,7 +27,7 @@ sub _do_cmd {
     $value =~ s/([\s"])/\\$1/g; # Escape characters in value (space & ")
     my $plistbuddy_command="$cmd :$key $value";
 
-    open ( OUTPUT, "-|", '/usr/libexec/plistbuddy', "-c", "$plistbuddy_command", "$boot_plist_filepath" );
+    open ( OUTPUT, "-|", '/usr/libexec/PlistBuddy', "-c", "$plistbuddy_command", "$boot_plist_filepath" );
     my $exit_code = $?;
     chomp($out = <OUTPUT>);
     close OUTPUT;

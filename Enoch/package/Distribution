@@ -17,7 +17,7 @@
 
     var bootPlist = null;
     if (my.target) {
-        var boot_plist_filenames = new Array( 'org.chameleon.Boot.plist', 'com.apple.Boot.plist' );
+        var boot_plist_filenames = new Array( 'org.chameleon.Boot.plist', 'com.apple.Boot.plist', 'com.apple.boot.plist');
         for ( var i = 0; i &lt; boot_plist_filenames.length; i++ ) {
             bootPlist = system.files.plistAtPath( my.target.mountpoint + '/Extra/' + boot_plist_filenames[i] );
             if (bootPlist)
