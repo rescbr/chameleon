@@ -159,7 +159,8 @@ static long InitDriverSupport( void )
 	gTempSpec       = malloc( 4096 );
 	gFileName       = malloc( 4096 );
 
-	if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName ) {
+	if ( !gExtensionsSpec || !gDriverSpec || !gFileSpec || !gTempSpec || !gFileName )
+	{
 		stop("InitDriverSupport error");
 	}
 
@@ -499,9 +500,12 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	do{
 	// Save the driver path.
         
-	if(name) {
+	if(name)
+	{
 		snprintf(gFileSpec, 4096, "%s/%s/%s", dirSpec, name, (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
-	} else {
+	}
+	else
+	{
 		snprintf(gFileSpec, 4096, "%s/%s", dirSpec, (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
 	}
 	executablePathLength = strlen(gFileSpec) + 1;
@@ -512,15 +516,19 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	}
 	strcpy(tmpExecutablePath, gFileSpec);
 
-	if(name) {
+	if(name)
+	{
 		snprintf(gFileSpec, 4096, "%s/%s", dirSpec, name);
-	} else 	{
+	}
+	else
+	{
 		snprintf(gFileSpec, 4096, "%s", dirSpec);
 	}
 	bundlePathLength = strlen(gFileSpec) + 1;
 
 	tmpBundlePath = malloc(bundlePathLength);
-	if (tmpBundlePath == 0) {
+	if (tmpBundlePath == 0)
+	{
 		break;
 	}
 
@@ -528,19 +536,24 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 
 	// Construct the file spec to the plist, then load it.
 
-	if(name) {
+	if(name)
+	{
 		snprintf(gFileSpec, 4096, "%s/%s/%sInfo.plist", dirSpec, name, (bundleType == kCFBundleType2) ? "Contents/" : "");
-	} else {
+	}
+	else
+	{
 		snprintf(gFileSpec, 4096, "%s/%sInfo.plist", dirSpec, (bundleType == kCFBundleType2) ? "Contents/" : "");
 	}
 
 	length = LoadFile(gFileSpec);
-	if (length == -1) {
+	if (length == -1)
+	{
 		break;
 	}
 	length = length + 1;
 	buffer = malloc(length);
-	if (buffer == 0) {
+	if (buffer == 0)
+	{
 		break;
 	}
 	strlcpy(buffer, (char *)kLoadAddr, length);
@@ -566,7 +579,8 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	module->bundlePathLength = bundlePathLength;
 	module->plistAddr = malloc(length);
 
-	if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0)) {
+	if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
+	{
 		break;
 	}
 

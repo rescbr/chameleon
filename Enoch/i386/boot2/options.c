@@ -1104,8 +1104,10 @@ int getBootOptions(bool firstRun)
 			// New behavior:
 			// Switch between text & graphic interfaces
 			// Only Permitted if started in graphics interface
-			if (useGUI) {
-				if (bootArgs->Video.v_display != VGA_TEXT_MODE) {
+			if (useGUI)
+			{
+				if (bootArgs->Video.v_display != VGA_TEXT_MODE)
+				{
 					setVideoMode(VGA_TEXT_MODE, 0);
 
 					setCursorPosition(0, 0, 0);
@@ -1121,7 +1123,8 @@ int getBootOptions(bool firstRun)
 					nextRow = kMenuTopRow;
 					showPrompt = true;
 
-					if (gDeviceCount) {
+					if (gDeviceCount)
+					{
 						printf("Use \30\31 keys to select the startup volume.");
 						showMenu(menuItems, gDeviceCount, selectIndex, kMenuTopRow + 2, kMenuMaxItems);
 						nextRow += MIN(gDeviceCount, kMenuMaxItems) + 3;
@@ -1130,7 +1133,9 @@ int getBootOptions(bool firstRun)
 					showPrompt = (gDeviceCount == 0) || (menuBVR->flags & kBVFlagNativeBoot);
 					showBootPrompt(nextRow, showPrompt);
 					//changeCursor( 0, kMenuTopRow, kCursorTypeUnderline, 0 );
-				} else {
+				}
+				else
+				{
 					gui.redraw = true;
 					setVideoMode(GRAPHICS_MODE, 0);
 					updateVRAM();
@@ -1518,7 +1523,7 @@ int processBootOptions()
 void showTextBuffer(char *buf_orig, int size)
 {
 	char	*bp;
-	char* buf;
+	char	*buf;
 	int	line;
 	int	line_offset;
 	int	c;

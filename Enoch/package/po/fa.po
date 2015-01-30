@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "POT-Creation-Date: 2015-01-01 21:43+0000\n"
-"PO-Revision-Date: 2014-01-05 13:57+0000\n"
+"PO-Revision-Date: 2015-01-18 03:33-0000\n"
 "Last-Translator: minlite <miromarkarian@gmail.com>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: fa\n"
@@ -601,7 +601,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:126
 #, no-wrap
 msgid "PrivateData=No"
-msgstr ""
+msgstr "‏PrivateData=No"
 
 #. type: "PrivateData_description"
 #: Resources/templates/Localizable.strings:127
@@ -613,7 +613,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:131
 #, no-wrap
 msgid "USBBusFix=Yes"
-msgstr ""
+msgstr "‏USBBusFix=Yes"
 
 #. type: "USBBusFix_description"
 #: Resources/templates/Localizable.strings:132
@@ -623,10 +623,9 @@ msgstr ""
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:134
-#, fuzzy, no-wrap
-#| msgid "LegacyLogo=Yes"
+#, no-wrap
 msgid "USBLegacyOff=Yes"
-msgstr "LegacyLogo=Yes"
+msgstr "‏LegacyLogo=YesUSBLegacyOff=Yes"
 
 #. type: "USBLegacyOff_description"
 #: Resources/templates/Localizable.strings:135
@@ -636,10 +635,9 @@ msgstr ""
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:137
-#, fuzzy, no-wrap
-#| msgid "LegacyLogo=Yes"
+#, no-wrap
 msgid "XHCILegacyOff=Yes"
-msgstr "LegacyLogo=Yes"
+msgstr "‏XHCILegacyOff=Yes"
 
 #. type: "XHCILegacyOff_description"
 #: Resources/templates/Localizable.strings:138
@@ -651,7 +649,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:140
 #, no-wrap
 msgid "UHCIreset=Yes"
-msgstr ""
+msgstr "‏UHCIreset=Yes"
 
 #. type: "UHCIreset_description"
 #: Resources/templates/Localizable.strings:141
@@ -2317,7 +2315,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:635
 #, no-wrap
 msgid "npci=0x2000"
-msgstr ""
+msgstr "‏npci=0x2000"
 
 #. type: "Npci_description"
 #: Resources/templates/Localizable.strings:636
@@ -2329,7 +2327,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:638
 #, no-wrap
 msgid "npci=0x3000"
-msgstr ""
+msgstr "‏npci=0x3000"
 
 #. type: "Npci3_description"
 #: Resources/templates/Localizable.strings:639
@@ -2356,7 +2354,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:646
 #, no-wrap
 msgid "darkwake=0"
-msgstr ""
+msgstr "‏darkwake=0"
 
 #. type: "Darkwake_description"
 #: Resources/templates/Localizable.strings:647
@@ -2368,7 +2366,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:649
 #, no-wrap
 msgid "nvda_drv=1"
-msgstr ""
+msgstr "‏nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
 #: Resources/templates/Localizable.strings:650
@@ -2384,7 +2382,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:655
 #, no-wrap
 msgid "kext-dev-mode=1"
-msgstr ""
+msgstr "‏kext-dev-mode=1"
 
 #. type: "kext-dev-mode1_description"
 #: Resources/templates/Localizable.strings:656
@@ -2396,7 +2394,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:658
 #, no-wrap
 msgid "dart=0"
-msgstr ""
+msgstr "‏dart=0"
 
 #. type: "Dart0_description"
 #: Resources/templates/Localizable.strings:659

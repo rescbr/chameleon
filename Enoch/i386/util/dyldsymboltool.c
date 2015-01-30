@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2010 Evan Lojewski. All rights reserved.
+ * Copyright (c) 2010-2015 Evan Lojewski. All rights reserved.
  *	
  *	dyldsymboltool
  *
@@ -22,18 +22,18 @@
 
 typedef struct symbols_dylib
 {
-	struct mach_header		header;
+	struct mach_header	header;
 	struct dylib_command	dylib_info;
-	char					module_name[sizeof(DYLIB_NAME)];	
+	char			module_name[sizeof(DYLIB_NAME)];
 	struct symtab_command	symtab;
 } symbols_dylib_t;
 
 
 typedef struct symbolList_t
 {
-	char*					name;
-	uint32_t				addr;
-	int						pos;
+	char			*name;
+	uint32_t		addr;
+	int			pos;
 	struct symbolList_t*	next;
 } symbolList_t;
 
@@ -116,9 +116,9 @@ int main(int argc, char *argv[])
         
         //exit(1);
 	}
-    else
-    {
-        add_symbol(&symbols, START_SYMBOL, start_addr);
+	else
+	{
+		add_symbol(&symbols, START_SYMBOL, start_addr);
 	}
 	
 	/* Header command info */
@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
 	dylib.dylib_info.cmd = LC_ID_DYLIB;
 	dylib.dylib_info.cmdsize = sizeof(struct dylib_command) + sizeof(dylib.module_name);	// todo: verify
 	dylib.dylib_info.dylib.name.offset = sizeof(struct dylib_command);
-	dylib.dylib_info.dylib.timestamp = 0;	// TODO: populate with time
-	dylib.dylib_info.dylib.current_version = 0;			// TODO
-	dylib.dylib_info.dylib.compatibility_version = 0;	// TODO
+	dylib.dylib_info.dylib.timestamp = 0;							// TODO: populate with time
+	dylib.dylib_info.dylib.current_version = 0;						// TODO
+	dylib.dylib_info.dylib.compatibility_version = 0;					// TODO
 	
 	
 	//int offset = dylib.dylib_info.cmdsize%4 ? 4 - (dylib.dylib_info.cmdsize % 4) : 0;
@@ -153,9 +153,8 @@ int main(int argc, char *argv[])
 	dylib.symtab.stroff = sizeof(dylib) + dylib.symtab.nsyms * sizeof(struct nlist);
 	dylib.symtab.strsize = string_size(symbols);
 	dylib.symtab.cmdsize = sizeof(struct symtab_command);
-	
-	
-    
+
+
 	FILE* outfile = fopen(argv[argc-1], "w");
 	fwrite(&dylib,	sizeof(dylib)	/* Sizeof header + module name */
 					, 1, outfile);
@@ -183,7 +182,7 @@ int main(int argc, char *argv[])
 	}
 
 	fwrite(orig,	 
-					dylib.symtab.stroff	+					// Sizeof symbol nlists 
+					dylib.symtab.stroff	+			// Sizeof symbol nlists 
 					dylib.symtab.strsize - sizeof(dylib) + 1	// sizeof symbol strings
 					, 1, outfile);
 
@@ -193,7 +192,7 @@ int main(int argc, char *argv[])
 	exit(0);
 }
 
-int num_symbols(symbolList_t* list)
+int num_symbols(symbolList_t *list)
 {
 	int retVal = 0;
 	while(list)
@@ -204,7 +203,7 @@ int num_symbols(symbolList_t* list)
 	return retVal;
 }
 
-int string_size(symbolList_t* list)
+int string_size(symbolList_t *list)
 {
 	int retVal = 0;
 	while(list)
@@ -216,7 +215,7 @@ int string_size(symbolList_t* list)
 	
 }
 
-void add_symbol(symbolList_t** list, char* name, uint32_t addr)
+void add_symbol(symbolList_t **list, char *name, uint32_t addr)
 {
 	symbolList_t* entry = malloc(sizeof(symbolList_t));
 	entry->next = (*list);
