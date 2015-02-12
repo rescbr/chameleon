@@ -413,7 +413,7 @@ typedef struct _PlatformInfo_t
 
 	uint8_t				Type;			// system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;			// system-id (SMBIOS Table 1: system uuid)
-
+//	uint32_t			HWSignature;		// machine-signature (FACS: Hardware Signature)
 } PlatformInfo_t;
 
 extern PlatformInfo_t Platform;

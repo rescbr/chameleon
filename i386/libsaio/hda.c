@@ -3,6 +3,7 @@
  *
  *	Copyright (C) 2012	Chameleon Team
  *	Edit by Fabio (ErmaC)
+ *	HDA bus scans and codecs enumeration by Zenith432
  *
  *	HDA injector is free software: you can redistribute it and/or modify
  *	it under the terms of the GNU General Public License as published by
@@ -66,7 +67,7 @@
 #include "platform.h"
 #include "device_inject.h"
 #include "hda.h"
-#include "aml_generator.h"
+//#include "aml_generator.h"
 
 #ifndef DEBUG_HDA
 #define DEBUG_HDA 0
@@ -86,7 +87,7 @@ uint8_t default_HDEF_layout_id[]		=	{0x0C, 0x00, 0x00, 0x00};
 #define HDEF_LEN ( sizeof(default_HDEF_layout_id) / sizeof(uint8_t) )
 uint8_t default_HDAU_layout_id[]		=	{0x01, 0x00, 0x00, 0x00};
 #define HDAU_LEN ( sizeof(default_HDAU_layout_id) / sizeof(uint8_t) )
-uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
+static uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 /* Structures */
 
@@ -553,11 +554,15 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	struct		DevPropDevice	*device = NULL;
 	char		*devicepath = NULL;
 	char		*controller_name = NULL;
-	int         len;
+	int		len;
 	uint8_t		BuiltIn = 0x00;
 	uint16_t	controller_vendor_id = hda_dev->vendor_id;
 	uint16_t	controller_device_id = hda_dev->device_id;
 	const char	*value;
+
+	verbose("\n------------------------\n");
+	verbose("\tAUDIO DEVICE INFO\n");
+	verbose("-------------------------\n");
 
 	devicepath = get_pci_dev_path(hda_dev);
 	controller_name = get_hda_controller_name(controller_device_id, controller_vendor_id);
@@ -582,10 +587,6 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		return 0;
 	}
 	devprop_add_hda_template(device);
-
-	verbose("\n--------------------------------\n");
-	verbose("- AUDIO DEVICE INFO -\n");
-	verbose("--------------------------------\n");
 
 	switch ((controller_device_id << 16) | controller_vendor_id)
 	{
@@ -679,12 +680,12 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
                            default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
 	}
 
-            devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
-            devprop_add_value(device, "@0,connector-type", connector_type_value, 4);
-            devprop_add_value(device, "@1,connector-type", connector_type_value, 4);
-            devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
-            devprop_add_value(device, "built-in", &BuiltIn, 1);
-            break;
+	devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
+	devprop_add_value(device, "@0,connector-type", connector_type_value, 4);
+	devprop_add_value(device, "@1,connector-type", connector_type_value, 4);
+	devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+	devprop_add_value(device, "built-in", &BuiltIn, 1);
+	break;
 
 	/*************************************************************************************************************
 	* The above case are intended as for HDAU (ATi) device onboard audio for GFX card with Audio controller HDMi

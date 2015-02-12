@@ -65,7 +65,8 @@
 bool setup_hda_devprop(pci_dt_t *hda_dev);
 
 struct hda_controller_devices;
-typedef struct {
+typedef struct
+{
 	uint32_t	model;
 	char		*desc;
 	// char		quirks_on;
@@ -74,10 +75,11 @@ typedef struct {
 
 /*
 struct hdacc_codecs;
-typedef struct {
-    uint32_t cid;
-    uint16_t revid;
-    char *name;
+typedef struct
+{
+	uint32_t cid;
+	uint16_t revid;
+	char *name;
 } hdacc_codecs;
 */
 
