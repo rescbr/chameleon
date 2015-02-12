@@ -25,7 +25,7 @@
  * It pauses until the value is latched in the counter
  * and then reads the time stamp counter to return to the caller.
  */
-uint64_t timeRDTSC(void)
+static uint64_t timeRDTSC(void)
 {
 	int		attempts = 0;
 	uint64_t    latchTime;
@@ -250,7 +250,10 @@ void scan_cpu(PlatformInfo_t *p)
 
 	uint32_t	max_ratio		= 0;
 	uint32_t	min_ratio		= 0;
-	uint32_t	reg[4];
+	uint32_t	reg[4]; //		= {0, 0, 0, 0};
+	uint32_t	cores_per_package	= 0;
+	uint32_t	logical_per_package	= 1;
+	uint32_t	threads_per_core	= 1;
 
 	uint8_t		bus_ratio_max		= 0;
 	uint8_t		bus_ratio_min		= 0;
@@ -261,27 +264,64 @@ void scan_cpu(PlatformInfo_t *p)
 
 	const char	*newratio;
 	char		str[128];
+	char		*s			= 0;
 
 	int		len			= 0;
 	int		myfsb			= 0;
+	int		i			= 0;
 
 	/* get cpuid values */
-	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
-	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]);
+	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
+	p->CPU.Vendor = p->CPU.CPUID[CPUID_0][ebx];
 
-	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]);
-	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]);
+	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
+
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((bit(28) & p->CPU.CPUID[CPUID_1][edx]) != 0)) // Intel && HTT/Multicore
+	{
+		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
+	}
+
+	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
+
+	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
+
+	/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
+	if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
+	{
+		for (i = 0; i < 0xFF; i++) // safe loop
+		{
+			do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
+			if (bitfield(reg[eax], 4, 0) == 0)
+			{
+				break;
+			}
+			//cores_per_package = bitfield(reg[eax], 31, 26) + 1;
+		}
+	}
+
 	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
 
-	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5)
+	if (i > 0)
+	{
+		cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
+		threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
+	}
+
+	if (cores_per_package == 0)
+	{
+		cores_per_package = 1;
+	}
+
+	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) // Monitor/Mwait
 	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
-	if (p->CPU.CPUID[CPUID_0][0] >= 6)
+	if (p->CPU.CPUID[CPUID_0][0] >= 6) // Thermal/Power
 	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}
+
+	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
 	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
 	{
 		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
@@ -292,19 +332,7 @@ void scan_cpu(PlatformInfo_t *p)
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
-// #if DEBUG_CPU
-	{
-		int		i;
-		DBG("CPUID Raw Values:\n");
-		for (i = 0; i < CPUID_MAX; i++) {
-			DBG("%02d: %08x-%08x-%08x-%08x\n", i,
-				   p->CPU.CPUID[i][0], p->CPU.CPUID[i][1],
-				   p->CPU.CPUID[i][2], p->CPU.CPUID[i][3]);
-		}
-	}
-// #endif
-
-/*
+/*  http://www.flounder.com/cpuid_explorer2.htm
     EAX (Intel):
     31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
     +--------+----------------+--------+----+----+--------+--------+--------+
@@ -329,73 +357,10 @@ void scan_cpu(PlatformInfo_t *p)
 
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 
-	if (p->CPU.Vendor == CPUID_VENDOR_INTEL &&
-		p->CPU.Family == 0x06 &&
-		p->CPU.Model >= CPUID_MODEL_NEHALEM &&
-		p->CPU.Model != CPUID_MODEL_ATOM		// MSR is *NOT* available on the Intel Atom CPU
-		)
-	{
-		/*
-		 * Find the number of enabled cores and threads
-		 * (which determines whether SMT/Hyperthreading is active).
-		 */
-		switch (p->CPU.Model)
-		{
-			case CPUID_MODEL_NEHALEM:
-			case CPUID_MODEL_FIELDS:
-			case CPUID_MODEL_DALES:
-			case CPUID_MODEL_NEHALEM_EX:
-			case CPUID_MODEL_JAKETOWN:
-			case CPUID_MODEL_SANDYBRIDGE:
-			case CPUID_MODEL_IVYBRIDGE:
-			case CPUID_MODEL_HASWELL:
-			case CPUID_MODEL_HASWELL_SVR:
-			//case CPUID_MODEL_HASWELL_H:
-			case CPUID_MODEL_HASWELL_ULT:
-			case CPUID_MODEL_CRYSTALWELL:
-				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-				p->CPU.NoCores		= (uint8_t)bitfield((uint32_t)msr, 31, 16);
-				p->CPU.NoThreads	= (uint8_t)bitfield((uint32_t)msr, 15,  0);
-				break;
-
-			case CPUID_MODEL_DALES_32NM:
-			case CPUID_MODEL_WESTMERE:
-			case CPUID_MODEL_WESTMERE_EX:
-				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-				p->CPU.NoCores		= (uint8_t)bitfield((uint32_t)msr, 19, 16);
-				p->CPU.NoThreads	= (uint8_t)bitfield((uint32_t)msr, 15,  0);
-				break;
-
-			default:
-				p->CPU.NoCores   = bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-				p->CPU.NoThreads = (uint8_t)(p->CPU.LogicalPerPackage & 0xff);
-				//workaround for N270. I don't know why it detected wrong
-				if ((p->CPU.Model == CPUID_MODEL_ATOM) && (p->CPU.Stepping == 2))
-				{
-					p->CPU.NoCores = 1;
-				}
-				break;
-
-		} // end switch
-
-	}
-	else if (p->CPU.Vendor == CPUID_VENDOR_AMD)
-	{
-		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
-	}
-	else
-	{
-		// Use previous method for Cores and Threads
-		p->CPU.NoThreads	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-		p->CPU.NoCores		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_4][0], 31, 26) + 1;
-	}
-
 	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
 	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
 	{
-		char	 *s;
 		bzero(str, 128);
 		/*
 		 * The BrandString 48 bytes (max), guaranteed to
@@ -426,6 +391,77 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		p->CPU.BrandString[47] = '\0';
 //		DBG("Brandstring = %s\n", p->CPU.BrandString);
+	}
+
+	/*
+	 * Find the number of enabled cores and threads
+	 * (which determines whether SMT/Hyperthreading is active).
+	 */
+	switch (p->CPU.Vendor)
+	{
+		case CPUID_VENDOR_INTEL:
+			switch (p->CPU.Model)
+			{
+				case CPUID_MODEL_NEHALEM:
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_JAKETOWN:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE:
+
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
+				//case CPUID_MODEL_HASWELL_H:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_CRYSTALWELL:
+				//case CPUID_MODEL_:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+
+				case CPUID_MODEL_DALES_32NM:
+				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_WESTMERE_EX:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+			}
+
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores		= cores_per_package;
+				p->CPU.NoThreads	= logical_per_package;
+			}
+			break;
+
+		case CPUID_VENDOR_AMD:
+			p->CPU.NoCores		= (uint32_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
+			p->CPU.NoThreads	= (uint32_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores = 1;
+			}
+
+			if (p->CPU.NoThreads < p->CPU.NoCores)
+			{
+				p->CPU.NoThreads = p->CPU.NoCores;
+			}
+
+			break;
+
+		default:
+			stop("Unsupported CPU detected! System halted.");
+	}
+
+	//workaround for N270. I don't know why it detected wrong
+	// MSR is *NOT* available on the Intel Atom CPU
+	if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+	{
+			p->CPU.NoCores		= 1;
+			p->CPU.NoThreads	= 2;
 	}
 
 	/* setup features */
@@ -469,9 +505,7 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Features |= CPU_FEATURE_MSR;
 	}
 
-	//if ((bit(28) & p->CPU.CPUID[CPUID_1][3]) != 0) {
-
-	if (p->CPU.NoThreads > p->CPU.NoCores)
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && (p->CPU.NoThreads > p->CPU.NoCores))
 	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
@@ -776,21 +810,44 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.CPUFrequency = cpuFrequency;
 
 	// keep formatted with spaces instead of tabs
-	DBG("\n---------------------------------------------\n");
-   	DBG("------------------ CPU INFO -----------------\n");
-	DBG("---------------------------------------------\n");
+	DBG("\n------------------------------\n");
+   	DBG("\tCPU INFO\n");
+	DBG("------------------------------\n");
+
+	DBG("CPUID Raw Values:\n");
+	for (i = 0; i < CPUID_MAX; i++)
+	{
+		DBG("%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
+	}
+	DBG("\n");
 	DBG("Brand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
-	DBG("Vendor:                  0x%x\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
-	DBG("Family:                  0x%x\n",		p->CPU.Family);			// Family ex: 6 (06h)
-	DBG("ExtFamily:               0x%x\n",		p->CPU.ExtFamily);
-	DBG("Signature:               %x\n",		p->CPU.Signature);		// CPUID signature
-	DBG("Model:                   0x%x\n",		p->CPU.Model);			// Model ex: 37 (025h)
-	DBG("ExtModel:                0x%x\n",		p->CPU.ExtModel);
-	DBG("Stepping:                0x%x\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
-	DBG("MaxCoef:                 0x%x\n",		p->CPU.MaxCoef);
-	DBG("CurrCoef:                0x%x\n",		p->CPU.CurrCoef);
-	DBG("MaxDiv:                  0x%x\n",		p->CPU.MaxDiv);
-	DBG("CurrDiv:                 0x%x\n",		p->CPU.CurrDiv);
+	DBG("Vendor:                  0x%X\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
+	DBG("Family:                  0x%X\n",		p->CPU.Family);			// Family ex: 6 (06h)
+	DBG("ExtFamily:               0x%X\n",		p->CPU.ExtFamily);
+	DBG("Signature:               0x%08X\n",	p->CPU.Signature);		// CPUID signature
+	/*switch (p->CPU.Type) {
+		case PT_OEM:
+			DBG("Processor type:          Intel Original OEM Processor\n");
+			break;
+		case PT_OD:
+			DBG("Processor type:          Intel Over Drive Processor\n");
+			break;
+		case PT_DUAL:
+			DBG("Processor type:          Intel Dual Processor\n");
+			break;
+		case PT_RES:
+			DBG("Processor type:          Intel Reserved\n");
+			break;
+		default:
+			break;
+	}*/
+	DBG("Model:                   0x%X\n",		p->CPU.Model);			// Model ex: 37 (025h)
+	DBG("ExtModel:                0x%X\n",		p->CPU.ExtModel);
+	DBG("Stepping:                0x%X\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
+	DBG("MaxCoef:                 %d\n",		p->CPU.MaxCoef);
+	DBG("CurrCoef:                %d\n",		p->CPU.CurrCoef);
+	DBG("MaxDiv:                  %d\n",		p->CPU.MaxDiv);
+	DBG("CurrDiv:                 %d\n",		p->CPU.CurrDiv);
 	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
 	DBG("FSBFreq:                 %dMHz\n",		p->CPU.FSBFrequency / 1000000);
 	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
