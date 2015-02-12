@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 Evan Lojewski. All rights reserved.
+ * Copyright 2010-2015 Evan Lojewski. All rights reserved.
  *
  */
 #include "boot.h"
@@ -33,9 +33,9 @@ static UInt64 textAddress = 0;
 static UInt64 textSection = 0;
 
 /** Internal symbols, however there are accessor methods **/
-moduleHook_t* moduleCallbacks = NULL;
-moduleList_t* loadedModules = NULL;
-symbolList_t* moduleSymbols = NULL;
+moduleHook_t *moduleCallbacks = NULL;
+moduleList_t *loadedModules = NULL;
+symbolList_t *moduleSymbols = NULL;
 unsigned int (*lookup_symbol)(const char*) = NULL;
 
 char *strrchr(const char *s, int c)
@@ -142,9 +142,9 @@ int init_module_system()
 	return retVal;
 }
 
-void start_built_in_module(const char* name,
-                           const char* author,
-                           const char* description,
+void start_built_in_module(const char *name,
+                           const char *author,
+                           const char *description,
                            UInt32 version,
                            UInt32 compat,
                            void(*start_function)(void))

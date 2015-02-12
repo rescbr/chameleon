@@ -44,7 +44,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				}
 				break;
 				
-			case PCI_CLASS_NETWORK_ETHERNET: 
+			case PCI_CLASS_NETWORK_ETHERNET:
 				if (do_eth_devprop)
 				{
 					set_eth_builtin(current);

@@ -17,15 +17,13 @@
 
 
 void patchVideoBios()
-{		
+{
 	UInt32 x = 0, y = 0, bp = 0;
 	
 	verbose("Resolution:\n");
 	getResolution(&x, &y, &bp);
 	
-	if (x != 0 &&
-		y != 0 && 
-		bp != 0)
+	if (x != 0 && y != 0 && bp != 0)
 	{
 		vbios_map * map;
 		
@@ -33,11 +31,11 @@ void patchVideoBios()
 		if(map)
 		{
 			unlock_vbios(map);
-			
+
 			set_mode(map, x, y, bp, 0, 0);
-			
+
 			relock_vbios(map);
-			
+
 			close_vbios(map);
 		}
 	}
@@ -190,7 +188,7 @@ chipset_type get_chipset(UInt32 id)
 		case 0x01048086: // 2nd Generation Core Processor Family DRAM Controller
 		case 0x01088086: // Xeon E3-1200 2nd Generation Core Processor Family DRAM Controller
 		case 0x010c8086: // Xeon E3-1200 2nd Generation Core Processor Family DRAM Controller
-			
+
 		case 0x01508086: // 3rd Generation Core Processor Family DRAM Controller
 		case 0x01548086: // 3rd Generation Core Processor Family DRAM Controller
 		case 0x01588086: // 3rd Generation Core Processor Family DRAM Controller
@@ -198,7 +196,6 @@ chipset_type get_chipset(UInt32 id)
 			verbose(" core proc identified\n");
 			type = CT_CORE_PROC;
 			break;
-			
 			
 		default:
 			if((id & 0x0000FFFF) == 0x00008086) // Intel chipset
@@ -215,6 +212,7 @@ chipset_type get_chipset(UInt32 id)
 			}
 			break;
 	}
+
 	return type;
 }
 
@@ -236,6 +234,7 @@ vbios_resolution_type3 * map_type3_resolution(vbios_map * map, UInt16 res)
 	return ptr;
 }
 
+char detect_bios_type(vbios_map * map, char modeline, int entry_size);
 char detect_bios_type(vbios_map * map, char modeline, int entry_size)
 {
 	UInt32 i;
@@ -256,8 +255,8 @@ char detect_bios_type(vbios_map * map, char modeline, int entry_size)
 				r2 = map->mode_table[i].resolution;
 			}
 		}
-		
-		/*printf("r1 = %d  r2 = %d\n", r1, r2);*/
+
+		//printf("r1 = %d  r2 = %d\n", r1, r2);
 	}
 	
 	return (r2-r1-6) % entry_size == 0;
@@ -275,6 +274,10 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 {
 	UInt32 z;
 	vbios_map * map = malloc(sizeof(vbios_map));
+	if (!map)
+	{
+		return 0;
+	}
 	for(z=0; z<sizeof(vbios_map); z++) ((char*)map)[z]=0;
 	/*
 	 * Determine chipset
@@ -336,15 +339,20 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		}
 		map->mode_table_size = std_vesa->sHeader.usStructureSize - sizeof(ATOM_COMMON_TABLE_HEADER);
 		
-		if (!detect_ati_bios_type(map)) map->bios = BT_ATI_2;
-		
-		if (map->bios == BT_ATI_1) {
+		if (!detect_ati_bios_type(map))
+		{
+			map->bios = BT_ATI_2;
+		}
+
+		if (map->bios == BT_ATI_1)
+		{
 			verbose(", BT_ATI_1\n");
 		} else {
 			verbose(", BT_ATI_2\n");
 		}
 	}
-	else {
+	else
+	{
 		
 		/*
 		 * check if we have NVIDIA
@@ -365,7 +373,7 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 				NV_VESA_TABLE * std_vesa;
 				
 				int i = 0;
-				
+
 				while (i < 0x300)
 				{ //We don't need to look for the table in the whole bios, the 768 first bytes only
 					if ((	map->bios_ptr[i] == 0x44) 
@@ -400,27 +408,25 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 		}
 	}
 	
-	
+
 	/*
 	 * check if we have Intel
 	 */
-	
+
 	/*if (map->chipset == CT_UNKNOWN && memmem(map->bios_ptr, VBIOS_SIZE, INTEL_SIGNATURE, strlen(INTEL_SIGNATURE))) {
 	 printf( "Intel chipset detected.  However, 915resolution was unable to determine the chipset type.\n");
-	 
+
 	 printf("Chipset Id: %x\n", map->chipset_id);
-	 
+
 	 printf("Please report this problem to stomljen@yahoo.com\n");
-	 
+
 	 close_vbios(map);
 	 return 0;
 	 }*/
-	
+
 	/*
 	 * check for others
 	 */
-	
-
 	
 	/*
 	 * Figure out where the mode table is 
@@ -443,8 +449,8 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 			
 			p++;
 		}
-		
-		if (map->mode_table == 0) 
+
+		if (map->mode_table == 0)
 		{
 			close_vbios(map);
 			return 0;
@@ -503,7 +509,7 @@ void close_vbios(vbios_map * map)
 
 void unlock_vbios(vbios_map * map)
 {
-	
+
 	map->unlocked = TRUE;
 
 	switch (map->chipset) {
@@ -556,6 +562,8 @@ void unlock_vbios(vbios_map * map)
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000080);
 			outb(CONFIG_MECH_ONE_DATA + 1, 0x33);
 			outb(CONFIG_MECH_ONE_DATA + 2, 0x33);
+			break;
+		default:
 			break;
 	}
 	
@@ -614,6 +622,7 @@ void relock_vbios(vbios_map * map)
 			outl(CONFIG_MECH_ONE_ADDR, 0x80000080);
 			outb(CONFIG_MECH_ONE_DATA + 1, map->b1);
 			outb(CONFIG_MECH_ONE_DATA + 2, map->b2);
+		default:
 			break;
 	}
 	
@@ -647,7 +656,7 @@ int getMode(edid_mode *mode)
 	mode->v_sync_offset = (edidInfo[65] & 0x0C) | ((edidInfo[64] & 0x0C) >> 2);
 	mode->v_sync_width = ((edidInfo[65] & 0x3) << 2) | (edidInfo[64] & 0x03);
 */		
-		
+
 	free( edidInfo );
 		
 	return 0;
@@ -666,7 +675,7 @@ static void gtf_timings(UInt32 x, UInt32 y, UInt32 freq,
 	vfreq = vbl * freq;
 	hbl = 16 * (int)(x * (30.0 - 300000.0 / vfreq) /
 					 +            (70.0 + 300000.0 / vfreq) / 16.0 + 0.5);
-	
+
 	*vsyncstart = y;
 	*vsyncend = y + 3;
 	*vblank = vbl - 1;
@@ -694,8 +703,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			verbose("BT_1 patched.\n");
 			vbios_resolution_type1 * res = map_type1_resolution(map, map->mode_table[i].resolution);
 			
-			if (bp) {
-				map->mode_table[i].bits_per_pixel = bp;
+			if (bp)
+			{
+				map->mode_table[i].bits_per_pixel = (uint8_t)bp;
 			}
 			
 			res->x2 = (htotal?(((htotal-x) >> 8) & 0x0f) : (res->x2 & 0x0f)) | ((x >> 4) & 0xf0);
@@ -704,28 +714,31 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			res->y2 = (vtotal?(((vtotal-y) >> 8) & 0x0f) : (res->y2 & 0x0f)) | ((y >> 4) & 0xf0);
 			res->y1 = (y & 0xff);
 			if (htotal)
+			{
 				res->x_total = ((htotal-x) & 0xff);
-			
+			}
 			if (vtotal)
+			{
 				res->y_total = ((vtotal-y) & 0xff);
-			
+			}
 			break;
 		}
 		case BT_2:
 		{
 			vbios_resolution_type2 * res = map_type2_resolution(map, map->mode_table[i].resolution);
 			
-			res->xchars = x / 8;
-			res->ychars = y / 16 - 1;
+			res->xchars = (uint8_t)(x / 8);
+			res->ychars = (uint8_t)(y / 16 - 1);
 			xprev = res->modelines[0].x1;
 			yprev = res->modelines[0].y1;
 			
 			for(j=0; j < 3; j++) {
 				vbios_modeline_type2 * modeline = &res->modelines[j];
 				
-				if (modeline->x1 == xprev && modeline->y1 == yprev) {
-					modeline->x1 = modeline->x2 = x-1;
-					modeline->y1 = modeline->y2 = y-1;
+				if (modeline->x1 == xprev && modeline->y1 == yprev)
+				{
+					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
+					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
 					gtf_timings(x, y, freqs[j], &modeline->clock,
 								&modeline->hsyncstart, &modeline->hsyncend,
@@ -733,14 +746,21 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 								&modeline->vsyncend, &modeline->vblank);
 					
 					if (htotal)
-						modeline->htotal = htotal;
+					{
+						modeline->htotal = (uint16_t)htotal;
+					}
 					else
+					{
 						modeline->htotal = modeline->hblank;
-					
+					}
 					if (vtotal)
-						modeline->vtotal = vtotal;
+					{
+						modeline->vtotal = (uint16_t)vtotal;
+					}
 					else
+					{
 						modeline->vtotal = modeline->vblank;
+					}
 				}
 			}
 			verbose("BT_1 patched.\n");
@@ -753,28 +773,37 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			xprev = res->modelines[0].x1;
 			yprev = res->modelines[0].y1;
 			
-			for (j=0; j < 3; j++) {
+			for (j=0; j < 3; j++)
+			{
 				vbios_modeline_type3 * modeline = &res->modelines[j];
 				
-				if (modeline->x1 == xprev && modeline->y1 == yprev) {
-					modeline->x1 = modeline->x2 = x-1;
-					modeline->y1 = modeline->y2 = y-1;
+				if (modeline->x1 == xprev && modeline->y1 == yprev)
+				{
+					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
+					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
 					gtf_timings(x, y, freqs[j], &modeline->clock,
 								&modeline->hsyncstart, &modeline->hsyncend,
 								&modeline->hblank, &modeline->vsyncstart,
 								&modeline->vsyncend, &modeline->vblank);
 					if (htotal)
-						modeline->htotal = htotal;
+					{
+						modeline->htotal = (uint16_t)htotal;
+					}
 					else
+					{
 						modeline->htotal = modeline->hblank;
+					}
 					if (vtotal)
-						modeline->vtotal = vtotal;
+					{
+						modeline->vtotal = (uint16_t)vtotal;
+					}
 					else
+					{
 						modeline->vtotal = modeline->vblank;
-					
-					modeline->timing_h   = y-1;
-					modeline->timing_v   = x-1;
+					}
+					modeline->timing_h   = (uint16_t)(y-1);
+					modeline->timing_v   = (uint16_t)(x-1);
 				}
 			}
 			verbose("BT_3 patched.\n");
@@ -787,8 +816,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				
 			ATOM_MODE_TIMING *mode_timing = (ATOM_MODE_TIMING *) map->ati_mode_table;
 
-			//if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force) {
-			if (!getMode(&mode)) {
+			//if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force){
+			if (!getMode(&mode))
+			{
 				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode 0 patched!\n", mode.h_active, mode.v_active);
 				mode_timing->usCRTC_H_Total = mode.h_active + mode.h_blanking;
 				mode_timing->usCRTC_H_Disp = mode.h_active;
@@ -801,7 +831,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usCRTC_V_SyncWidth = mode.v_sync_width;
 
 				mode_timing->usPixelClock = mode.pixel_clock;
-			} else {
+			}
+			else
+			{
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
@@ -825,7 +857,7 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 												
 				mode_timing->usPixelClock = modeline.clock;
 			 }*/
-	
+
 			break;
 		}
 		case BT_ATI_2:
@@ -836,7 +868,8 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			ATOM_DTD_FORMAT *mode_timing = (ATOM_DTD_FORMAT *) map->ati_mode_table;
 			
 			/*if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force) {*/
-			if (!getMode(&mode)) {
+			if (!getMode(&mode))
+			{
 				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode 0 patched!\n", mode.h_active, mode.v_active);
 				mode_timing->usHBlanking_Time = mode.h_blanking;
 				mode_timing->usHActive = mode.h_active;
@@ -849,7 +882,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usVSyncWidth = mode.v_sync_width;
 										
 				mode_timing->usPixClk = mode.pixel_clock;
-			} else {
+			}
+			else
+			{
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
@@ -862,30 +897,29 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 							&modeline.vsyncend, &modeline.vblank, 0);
 											
 				mode_timing->usHBlanking_Time = modeline.hblank;
-									 +						mode_timing->usHActive = x;
-									 +						mode_timing->usHSyncOffset = modeline.hsyncstart - x;
-									 +						mode_timing->usHSyncWidth = modeline.hsyncend - modeline.hsyncstart;
-									 +						
-									 +						mode_timing->usVBlanking_Time = modeline.vblank;
-									 +						mode_timing->usVActive = y;
-									 +						mode_timing->usVSyncOffset = modeline.vsyncstart - y;
-									 +						mode_timing->usVSyncWidth = modeline.hsyncend - modeline.hsyncstart;
-									 +						
-									 +						mode_timing->usPixClk = modeline.clock;
-									 +					}*/
-				
-			
+											mode_timing->usHActive = x;
+											mode_timing->usHSyncOffset = modeline.hsyncstart - x;
+											mode_timing->usHSyncWidth = modeline.hsyncend - modeline.hsyncstart;
+											
+											mode_timing->usVBlanking_Time = modeline.vblank;
+											mode_timing->usVActive = y;
+											mode_timing->usVSyncOffset = modeline.vsyncstart - y;
+											mode_timing->usVSyncWidth = modeline.hsyncend - modeline.hsyncstart;
+											
+											mode_timing->usPixClk = modeline.clock;
+										}*/
+
 			break;
 		}
 		case BT_NVDA:
 		{
 			verbose("BT_NVDA");
 			edid_mode mode;
-			
 			NV_MODELINE *mode_timing = (NV_MODELINE *) map->nv_mode_table;
 			
 			/*if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force) {*/
-			if (!getMode(&mode)) {
+			if (!getMode(&mode))
+			{
 				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode %d patched!\n", mode.h_active, mode.v_active, i);
 				mode_timing[i].usH_Total = mode.h_active + mode.h_blanking;
 				mode_timing[i].usH_Active = mode.h_active;
@@ -898,28 +932,29 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing[i].usV_SyncEnd = mode.v_active + mode.v_sync_offset + mode.v_sync_width;
 				
 				mode_timing[i].usPixel_Clock = mode.pixel_clock;
-			} else {
+			}
+			 else
+			{
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
 			 {
 			 vbios_modeline_type2 modeline;
-			 
 			 cvt_timings(x, y, freqs[0], &modeline.clock,
 			 &modeline.hsyncstart, &modeline.hsyncend,
 			 &modeline.hblank, &modeline.vsyncstart,
 			 &modeline.vsyncend, &modeline.vblank, 0);
-			 
+
 			 mode_timing[i].usH_Total = x + modeline.hblank - 1;
 			 mode_timing[i].usH_Active = x;
 			 mode_timing[i].usH_SyncStart = modeline.hsyncstart - 1;
 			 mode_timing[i].usH_SyncEnd = modeline.hsyncend - 1;
-			 
+
 			 mode_timing[i].usV_Total = y + modeline.vblank - 1;
 			 mode_timing[i].usV_Active = y;
 			 mode_timing[i].usV_SyncStart = modeline.vsyncstart - 1;
 			 mode_timing[i].usV_SyncEnd = modeline.vsyncend - 1;
-			 
+
 			 mode_timing[i].usPixel_Clock = modeline.clock;
 			 }*/
 			break;
@@ -929,6 +964,8 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			verbose(" Unknown - vbios not patched\n");
 			break;
 		}
+		default:
+			break;
 	}
 	//		}
 	//	}

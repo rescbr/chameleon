@@ -1,6 +1,6 @@
 /*
  * Module Loading functionality
- * Copyright 2009 Evan Lojewski. All rights reserved.
+ * Copyright 2009-2015 Evan Lojewski. All rights reserved.
  *
  */
 
@@ -14,11 +14,11 @@
 
 #define MODULE_PATH		"/Extra/modules/"
 
-#define SYMBOLS_MODULE "Symbols.dylib"
-#define SYMBOLS_AUTHOR "Chameleon"
-#define SYMBOLS_DESCRIPTION "Chameleon symbols for linking"
-#define SYMBOLS_VERSION     0
-#define SYMBOLS_COMPAT      0
+#define SYMBOLS_MODULE		"Symbols.dylib"
+#define SYMBOLS_AUTHOR		"Chameleon"
+#define SYMBOLS_DESCRIPTION	"Chameleon symbols for linking"
+#define SYMBOLS_VERSION		0
+#define SYMBOLS_COMPAT		0
 
 #define VOID_SYMBOL		"dyld_void_start"
 
@@ -26,9 +26,9 @@
 
 typedef struct symbolList_t
 {
-	char* symbol;
-	UInt64 addr;
-	struct symbolList_t* next;
+	char			*symbol;
+	UInt64			addr;
+	struct symbolList_t	*next;
 } symbolList_t;
 
 typedef struct callbackList_t
@@ -46,12 +46,12 @@ typedef struct moduleHook_t
 
 typedef struct modulesList_t
 {
-	const char*				name;
-	const char*             author;
-	const char*             description;
-	UInt32					version;
-	UInt32					compat;
-	struct modulesList_t* next;
+	const char		*name;
+	const char		*author;
+	const char		*description;
+	UInt32			version;
+	UInt32			compat;
+	struct modulesList_t	*next;
 } moduleList_t;
 
 
@@ -59,11 +59,11 @@ typedef struct modulesList_t
 int init_module_system();
 void load_all_modules();
 
-void start_built_in_module(const char* name, 
-                           const char* author, 
-                           const char* description,
-                           UInt32 version,
-                           UInt32 compat,
+void start_built_in_module(const char	*name,
+                           const char	*author,
+                           const char	*description,
+                           UInt32	version,
+                           UInt32	compat,
                            void(*start_function)(void));
 
 int load_module(char* module);

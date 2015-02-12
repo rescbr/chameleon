@@ -147,6 +147,10 @@ int edid_checksum(unsigned char *edid)
 		/* checksum passed, everything's good */
 		err = 1;
 	}
+	else
+	{
+		msglog(" edid_checksum error ");
+	}
 	
 	return err;
 }
@@ -165,6 +169,11 @@ static int edid_check_header(unsigned char *edid)
 			err = 0;
 	}
 	
+	if (err == 0)
+	{
+		msglog(" edid_check_header error ");
+	}
+
 	return err;
 }
 //------------------------------------------------------------------------
@@ -179,11 +188,12 @@ bool verifyEDID(unsigned char *edid)
 
 int edid_is_timing_block(unsigned char *block)
 {
-	if ((block[0] != 0x00) || (block[1] != 0x00) ||
-		(block[2] != 0x00) || (block[4] != 0x00))
+	if ((block[0] != 0x00) || (block[1] != 0x00) || (block[2] != 0x00) || (block[4] != 0x00))
+	{
 		return 1;
-	else
+	} else {
 		return 0;
+	}
 }
 //----------------------------------------------------------------------------------
 
@@ -191,13 +201,19 @@ int fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UInt
 {
 	int i;
 	unsigned char *block;
-	
-	if(!verifyEDID((unsigned char *)edid)) return 0;
+
+	msglog(" Parse Edid:");
+	if(!verifyEDID((unsigned char *)edid))
+	{
+		msglog(" error\n");
+		return 0;
+	}
 	
 	block = (unsigned char *)edid + DETAILED_TIMING_DESCRIPTIONS_START; //54
 	
 	for (i = 0; i < 4; i++, block += DETAILED_TIMING_DESCRIPTION_SIZE) {
 		if (edid_is_timing_block(block)) {
+			msglog(" descriptor block %d is timing descriptor ", i);
 			var->h_active = H_ACTIVE;
 			var->v_active = V_ACTIVE;
 			var->h_sync_offset = H_SYNC_OFFSET;
@@ -237,7 +253,7 @@ int fb_parse_edid(struct EDID *edid, edid_mode* var)  //(struct EDID *edid, UInt
 void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 {
 //	int val;
-	static UInt32 xResolution, yResolution, bpResolution;
+	static UInt32 xResolution, yResolution, bpResolution = 32;	// assume 32bits
 /*
 	if(getIntForKey(kScreenWidth, &val, &bootInfo->chameleonConfig))
 	{
@@ -249,16 +265,15 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 		yResolution = val;
 	}
 */
-	bpResolution = 32;	// assume 32bits
-
-	
 	if(!xResolution || !yResolution || !bpResolution)
 	{
-		
 		char* edidInfo = readEDID();
 		
-		if(!edidInfo) return;
-		
+		if(!edidInfo)
+		{
+			return;
+		}
+
 		edid_mode mode;
 		// TODO: check *all* resolutions reported and either use the highest, or the native resolution (if there is a flag for that)
 		//xResolution =  edidInfo[56] | ((edidInfo[58] & 0xF0) << 4);  
@@ -270,7 +285,8 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 			xResolution = DEFAULT_SCREEN_WIDTH;
 			yResolution = DEFAULT_SCREEN_HEIGHT;
 		}
-		else {
+		else
+		{
 			xResolution = mode.h_active;
 			yResolution = mode.v_active;
 		}
@@ -306,6 +322,7 @@ void getResolution(UInt32* x, UInt32* y, UInt32* bp)
 	*y  = yResolution;
 	*bp = bpResolution;
 
+	msglog("Best mode: %dx%dx%d\n", *x, *y, *bp);
 }
 
 char* readEDID()
@@ -326,18 +343,18 @@ char* readEDID()
 		bzero( edidInfo, EDID_BLOCK_SIZE);
 
 		status = getEDID(edidInfo, blocks_left);
-		
+
 		/*
 		msglog("Buffer location: 0x%X status: %d\n", SEG(edidInfo) << 16 | OFF(edidInfo), status);
-		
+
 		int j, i;
-		for (j = 0; j < 8; j++) {
+		for (j = 0; j < 8; j++)
+		{
 			for(i = 0; i < 16; i++) msglog(" 0x%02X", edidInfo[((i+1) * (j + 1)) - 1]);
 			msglog("\n");
 		}
 		*/
-		
-		
+
 		if(status == 0)
 		{
 			//if( edidInfo[0] == 0x00 || edidInfo[0] == 0xFF)
@@ -346,10 +363,9 @@ char* readEDID()
 			{
 				blocks_left--;
 				int reported = edidInfo[ EDID_V1_BLOCKS_TO_GO_OFFSET ];
-				
+
 				if ( reported > blocks_left )
 				{
-					
 					msglog("EDID claims %d more blocks left\n", reported);
 				}
 				
@@ -382,28 +398,28 @@ char* readEDID()
 				return 0;
 			}
 		}
-		blocks_left = 0;	
+		blocks_left = 0;
 	} while(blocks_left);
 
 	char* ret = malloc(sizeof(edidInfo));
+	if (!ret)
+	{
+		return 0;
+	}
 	memcpy(ret, edidInfo, sizeof(edidInfo));
 	return ret;
 }
 
-
 int getEDID( void * edidBlock, UInt8 block)
 {
 	biosBuf_t bb;
-	
 	bzero(&bb, sizeof(bb));
-    bb.intno  = 0x10;
-    bb.eax.rr = 0x4F15;
+	bb.intno  = 0x10;
+	bb.eax.rr = 0x4F15;
 	bb.ebx.r.l= 0x01;
 	bb.edx.rr = block;
-	
-    bb.es     = SEG( edidBlock );
-    bb.edi.rr = OFF( edidBlock );
-	
-    bios( &bb );
-    return(bb.eax.r.h);
+	bb.es     = SEG( edidBlock );
+	bb.edi.rr = OFF( edidBlock );
+	bios( &bb );
+	return(bb.eax.r.h);
 }

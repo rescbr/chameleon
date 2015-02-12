@@ -68,7 +68,9 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 				lpc_controllers[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
 
 			if (rcba == 0)
+			{
 				printf(" RCBA disabled; cannot force enable HPET\n");
+			}
 			else
 			{
 				val = REG32(rcba, 0x3404);
@@ -91,7 +93,9 @@ void force_enable_hpet(pci_dt_t *lpc_dev)
 				// verify if the job is done
 				val = REG32(rcba, 0x3404);
 				if (!(val & 0x80))
+				{
 					printf(" Failed to force enable HPET\n");
+				}
 			}
 			break;
 		}

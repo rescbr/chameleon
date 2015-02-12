@@ -124,18 +124,21 @@ static uint64_t measure_tsc_frequency(void)
 		pollCount = poll_PIT2_gate();
 		tscEnd = rdtsc64();
 		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1) {
+		if (pollCount <= 1)
+		{
 			continue;
 		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the TSC delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
-		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC) {
+		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC)
+		{
 			continue;
 		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (tscEnd - tscStart) < tscDelta ) {
+		if ( (tscEnd - tscStart) < tscDelta )
+		{
 			tscDelta = tscEnd - tscStart;
 		}
 	}
@@ -152,9 +155,12 @@ static uint64_t measure_tsc_frequency(void)
 	 * arithmetic headroom. For now, 32-bit should be enough.
 	 * Also unlike Linux, our compiler can do 64-bit integer arithmetic.
 	 */
-	if (tscDelta > (1ULL<<32)) {
+	if (tscDelta > (1ULL<<32))
+	{
 		retval = 0;
-	} else {
+	}
+	else
+	{
 		retval = tscDelta * 1000 / 30;
 	}
 	disable_PIT2();
@@ -236,28 +242,28 @@ static uint64_t measure_aperf_frequency(void)
  */
 void scan_cpu(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency	= 0;
-	uint64_t	fsbFrequency	= 0;
-	uint64_t	cpuFrequency	= 0;
-	uint64_t	msr		= 0;
-	uint64_t	flex_ratio	= 0;
+	uint64_t	tscFrequency		= 0;
+	uint64_t	fsbFrequency		= 0;
+	uint64_t	cpuFrequency		= 0;
+	uint64_t	msr			= 0;
+	uint64_t	flex_ratio		= 0;
 
-	uint32_t	max_ratio	= 0;
-	uint32_t	min_ratio	= 0;
+	uint32_t	max_ratio		= 0;
+	uint32_t	min_ratio		= 0;
 	uint32_t	reg[4];
 
-	uint8_t		bus_ratio_max	= 0;
-	uint8_t		bus_ratio_min	= 0;
-	uint8_t		currdiv		= 0;
-	uint8_t		currcoef	= 0;
-	uint8_t		maxdiv		= 0;
-	uint8_t		maxcoef		= 0;
+	uint8_t		bus_ratio_max		= 0;
+	uint8_t		bus_ratio_min		= 0;
+	uint8_t		currdiv			= 0;
+	uint8_t		currcoef		= 0;
+	uint8_t		maxdiv			= 0;
+	uint8_t		maxcoef			= 0;
 
 	const char	*newratio;
 	char		str[128];
 
-	int		len = 0;
-	int		myfsb = 0;
+	int		len			= 0;
+	int		myfsb			= 0;
 
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]);
@@ -521,20 +527,20 @@ void scan_cpu(PlatformInfo_t *p)
 					if (bitfield(msr, 16, 16))
 					{
 						flex_ratio = bitfield(msr, 15, 8);
-						/* bcc9: at least on the gigabyte h67ma-ud2h,
-						 where the cpu multipler can't be changed to
-						 allow overclocking, the flex_ratio msr has unexpected (to OSX)
-						 contents.	These contents cause mach_kernel to
-						 fail to compute the bus ratio correctly, instead
-						 causing the system to crash since tscGranularity
-						 is inadvertently set to 0.
-						 */
+						// bcc9: at least on the gigabyte h67ma-ud2h,
+						// where the cpu multipler can't be changed to
+						// allow overclocking, the flex_ratio msr has unexpected (to OSX)
+						// contents.	These contents cause mach_kernel to
+						// fail to compute the bus ratio correctly, instead
+						// causing the system to crash since tscGranularity
+						// is inadvertently set to 0.
+
 						if (flex_ratio == 0)
 						{
-							/* Clear bit 16 (evidently the presence bit) */
+							// Clear bit 16 (evidently the presence bit)
 							wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 							msr = rdmsr64(MSR_FLEX_RATIO);
-							DBG("Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
+							DBG("CPU: Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
 						}
 						else
 						{
@@ -592,7 +598,7 @@ void scan_cpu(PlatformInfo_t *p)
 						}
 					}
 					//valv: to be uncommented if Remarq.1 didn't stick
-					/*if (bus_ratio_max > 0) bus_ratio = flex_ratio;*/
+					//if (bus_ratio_max > 0) bus_ratio = flex_ratio;
 					p->CPU.MaxRatio = max_ratio;
 					p->CPU.MinRatio = min_ratio;
 
@@ -606,9 +612,9 @@ void scan_cpu(PlatformInfo_t *p)
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
 				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
 				currcoef = bitfield(msr, 12, 8);  // Bungo: reverted to 2263 state because of wrong old CPUs freq. calculating
-				/* Non-integer bus ratio for the max-multi*/
+				// Non-integer bus ratio for the max-multi
 				maxdiv = bitfield(msr, 46, 46);
-				/* Non-integer bus ratio for the current-multi (undocumented)*/
+				// Non-integer bus ratio for the current-multi (undocumented)
 				currdiv = bitfield(msr, 14, 14);
 
 				// This will always be model >= 3
@@ -619,8 +625,8 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 				else
 				{
-					/* On lower models, currcoef defines TSC freq */
-					/* XXX */
+					// On lower models, currcoef defines TSC freq
+					// XXX
 					maxcoef = currcoef;
 				}
 
@@ -753,8 +759,8 @@ void scan_cpu(PlatformInfo_t *p)
 	if (!fsbFrequency)
 	{
 		fsbFrequency = (DEFAULT_FSB * 1000);
+		DBG("CPU: fsbFrequency = 0! using the default value for FSB!\n");
 		cpuFrequency = tscFrequency;
-		DBG("0 ! using the default value for FSB !\n");
 	}
 
 	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
