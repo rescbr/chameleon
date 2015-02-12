@@ -179,6 +179,10 @@ typedef enum {
 	kOPM,
 	kIkura,
 	kIkuraS,
+	/* AMD8000Controller */
+	kBaladi,
+	kExmoor,
+	kBasset,
 	kCfgEnd
 } config_name_t;
 
@@ -228,6 +232,7 @@ card_t *card;
 #define EVERGREEN	MKFLAG(1)
 #define FLAGMOBILE	MKFLAG(2)
 #define FLAGOLD		MKFLAG(3)
+#define FLAGNOTFAKE	MKFLAG(4)
 
 /* Typedefs STRUCTS */
 typedef struct {

@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-01-01 16:16+0000\n"
-"PO-Revision-Date: 2015-01-01 16:46-0000\n"
-"Last-Translator: Marchrius <max-92@hotmail.it>\n"
+"PO-Revision-Date: 2015-02-12 21:46+0000\n"
+"Last-Translator: Gianfranco <gianfrancominischetti@gmail.com>\n"
 "Language-Team: it <it@li.org>\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1406285087.0\n"
+"X-POOTLE-MTIME: 1423777595.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -68,7 +68,7 @@ msgstr "%PKGDEV%"
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
 msgstr ""
 "Pacchetto compilato da: %WHOBUILD%, tradotto in Italiano da: ErmaC, scrax, "
-"Micky1979 e Marchrius"
+"Micky1979, Marchrius, Gianfranco Minischetti"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -467,7 +467,8 @@ msgid ""
 "Dependencies: none"
 msgstr ""
 "Il modulo KernelPatcher provvede a modificare:\n"
-"*Abilita l'uso del kernelcache con /Extra/Extensions and /Extra/Extensions.mkext\n"
+"*Abilita l'uso del kernelcache con /Extra/Extensions e "
+"/Extra/Extensions.mkext\n"
 "*Rimuove il controllo sulla ID della CPU\n"
 "*Rimuove il LAPIC panic\n"
 "*Rimuove il commpage_stuff_routine panic\n"
@@ -619,7 +620,11 @@ msgstr "ShowInfo=Yes"
 #: Resources/templates/Localizable.strings:121
 #, no-wrap
 msgid "Enables display of partition and resolution details shown on the left side of the GUI under the boot banner. This is useful information for troubleshooting, though can clash with certain themes."
-msgstr "Abilita le informazioni all'avvio di partizioni e risoluzioni."
+msgstr ""
+"Mostra i dettagli delle partizioni e delle risoluzioni sul lato sinistro "
+"della GUI, sotto il banner. Queste informazioni sono utili per la "
+"risoluzione dei problemi, sebbene possano entrare in conflitto con alcuni "
+"temi."
 
 #. type: "Wait_title"
 #: Resources/templates/Localizable.strings:123
@@ -644,6 +649,7 @@ msgstr "PrivateData=No"
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
 msgstr ""
+"Mostra dati nascosti (numero seriale) nel log bdmesg (attivato di default)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:131
@@ -655,7 +661,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:132
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "Attiva i fix XHCI, EHCI e UHCI (disattivato di default)."
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:134
@@ -668,6 +674,7 @@ msgstr "USBLegacyOff=Yes"
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
 msgstr ""
+"Forza disattivazione USB Legacy per XHCI e EHCI (disattivato di default)."
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:137
@@ -679,7 +686,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "Forza disattivazione USB Legacy per XHCI (disattivato di default)."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:140
@@ -2269,7 +2276,7 @@ msgstr "00"
 #: Resources/templates/Localizable.strings:582
 #, no-wrap
 msgid "Set HDEF PinConfiguration for ???."
-msgstr "Imposta il PinConfiguration per ???."
+msgstr "Imposta il PinConfiguration HDEF per ???."
 
 #. type: "GraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:586
@@ -2281,7 +2288,10 @@ msgstr "GraphicsEnabler=Yes"
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "Enables the option to autodetect NVIDIA, AMD/ATI or Intel based GPUs and inject the correct info."
-msgstr "Aggiunge GraphicsEnabler=Yes al org.chameleon.Boot.plist, Questa opzione abilita il riconoscimento automatico delle schede grafiche iniettanto le informazioni corrette."
+msgstr ""
+"Aggiunge GraphicsEnabler=Yes al org.chameleon.Boot.plist, Questa opzione "
+"abilita il riconoscimento automatico delle schede grafiche Nvidia, AMD/ATI o "
+"Intel, iniettando le informazioni corrette."
 
 #. type: "EnableHDMIAudio_title"
 #: Resources/templates/Localizable.strings:589
@@ -2293,7 +2303,10 @@ msgstr "EnableHDMIAudio=Yes"
 #: Resources/templates/Localizable.strings:590
 #, no-wrap
 msgid "Inject HDMi audio for NVIDIA or AMD/ATI."
-msgstr "Aggiunge EnableHDMIAudio=Yes al org.chameleon.Boot.plist, Questa opzione abilita l'audio HDMi delle schede grafiche iniettanto le informazioni corrette."
+msgstr ""
+"Aggiunge EnableHDMIAudio=Yes al org.chameleon.Boot.plist, Questa opzione "
+"abilita l'audio HDMi delle schede grafiche iniettando le informazioni "
+"corrette."
 
 #. type: "UseIntelHDMI_title"
 #: Resources/templates/Localizable.strings:592
@@ -2365,7 +2378,8 @@ msgstr "SkipNvidiaGfx=Yes"
 #: Resources/templates/Localizable.strings:608
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for NVIDIA based GPUs."
-msgstr "Salta il riconoscimento da perte del GraphicsEnabler per le schede nVidia."
+msgstr ""
+"Salta il riconoscimento da parte del GraphicsEnabler per le schede nVidia."
 
 #. type: "SkipAtiGfx_title"
 #: Resources/templates/Localizable.strings:610
@@ -2425,7 +2439,10 @@ msgstr "Modalità Verbose (-v)"
 #: Resources/templates/Localizable.strings:627
 #, no-wrap
 msgid "Turns on verbose logging and allows you to see messages from both Chameleon and the OS X kernel at boot time. Essential for troubleshooting."
-msgstr "Attiva il registro dettagliato e permette di vedere i menssaggi sia di Chameleon che del Kernel, durante l'avvio. Essenziale per la soluzione di problemi."
+msgstr ""
+"Attiva il registro dettagliato e permette di vedere i messaggi sia di "
+"Chameleon che del Kernel, durante l'avvio. Essenziale per la soluzione di "
+"problemi."
 
 #. type: "Singleusermode_title"
 #: Resources/templates/Localizable.strings:629
@@ -2461,7 +2478,9 @@ msgstr "npci=0x2000"
 #: Resources/templates/Localizable.strings:636
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x2000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
-msgstr "Imposta la flag npci=0x2000 per la key Kernel Flags."
+msgstr ""
+"Imposta la flag npci=0x2000 per la key Kernel Flags. Risolve il blocco su "
+"'PCI configuration begin' su alcuni sistemi."
 
 #. type: "Npci3_title"
 #: Resources/templates/Localizable.strings:638
@@ -2473,7 +2492,9 @@ msgstr "npci=0x3000"
 #: Resources/templates/Localizable.strings:639
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
-msgstr "Imposta la flag npci=0x3000 per la key Kernel Flags."
+msgstr ""
+"Imposta la flag npci=0x3000 per la key Kernel Flags. Risolve il blocco su "
+"'PCI configuration begin' su alcuni sistemi."
 
 #. type: "WaitingRootDevice_title"
 #: Resources/templates/Localizable.strings:641

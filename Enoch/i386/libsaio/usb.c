@@ -162,9 +162,7 @@ static int legacy_off (pci_dt_t *pci_dev)
 	DBG("Clearing USBLEGCTLSTS\n");
 	pci_config_write32(pci_dev->dev.addr, eecp + 4, 0);	//usblegctlsts
 	
-	// if delay value is in milliseconds it doesn't appear to work. 
-	// setting value to anything up to 65535 does not add the expected delay here.
-	delay(100);
+	delay(100000);
 	
 	usbcmd = *((unsigned int*)(opaddr));
 	usbsts = *((unsigned int*)(opaddr + 4));
@@ -402,7 +400,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 			timeOut = 40;
 			while (timeOut--)
 			{
-				delay(1);
+				delay(500);
 				value = *(uint32_t const volatile*) (bar0 + extendCap);
 				if (value == ~0)
 				{

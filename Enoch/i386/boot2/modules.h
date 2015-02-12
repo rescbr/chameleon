@@ -49,7 +49,6 @@ typedef struct modulesList_t
 	const char		*name;
 	const char		*author;
 	const char		*description;
-//	const void		*base;
 	UInt32			version;
 	UInt32			compat;
 	struct modulesList_t	*next;

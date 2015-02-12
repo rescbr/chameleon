@@ -28,16 +28,6 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
-
-// OS X Versions
-//#define YOSEMITE        checkOSVersion("10.10") // Yosemite
-//#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
-//#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
-//#define LION            checkOSVersion("10.7")  // Lion
-//#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
-//#define LEOPARD         checkOSVersion("10.5")  // Leopard
-//#define TIGER           checkOSVersion("10.4")  // Tiger
-
 /*
  * Paths used by chameleon
  */
@@ -119,13 +109,13 @@
 #define kEHCIhard			"EHCIhard"		/* usb.c */
 #define kDefaultPartition		"Default Partition"	/* sys.c */
 
-/* Zenith432: added this */
+/* Zenith432: added this key */
 #define kXHCILegacyOff			"XHCILegacyOff"		/* usb.c */
 
-/* Duvel300: added this */
+/* Duvel300: added this key */
 #define kRestartFix			"RestartFix"		/* acpi_patcher.c */
 
-/* Slice: added this */
+/* Slice: added these keys */
 #define kPS2RestartFix			"PS2RestartFix"		/* acpi_patcher.c */
 //#define kInjectEDID			"InjectEDID"		/* ati.c */
 //#define kCustomEDID			"CustomEDID"		/* ati.c */
@@ -136,7 +126,7 @@
 
 /* Lebidou: added this key */
 
-/* Meklort: added this key */
+/* Meklort: added these keys */
 #define kMD0Image			"md0"			/* ramdisk.h */
 #define kEnableWifi			"EnableWifi"		/* pci_setup.c */
 
@@ -156,7 +146,6 @@
 #define kDropECDT			"DropECDT"		/* acpi_patcher.c */
 #define kDropASFT			"DropASFT"		/* acpi_patcher.c */
 #define kDropDMAR			"DropDMAR"		/* acpi_patcher.c */
-#define kUpdateACPI			"UpdateACPI"		/* acpi_patcher.c */
 
 /* Mojodojo: added these keys */
 #define kGeneratePStates		"GeneratePStates"		/* acpi_patcher.c */
@@ -173,7 +162,7 @@
 #define kDcfg0				"display_0"			/* nvidia.c */
 #define kDcfg1				"display_1"			/* nvidia.c */
 
-/* Marchrius: added these keys */
+/* Marchrius: added this key */
 #define kEnableBacklight		"EnableBacklight"		/* nvidia.c */
 
 /* Kabyl: added these keys */
@@ -206,10 +195,10 @@
 #define kDropMCFG			"DropMCFG"			/* acpi_patcher.c */
 #define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
 
-/* Karas: added these keys */
+/* Karas: added this key */
 #define kMemFullInfo			"ForceFullMemInfo"		/* smbios.c */
 
-/* Bungo: added these keys */
+/* Bungo: added this key */
 #define kPrivateData			"PrivateData"			/* smbios_decode.c */
 
 

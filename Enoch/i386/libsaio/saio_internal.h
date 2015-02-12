@@ -53,7 +53,7 @@ extern void   putca(int ch, int attr, int repeat);
 extern int    readKeyboardStatus(void);
 extern int    readKeyboardShiftFlags(void);
 extern unsigned int time18(void);
-extern void   delay(int ms);
+extern void   delay(int us);
 extern unsigned int get_diskinfo(int dev);
 #if APM_SUPPORT
 extern int    APMPresent(void);

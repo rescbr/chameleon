@@ -192,8 +192,7 @@ static const char *SMBMemoryDeviceFormFactors[] =    // Bungo: strings for form 
 /*=====
  7.18.2
  ====*/
-static const char *
-SMBMemoryDeviceTypes[] =
+static const char *SMBMemoryDeviceTypes[] =
 {
 	"RAM",          /* 00h  Undefined */
 	"RAM",          /* 01h  Other */
@@ -220,7 +219,8 @@ SMBMemoryDeviceTypes[] =
 	"RAM",		/* 16h  unused */
 	"RAM",		/* 17h  unused */
 	"DDR3",		/* 18h  DDR3, chosen in [5776134] */
-	"FBD2"		/* 19h  FBD2 */
+	"FBD2",		/* 19h  FBD2 */
+	"DDR4"		/* 1Ah  DDR4 */
 };
 
 static const int kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes) / sizeof(SMBMemoryDeviceTypes[0]);
@@ -240,7 +240,7 @@ char *SMBStringForField(SMBStructHeader *structHeader, uint8_t field, const bool
 	}
 
 	return str;
-};
+}
 
 void printHeader(SMBStructHeader *structHeader)
 {
@@ -534,6 +534,9 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 	DBG("\tPart Number: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->partNumber, neverMask));
 // Rank:
 // Configured Clock Speed:
+// Minimum Voltage:
+// Maximum Voltage:
+// Configured Voltage:
 	DBG("\n");
 }
 

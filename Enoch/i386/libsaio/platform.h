@@ -35,7 +35,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
 #define CPUID_MODEL_YONAH		0x0E			// Sossaman, Yonah
 #define CPUID_MODEL_MEROM		0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
-#define CPUID_MODEL_CONROE		0x0F			// 
+#define CPUID_MODEL_CONROE		0x0F			//
 #define CPUID_MODEL_CELERON		0x16			// Merom, Conroe (65nm), Celeron (45nm)
 #define CPUID_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPUID_MODEL_WOLFDALE		0x17			// Xeon 31xx, 33xx, 52xx, 54xx, Core 2 Quad 8xxx and 9xxx
@@ -368,15 +368,15 @@ typedef struct _PlatformInfo_t
 		uint32_t		Vendor;			// Vendor - char Vendor[16];
 		char			BrandString[48];	// 48 Byte Branding String
 		//uint16_t		Type;			// Type
-		uint8_t			Family;			// Family
-		uint8_t			Model;			// Model
-		uint8_t			ExtModel;		// Extended Model
-		uint8_t			ExtFamily;		// Extended Family
-		uint8_t			Stepping;		// Stepping
+		uint32_t		Family;			// Family
+		uint32_t		Model;			// Model
+		uint32_t		ExtModel;		// Extended Model
+		uint32_t		ExtFamily;		// Extended Family
+		uint32_t		Stepping;		// Stepping
 		uint64_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint64_t		ExtFeatures;
-		uint32_t		CoresPerPackage;
-		uint32_t		LogicalPerPackage;
+		//uint32_t		CoresPerPackage;
+		//uint32_t		LogicalPerPackage;
 		uint32_t		Signature;		// Processor Signature
 		//uint8_t		Brand;
 		//uint8_t		ProcessorFlag;
@@ -425,7 +425,7 @@ typedef struct _PlatformInfo_t
 
 	uint8_t				Type;			// system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;			// system-id (SMBIOS Table 1: system uuid)
-
+//	uint32_t			HWSignature;		// machine-signature (FACS: Hardware Signature)
 } PlatformInfo_t;
 
 extern PlatformInfo_t Platform;

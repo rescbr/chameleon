@@ -735,7 +735,8 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			for(j=0; j < 3; j++) {
 				vbios_modeline_type2 * modeline = &res->modelines[j];
 				
-				if (modeline->x1 == xprev && modeline->y1 == yprev) {
+				if (modeline->x1 == xprev && modeline->y1 == yprev)
+				{
 					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
 					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
@@ -772,10 +773,12 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			xprev = res->modelines[0].x1;
 			yprev = res->modelines[0].y1;
 			
-			for (j=0; j < 3; j++) {
+			for (j=0; j < 3; j++)
+			{
 				vbios_modeline_type3 * modeline = &res->modelines[j];
 				
-				if (modeline->x1 == xprev && modeline->y1 == yprev) {
+				if (modeline->x1 == xprev && modeline->y1 == yprev)
+				{
 					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
 					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
@@ -828,7 +831,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usCRTC_V_SyncWidth = mode.v_sync_width;
 
 				mode_timing->usPixelClock = mode.pixel_clock;
-			} else {
+			}
+			else
+			{
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
@@ -863,7 +868,8 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			ATOM_DTD_FORMAT *mode_timing = (ATOM_DTD_FORMAT *) map->ati_mode_table;
 			
 			/*if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force) {*/
-			if (!getMode(&mode)) {
+			if (!getMode(&mode))
+			{
 				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode 0 patched!\n", mode.h_active, mode.v_active);
 				mode_timing->usHBlanking_Time = mode.h_blanking;
 				mode_timing->usHActive = mode.h_active;
@@ -876,7 +882,9 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 				mode_timing->usVSyncWidth = mode.v_sync_width;
 										
 				mode_timing->usPixClk = mode.pixel_clock;
-			} else {
+			}
+			else
+			{
 				verbose(" Edid not found or invalid - vbios not patched!\n");
 			}
 			/*else
