@@ -1007,12 +1007,12 @@ void sleep(int n)
 
 //==============================================================================
 
-void delay(int ms)
+void delay(int us)
 {
     bb.intno = 0x15;
     bb.eax.r.h = 0x86;
-    bb.ecx.rr = ms >> 16;
-    bb.edx.rr = ms & 0xFFFF;
+    bb.ecx.rr = us >> 16;
+    bb.edx.rr = us & 0xFFFF;
     bios(&bb);
 }
 
