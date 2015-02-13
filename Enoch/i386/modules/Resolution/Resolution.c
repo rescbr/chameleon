@@ -6,6 +6,7 @@
 #include "915resolution.h"
 #include "gui.h"
 
+void Resolution_start();
 void Resolution_start()
 {
     UInt32 bp = 0;

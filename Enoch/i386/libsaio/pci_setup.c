@@ -40,7 +40,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				{
 					dram_controller_dev = current;
 				}
-				break;
+				break; // PCI_CLASS_BRIDGE_HOST
 				
 			case PCI_CLASS_NETWORK_ETHERNET: 
 				//DBG("Setup ETHERNET %s enabled\n", do_eth_devprop?"":"no");
@@ -48,7 +48,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				{
 					setup_eth_builtin(current);
 				}
-				break;
+				break; // PCI_CLASS_NETWORK_ETHERNET
 
 			case PCI_CLASS_NETWORK_OTHER:
 				//DBG("Setup WIRELESS %s enabled\n", do_wifi_devprop?"":"no");
@@ -56,7 +56,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				{
 					setup_wifi_airport(current);
 				}
-				break;
+				break; // PCI_CLASS_NETWORK_OTHER
 
 			case PCI_CLASS_DISPLAY_VGA:
 				//DBG("GraphicsEnabler %s enabled\n", do_gfx_devprop?"":"no");
@@ -73,7 +73,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_ati_devprop(current);
 							}
-							break;
+							break; // PCI_VENDOR_ID_ATI
 
 						case PCI_VENDOR_ID_INTEL:
 							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit)
@@ -84,7 +84,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_gma_devprop(current);
 							}
-							break;
+							break; // PCI_VENDOR_ID_INTEL
 
 						case PCI_VENDOR_ID_NVIDIA:
 							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit)
@@ -95,10 +95,13 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_nvidia_devprop(current);
 							}
+							break; // PCI_VENDOR_ID_NVIDIA
+
+						default:
 							break;
-						}
 					}
-					break;
+				}
+				break; // PCI_CLASS_DISPLAY_VGA
 
 			case PCI_CLASS_MULTIMEDIA_AUDIO_DEV:
 				//DBG("Setup HDEF %s enabled\n", do_hda_devprop?"":"no");
@@ -106,26 +109,27 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				{
 					setup_hda_devprop(current);
 				}
-				break;
+				break; // PCI_CLASS_MULTIMEDIA_AUDIO_DEV
 
-				case PCI_CLASS_SERIAL_USB:
-					//DBG("USB fix \n");
-					notify_usb_dev(current);
-        			        /*if (do_usb_devprop)
-					{
-						set_usb_devprop(current);
-					}*/
-					break;
+			case PCI_CLASS_SERIAL_USB:
+				//DBG("USB fix \n");
+				notify_usb_dev(current);
+        		        /*if (do_usb_devprop)
+				{
+					set_usb_devprop(current);
+				}*/
+				break; // PCI_CLASS_SERIAL_USB
 
-				case PCI_CLASS_BRIDGE_ISA:
-					//DBG("Force HPET %s enabled\n", do_enable_hpet?"":"no");
-					if (do_enable_hpet)
-					{
-						force_enable_hpet(current);
-					}
-					break;
+			case PCI_CLASS_BRIDGE_ISA:
+				//DBG("Force HPET %s enabled\n", do_enable_hpet?"":"no");
+				if (do_enable_hpet)
+				{
+					force_enable_hpet(current);
+				}
+				break; // PCI_CLASS_BRIDGE_ISA
+
 			}
-		
+
 		execute_hook("PCIDevice", current, NULL, NULL, NULL);
 		//DBG("setup_pci_devs current devID=%08x\n", current->device_id);
 		setup_pci_devs(current->children);
