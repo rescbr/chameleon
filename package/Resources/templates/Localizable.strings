@@ -86,6 +86,10 @@ Dependencies: none";
 "NVIDIAGraphicsEnabler_description" = "The GraphicsEnabler nVidia code ported to a module.
 Dependencies: none";
 
+"GraphicsEnablerModule_title" = "GraphicsEnabler";
+"GraphicsEnablerModule_description" = "The GraphicsEnabler code ported to a module.
+Dependencies: none";
+
 "AMDGraphicsEnabler_title" = "AMDGraphicsEnabler";
 "AMDGraphicsEnabler_description" = "The GraphicsEnabler AMD/ATi code ported to a module.
 Dependencies: none";

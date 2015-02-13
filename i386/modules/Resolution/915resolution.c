@@ -317,7 +317,7 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 	 */
 	map->ati_tables.base = map->bios_ptr;
 	map->ati_tables.AtomRomHeader = (ATOM_ROM_HEADER *) (map->bios_ptr + *(unsigned short *) (map->bios_ptr + OFFSET_TO_POINTER_TO_ATOM_ROM_HEADER)); 
-	if (strcmp ((char *) map->ati_tables.AtomRomHeader->uaFirmWareSignature, "ATOM") == 0)
+	if (strncmp ((char *) map->ati_tables.AtomRomHeader->uaFirmWareSignature, "ATOM", sizeof("ATOM")) == 0)
 	{
 		verbose("ATI");
 		// ATI Radeon Card
@@ -659,6 +659,8 @@ int getMode(edid_mode *mode)
 
 	free( edidInfo );
 		
+	if(!mode->h_active) return 1;
+
 	return 0;
 		
 }

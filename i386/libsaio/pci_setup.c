@@ -7,7 +7,6 @@
 #include "hda.h"
 #include "modules.h"
 
-
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 extern bool setup_gma_devprop(pci_dt_t *gma_dev);
@@ -42,14 +41,14 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				{
 					dram_controller_dev = current;
 				}
-				break;
+				break; // PCI_CLASS_BRIDGE_HOST
 				
 			case PCI_CLASS_NETWORK_ETHERNET:
 				if (do_eth_devprop)
 				{
 					set_eth_builtin(current);
 				}
-				break;
+				break; // PCI_CLASS_NETWORK_ETHERNET
 
 			case PCI_CLASS_DISPLAY_VGA:
 				if (do_gfx_devprop)
@@ -65,7 +64,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_ati_devprop(current);
 							}
-							break;
+							break; // PCI_VENDOR_ID_ATI
 
 						case PCI_VENDOR_ID_INTEL:
 							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit)
@@ -76,7 +75,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_gma_devprop(current);
 							}
-							break;
+							break; // PCI_VENDOR_ID_INTEL
 
 						case PCI_VENDOR_ID_NVIDIA:
 							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit)
@@ -87,30 +86,34 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 							{
 								setup_nvidia_devprop(current);
 							}
+							break; // PCI_VENDOR_ID_NVIDIA
+
+						default:
 							break;
-						}
 					}
-					break;
+				}
+				break; // PCI_CLASS_DISPLAY_VGA
 
 			case PCI_CLASS_MULTIMEDIA_AUDIO_DEV:
 				if (do_hda_devprop)
 				{
 					setup_hda_devprop(current);
 				}
-				break;
+				break; // PCI_CLASS_MULTIMEDIA_AUDIO_DEV
 
 			case PCI_CLASS_SERIAL_USB:
 				notify_usb_dev(current);
-				break;
+				break; // PCI_CLASS_SERIAL_USB
 
 			case PCI_CLASS_BRIDGE_ISA:
 				if (do_enable_hpet)
 				{
 					force_enable_hpet(current);
 				}
-				break;
-		}
-		
+				break; // PCI_CLASS_BRIDGE_ISA
+
+			}
+
 		execute_hook("PCIDevice", current, NULL, NULL, NULL);
 		
 		setup_pci_devs(current->children);
