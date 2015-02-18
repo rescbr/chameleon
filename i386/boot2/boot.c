@@ -77,6 +77,8 @@ bool		gEnableCDROMRescan;
 bool		gScanSingleDrive;
 bool		useGUI;
 
+static int interruptsAvailable = 0;
+
 static bool	gUnloadPXEOnExit = false;
 
 static char	gCacheNameAdler[64 + 256];
@@ -199,6 +201,10 @@ static int ExecKernel(void *binary)
 
 	usb_loop();
 
+#if DEBUG
+	if (interruptsAvailable) ShowInterruptCounters();
+#endif
+
 	// If we were in text mode, switch to graphics mode.
 	// This will draw the boot graphics unless we are in
 	// verbose mode.
@@ -224,6 +230,8 @@ static int ExecKernel(void *binary)
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
 
+		if (interruptsAvailable) DisableInterrupts();
+
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
@@ -235,11 +243,13 @@ static int ExecKernel(void *binary)
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
 
+		if (interruptsAvailable) DisableInterrupts();
+
 		startprog( kernelEntry, bootArgsPreLion );
 	}
 
 	// Not reached
-	return 0;
+	__builtin_unreachable();
 }
 
 
@@ -438,6 +448,10 @@ void common_boot(int biosdev)
 
 	// Initialize boot-log
 	initBooterLog();
+
+	// Enable interrupts
+	interruptsAvailable = SetupInterrupts();
+	if (interruptsAvailable) EnableInterrupts();
 
 	// Initialize boot info structure.
 	initKernBootStruct();
@@ -833,6 +847,7 @@ void common_boot(int biosdev)
 	{
 		nbpUnloadBaseCode();
 	}
+	if (interruptsAvailable) DisableInterrupts();
 }
 
 /*!

@@ -106,6 +106,8 @@ new_ds:     .space 2
  */
 LABEL(_bios)
     enter   $0, $0
+    pushfl
+    cli
     pushal
 
     movl    8(%ebp), %edx       // address of save area
@@ -179,6 +181,7 @@ do_int:
     movl    %ebp, O_EBP(%edx)
 
     popal
+    popfl
     leave
 
     ret
