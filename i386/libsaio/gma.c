@@ -630,11 +630,11 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_ULT_M_GT2: // 0a16
 		case GMA_HASWELL_ULT_E_GT2: // 0a1e
 			verbose("Injecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
-			device_id = 0x0412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
+			device_id = 0x00000412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
 			devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
-			devprop_add_value(device, "IOName",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
+//			devprop_add_value(device, "IOName",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 			devprop_add_value(device, "name",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
 
