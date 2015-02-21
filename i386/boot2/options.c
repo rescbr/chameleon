@@ -194,7 +194,7 @@ static int countdown( const char * msg, int row, int timeout )
 		{
 			multi--; 
 			lasttime=time18();
-		}		
+		}
   
 		if ( (ch = readKeyboardStatus()) )
 			break;
@@ -413,7 +413,7 @@ static void showMenu( const MenuItem * items, int count,
 
     gMenuStart		= 0;
     gMenuEnd	    = MIN( count, gui.maxdevices ) - 1;
-	
+
 	// If the selected item is not visible, shift the list down.
 
     if ( gMenuSelection > gMenuBottom )
@@ -451,38 +451,38 @@ static void showMenu( const MenuItem * items, int count,
 
 static int updateMenu( int key, void ** paramPtr )
 {
-    int moved = 0;
+	int moved = 0;
 
-    union {
-        struct {
-            unsigned int
-                selectionUp   : 1,
-                selectionDown : 1,
-                scrollUp      : 1,
-                scrollDown    : 1;
-        } f;
-        unsigned int w;
-    } draw = {{0}};
+	union {
+		struct {
+			unsigned int
+			selectionUp   : 1,
+			selectionDown : 1,
+			scrollUp      : 1,
+			scrollDown    : 1;
+		} f;
+		unsigned int w;
+	} draw = {{0}};
 
-    if ( gMenuItems == NULL )
+	if ( gMenuItems == NULL )
 		return 0;
 
 	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 	{
 		int res;
-		
+
 		// set navigation keys for horizontal layout as defaults
 		int previous	= 0x4B00;		// left arrow
 		int subsequent	= 0x4D00;		// right arrow
-		int menu		= 0x5000;		// down arrow
-		
+		int menu	= 0x5000;		// down arrow
+
 		if ( gui.layout == VerticalLayout )
 		{
 			// set navigation keys for vertical layout
 			previous	= 0x4800;		// up arrow
 			subsequent	= 0x5000;		// down arrow
 			menu		= 0x4B00;		// right arrow
-		} 
+		}
 
 		if ( key == previous )
 		{
@@ -490,7 +490,7 @@ static int updateMenu( int key, void ** paramPtr )
 				draw.f.selectionUp = 1;
 			else if ( gMenuTop > 0 )
 				draw.f.scrollDown = 1;
-			
+
 		}
 		
 		else if ( key ==  subsequent )
@@ -518,7 +518,7 @@ static int updateMenu( int key, void ** paramPtr )
 			else
 			{
 				shouldboot = ( res != DO_NOT_BOOT );
-				
+
 				if ( shouldboot )
 					gui.menu.draw = false;
 
@@ -528,31 +528,33 @@ static int updateMenu( int key, void ** paramPtr )
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
 						break;
-						
+
 					case BOOT_VERBOSE:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
 						addBootArg(kVerboseModeFlag);
 						break;
-						
+
 					case BOOT_IGNORECACHE:
 						gVerboseMode = false;
 						gBootMode = kBootModeNormal;
 						addBootArg(kIgnoreCachesFlag);
 						break;
-						
+
 					case BOOT_SINGLEUSER:
 						gVerboseMode = true;
 						gBootMode = kBootModeNormal;
 						addBootArg(kSingleUserModeFlag);
 						break;
 				}
-				
+
 			}
-			
-		}	
-			
-	} else {
+
+		}
+
+	}
+	else
+	{
 		switch ( key )
 		{
         	case 0x4800:  // Up Arrow
@@ -571,31 +573,30 @@ static int updateMenu( int key, void ** paramPtr )
 		}
 	}
 
-    if ( draw.w )
-    {
-        if ( draw.f.scrollUp )
-        {
-            scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, 1);
-            gMenuTop++; gMenuBottom++;
+	if ( draw.w )
+	{
+		if ( draw.f.scrollUp )
+		{
+			scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, 1);
+			gMenuTop++; gMenuBottom++;
 			gMenuStart++; gMenuEnd++;
-            draw.f.selectionDown = 1;
-        }
+			draw.f.selectionDown = 1;
+		}
 
-        if ( draw.f.scrollDown )
-        {
-            scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, -1);
-            gMenuTop--; gMenuBottom--;
-            gMenuStart--; gMenuEnd--;
-            draw.f.selectionUp = 1;
-        }
+		if ( draw.f.scrollDown )
+		{
+			scollPage(0, gMenuRow, 40, gMenuRow + gMenuHeight - 1, 0x07, 1, -1);
+			gMenuTop--; gMenuBottom--;
+			gMenuStart--; gMenuEnd--;
+			draw.f.selectionUp = 1;
+		}
 
-        if ( draw.f.selectionUp || draw.f.selectionDown )
-        {
-
+		if ( draw.f.selectionUp || draw.f.selectionDown )
+		{
 			CursorState cursorState;
 
 			// Set cursor at current position, and clear inverse video.
-	
+
 			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 			{
 				changeCursor( 0, gMenuRow + gMenuSelection - gMenuTop, kCursorTypeHidden, &cursorState );
@@ -610,31 +611,34 @@ static int updateMenu( int key, void ** paramPtr )
 					gMenuStart--;
 					gMenuEnd--;
 				}
-				
-			} else {
-			gMenuSelection++;
-			if(( gMenuSelection - ( gui.maxdevices - 1) - gMenuStart) > 0 )
-			{
-				gMenuStart++;
-				gMenuEnd++;
+
 			}
-	    }
+			else
+			{
+				gMenuSelection++;
+				if(( gMenuSelection - ( gui.maxdevices - 1) - gMenuStart) > 0 )
+				{
+					gMenuStart++;
+					gMenuEnd++;
+				}
+			}
 
-		if( bootArgs->Video.v_display == VGA_TEXT_MODE )
-	    {
-			moveCursor( 0, gMenuRow + gMenuSelection - gMenuTop );
-			printMenuItem( &gMenuItems[gMenuSelection], 1 );
-			restoreCursor( &cursorState );
+			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
+			{
+				moveCursor( 0, gMenuRow + gMenuSelection - gMenuTop );
+				printMenuItem( &gMenuItems[gMenuSelection], 1 );
+				restoreCursor( &cursorState );
 
-	    } else
+			}
+			else
+			{
+				drawDeviceList (gMenuStart, gMenuEnd, gMenuSelection);
+			}
+		}
 
-			drawDeviceList (gMenuStart, gMenuEnd, gMenuSelection);
-
+		*paramPtr = gMenuItems[gMenuSelection].param;
+		moved = 1;
 	}
-
-        *paramPtr = gMenuItems[gMenuSelection].param;        
-        moved = 1;
-    }
 
 	return moved;
 }
@@ -750,7 +754,8 @@ char *getMemoryInfoString()
 
 void lspci(void)
 {
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) { 
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		setActiveDisplayPage(1);
 		clearScreenRows(0, 24);
 		setCursorPosition(0, 0, 1);
@@ -760,7 +765,8 @@ void lspci(void)
 
 	pause();
 
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		setActiveDisplayPage(0);
 	}
 }
@@ -1156,6 +1162,7 @@ done:
 		clearScreenRows(kMenuTopRow, kScreenLastRow);
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
 	}
+
 	shouldboot = false;
 	gui.menu.draw = false;
 	if (menuItems) {
@@ -1200,6 +1207,7 @@ bool copyArgument(const char *argName, const char *val, int cnt, char **argP, in
 	*argP += cnt;
 	*argP[0] = ' ';
 	(*argP)++;
+
 	*cntRemainingP -= len;
 
 	return true;
@@ -1243,15 +1251,15 @@ processBootArgument(
 
 int processBootOptions()
 {
-	const char *cp  = gBootArgs;
-	const char *val = 0;
-	const char *kernel;
-	int         cnt;
-	int         userCnt;
-	int         cntRemaining;
-	char       *argP;
-	char       *configKernelFlags;
-	char       *valueBuffer;
+	const char	*cp  = gBootArgs;
+	const char	*val = 0;
+	const char	*kernel;
+	int		cnt;
+	int		userCnt;
+	int		cntRemaining;
+	char		*argP;
+	char		*configKernelFlags;
+	char		*valueBuffer;
 
 	valueBuffer = malloc(VALUE_SIZE);
     

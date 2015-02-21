@@ -137,7 +137,12 @@ static card_config_t card_configs[] = {
 	{"Hamachi",	4},
 	{"OPM",         6},
 	{"Ikura",       6},
-	{"IkuraS",      1}
+	{"IkuraS",      1},
+	/* AMD8000Controller */
+	{"Baladi",      5},	//desktop
+	{"Exmoor",      4},	//mobile
+	{"Basset",      4}
+
 };
 
 static radeon_card_info_t radeon_cards[] = {
@@ -1500,7 +1505,8 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x99A2,	0x00000000, CHIP_FAMILY_ARUBA,	"AMD Radeon HD",      kNull       }, // Mobile
 //	{ 0x99A4,	0x00000000, CHIP_FAMILY_ARUBA,	"AMD Radeon HD",      kNull       },
 
-	{ 0x6613,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R7 240",	kFutomaki		},
+	{ 0x6610,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 250",	kFutomaki		},
+	{ 0x6613,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 240",	kFutomaki		},
 	{ 0x665C,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon HD 7790",	kFutomaki		},
 	{ 0x665D,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 260",	kFutomaki		},
 
@@ -1641,8 +1647,8 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x67A8,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67A9,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67AA,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
-	{ 0x67B0,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290X",           kFutomaki	},
-	{ 0x67B1,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290",            kFutomaki	}, // CHIP_FAMILY_HAWAII
+	{ 0x67B0,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290X",           kBaladi	},
+	{ 0x67B1,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290",            kBaladi	}, // CHIP_FAMILY_HAWAII
 //	{ 0x67B8,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67B9,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67BA,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
@@ -1770,7 +1776,7 @@ bool get_bootdisplay_val(value_t *val)
 	val->type = kCst;
 	val->size = 4;
 	val->data = (uint8_t *)&v;
-	
+
 	return true;
 }
 
@@ -1850,7 +1856,7 @@ bool get_binimage_val(value_t *val)
 	val->type = kPtr;
 	val->size = card->rom_size;
 	val->data = card->rom;
-	
+
 	return true;
 }
 
@@ -2284,11 +2290,12 @@ bool devprop_add_pci_config_space(void)
 }
 #endif
 
+static char	name[24];
+static char	name_parent[24];
+
 static bool init_card(pci_dt_t *pci_dev)
 {
 	bool	add_vbios = true;
-	char	name[24];
-	char	name_parent[24];
 	int		i;
 	int		n_ports = 0;
 
@@ -2347,7 +2354,7 @@ static bool init_card(pci_dt_t *pci_dev)
 			{
 				read_disabled_vbios();
 			}
-			verbose("\n");
+			verbose("Video BIOS read from file\n");
 		}
 	}
 

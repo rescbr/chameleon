@@ -2323,11 +2323,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
 	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
-	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
-	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
-	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
-	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
-	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
+	devprop_add_value(device, "VRAM,totalsize", (uint8_t *)&videoRam, 4);
+	devprop_add_value(device, "model", (uint8_t *)model, strlen(model) + 1);
+	devprop_add_value(device, "rom-revision", (uint8_t *)biosVersion, strlen(biosVersion) + 1);
+	devprop_add_value(device, "@0,display-cfg", (uint8_t *)&default_dcfg_0, DCFG0_LEN);
+	devprop_add_value(device, "@1,display-cfg", (uint8_t *)&default_dcfg_1, DCFG1_LEN);
 
 	/******************** Added Marchrius.**********************/
 	//              For the AppleBacklightDisplay              //

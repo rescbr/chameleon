@@ -295,7 +295,7 @@ long HFSReadFile(CICell ih, char *filePath, void *base, u_int64_t offset,  u_int
 	char entry[512];
 	char devStr[12];
 	u_int32_t dirID;
-	long result, flags;
+	long result, flags = 0;
 
 	if (HFSInitPartition(ih) == -1)
 	{
@@ -647,6 +647,8 @@ static long GetCatalogEntryInfo(void * entry, long * flags, u_int32_t * time, Fi
 		*flags = kFileTypeUnknown;
 		tmpTime = 0;
 		break;
+	default:
+		break;
 	}
 
 	if (time != 0)
@@ -920,6 +922,12 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 	curNode  = SWAP_BE32(gBTHeaders[btree]->rootNode);
 	nodeSize = SWAP_BE16(gBTHeaders[btree]->nodeSize);
 	nodeBuf  = (char *)malloc(nodeSize);
+
+	if (!nodeBuf) 
+	{
+		return -1;
+	}
+
 	node     = (BTNodeDescriptor *)nodeBuf;
 
 	while (1)
@@ -1017,6 +1025,8 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 			case kHFSPlusFolderThreadRecord : entrySize = 264;
 				break;
 			case kHFSPlusFileThreadRecord   : entrySize = 264;
+				break;
+			default:
 				break;
 		}
 	}

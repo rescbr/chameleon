@@ -82,8 +82,7 @@ static Property *freeProperties, *allocedProperties;
 
 //==============================================================================
 
-Property *
-DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
+Property *DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 {
 	Property *prop;
 
@@ -143,8 +142,7 @@ DT__AddProperty(Node *node, const char *name, uint32_t length, void *value)
 
 //==============================================================================
 
-Node *
-DT__AddChild(Node *parent, const char *name)
+Node *DT__AddChild(Node *parent, const char *name)
 {
 	Node *node;
 
@@ -206,8 +204,7 @@ DT__AddChild(Node *parent, const char *name)
 
 //==============================================================================
 
-void
-DT__FreeProperty(Property *prop)
+void DT__FreeProperty(Property *prop)
 {
 	prop->next = freeProperties;
 	freeProperties = prop;
@@ -215,8 +212,7 @@ DT__FreeProperty(Property *prop)
 
 //==============================================================================
 
-void
-DT__FreeNode(Node *node)
+void DT__FreeNode(Node *node)
 {
 	node->next = freeNodes;
 	freeNodes = node;
@@ -224,8 +220,7 @@ DT__FreeNode(Node *node)
 
 //==============================================================================
 
-void
-DT__Initialize(void)
+void DT__Initialize(void)
 {
 	DPRINTF("DT__Initialize\n");
 
@@ -246,8 +241,7 @@ DT__Initialize(void)
 /*
  * Free up memory used by in-memory representation of device tree.
  */
-void
-DT__Finalize(void)
+void DT__Finalize(void)
 {
 	Node *node;
 	Property *prop;
@@ -280,8 +274,7 @@ DT__Finalize(void)
 
 //==============================================================================
 
-static void *
-FlattenNodes(Node *node, void *buffer)
+static void *FlattenNodes(Node *node, void *buffer)
 {
 	Property *prop;
 	DeviceTreeNode *flatNode;
@@ -325,8 +318,7 @@ FlattenNodes(Node *node, void *buffer)
  * To use your own buffer, call with *result = &buffer.
  */
 
-void
-DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
+void DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
 {
 	uint32_t totalSize;
 	void * buf;
@@ -378,8 +370,7 @@ DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
 
 //==============================================================================
 
-char *
-DT__GetName(Node *node)
+char *DT__GetName(Node *node)
 {
 	Property *prop;
 
@@ -400,8 +391,7 @@ DT__GetName(Node *node)
 
 //==============================================================================
 // Bungo
-Property *
-DT__GetProperty(Node *node, const char *name)
+Property *DT__GetProperty(Node *node, const char *name)
 {
 	Property *prop;
 
@@ -418,8 +408,7 @@ DT__GetProperty(Node *node, const char *name)
 
 //==============================================================================
 
-Node *
-DT__FindNode(const char *path, bool createIfMissing)
+Node *DT__FindNode(const char *path, bool createIfMissing)
 {
 	Node *node, *child;
 	DTPropertyNameBuf nameBuf;
@@ -486,8 +475,7 @@ DT__FindNode(const char *path, bool createIfMissing)
 
 //==============================================================================
 
-void
-DT__PrintNode(Node *node, int level)
+void DT__PrintNode(Node *node, int level)
 {
 	char spaces[10], *cp = spaces;
 	Property *prop;
@@ -524,8 +512,7 @@ DT__PrintNode(Node *node, int level)
 
 //==============================================================================
 
-static void
-_PrintTree(Node *node, int level)
+static void _PrintTree(Node *node, int level)
 {
 	DT__PrintNode(node, level);
 
@@ -539,8 +526,7 @@ _PrintTree(Node *node, int level)
 
 //==============================================================================
 
-void
-DT__PrintTree(Node *node)
+void DT__PrintTree(Node *node)
 {
 	if (node == 0) node = rootNode;
 	_PrintTree(node, 0);
@@ -548,8 +534,7 @@ DT__PrintTree(Node *node)
 
 //==============================================================================
 
-void
-DT__PrintFlattenedNode(DTEntry entry, int level)
+void DT__PrintFlattenedNode(DTEntry entry, int level)
 {
 	char spaces[10], *cp = spaces;
 	DTPropertyIterator	                propIter;
@@ -580,8 +565,7 @@ DT__PrintFlattenedNode(DTEntry entry, int level)
 
 //==============================================================================
 
-static void
-_PrintFlattenedTree(DTEntry entry, int level)
+static void _PrintFlattenedTree(DTEntry entry, int level)
 {
 	DTEntryIterator entryIter;
 
@@ -602,16 +586,14 @@ _PrintFlattenedTree(DTEntry entry, int level)
 
 //==============================================================================
 
-void
-DT__PrintFlattenedTree(DTEntry entry)
+void DT__PrintFlattenedTree(DTEntry entry)
 {
 	_PrintFlattenedTree(entry, 0);
 }
 
 //==============================================================================
 
-int
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	DTEntry			dtEntry;
 	DTPropertyIterator	propIter;
