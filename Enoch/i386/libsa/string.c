@@ -25,25 +25,25 @@
 
 #include "libsa.h"
 
-void * memset(void * dst, int val, size_t len)
+void *memset(void * dst, int val, size_t len)
 {
-    asm volatile ( "rep; stosb"
-       : "=c" (len), "=D" (dst)
-       : "0" (len), "1" (dst), "a" (val)
-       : "memory" );
+	asm volatile ( "rep; stosb"
+		: "=c" (len), "=D" (dst)
+		: "0" (len), "1" (dst), "a" (val)
+		: "memory" );
 
-    return dst;
+	return dst;
 }
 
 #if 0
 void * memcpy(void * dst, const void * src, size_t len)
 {
-    asm volatile ( "rep; movsb"
-       : "=c" (len), "=D" (dst), "=S" (src)
-       : "0" (len), "1" (dst), "2" (src)
-       : "memory" );
+	asm volatile ( "rep; movsb"
+		: "=c" (len), "=D" (dst), "=S" (src)
+		: "0" (len), "1" (dst), "2" (src)
+		: "memory" );
 
-    return dst;
+	return dst;
 }
 
 void bcopy(const void * src, void * dst, size_t len)
@@ -53,73 +53,73 @@ void bcopy(const void * src, void * dst, size_t len)
 
 void bzero(void * dst, size_t len)
 {
-    memset(dst, 0, len);
+	memset(dst, 0, len);
 }
 
 void __bzero(void * dst, size_t len)
 {
-    memset(dst, 0, len);
+	memset(dst, 0, len);
 }
 
 #else
 void * memcpy(void * dst, const void * src, size_t len)
 {
-    asm volatile ( "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; movsl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; movsb           \n\t"
-       : "=D" (dst)
-       : "c" (len), "D" (dst), "S" (src)
-       : "memory", "%edx" );
+	asm volatile ( "cld                  \n\t"
+		"movl %%ecx, %%edx    \n\t"
+		"shrl $2, %%ecx       \n\t"
+		"rep; movsl           \n\t"
+		"movl %%edx, %%ecx    \n\t"
+		"andl $3, %%ecx       \n\t"
+		"rep; movsb           \n\t"
+		: "=D" (dst)
+		: "c" (len), "D" (dst), "S" (src)
+		: "memory", "%edx" );
 
-    return dst;
+	return dst;
 }
 
 void bcopy(const void * src, void * dst, size_t len)
 {
-    asm volatile ( "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; movsl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; movsb           \n\t"
-       :
-       : "c" (len), "D" (dst), "S" (src)
-       : "memory", "%edx" );
+	asm volatile ( "cld                  \n\t"
+		"movl %%ecx, %%edx    \n\t"
+		"shrl $2, %%ecx       \n\t"
+		"rep; movsl           \n\t"
+		"movl %%edx, %%ecx    \n\t"
+		"andl $3, %%ecx       \n\t"
+		"rep; movsb           \n\t"
+		:
+		: "c" (len), "D" (dst), "S" (src)
+		: "memory", "%edx" );
 }
 
 void bzero(void * dst, size_t len)
 {
-    asm volatile ( "xorl %%eax, %%eax    \n\t"
-         "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; stosl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; stosb           \n\t"
-       : 
-       : "c" (len), "D" (dst)
-       : "memory", "%eax" );
+	asm volatile ( "xorl %%eax, %%eax    \n\t"
+		"cld                  \n\t"
+		"movl %%ecx, %%edx    \n\t"
+		"shrl $2, %%ecx       \n\t"
+		"rep; stosl           \n\t"
+		"movl %%edx, %%ecx    \n\t"
+		"andl $3, %%ecx       \n\t"
+		"rep; stosb           \n\t"
+		:
+		: "c" (len), "D" (dst)
+		: "memory", "%eax" );
 }
 
 void __bzero(void * dst, size_t len)
 {
-    asm volatile ( "xorl %%eax, %%eax    \n\t"
-         "cld                  \n\t"
-         "movl %%ecx, %%edx    \n\t"
-         "shrl $2, %%ecx       \n\t"
-         "rep; stosl           \n\t"
-         "movl %%edx, %%ecx    \n\t"
-         "andl $3, %%ecx       \n\t"
-         "rep; stosb           \n\t"
-       : 
-       : "c" (len), "D" (dst)
-       : "memory", "%eax" );
+	asm volatile ( "xorl %%eax, %%eax    \n\t"
+		"cld                  \n\t"
+		"movl %%ecx, %%edx    \n\t"
+		"shrl $2, %%ecx       \n\t"
+		"rep; stosl           \n\t"
+		"movl %%edx, %%ecx    \n\t"
+		"andl $3, %%ecx       \n\t"
+		"rep; stosb           \n\t"
+		:
+		: "c" (len), "D" (dst)
+		: "memory", "%eax" );
 }
 
 #endif
@@ -178,8 +178,7 @@ int strncmp(const char * s1, const char * s2, size_t n)
 	return 0;
 }
 
-char *
-strcpy(char * s1, const char * s2)
+char *strcpy(char *s1, const char *s2)
 {
 	register char *ret = s1;
 	while ((*s1++ = *s2++))
@@ -187,8 +186,7 @@ strcpy(char * s1, const char * s2)
 	return ret;
 }
 
-char *
-stpcpy(char * s1, const char * s2)
+char *stpcpy(char *s1, const char *s2)
 {
 	while ((*s1++ = *s2++))
 	{
@@ -197,8 +195,7 @@ stpcpy(char * s1, const char * s2)
 	return --s1;
 }
 
-char *
-strncpy(char * s1, const char * s2, size_t n)
+char *strncpy(char *s1, const char *s2, size_t n)
 {
 	register char *ret = s1;
 	while (n && (*s1++ = *s2++))
@@ -210,8 +207,7 @@ strncpy(char * s1, const char * s2, size_t n)
 	return ret;
 }
 
-char *
-stpncpy(char * s1, const char * s2, size_t n)
+char *stpncpy(char *s1, const char *s2, size_t n)
 {
 	while (n && (*s1++ = *s2++))
 		--n;
@@ -222,8 +218,7 @@ stpncpy(char * s1, const char * s2, size_t n)
 	return s1;
 }
 
-char *
-strstr(const char *in, const char *str)
+char *strstr(const char *in, const char *str)
 {
     char c;
     size_t len;
@@ -246,8 +241,7 @@ strstr(const char *in, const char *str)
     return (char *) (in - 1);
 }
 
-int
-ptol(const char *str)
+int ptol(const char *str)
 {
 	register int c = *str;
 
@@ -259,8 +253,7 @@ ptol(const char *str)
 	return c;
 }
 
-int
-atoi(const char *str)
+int atoi(const char *str)
 {
 	register int sum = 0;
 	while (*str == ' ' || *str == '\t')
@@ -270,6 +263,47 @@ atoi(const char *str)
 		sum += *str++ - '0';
 	}
 	return sum;
+}
+/*
+ * Appends src to string dst of size siz (unlike strncat, siz is the
+ * full size of dst, not space left).  At most siz-1 characters
+ * will be copied.  Always NUL terminates (unless siz <= strlen(dst)).
+ * Returns strlen(src) + MIN(siz, strlen(initial dst)).
+ * If retval >= siz, truncation occurred.
+ */
+size_t strlcat(char *dst, const char *src, size_t siz)
+{
+	char *d = dst;
+	const char *s = src;
+	size_t n = siz;
+	size_t dlen;
+
+	/* Find the end of dst and adjust bytes left but don't go past end */
+	while (n-- != 0 && *d != '\0')
+	{
+		d++;
+	}
+
+	dlen = d - dst;
+	n = siz - dlen;
+
+	if (n == 0)
+	{
+		return(dlen + strlen(s));
+	}
+
+	while (*s != '\0')
+	{
+		if (n != 1)
+		{
+			*d++ = *s;
+			n--;
+		}
+		s++;
+	}
+	*d = '\0';
+
+	return(dlen + (s - src));       /* count does not include NUL */
 }
 
 char *strncat(char *s1, const char *s2, size_t n)
@@ -308,7 +342,7 @@ int strncasecmp(const char *s1, const char *s2, size_t len)
 }
 #endif
 
-char* strchr(const char *str, int c)
+char *strchr(const char *str, int c)
 {
     do
     {
@@ -318,9 +352,9 @@ char* strchr(const char *str, int c)
     while(*(str++));
     
     return 0;
-}        
-        
-char* strbreak(const char *str, char **next, long *len)
+}
+
+char *strbreak(const char *str, char **next, long *len)
 {
     char *start = (char*)str, *end;
     bool quoted = false;
@@ -358,13 +392,14 @@ char* strbreak(const char *str, char **next, long *len)
 }
 
 /* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
-uint8_t checksum8( void * start, unsigned int length )
+uint8_t checksum8( void *start, unsigned int length )
 {
     uint8_t   csum = 0;
     uint8_t * cp = (uint8_t *) start;
     unsigned int i;
 
-	for ( i = 0; i < length; i++) {
+	for ( i = 0; i < length; i++)
+	{
 		csum += *cp++;
 	}
 	return csum;
