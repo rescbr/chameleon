@@ -1120,8 +1120,8 @@ static int getNumberArrayFromProperty( const char *  propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {
-	char            *propStr;
-	unsigned long   count       = 0;
+	char		*propStr;
+	unsigned long	count = 0;
 
 	propStr = newStringForKey((char *)propKey , &bootInfo->chameleonConfig);
 

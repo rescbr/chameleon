@@ -2,7 +2,7 @@
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * Portions Copyright (c) 2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
  * Original Code as defined in and that are subject to the Apple Public
@@ -10,7 +10,7 @@
  * except in compliance with the License.  Please obtain a copy of the
  * License at http://www.apple.com/publicsource and read it before using
  * this file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -18,7 +18,7 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  */
 
@@ -40,13 +40,13 @@ enum xmltype {
 
 struct string_ref
 {
-	char* string;
+	char *string;
 	int id;
-	struct string_ref* next;
+	struct string_ref *next;
 };
 typedef struct string_ref string_ref;
 
-extern string_ref* ref_strings;
+extern string_ref *ref_strings;
 
 #define kXMLTagPList        "plist "
 #define kXMLTagDict         "dict"
@@ -63,27 +63,17 @@ extern string_ref* ref_strings;
 #define kXMLStringID        "ID="
 #define kXMLStringIDRef     "IDREF="
 
-#define kPropCFBundleIdentifier ("CFBundleIdentifier")
-#define kPropCFBundleExecutable ("CFBundleExecutable")
-#define kPropOSBundleRequired   ("OSBundleRequired")
-#define kPropOSBundleLibraries  ("OSBundleLibraries")
-#define kPropIOKitPersonalities ("IOKitPersonalities")
-#define kPropIONameMatch        ("IONameMatch")
-
-/*
-struct Tag {
-	long       type;
-	char       *string;
-	struct Tag *tag;
-	struct Tag *tagNext;
-};
-typedef struct Tag Tag, *TagPtr;
- */
+#define kPropCFBundleIdentifier		("CFBundleIdentifier")
+#define kPropCFBundleExecutable		("CFBundleExecutable")
+#define kPropOSBundleRequired		("OSBundleRequired")
+#define kPropOSBundleLibraries		("OSBundleLibraries")
+#define kPropIOKitPersonalities		("IOKitPersonalities")
+#define kPropIONameMatch		("IONameMatch")
 
 extern long  gImageFirstBootXAddr;
 extern long  gImageLastKernelAddr;
 
-TagPtr XMLGetProperty( TagPtr dict, const char * key );
+TagPtr XMLGetProperty( TagPtr dict, const char *key );
 TagPtr XMLGetElement( TagPtr dict, int id );
 TagPtr XMLGetKey( TagPtr dict, int id );
 TagPtr XMLGetValueForKey(TagPtr key);
@@ -98,7 +88,7 @@ long XMLCastStringOffset(TagPtr dict);
 int XMLCastInteger ( TagPtr dict );
 TagPtr XMLCastDict ( TagPtr dict );
 TagPtr XMLCastArray( TagPtr dict );
-char* XMLCastData( TagPtr dict, int* length );
+char* XMLCastData( TagPtr dict, int *length );
 
 bool XMLIsBoolean(TagPtr entry);
 bool XMLIsString (TagPtr entry);
@@ -108,7 +98,7 @@ bool XMLIsArray  (TagPtr entry);
 bool XMLIsData   (TagPtr entry);
 
 
-bool XMLAddTagToDictionary(TagPtr dict, char* key, TagPtr value);
+bool XMLAddTagToDictionary(TagPtr dict, char *key, TagPtr value);
 
 long XMLParseNextTag(char *buffer, TagPtr *tag);
 void XMLFreeTag(TagPtr tag);
@@ -119,11 +109,11 @@ char* XMLDecode(const char *in);
 // Puts the first dictionary it finds in the
 // tag pointer and returns 0, or returns -1 if not found.
 //
-long XMLParseFile( char * buffer, TagPtr * dict );
+long XMLParseFile( char *buffer, TagPtr *dict );
 
 //==========================================================================
 // ParseTag*
-long    ParseTagBoolean( char * buffer, TagPtr * tag, long type );
+long    ParseTagBoolean( char *buffer, TagPtr *tag, long type );
 
 
 #endif /* __LIBSAIO_XML_H */

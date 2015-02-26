@@ -9,11 +9,11 @@
 void Resolution_start();
 void Resolution_start()
 {
-    UInt32 bp = 0;
-    UInt32 x, y;
+	UInt32 bp = 0;
+	UInt32 x, y;
 	patchVideoBios();
-    getResolution(&x, &y, &bp);
-    gui.screen.width = x;
-    gui.screen.height = y;
+	getResolution(&x, &y, &bp);
+	gui.screen.width = x;
+	gui.screen.height = y;
 }
 

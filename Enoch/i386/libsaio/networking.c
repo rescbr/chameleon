@@ -22,29 +22,33 @@
 #define DBG(x...)
 #endif
 
-uint32_t builtin_set		= 0;
+uint32_t builtin_set	= 0;
+uint8_t builtin		= 0;
 extern uint32_t devices_number;
 //extern uint32_t onboard_number;
 
 int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
 {
-	uint8_t builtin = 0x00;
+	builtin = 0;
 	if(device)
 	{
-        
+
 		if((vendor_id != 0x168c) && (builtin_set == 0))
 		{
 			builtin_set = 1;
 			builtin = 0x01;
 		}
-		if(!devprop_add_value(device, "device_type", (uint8_t*)"ethernet", 8))
+
+		if(!devprop_add_value(device, "built-in", (uint8_t *)&builtin, 1))
 		{
 			return 0;
 		}
-		if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
+
+		if(!devprop_add_value(device, "device_type", (uint8_t *)"Ethernet Controller", 20))
 		{
 			return 0;
 		}
+
 		devices_number++;
 		return 1;
 	}
@@ -111,44 +115,43 @@ static network_device known_ethernet_cards[] =
 
 static network_device generic_ethernet_cards[] =
 {
-    { 0x0000, 0x0000, "Generic Ethernet Controller" },
-    { 0x10EC, 0x0000, "Realtek Ethernet Controller" },
-    { 0x11AB, 0x0000, "Marvell Ethernet Controller" },
+	{ 0x0000, 0x0000, "Generic Ethernet Controller" },
+	{ 0x10EC, 0x0000, "Realtek Ethernet Controller" },
+	{ 0x11AB, 0x0000, "Marvell Ethernet Controller" },
 	{ 0x1969, 0x0000, "Atheros Ethernet Controller" },
-    { 0x8086, 0x0000, "Intel(R) Ethernet Controller" },
+	{ 0x8086, 0x0000, "Intel(R) Ethernet Controller" },
 };
 
 char *get_ethernet_model(uint32_t vendor_id, uint32_t device_id)
 {
-    int i = 0;
-    for( ; i < sizeof(known_ethernet_cards) / sizeof(known_ethernet_cards[0]); i++)
-    {
-        if(vendor_id == known_ethernet_cards[i].vendor_id &&
-           device_id == known_ethernet_cards[i].device_id)
-        {
-            return known_ethernet_cards[i].model;
-        }
-    }
-    i = 0;
-    for ( ; i < sizeof(generic_ethernet_cards) / sizeof(generic_ethernet_cards[0]); i++)
-    {
-        if (vendor_id == generic_ethernet_cards[i].vendor_id)
-        {
-            return generic_ethernet_cards[i].model;
-        }
-    }
-    return generic_ethernet_cards[0].model;
+	int i = 0;
+	for( ; i < sizeof(known_ethernet_cards) / sizeof(known_ethernet_cards[0]); i++)
+	{
+		if(vendor_id == known_ethernet_cards[i].vendor_id && device_id == known_ethernet_cards[i].device_id)
+		{
+			return known_ethernet_cards[i].model;
+		}
+	}
+	i = 0;
+	for ( ; i < sizeof(generic_ethernet_cards) / sizeof(generic_ethernet_cards[0]); i++)
+	{
+		if (vendor_id == generic_ethernet_cards[i].vendor_id)
+		{
+			return generic_ethernet_cards[i].model;
+		}
+	}
+	return generic_ethernet_cards[0].model;
 }
 
 void setup_eth_builtin(pci_dt_t *eth_dev)
 {
-	char *devicepath = get_pci_dev_path(eth_dev);
-    char *name_model = NULL;
-    
-	DevPropDevice *device = (DevPropDevice*)malloc(sizeof(DevPropDevice));
-    
+	char *devicepath	= get_pci_dev_path(eth_dev);
+	char *name_model	= NULL;
+
+	DevPropDevice *device = (DevPropDevice *)malloc(sizeof(DevPropDevice));
+
 	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
-    
+
 	if (!string)
 	{
 		string = devprop_create_string();
@@ -163,14 +166,15 @@ void setup_eth_builtin(pci_dt_t *eth_dev)
 	{
 		verbose("Setting up lan keys\n");
 		name_model = get_ethernet_model(eth_dev->vendor_id, eth_dev->device_id);
-        
+
 		devprop_add_network_template(device, eth_dev->vendor_id);
-		devprop_add_value(device, "model", (uint8_t*)name_model, (strlen(name_model) + 1));
-		devprop_add_value(device, "device_type", (uint8_t*)"ethernet", 9);
+		devprop_add_value(device, "model", (uint8_t *)name_model, (strlen(name_model) + 1));
+		devprop_add_value(device, "device_type", (uint8_t *)"Ethernet Controller", 20);
+
 		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata)
 		{
-			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
+			memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
 			stringlength = string->length;
 		}
 	}
@@ -197,12 +201,12 @@ static network_device known_wifi_cards[] =
 void setup_wifi_airport(pci_dt_t *wlan_dev) // ARPT
 {
 	char tmp[16];
-	uint8_t		BuiltIn = 0x00;
+	builtin = 0;
 	DevPropDevice *device ;
 	char *devicepath = get_pci_dev_path(wlan_dev);
-    
+
 	verbose("Wifi Controller [%04x:%04x]\n", wlan_dev->vendor_id, wlan_dev->device_id);
-    
+
 	if (!string)
 	{
 		string = devprop_create_string();
@@ -215,28 +219,28 @@ void setup_wifi_airport(pci_dt_t *wlan_dev) // ARPT
 	device = devprop_add_device(string, devicepath);
 	if(device)
 	{
-		//sprintf(tmp, sizeof(tmp),"Airport");
-		sprintf(tmp, "AirPort");
+		snprintf(tmp, sizeof(tmp),"Airport");
 		devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp) + 1);
 		devprop_add_value(device, "device_type", (uint8_t *) tmp, strlen(tmp) + 1);
-		devprop_add_value(device, "built-in", (uint8_t *)&BuiltIn, 1);
-        
-		int i = 0;
+		devprop_add_value(device, "built-in", (uint8_t *)&builtin, 1);
+
+		unsigned int i = 0;
 		for( ; i < sizeof(known_wifi_cards) / sizeof(known_wifi_cards[0]); i++)
 		{
 			if(wlan_dev->vendor_id == known_wifi_cards[i].vendor_id && wlan_dev->device_id == known_wifi_cards[i].device_id)
 			{
 				verbose("Setting up wifi keys\n");
-				devprop_add_value(device, "model", (uint8_t*)known_wifi_cards[i].model, (strlen(known_wifi_cards[i].model) + 1));
+
+				devprop_add_value(device, "model", (uint8_t *)known_wifi_cards[i].model, (strlen(known_wifi_cards[i].model) + 1));
 				// NOTE: I would set the subsystem id and subsystem vendor id here,
 				// however, those values seem to be ovverriden in the boot process.
 				// A better method would be injecting the DTGP dsdt method
 				// and then injecting the subsystem id there.
                 
-				stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
+				stringdata = (uint8_t *)malloc(sizeof(uint8_t) *string->length);
 				if(stringdata)
 				{
-					memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
+					memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
 					stringlength = string->length;
 				}
 				return;

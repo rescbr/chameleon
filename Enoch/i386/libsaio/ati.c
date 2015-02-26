@@ -68,7 +68,7 @@ card_config_t card_configs[] = {
 	{"Ipomoea",	3},
 	{"Muskgrass",	4},
 	{"Juncus",	4},
-	{"Osmunda",     4}, 
+	{"Osmunda",     4},
 	{"Pondweed",	3},
 	{"Spikerush",   4},
 	{"Typha",       5},
@@ -835,24 +835,27 @@ bool get_bootdisplay_val(value_t *val)
 {
 	static uint32_t v = 0;
 	
-	if (v) {
+	if (v)
+	{
 		return false;
 	}
-	if (!card->posted) {
+	if (!card->posted)
+	{
 		return false;
 	}
 	v = 1;
 	val->type = kCst;
 	val->size = 4;
 	val->data = (uint8_t *)&v;
-	
+
 	return true;
 }
 
 bool get_dual_link_val(value_t *val)
 {
 	bool doit = false;
-	if(getBoolForKey(kEnableDualLink, &doit, &bootInfo->chameleonConfig) && doit) {
+	if(getBoolForKey(kEnableDualLink, &doit, &bootInfo->chameleonConfig) && doit)
+	{
 		uint8_t AAPL00_value[] = {0x01, 0x00, 0x00, 0x00};
 		val->type = kStr;
 		val->size = strlen("AAPL00,DualLink") + 1;
@@ -865,7 +868,8 @@ bool get_dual_link_val(value_t *val)
 bool get_hdmiaudio(value_t * val)
 {
 	bool doit = false;
-	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit) {
+	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit)
+	{
 		val->type = kStr;
 		val->size = strlen("onboard-1") + 1;
 		val->data = (uint8_t *)"onboard-1";
@@ -1420,11 +1424,12 @@ bool devprop_add_pci_config_space(void)
 }
 #endif
 
+static char	name[24];
+static char	name_parent[24];
+
 static bool init_card(pci_dt_t *pci_dev)
 {
 	bool	add_vbios = true;
-	char	name[24];
-	char	name_parent[24];
 	int		i;
 	int		n_ports = 0;
 

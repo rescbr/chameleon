@@ -263,7 +263,7 @@ static const char * bios_error(int errnum)
 		return errname;
 	}
 
-	sprintf(errorstr, "Error 0x%02x", errnum);
+	snprintf(errorstr, sizeof(errorstr), "Error 0x%02x", errnum);
 	return errorstr; // No string, print error code only
 }
 
@@ -844,7 +844,7 @@ EFI_GUID const GPT_BASICDATA2_GUID	= { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D,
 // same as Apple ZFS
 //EFI_GUID const GPT_ZFS_GUID		= { 0x6A898CC3, 0x1DD2, 0x11B2, { 0x99, 0xA6, 0x08, 0x00, 0x20, 0x73, 0x66, 0x31 } };  // 0xBF01 "Solaris /usr & Apple ZFS
 
-BVRef newGPTBVRef( int biosdev,
+static BVRef newGPTBVRef( int biosdev,
                    int partno,
                    unsigned int blkoff,
                    const gpt_ent *part,
@@ -975,7 +975,13 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
 	{
 	// Create a new mapping.
 
-	map = (struct DiskBVMap *)malloc(sizeof(*map));
+	map = (struct DiskBVMap *) malloc(sizeof(*map));
+
+	if ( !map )
+	{
+		return NULL;
+	}
+
 	if ( map )
         {
 		map->biosdev = biosdev;
@@ -1325,7 +1331,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 				dpme.dpme_boot_block);
 				*/
 
-				if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0)
+				if (strncmp(dpme_p->dpme_type, "Apple_HFS",sizeof("Apple_HFS")) == 0)
 				{
 					bvr = newAPMBVRef(biosdev,
 					i,
@@ -1430,7 +1436,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 
 	// Determine whether the partition header signature is present.
 
-	if (memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)))
+	if ( memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)) )
 	{
 		goto scanErr;
 	}
@@ -1492,6 +1498,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 	{
         	goto scanErr;
 	}
+
+	bzero(buffer,bufferSize);
 
 	if (readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
 	{
@@ -1717,7 +1725,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	if (!valid)
 	{
 		// OS X Standard
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{
@@ -1727,7 +1735,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		else
 		{
 			// OS X Server
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 			if (!loadConfigFile(dirSpec, &systemVersion))
 			{
@@ -1736,7 +1744,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 			}
 /*			else
 			{
-				sprintf(dirSpec, "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
+				snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 				if (!loadConfigFile(dirSpec, &systemVersion))
 				{
@@ -1776,7 +1784,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	if(!valid)
 	{
 		int fh = -1;
-		sprintf(dirSpec, "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		fh = open(dirSpec, 0);
 
 		if (fh >= 0)
@@ -1788,7 +1796,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 		else
 		{
-			sprintf(dirSpec, "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
 			fh = open(dirSpec, 0);
 
 			if (fh >= 0)
@@ -1828,12 +1836,14 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		//
 		if (bvr->flags & kBVFlagBooter)
 		{
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			strcpy(fileSpec, ".disk_label.contentDetails");
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			strlcpy(fileSpec, ".disk_label.contentDetails", sizeof(fileSpec));
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
-				fh = open(strcat(dirSpec, fileSpec), 0);
+				strlcat(dirSpec, fileSpec, sizeof(dirSpec));
+				fh = open(dirSpec,0);
+
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{
@@ -1852,7 +1862,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 				if (!error)
 				{
 					label[fileSize] = '\0';
-					strcpy(bvr->altlabel, label);
+					strlcpy(bvr->altlabel, label, sizeof(bvr->altlabel));
 				}
 			}
 		}
@@ -2183,7 +2193,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 	}
 
 	// Try to match hd(x,y) first.
-	sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	snprintf(testStr, sizeof(testStr),"hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
 	{
 		return true;
@@ -2218,7 +2228,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias"; etc...
  */
 
-bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
+static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 {
 	char *aliasList, *entryStart, *entryNext;
     
@@ -2328,7 +2338,7 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 
 		if (name == NULL)
 		{
-			sprintf(p, "TYPE %02X", type);
+			snprintf(p, strMaxLen, "TYPE %02X", type);
 		}
 		else
 		{
@@ -2337,7 +2347,7 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 	}
 
 	// Set the devices label
-	sprintf(bvr->label, p);
+	snprintf(bvr->label, sizeof(bvr->label), p);
 }
 
 

@@ -78,7 +78,8 @@ void flipRB(pixmap_t *p)
 	
 	uint32_t x;
 	register uint8_t tempB;
-	for (x = 0; x < (p->height) * (p->width) ; x++) {
+	for (x = 0; x < (p->height) * (p->width) ; x++)
+	{
 		tempB = (p->pixels[x]).ch.b;
 		(p->pixels[x]).ch.b = (p->pixels[x]).ch.r;
 		(p->pixels[x]).ch.r = tempB;

@@ -13,9 +13,20 @@
 #include "Keylayout.h"
 #include "bootstruct.h"
 
+#ifndef DEBUG_KLAYOUT
+#define DEBUG_KLAYOUT 0
+#endif
+
+#if DEBUG_KLAYOUT
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
+
 #define kKeyboardLayout "KeyboardLayout"
 
 struct keyboard_layout *current_layout = NULL;
+int getchar_replacement();
 
 int getchar_replacement() {
 	int code   = bgetc();
@@ -50,46 +61,57 @@ int getchar_replacement() {
 	return (code);
 }
 
-static uint32_t load_keyboard_layout_file(const char *filename) {
+static uint32_t load_keyboard_layout_file(const char *filename)
+{
 	int      fd;
 	char     magic[KEYBOARD_LAYOUTS_MAGIC_SIZE];
 	uint32_t version;
 	
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0) {
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
 		goto fail; // fail
 	}
 	
-	if (read(fd, magic, sizeof(magic)) != sizeof(magic)) {
+	if (read(fd, magic, sizeof(magic)) != sizeof(magic))
+	{
 		printf("Can't find magic in keyboard layout file: %s\n", filename);
 		goto fail;
 	}
 
-	if (memcmp (magic, KEYBOARD_LAYOUTS_MAGIC, KEYBOARD_LAYOUTS_MAGIC_SIZE) != 0) {
+	if (memcmp (magic, KEYBOARD_LAYOUTS_MAGIC, KEYBOARD_LAYOUTS_MAGIC_SIZE) != 0)
+	{
 		printf("Invalid magic code in keyboard layout file: %s\n", filename);
 		goto fail;
-    }
+	}
 
-	if (read(fd, (char*) &version, sizeof(version)) != sizeof(version)) {
+	if (read(fd, (char*) &version, sizeof(version)) != sizeof(version))
+	{
 		printf("Can't get version of keyboard layout file: %s\n", filename);
 		goto fail;
 	}
 	
-	if (version != KEYBOARD_LAYOUTS_VERSION) {
+	if (version != KEYBOARD_LAYOUTS_VERSION)
+	{
 		verbose("Bad version for keyboard layout file %s expected v%d found v%d\n",
-			   filename, KEYBOARD_LAYOUTS_VERSION, version);
+			filename, KEYBOARD_LAYOUTS_VERSION, version);
 		goto fail;
 	}
 	
 	if (current_layout)
+	{
 		free(current_layout);
-		
+	}
+
 	current_layout = malloc(sizeof(*current_layout));
 	if (!current_layout)
+	{
 		goto fail;
+	}
 
 	b_lseek(fd, KEYBOARD_LAYOUTS_MAP_OFFSET, 0);
 	
-	if (read(fd, (char*) current_layout, sizeof(*current_layout)) != sizeof(*current_layout)) {
+	if (read(fd, (char*) current_layout, sizeof(*current_layout)) != sizeof(*current_layout))
+	{
 		printf("Wrong keyboard layout file %s size\n", filename);
 		goto fail;
 	}
@@ -97,10 +119,11 @@ static uint32_t load_keyboard_layout_file(const char *filename) {
 	close(fd);
 	
 	return 1;
-		
-  fail:
+
+fail:
     
-	if (current_layout) {
+	if (current_layout)
+	{
 		free(current_layout);
 		current_layout = NULL;
 	}
@@ -113,17 +136,21 @@ void Keylayout_start()
 	const char	*val;
 	int			len;
 
-	if (getValueForKey("KeyLayout", &val, &len, &bootInfo->chameleonConfig)) {
-		sprintf(layoutPath, "/Extra/Keymaps/%s", val);
+	if (getValueForKey("KeyLayout", &val, &len, &bootInfo->chameleonConfig))
+	{
+		snprintf(layoutPath, sizeof(layoutPath),"/Extra/Keymaps/%s", val);
 		// Add the extension if needed
-		if (len <= 4 || strcmp(val+len-4,".lyt") != 0)
-			strncat(layoutPath, ".lyt", sizeof(layoutPath) - strlen(layoutPath) - 1);
+		if (len <= 4 || strncmp(val+len-4,".lyt", sizeof(".lyt")) != 0)
+			strlcat(layoutPath, ".lyt", sizeof(layoutPath));
 
-		if (!load_keyboard_layout_file(layoutPath)) {
-			printf("Can't load %s keyboard layout file. Keylayout will not be used !\n",
-				   layoutPath);
+		if (!load_keyboard_layout_file(layoutPath))
+		{
+			DBG("Can't load %s keyboard layout file. Keylayout will not be used !\n",
+				layoutPath);
 			sleep(2);
-		} else if (!replace_function("_getchar", &getchar_replacement)) {
+		}
+		else if (!replace_function("_getchar", &getchar_replacement))
+		{
 			printf("Can't replace function getchar: Keylayout module can't be used !\n");
 			sleep(2);
 		}

@@ -57,9 +57,9 @@ static short Llzvn_tableref[256] =
 	} while (0)
 
 
-size_t lzvn_decode(void * dst,
+size_t lzvn_decode(void *dst,
 			size_t dst_size,
-			const void * src,
+			const void *src,
 			size_t src_size)
 {
     size_t   rax = 0;

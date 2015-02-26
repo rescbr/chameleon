@@ -3,9 +3,9 @@
 set -u
 
 configFile='/private/tmp/InstallConfig.plist'
-v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} | sed -e 's/[[:blank:]]*//g' )
-v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' \
-                                                                               | sed -e 's/^[ \t]*//' )
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
 
 moduleName="@moduleName@"
 moduleFile="@moduleFile@"

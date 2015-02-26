@@ -14,9 +14,9 @@
 #endif
 
 #if DEBUG_PCI
-#define DBG(x...)		printf(x)
+#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 pci_dt_t	*root_pci_dev;
@@ -213,7 +213,7 @@ void dump_pci_dt(pci_dt_t *pci_dt)
 	while (current) {
 		printf("%02x:%02x.%x [%04x%02x] [%04x:%04x] (subsys [%04x:%04x]):: %s\n", 
 			current->dev.bits.bus, current->dev.bits.dev, current->dev.bits.func, 
-			current->class_id, 0 /* FIXME: what should this be? */,
+			current->class_id, current->progif,
 			current->vendor_id, current->device_id,
 			current->subsys_id.subsys.vendor_id, current->subsys_id.subsys.device_id, 
 			get_pci_dev_path(current));

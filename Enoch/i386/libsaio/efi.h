@@ -254,7 +254,7 @@ EFI_STATUS
   IN EFI_UINTN                    DescriptorSize,
   IN EFI_UINT32                   DescriptorVersion,
   IN EFI_MEMORY_DESCRIPTOR        * VirtualMap
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -262,7 +262,7 @@ EFI_STATUS
 (EFIAPI *EFI_CONVERT_POINTER) (
   IN EFI_UINTN                DebugDisposition,
   IN OUT VOID                 **Address
-  );
+  ) __attribute__((regparm(0)));
 
 
 // Variable attributes
@@ -281,7 +281,7 @@ EFI_STATUS
   OUT EFI_UINT32              * Attributes OPTIONAL,
   IN OUT EFI_UINTN            * DataSize,
   OUT VOID                    * Data
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -290,7 +290,7 @@ EFI_STATUS
   IN OUT EFI_UINTN            * VariableNameSize,
   IN OUT EFI_CHAR16           * VariableName,
   IN OUT EFI_GUID             * VendorGuid
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -301,7 +301,7 @@ EFI_STATUS
   IN EFI_UINT32               Attributes,
   IN EFI_UINTN                DataSize,
   IN VOID                     * Data
-  );
+  ) __attribute__((regparm(0)));
 
 
 // EFI Time
@@ -318,14 +318,14 @@ EFI_STATUS
 (EFIAPI *EFI_GET_TIME) (
   OUT EFI_TIME                * Time,
   OUT EFI_TIME_CAPABILITIES   * Capabilities OPTIONAL
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
 EFI_STATUS
 (EFIAPI *EFI_SET_TIME) (
   IN EFI_TIME                 * Time
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -334,7 +334,7 @@ EFI_STATUS
   OUT EFI_BOOLEAN             * Enabled,
   OUT EFI_BOOLEAN             * Pending,
   OUT EFI_TIME                * Time
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -342,7 +342,7 @@ EFI_STATUS
 (EFIAPI *EFI_SET_WAKEUP_TIME) (
   IN EFI_BOOLEAN              Enable,
   IN EFI_TIME                 * Time OPTIONAL
-  );
+  ) __attribute((regparm(0)));
 
 typedef enum {
   EfiResetCold,
@@ -363,7 +363,7 @@ VOID
   IN EFI_STATUS                   ResetStatus,
   IN EFI_UINTN                    DataSize,
   IN EFI_CHAR16                   * ResetData OPTIONAL
-  );
+  ) __attribute__((regparm(0)));
 
 typedef
 EFI_RUNTIMESERVICE
@@ -391,7 +391,7 @@ EFI_STATUS
   IN EFI_UINT32                 Instance,
   IN EFI_GUID                   * CallerId OPTIONAL,
   IN EFI_STATUS_CODE_DATA       * Data OPTIONAL
-  );
+  ) __attribute__((regparm(0)));
 
 #endif
 //
