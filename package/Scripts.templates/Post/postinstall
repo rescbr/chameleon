@@ -5,6 +5,7 @@
 # $3 = Installation volume (mountpoint) to receive the payload
 # $4 = Root directory for the system
 
+logName="@LOG_FILENAME@"
 mainLine="=============================================================================="
 subLine="------------------------------------------------------------------------------"
 
@@ -19,32 +20,32 @@ fi
 
 configFile='/private/tmp/InstallConfig.plist'
 v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
-v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' \
-                                                                               | sed -e 's/^[ \t]*//' )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                     sed -e 's/^ *//' | sed -e 's/ *$//')
 
 targetDevice=$( /usr/libexec/PlistBuddy -c "Print :targetdev" ${configFile} )
-choicedVolume=$( LC_ALL=C diskutil info ${targetDevice} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' \
-                                                                                       | sed -e 's/^[ \t]*//' )
+choicedVolume=$( LC_ALL=C diskutil info ${targetDevice} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                            sed -e 's/^ *//' | sed -e 's/ *$//' )
 backupRootDir="${targetVolume}/Chameleon.Backups"
 backupDir=$( /usr/libexec/PlistBuddy -c "Print :backupDir" ${configFile} )
 
 # Check target exists
-if [ ! -d "${targetVolume}" ]; then
-    echo "Target volume does not exist !" >&2
-    exit 1
-fi
 if [ ! -d "${v_mntpt}" ]; then
-    echo "Ram disk volume does not exist !" >&2
+    echo "Ram disk volume does not exist !"
     exit 1
 fi
-if [ ! -d "${choicedVolume}" ]; then
-    echo "${choicedVolume} volume does not exist !" >&2
-    exit 1
-fi
-
-logName="@LOG_FILENAME@"
 
 exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+if [ ! -d "${targetVolume}" ]; then
+    echo "Target volume does not exist !"
+    exit 1
+fi
+
+if [ ! -d "${choicedVolume}" ]; then
+    echo "${choicedVolume} volume does not exist !"
+    exit 1
+fi
 
 echo "$mainLine"
 echo "Running Post postinstall script"
@@ -55,9 +56,10 @@ echo "$subLine"
 echo "Moving Extra folder to ${choicedVolume}"
 cp -R "${v_mntpt}/Extra" "${choicedVolume}"/
 
-echo "NOTE: any Themes or modules you have must be there since this now is the boot partition,"
-echo "      ACPI tables, SMBios.plist and the org.chameleon.Boot.plist (with custom settings"
-echo "      for the target OSX must be in each partition that contanin it.)"
+echo "NOTE: any Themes or modules you have must be there since this now"
+echo "      is the boot partition. ACPI tables, SMBios.plist and the"
+echo "      org.chameleon.Boot.plist (with custom settings for the target"
+echo "      OSX must be in each partition that contain it.)"
 
 echo "$subLine"
 echo "Post postinstall script complete"

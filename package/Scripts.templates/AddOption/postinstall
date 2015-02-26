@@ -3,9 +3,9 @@
 set -u
 
 configFile='/private/tmp/InstallConfig.plist'
-v_mntptDev=$( /usr/libexec/plistbuddy -c "Print :ramdisk" ${configFile} | sed -e 's/[[:blank:]]*//g' )
-v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' \
-                                                                    | sed -e 's/^[ \t]*//' )
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
 
 key="@optionKey@"
 value="@optionValue@"
@@ -33,10 +33,10 @@ bootPListFile="${v_mntpt}/Extra/org.chameleon.Boot.plist"
 
 case "$type" in
     bool|text)
-          /usr/libexec/plistbuddy -c "Add :${key} string ${value}" "$bootPListFile"
+          /usr/libexec/PlistBuddy -c "Add :${key} string ${value}" "$bootPListFile"
           ;;
     list)
-          current_values=$( /usr/libexec/plistbuddy -c "Print :${key}" \
+          current_values=$( /usr/libexec/PlistBuddy -c "Print :${key}" \
            "$bootPListFile" 2>/dev/null )
           result=$?
           current_values="${current_values// /\\ }"    # Escape spaces
@@ -49,12 +49,12 @@ case "$type" in
               else
                   new_values="${current_values}\ ${value}"
               fi
-              /usr/libexec/plistbuddy -c "Set :${key} ${new_values}" \
+              /usr/libexec/PlistBuddy -c "Set :${key} ${new_values}" \
                "$bootPListFile"
           else
               # Create a new option
               new_values="${value}"
-              /usr/libexec/plistbuddy -c "Add :${key} string ${new_values}" \
+              /usr/libexec/PlistBuddy -c "Add :${key} string ${new_values}" \
                "$bootPListFile"
           fi
           ;;
