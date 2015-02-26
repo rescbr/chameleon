@@ -135,9 +135,9 @@ int main(int argc, char *argv[])
 	dylib.dylib_info.cmd = LC_ID_DYLIB;
 	dylib.dylib_info.cmdsize = sizeof(struct dylib_command) + sizeof(dylib.module_name);	// todo: verify
 	dylib.dylib_info.dylib.name.offset = sizeof(struct dylib_command);
-	dylib.dylib_info.dylib.timestamp = 0;	// TODO: populate with time
-	dylib.dylib_info.dylib.current_version = 0;		// TODO
-	dylib.dylib_info.dylib.compatibility_version = 0;	// TODO
+	dylib.dylib_info.dylib.timestamp = 0;							// TODO: populate with time
+	dylib.dylib_info.dylib.current_version = 0;						// TODO
+	dylib.dylib_info.dylib.compatibility_version = 0;					// TODO
 	
 	
 	//int offset = dylib.dylib_info.cmdsize%4 ? 4 - (dylib.dylib_info.cmdsize % 4) : 0;

@@ -147,7 +147,7 @@ typedef struct {
 	u_int64_t       t_write;
 	u_int64_t       t_mftwrite;
 	u_int64_t       t_access;
-}               ntfs_times_t;
+} ntfs_times_t;
 
 #define NTFS_FFLAG_RDONLY	0x01LL
 #define NTFS_FFLAG_HIDDEN	0x02LL

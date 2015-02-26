@@ -1963,7 +1963,6 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
 	uint64_t vram_size = 0;
-	// unsigned long long vram_size = 0;
 
 	// First check if any value exist in the plist
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);

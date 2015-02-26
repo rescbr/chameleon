@@ -16,7 +16,7 @@
 #if DEBUG_PCI
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 pci_dt_t	*root_pci_dev;

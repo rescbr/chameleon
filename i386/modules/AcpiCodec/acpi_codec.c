@@ -4330,7 +4330,7 @@ static U32 process_xsdt (ACPI_TABLE_RSDP *rsdp_mod , U32 *new_table_list)
     {
         DropTables_p = XMLCastDict(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char*)"ACPIDropTables"));
         if (DropTables_p) DropTables_tag_count = XMLTagCount(DropTables_p) ;
-    }   
+    }
     
 	U32 new_table = 0ul;
 	U8 new_table_index = 0, table_added = 0;

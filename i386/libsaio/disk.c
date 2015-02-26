@@ -975,7 +975,13 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
 	{
 	// Create a new mapping.
 
-	map = (struct DiskBVMap *)malloc(sizeof(*map));
+	map = (struct DiskBVMap *) malloc(sizeof(*map));
+
+	if ( !map )
+	{
+		return NULL;
+	}
+
 	if ( map )
         {
 		map->biosdev = biosdev;
@@ -1430,7 +1436,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 
 	// Determine whether the partition header signature is present.
 
-	if (memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)))
+	if ( memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)) )
 	{
 		goto scanErr;
 	}
@@ -1492,6 +1498,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 	{
         	goto scanErr;
 	}
+
+	bzero(buffer,bufferSize);
 
 	if (readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
 	{
@@ -2218,7 +2226,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias"; etc...
  */
 
-bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
+static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 {
 	char *aliasList, *entryStart, *entryNext;
     
