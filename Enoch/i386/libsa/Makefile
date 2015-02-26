@@ -23,7 +23,7 @@ INC = -I. -I$(SYMROOT) -I$(LIBSAIODIR) -I${SRCROOT}/i386/include
 
 OBJS = prf.o printf.o zalloc.o \
 	string.o strtol.o error.o \
-	setjmp.o qsort.o efi_tables.o
+	setjmp.o qsort.o efi_tables.o interrupts.o
 
 OBJS := $(addprefix $(OBJROOT)/, $(OBJS))
 

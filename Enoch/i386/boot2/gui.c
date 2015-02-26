@@ -1967,6 +1967,7 @@ void showInfoBox(char *title, char *text_orig)
 
 // ====================================================================
 
+#if UNUSED
 void animateProgressBar()
 {
 	int y;
@@ -1986,6 +1987,7 @@ void animateProgressBar()
 		pixel(buffBar, buffBar->width-1, 0).value = buff;
 	}
 }
+#endif
 
 // ====================================================================
 
@@ -2045,7 +2047,9 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 	}
 
 	blend(&progressbar, blendInto, p);
+#if 0
 	animateProgressBar();
+#endif
 	free(progressbar.pixels);
 }
 
