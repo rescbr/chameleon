@@ -190,10 +190,23 @@ static int countdown( const char * msg, int row, int timeout )
 
 	for ( time = time18(), timeout++; timeout > 0; )
 	{
-		if( time18() > lasttime)
+		int currenttime;
+		if (lasttime)
 		{
-			multi--; 
-			lasttime=time18();
+			currenttime = time18();
+			if( currenttime > lasttime)
+			{
+				multi -= (currenttime - lasttime);
+				if (multi < 0)
+				{
+					multi = 0;
+				}
+				lasttime=currenttime;
+			}
+		}
+		else
+		{
+			lasttime = currenttime = time;
 		}
   
 		if ( (ch = readKeyboardStatus()) )
@@ -207,7 +220,7 @@ static int countdown( const char * msg, int row, int timeout )
 			break;
 		}
 
-		if ( time18() >= time )
+		if ( currenttime >= time )
 		{
 			time += 18;
 			timeout--;

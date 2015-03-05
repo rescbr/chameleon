@@ -154,4 +154,19 @@ extern void	*realloc(void *ptr, size_t size);
  */
 extern struct segment_command *getsegbynamefromheader(struct mach_header *mhp, char *segname);
 
+/*
+ * interrupts.c
+ */
+#ifdef __i386__
+extern int SetupInterrupts(void);
+static inline void EnableInterrupts(void) { __asm__ volatile ("sti"); }
+static inline void DisableInterrupts(void) { __asm__ volatile ("cli"); }
+extern void ShowInterruptCounters(void);
+#else
+static inline int SetupInterrupts(void) { return 0; }
+static inline void EnableInterrupts(void) { }
+static inline void DisableInterrupts(void) { }
+static inline void ShowInterruptCounters(void) { }
+#endif
+
 #endif /* !__BOOT_LIBSA_H */

@@ -53,12 +53,15 @@ static biosBuf_t bb;
 
 int bgetc(void)
 {
+#if 0
 	/*  Poll for the next character.  Most real BIOS do not need this as the
 	    INT 16h,AH=0h function will block until one is received.
 	    Unfortunately, Apple's EFI CSM will never wake up.  This idea is lifted
 	    from the grub-a20.patch to GRUB's stage2/asm.S file.
 	*/
 	while(!readKeyboardStatus());
+	// Apple's EFI CSM???? Who cares - Zenith432
+#endif
 
 	bb.intno = 0x16;
 	bb.eax.r.h = 0x00;
@@ -85,10 +88,14 @@ int readKeyboardStatus(void)
 
 int readKeyboardShiftFlags(void)
 {
+#if 0
 	bb.intno = 0x16;
 	bb.eax.r.h = 0x02;
 	bios(&bb);
 	return bb.eax.r.l;
+#else
+	return *(uint8_t const volatile*) 0x417U;
+#endif
 }
 
 
@@ -96,6 +103,7 @@ int readKeyboardShiftFlags(void)
 
 unsigned int time18(void)
 {
+#if 0
 	union {
 		struct {
 			unsigned int low:16;
@@ -112,9 +120,15 @@ unsigned int time18(void)
 	time.s.high = bb.ecx.rr;
 
 	return time.i;
+#else
+	(void) __sync_lock_test_and_set((uint8_t volatile*) 0x470U, (uint8_t) 0U);
+	return *(uint32_t const volatile*) 0x46CU;
+#endif
 }
 
 #if 0
+
+static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
 {
 	int i, still_changing, newcount = count;
@@ -578,7 +592,7 @@ int is_no_emulation(int drive)
 /*
  * BIOS drive information.
  */
-void print_drive_info(boot_drive_info_t *dp)
+static void print_drive_info(boot_drive_info_t *dp)
 {
 //	printf("buf_size = %x\n", dp->params.buf_size);
 	printf("info_flags = %x\n", dp->params.info_flags);
@@ -741,6 +755,7 @@ int get_drive_info(int drive, struct driveInfo *dp)
 
 //==============================================================================
 
+#if UNUSED
 int ebiosEjectMedia(int biosdev)
 {
 	bb.intno = 0x13;
@@ -750,6 +765,7 @@ int ebiosEjectMedia(int biosdev)
 	bios(&bb);
 	return bb.eax.r.h;
 }
+#endif
 
 void setCursorPosition(int x, int y, int page)
 {
@@ -807,7 +823,7 @@ void setActiveDisplayPage( int page )
 
 #if DEBUG
 
-int terminateDiskEmulation()
+static int terminateDiskEmulation()
 {
 	static char cd_spec[0x13];
 
@@ -820,7 +836,7 @@ int terminateDiskEmulation()
 	return bb.eax.r.h;
 }
 
-int readDriveParameters(int drive, struct driveParameters *dp)
+static int readDriveParameters(int drive, struct driveParameters *dp)
 {
 	bb.intno = 0x13;
 	bb.edx.r.l = drive;
@@ -977,6 +993,7 @@ ReadEISAFuncInfo(EISA_func_info_t *ep, int slot, int function)
 }
 #endif /* EISA_SUPPORT */
 
+#if UNUSED
 #define PCI_SIGNATURE 0x20494350  /* "PCI " */
 
 int
@@ -997,11 +1014,20 @@ ReadPCIBusInfo(PCI_bus_info_t *pp)
 	}
 	return -1;
 }
+#endif
 
 void sleep(int n)
 {
-    unsigned int endtime = (time18() + 18*n);
-    while (time18() < endtime);
+	// FIXME: doesn't handle midnight wraparound
+	unsigned int endtime = (time18() + 18*n);
+#ifdef __i386__
+	while (time18() < endtime)
+	{
+		__asm__ volatile ("rep; nop");
+	}
+#else
+	while (time18() < endtime);
+#endif
 }
 
 
