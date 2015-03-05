@@ -451,7 +451,7 @@ EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 static const char FIRMWARE_REVISION_PROP[] = "firmware-revision";
 static const char FIRMWARE_ABI_PROP[] = "firmware-abi";
 static const char FIRMWARE_VENDOR_PROP[] = "firmware-vendor";
-//static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
+static const char FIRMWARE_ABI_32_PROP_VALUE[] = "EFI32";
 static const char FIRMWARE_ABI_64_PROP_VALUE[] = "EFI64";
 static const char EFI_MODE_PROP[] = "efi-mode";  //Bungo
 static const char SYSTEM_ID_PROP[] = "system-id";
@@ -568,7 +568,7 @@ void setupSystemType()
 	DT__AddProperty(node, SYSTEM_TYPE_PROP, sizeof(Platform.Type), &Platform.Type);
 }
 
-void setupEfiDeviceTree(void)
+static void setupEfiDeviceTree(void)
 {
 	// EFI_CHAR8	*ret = 0;  Bungo: not used
 	EFI_CHAR16	*ret16 = 0;
@@ -586,16 +586,15 @@ void setupEfiDeviceTree(void)
 	// But I think eventually we want to fill stuff in the efi node
 	// too so we might as well create it so we have a pointer for it too.
 	node = DT__AddChild(node, "efi");
-/* Bungo
+
 	if (archCpuType == CPU_TYPE_I386)
 	{
-		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char *)FIRMWARE_ABI_32_PROP_VALUE);
 	}
 	else
 	{
-	*/
 		DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
-//	}
+	}
 
 	DT__AddProperty(node, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
 
