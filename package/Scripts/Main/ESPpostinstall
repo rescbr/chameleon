@@ -35,8 +35,6 @@ backupDir=$( /usr/libexec/PlistBuddy -c "Print :backupDir" ${configFile} )
 logName="Chameleon_Installer_Log.txt"
 logFile="${v_mntpt}/${logName}"
 # --------------------------------------------------------------------------------------------------------
-stage0Loader="boot0"
-stage0LoaderDualBoot="boot0md"
 stage1LoaderHFS="boot1h"
 stage1LoaderFAT="boot1f32"
 stage1LoaderExFAT="boot1x"
@@ -179,17 +177,18 @@ MOUNT_ESP() {
 }
 # --------------------------------------------------------------------------------------------------------
 PARTITION_ACTIVE_IF() {
-    echo -e "${mainLine}\nSET PARTITION ACTIVE:"
-    # if Windows was detected, don't activate the partition..
-    # if the stage 0 loader is boo0hfs, don't activate the partition
-    if [ WINDOWS_EXIST = "0" ] || [ "${stage0Loader}" != "boot0hfs" ];then
-        partitionactive=$( fdisk -d ${targetDiskRaw} | grep -n "*" | awk -F: '{print $1}')
-        if [ "${partitionactive}" ] && [ "${partitionactive}" = "${targetSlice}" ]; then
-            echo "${targetDiskRaw#/dev/r}, slice "${targetSlice}" is already set active. No need to change it."
-        else
-            echo "Setting ${choicedVolume} partition active."
-            # BadAxe requires EFI partition to be flagged active.
-            # but it doesn't' hurt to do it for any non-windows partition.
+    if  [ $InstallBootloader = "1" ];then
+        echo -e "${mainLine}\nSET PARTITION ACTIVE:"
+        # if Windows was detected, don't activate the partition..
+        # if the stage 0 loader is boo0hfs, don't activate the partition
+        if [ WINDOWS_EXIST = "0" ] || [ "${stage0Loader}" != "boot0hfs" ];then
+            partitionactive=$( fdisk -d ${targetDiskRaw} | grep -n "*" | awk -F: '{print $1}')
+            if [ "${partitionactive}" ] && [ "${partitionactive}" = "${targetSlice}" ]; then
+                echo "${targetDiskRaw#/dev/r}, slice "${targetSlice}" is already set active. No need to change it."
+            else
+                echo "Setting ${choicedVolume} partition active."
+                # BadAxe requires EFI partition to be flagged active.
+                # but it doesn't' hurt to do it for any non-windows partition.
 
 # leave left aligned the follow code:
 fdisk -e ${targetDiskRaw} <<-MAKEACTIVE
@@ -199,12 +198,13 @@ write
 y
 quit
 MAKEACTIVE
+            fi
+        else
+            echo "Partition will not activate when Windows is detected or stage 0 is boot0hfs"
         fi
-    else
-        echo "Partition will not activate when Windows is detected or stage 0 is boot0hfs"
+        echo ""
+        echo "$mainLine"
     fi
-    echo ""
-    echo "$mainLine"
 }
 # --------------------------------------------------------------------------------------------------------
 # Writing stage 0
