@@ -56,11 +56,6 @@ echo "$subLine"
 echo "Moving Extra folder to ${choicedVolume}"
 cp -R "${v_mntpt}/Extra" "${choicedVolume}"/
 
-echo "NOTE: any Themes or modules you have must be there since this now"
-echo "      is the boot partition. ACPI tables, SMBios.plist and the"
-echo "      org.chameleon.Boot.plist (with custom settings for the target"
-echo "      OSX must be in each partition that contain it.)"
-
 echo "$subLine"
 echo "Post postinstall script complete"
 echo "$mainLine"
@@ -81,6 +76,11 @@ fi
 # copying the installer log inside the Extra folder
 if [[ $( /usr/libexec/PlistBuddy -c "Print bootloader" ${configFile} ) == "true" ]];then
     # if we have installed the bootloader, this is a new log
+    echo "NOTE: any Themes or modules you have must be there since this now"
+    echo "      is the boot partition. ACPI tables, SMBios.plist and the"
+    echo "      org.chameleon.Boot.plist (with custom settings for the target"
+    echo "      OSX must be in each partition that contain it.)"
+    echo "$mainLine"
     cat "${v_mntpt}/${logName}" > "${choicedVolume}/Extra/${logName}"
 else
     # ..otherwise adding the new log to the existing one (if exist)

@@ -65,6 +65,9 @@ touch "${v_mntpt}/${logName}"
 exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
 
 echo "$mainLine"
+echo "SYSTEM INFO:"
+sw_vers
+echo "$mainLine"
 echo "Pre-Install Script"
 echo "$subLine"
 
