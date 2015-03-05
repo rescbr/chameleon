@@ -134,7 +134,7 @@ extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );
-long AllocateMemoryRange(char * rangeName, long start, long length, long type);
+long AllocateMemoryRange(char *rangeName, long start, long length, long type);
 
 /* misc.c */
 extern void   enableA20(void);

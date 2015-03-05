@@ -1069,7 +1069,6 @@ int replace_function(const char* symbol, void* newAddress)
 	return 0;
 }
 
-
 /*
  *	execute_hook(  const char* name )
  *		name - Name of the module hook
@@ -1105,8 +1104,6 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 		return 0;
 	}
 }
-
-
 
 /*
  *	register_hook_callback(  const char* name,  void(*callback)())

@@ -29,7 +29,7 @@
 #define __LIBSAIO_FAKE_EFI_H
 
 /* Set up space for up to 10 configuration table entries */
-#define MAX_CONFIGURATION_TABLE_ENTRIES 10
+#define MAX_CONFIGURATION_TABLE_ENTRIES (uint32_t)10
 
 extern void setupFakeEfi(void);
 

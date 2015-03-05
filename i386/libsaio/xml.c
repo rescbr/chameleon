@@ -64,7 +64,7 @@ char *GetRefString(int id)
 		tmp = tmp->next;
 	}
 	//verbose("Unable to locate Ref String %d\n", id);
-	return "";
+	return "Unknown";
 }
 
 struct Module {

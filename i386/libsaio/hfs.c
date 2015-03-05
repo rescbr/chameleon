@@ -1000,7 +1000,7 @@ static long ReadBTreeEntry(long btree, void * key, char * entry, long long * dir
 	}
 
 	// Return error if the file was not found.
-	if (result != 0)
+	if (result != 0 || !recordData)
 	{
 		free(nodeBuf);
 		return -1;

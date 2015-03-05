@@ -52,7 +52,7 @@ struct DevPropDevice {
 	// ------------------------
 	uint8_t	 num_pci_devpaths;
 	struct DevPropString *string;
-	// ------------------------	
+	// ------------------------
 };
 
 typedef struct DevPropDevice DevPropDevice;

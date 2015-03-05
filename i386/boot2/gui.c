@@ -538,7 +538,7 @@ int createBackBuffer( window_t *window )
 	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
 	{
-//		DBG("Unable to allocate memory for gui.backbuffer");
+		DBG("Unable to allocate memory for gui.backbuffer");
 		return 1;
 	}
 
@@ -547,7 +547,7 @@ int createBackBuffer( window_t *window )
 	{
 		free(gui.backbuffer);
 		gui.backbuffer = 0;
-//		DBG("Unable to allocate memory for gui.backbuffer->pixels");
+		DBG("Unable to allocate memory for gui.backbuffer->pixels");
 		return 1;
 	}
 	
@@ -564,7 +564,7 @@ int createWindowBuffer( window_t *window )
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
 	{
-//		DBG("Unable to allocate memory for window->pixmap");
+		DBG("Unable to allocate memory for window->pixmap");
 		return 1;
 	}
 
@@ -573,7 +573,7 @@ int createWindowBuffer( window_t *window )
 	{
 		free(window->pixmap);
 		window->pixmap = 0;
-//		DBG("Unable to allocate memory for window->pixmap->pixels");
+		DBG("Unable to allocate memory for window->pixmap->pixels");
 		return 1;
 	}
 	
@@ -935,7 +935,7 @@ int initGUI(void)
 	}
 #else
 
-//		DBG("Unable to load %s theme plist.\n",theme_name);
+		DBG("Unable to load %s theme plist.\n",theme_name);
 
 		return 1;
 
@@ -1000,7 +1000,7 @@ int initGUI(void)
 
 	DBG("Loading error occurred, reseting...\n",theme_name);
 
-	// not available memory, freeing resources
+	// Loading error occurred, freeing resources
 	freeWindowBuffer(&gui.menu);
 	freeWindowBuffer(&gui.infobox);
 	freeWindowBuffer(&gui.bootprompt);
