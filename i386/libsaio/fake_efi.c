@@ -145,12 +145,12 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 		DT__AddProperty(tableNode, "guid", sizeof(EFI_GUID), (void *)pGuid);
 
 		// The "table" property is the 32-bit (in our implementation) physical address of the table
-		DT__AddProperty(tableNode, "table", sizeof(void*) * 2, table);
+		DT__AddProperty(tableNode, "table", sizeof(void *) * 2, table);
 
 		// Assume the alias pointer is a global or static piece of data
 		if (alias != NULL)
 		{
-			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char*)alias);
+			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (char *)alias);
 		}
 
 		return EFI_SUCCESS;
@@ -192,9 +192,9 @@ void setupEfiTables32(void)
 		uint8_t voidret_instructions[sizeof(VOIDRET_INSTRUCTIONS)/sizeof(uint8_t)];
 		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS_32)/sizeof(uint8_t)];
 	};
-	
-	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
-	
+
+	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages *)AllocateKernelMemory(sizeof(struct fake_efi_pages));
+
 	// Zero out all the tables in case fields are added later
 	//bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
 	
@@ -262,8 +262,8 @@ void setupEfiTables32(void)
 	// but it is nice if we can at least prevent a complete crash by
 	// at least providing some sort of implementation until one can be provided
 	// nicely in a kext.
-	void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
-	void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
+	void (*voidret_fp)() = (void *)fakeEfiPages->voidret_instructions;
+	void (*unsupportedret_fp)() = (void *)fakeEfiPages->unsupportedret_instructions;
 	efiRuntimeServices->GetTime = (EFI_PTR32)unsupportedret_fp;
 	efiRuntimeServices->SetTime = (EFI_PTR32)unsupportedret_fp;
 	efiRuntimeServices->GetWakeupTime = (EFI_PTR32)unsupportedret_fp;
@@ -303,7 +303,7 @@ void setupEfiTables64(void)
 		uint8_t unsupportedret_instructions[sizeof(UNSUPPORTEDRET_INSTRUCTIONS_64)/sizeof(uint8_t)];
 	};
 
-	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages*)AllocateKernelMemory(sizeof(struct fake_efi_pages));
+	struct fake_efi_pages *fakeEfiPages = (struct fake_efi_pages *)AllocateKernelMemory(sizeof(struct fake_efi_pages));
 
 	// Zero out all the tables in case fields are added later
 	//bzero(fakeEfiPages, sizeof(struct fake_efi_pages));
@@ -371,8 +371,8 @@ void setupEfiTables64(void)
 	// at least providing some sort of implementation until one can be provided
 	// nicely in a kext.
 
-	void (*voidret_fp)() = (void*)fakeEfiPages->voidret_instructions;
-	void (*unsupportedret_fp)() = (void*)fakeEfiPages->unsupportedret_instructions;
+	void (*voidret_fp)() = (void *)fakeEfiPages->voidret_instructions;
+	void (*unsupportedret_fp)() = (void *)fakeEfiPages->unsupportedret_instructions;
 	efiRuntimeServices->GetTime = ptov64((EFI_PTR32)unsupportedret_fp);
 	efiRuntimeServices->SetTime = ptov64((EFI_PTR32)unsupportedret_fp);
 	efiRuntimeServices->GetWakeupTime = ptov64((EFI_PTR32)unsupportedret_fp);
@@ -465,7 +465,7 @@ static EFI_UINT32 MachineSig = 0;  //Bungo
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
-static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
+static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 {
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
 	EFI_CHAR16*	 dst = 0;
@@ -491,13 +491,15 @@ static EFI_CHAR16* getSmbiosChar16(const char * key, size_t* len)
 /*
  * Get the SystemID from the bios dmi info
 
-static	EFI_CHAR8* getSmbiosUUID()
+static	EFI_CHAR8 *getSmbiosUUID()
 {
-	static EFI_CHAR8		 uuid[UUID_LEN];
-	int						 i, isZero, isOnes;
-	SMBByte					*p;
+	static EFI_CHAR8	uuid[UUID_LEN];
+	int			i;
+	int			isZero;
+	int			isOnes;
+	SMBByte			*p;
 
-	p = (SMBByte*)Platform.UUID;
+	p = (SMBByte *)Platform.UUID;
 
 	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
 	{
@@ -526,7 +528,7 @@ static	EFI_CHAR8* getSmbiosUUID()
 // return a binary UUID value from the overriden SystemID and SMUUID if found, 
 // or from the bios if not, or from a fixed value if no bios value is found 
 
-static EFI_CHAR8* getSystemID()
+static EFI_CHAR8 *getSystemID()
 {
 	// unable to determine UUID for host. Error: 35 fix
 	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
@@ -543,7 +545,7 @@ static EFI_CHAR8* getSystemID()
 	if (!ret)
 	{
 		// no bios dmi UUID available, set a fixed value for system-id
-		ret=getUUIDFromString((sysId = (const char*) SYSTEM_ID));
+		ret=getUUIDFromString((sysId = (const char *) SYSTEM_ID));
 	}
 	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
 	return ret;
@@ -568,8 +570,8 @@ void setupSystemType()
 
 void setupEfiDeviceTree(void)
 {
-	// EFI_CHAR8*	 ret = 0;  Bungo: not used
-	EFI_CHAR16*	 ret16 = 0;
+	// EFI_CHAR8	*ret = 0;  Bungo: not used
+	EFI_CHAR16	*ret16 = 0;
 	size_t		 len = 0;
 	Node		*node;
 
@@ -636,16 +638,19 @@ void setupEfiDeviceTree(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 
-	if (Platform.CPU.FSBFrequency != 0) {
+	if (Platform.CPU.FSBFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(uint64_t), &Platform.CPU.FSBFrequency);
 	}
 
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform.CPU.TSCFrequency != 0) {
+	if (Platform.CPU.TSCFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(uint64_t), &Platform.CPU.TSCFrequency);
 	}
 
-	if (Platform.CPU.CPUFrequency != 0) {
+	if (Platform.CPU.CPUFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
@@ -653,20 +658,23 @@ void setupEfiDeviceTree(void)
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID())) {
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
+	if ((ret=getSystemID()))
+	{
+		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *) ret);
 	}
 	*/
 
 	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
 	// Export SystemSerialNumber if present
-	if ((ret16=getSmbiosChar16("SMserial", &len))) {
+	if ((ret16=getSmbiosChar16("SMserial", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
 	}
 
 	// Export Model if present
-	if ((ret16=getSmbiosChar16("SMproductname", &len))) {
+	if ((ret16=getSmbiosChar16("SMproductname", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 	}
 
