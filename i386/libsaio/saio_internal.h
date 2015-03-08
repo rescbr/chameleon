@@ -72,6 +72,7 @@ extern unsigned long getMemoryMap(struct MemoryRange * rangeArray, unsigned long
 extern unsigned long getExtendedMemorySize();
 extern unsigned long getConventionalMemorySize();
 extern void   sleep(int n);
+extern void   enableA20(void);
 
 /* bootstruct.c */
 extern void   initKernBootStruct(void);
@@ -137,7 +138,6 @@ long AllocateKernelMemory( long inSize );
 long AllocateMemoryRange(char *rangeName, long start, long length, long type);
 
 /* misc.c */
-extern void   enableA20(void);
 extern int    checkForSupportedHardware();
 extern int	  isLaptop();
 extern void   getPlatformName(char *nameBuf);

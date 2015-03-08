@@ -418,9 +418,9 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 // own things, and then calls common_boot.
 void boot(int biosdev)
 {
-	initialize_runtime();
 	// Enable A20 gate before accessing memory above 1Mb.
 	enableA20();
+	initialize_runtime();
 	common_boot(biosdev);
 }
 
