@@ -312,11 +312,11 @@ void scan_cpu(PlatformInfo_t *p)
 		cores_per_package = 1;
 	}
 
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) // Monitor/Mwait
+	if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
 	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
-	if (p->CPU.CPUID[CPUID_0][0] >= 6) // Thermal/Power
+	if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
 	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}

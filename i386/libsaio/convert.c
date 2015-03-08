@@ -8,7 +8,7 @@
 #include "convert.h"
 
 /** Transform a 16 bytes hexadecimal value UUID to a string */
-const char * getStringFromUUID(const EFI_CHAR8* eUUID)
+const char *getStringFromUUID(const EFI_CHAR8 *eUUID)
 {
 	static char msg[UUID_LEN*2 + 8] = "";
 	if (!eUUID) return "";
@@ -21,8 +21,8 @@ const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 	return msg ;
 }
 
-/** Parse an UUID string into an (EFI_CHAR8*) buffer */
-EFI_CHAR8*  getUUIDFromString(const char *source)
+/** Parse an UUID string into an (EFI_CHAR8 *) buffer */
+EFI_CHAR8 *getUUIDFromString(const char *source)
 {
 	if (!source)
 	{
@@ -100,6 +100,12 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
 	{
 		// the resulting binary will be the half size of the input hex string
 		binStr = malloc(len / 2);
+		if (!binStr)
+		{
+			*outLength = 0;
+			return NULL;
+		}
+		bzero(binStr,len / 2 );
 
 		binStrIdx = 0;
 		hexNibbleIdx = 0;
@@ -119,7 +125,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
 				{
 					binChar = 0;
 
-				for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
+				for (hexNibbleIdx = 0; (unsigned)hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
 				{
 					if (hexNibbleIdx > 0)
 					{
@@ -149,7 +155,7 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
 // FIXME: can't use my original code here,
 // Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
 /*
-static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
+static EFI_CHAR8 *getUUIDFromString2(const char * szInUUID)
 {
   char szUUID[UUID_LEN+1], *p=szUUID;
   int size=0;
@@ -165,6 +171,6 @@ static EFI_CHAR8* getUUIDFromString2(const char * szInUUID)
       verbose("UUID: cannot convert string <%s> to valid UUID.\n", szUUID);
       return (EFI_CHAR8*) 0;
   }
-  return (EFI_CHAR8*) ret; // new allocated buffer containing the converted string to bin
+  return (EFI_CHAR8 *) ret; // new allocated buffer containing the converted string to bin
 }
 */

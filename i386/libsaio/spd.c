@@ -126,7 +126,7 @@ unsigned char smb_read_byte_intel(uint32_t base, uint8_t adr, uint8_t cmd)
 #define READ_SPD(spd, base, slot, x) spd[x] = smb_read_byte_intel(base, 0x50 + slot, x)
 
 /** Read from spd *used* values only*/
-static void init_spd(char * spd, uint32_t base, int slot)
+static void init_spd(char *spd, uint32_t base, int slot)
 {
 	int i;
 	for (i = 0; i < SPD_INDEXES_SIZE; i++)
@@ -232,7 +232,7 @@ int getDDRspeedMhz(const char * spd)
 #define SLST(a) ((uint8_t)(spd[a] & 0x0f))
 
 /* Get DDR3 or DDR2 serial number, 0 most of the times, always return a valid ptr */
-const char *getDDRSerial(const char* spd)
+const char *getDDRSerial(const char *spd)
 {
 	static char asciiSerial[17];
 
@@ -296,7 +296,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 	int		i, speed;
 	uint8_t		spd_size, spd_type;
 	uint32_t	base, mmio, hostc;
-	uint16_t	cmd;		// Command
+	uint16_t	cmd;
 //	bool		dump = false;
 	RamSlotInfo_t	*slot;
 

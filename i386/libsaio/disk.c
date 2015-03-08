@@ -844,7 +844,7 @@ EFI_GUID const GPT_BASICDATA2_GUID	= { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D,
 // same as Apple ZFS
 //EFI_GUID const GPT_ZFS_GUID		= { 0x6A898CC3, 0x1DD2, 0x11B2, { 0x99, 0xA6, 0x08, 0x00, 0x20, 0x73, 0x66, 0x31 } };  // 0xBF01 "Solaris /usr & Apple ZFS
 
-BVRef newGPTBVRef( int biosdev,
+static BVRef newGPTBVRef( int biosdev,
                    int partno,
                    unsigned int blkoff,
                    const gpt_ent *part,
@@ -975,7 +975,13 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
 	{
 	// Create a new mapping.
 
-	map = (struct DiskBVMap *)malloc(sizeof(*map));
+	map = (struct DiskBVMap *) malloc(sizeof(*map));
+
+	if ( !map )
+	{
+		return NULL;
+	}
+
 	if ( map )
         {
 		map->biosdev = biosdev;
@@ -1430,7 +1436,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 
 	// Determine whether the partition header signature is present.
 
-	if (memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)))
+	if ( memcmp(headerMap->hdr_sig, GPT_HDR_SIG, strlen(GPT_HDR_SIG)) )
 	{
 		goto scanErr;
 	}
@@ -1492,6 +1498,8 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 	{
         	goto scanErr;
 	}
+
+	bzero(buffer,bufferSize);
 
 	if (readBytes(biosdev, gptBlock, 0, bufferSize, buffer) != 0)
 	{
@@ -2218,7 +2226,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias"; etc...
  */
 
-bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
+static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 {
 	char *aliasList, *entryStart, *entryNext;
     

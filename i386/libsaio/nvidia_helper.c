@@ -52,28 +52,28 @@
  
  */
 
-cardList_t* cardList = NULL;
+cardList_t *cardList = NULL;
 
-void add_card(char* model, uint32_t id, uint32_t subid, uint64_t videoRam)
+void add_card(char *model, uint32_t id, uint32_t subid, uint64_t videoRam)
 {
 	
-	cardList_t* new_card = malloc(sizeof(cardList_t));
+	cardList_t *new_card = malloc(sizeof(cardList_t));
 	if (new_card)
 	{	
 		new_card->next = cardList;
 		
 		cardList = new_card;
 		
-		new_card->id = id;
-		new_card->subid = subid;
-		new_card->videoRam = videoRam;
-		new_card->model = model;
+		new_card->id		= id;
+		new_card->subid		= subid;
+		new_card->videoRam	= videoRam;
+		new_card->model		= model;
 	}	
 }
 
-cardList_t* FindCardWithIds(uint32_t id, uint32_t subid)
+cardList_t *FindCardWithIds(uint32_t id, uint32_t subid)
 {
-	cardList_t* entry = cardList;
+	cardList_t *entry = cardList;
 	while(entry)
 	{		
 		if((entry->id == id) && (entry->subid == subid))
@@ -108,12 +108,16 @@ cardList_t* FindCardWithIds(uint32_t id, uint32_t subid)
 void fill_card_list(void) 
 {
 	unsigned int	i, count;
-	TagPtr NVDIATag;                           
-	char *model_name = NULL, *match_id = NULL, *sub_id = NULL, *vram_size = NULL;	
-	uint32_t dev_id = 0, subdev_id = 0;
-	uint64_t  VramSize = 0;	
+	TagPtr		NVDIATag;
+	char		*model_name = NULL;
+	char		*match_id = NULL;
+	char		*sub_id = NULL;
+	char		*vram_size = NULL;
+	uint32_t	dev_id = 0;
+	uint32_t	subdev_id = 0;
+	uint64_t	VramSize = 0;
 	
-	if ((NVDIATag = XMLCastArray(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char*)"NVIDIA"))))
+	if ((NVDIATag = XMLCastArray(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char *)"NVIDIA"))))
 	{
 		count = XMLTagCount(NVDIATag);
 		
@@ -127,15 +131,18 @@ void fill_card_list(void)
 				model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
 				vram_size  = XMLCastString(XMLGetProperty(element, (const char*)"VRam Size"));
 				
-				if (match_id) {
+				if (match_id)
+				{
 					dev_id = strtoul(match_id, NULL, 16);
 				}
 				
-				if (sub_id) {
+				if (sub_id)
+				{
 					subdev_id = strtoul(sub_id, NULL, 16);
 				}
 				
-				if (vram_size) {
+				if (vram_size)
+				{
 					VramSize = strtoul(vram_size, NULL, 10);
 				}
 				

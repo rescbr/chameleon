@@ -29,8 +29,8 @@ UMOUNT_VDISK() {
 }
 
 RAM_DISK() {
-    if [ $( df | awk '{$1=$2=$3=$4=$5=$6=$7=$8=""; print $0}' | sed -e 's/^[ \t]*//' | \
-                                                                grep -x "${v_mntpt}" ) ]; then
+    if [ $( df | awk '{$1=$2=$3=$4=$5=$6=$7=$8=""; print $0}' | \
+        sed -e 's/^ *//' | sed -e 's/ *$//' | grep -x "${v_mntpt}" ) ]; then
         devToUmount=$( LC_ALL=C diskutil info "${v_mntpt}" | grep -i 'Device Node:' | awk '{print $3}' )
         UMOUNT_VDISK $devToUmount
     fi
@@ -45,6 +45,7 @@ RAM_DISK() {
         exit 1
     fi
 
+    dev=$( echo "${dev}" | tr -d " \t\n" )
     rm -f $configFile
     # adding the Ram disk device to InstallConfig.plist to be shared with other packages
     /usr/libexec/PlistBuddy -c "Add :ramdisk  string ${dev}" $configFile
@@ -53,8 +54,8 @@ RAM_DISK() {
 RAM_DISK
 
 # ensure that ram disk has "/Volumes/BOOTRAMDISK" mount point
-v_mntpt=$( LC_ALL=C diskutil info ${dev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' \
-                                                                               | sed -e 's/^[ \t]*//' )
+v_mntpt=$( LC_ALL=C diskutil info ${dev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                             sed -e 's/^ *//' | sed -e 's/ *$//' )
 if [ ! -d "${v_mntpt}" ]; then
     echo "Ram Disk not found!"
     exit
@@ -63,6 +64,9 @@ fi
 touch "${v_mntpt}/${logName}"
 exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
 
+echo "$mainLine"
+echo "SYSTEM INFO:"
+sw_vers
 echo "$mainLine"
 echo "Pre-Install Script"
 echo "$subLine"

@@ -49,7 +49,7 @@ int getPciRootUID(void)
 
 	void *new_dsdt;
 	const char *val;
-	int len,fsize;
+	int len, fsize;
 	const char * dsdt_filename = NULL;
 	extern int search_and_get_acpi_fd(const char *, const char **);
 

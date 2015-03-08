@@ -34,14 +34,14 @@ typedef struct symbolList_t
 typedef struct callbackList_t
 {
 	void(*callback)(void*, void*, void*, void*);
-	struct callbackList_t* next;
+	struct callbackList_t *next;
 } callbackList_t;
 
 typedef struct moduleHook_t
 {
-	const char* name;
-	callbackList_t* callbacks;
-	struct moduleHook_t* next;
+	const char *name;
+	callbackList_t *callbacks;
+	struct moduleHook_t *next;
 } moduleHook_t;
 
 typedef struct modulesList_t
@@ -68,7 +68,7 @@ void start_built_in_module(const char	*name,
 
 int load_module(char* module);
 int is_module_loaded(const char* name);
-void module_loaded(const char* name, void* start, const char* author, const char* description, UInt32 version, UInt32 compat);
+void module_loaded(const char *name, void *start, const char *author, const char *description, UInt32 version, UInt32 compat);
 
 
 
@@ -76,35 +76,35 @@ void module_loaded(const char* name, void* start, const char* author, const char
 /********************************************************************************/
 /*	Symbol Functions															*/
 /********************************************************************************/
-long long		add_symbol(char* symbol, long long addr, char is64);
-unsigned int	lookup_all_symbols(const char* name);
+long long		add_symbol(char *symbol, long long addr, char is64);
+unsigned int	lookup_all_symbols(const char *name);
 
 
 
 /********************************************************************************/
 /*	Macho Parser																*/
 /********************************************************************************/
-void*			parse_mach(void* binary, 
+void*			parse_mach(void *binary, 
 							int(*dylib_loader)(char*),
 							long long(*symbol_handler)(char*, long long, char),
-                            void (*section_handler)(char* section, char* segment, void* cmd, UInt64 offset, UInt64 address)
+                            void (*section_handler)(char *section, char *segment, void *cmd, UInt64 offset, UInt64 address)
                            );
 unsigned int	handle_symtable(UInt32 base,
-							 struct symtab_command* symtabCommand,
+							 struct symtab_command *symtabCommand,
 							 long long(*symbol_handler)(char*, long long, char),
 							 char is64);
-void			rebase_macho(void* base, char* rebase_stream, UInt32 size);
+void			rebase_macho(void *base, char *rebase_stream, UInt32 size);
 
-void			bind_macho(void* base, UInt8* bind_stream, UInt32 size);
+void			bind_macho(void *base, UInt8 *bind_stream, UInt32 size);
 
 
 /********************************************************************************/
 /*	Module Interface														*/
 /********************************************************************************/
-int				replace_function(const char* symbol, void* newAddress);
-int				execute_hook(const char* name, void*, void*, void*, void*);
-void			register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
-moduleHook_t*	hook_exists(const char* name);
+int		replace_function(const char *symbol, void *newAddress);
+int		execute_hook(const char *name, void*, void*, void*, void*);
+void		register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*));
+moduleHook_t	*hook_exists(const char* name);
 
 #if DEBUG_MODULES
 void			print_hook_list();

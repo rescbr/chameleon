@@ -57,17 +57,20 @@ long ThinFatFile(void **binary, unsigned long *length)
 	struct fat_arch   *fap = (struct fat_arch *)((unsigned long)*binary + sizeof(struct fat_header));
 	cpu_type_t fapcputype;
 	uint32_t fapoffset;
-	uint32_t fapsize;	
+	uint32_t fapsize;
 
 	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */
 	{
 		nfat = fhp->nfat_arch;
 		swapped = 0;
-	} else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */
+	}
+	else if (fhp->magic == FAT_CIGAM)/* 0xbebafeca */
 	{
 		nfat = OSSwapInt32(fhp->nfat_arch);
 		swapped = 1;
-	} else {
+	}
+	else
+	{
 		return -1;
 	}
 
@@ -78,7 +81,9 @@ long ThinFatFile(void **binary, unsigned long *length)
 			fapcputype = OSSwapInt32(fap->cputype);
 			fapoffset = OSSwapInt32(fap->offset);
 			fapsize = OSSwapInt32(fap->size);
-		} else {
+		}
+		else
+		{
 			fapcputype = fap->cputype;
 			fapoffset = fap->offset;
 			fapsize = fap->size;
@@ -258,12 +263,14 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		segname = segCmd->segname;
 
 #ifdef DEBUG
-  printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-	 segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
-         (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
-  getchar();
+	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
+		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+		(unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+	getchar();
 #endif
-	} else {
+	}
+	else
+	{
 		struct segment_command *segCmd;
 
 		segCmd = (struct segment_command *)cmdBase;
@@ -276,7 +283,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 
 #ifdef DEBUG
 	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-	segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize, (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize, (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
 	getchar();
 #endif
 	}
@@ -289,21 +296,25 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	}
 
 	if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
-		 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
+		 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN))))
+	{
 		stop("Kernel overflows available space");
 	}
 
-	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
+	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
+	{
 		gHaveKernelCache = true;
 	}
 
 	// Copy from file load area.
-	if (vmsize>0 && filesize > 0) {
+	if (vmsize>0 && filesize > 0)
+	{
 		bcopy((char *)fileaddr, (char *)vmaddr, vmsize > filesize ? filesize : vmsize);
 	}
 
 	// Zero space at the end of the segment.
-	if (vmsize > filesize) {
+	if (vmsize > filesize)
+	{
 		bzero((char *)(vmaddr + filesize), vmsize - filesize);
 	}
 
@@ -317,7 +328,8 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 
 static long DecodeUnixThread(long cmdBase, unsigned int *entry)
 {
-	switch (archCpuType) {
+	switch (archCpuType)
+	{
 		case CPU_TYPE_I386:
 		{
 			i386_thread_state_t *i386ThreadState;
@@ -355,8 +367,8 @@ static long DecodeSymbolTable(long cmdBase)
 	symTab = (struct symtab_command *)cmdBase;
 
 #if DEBUG
-
-	printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n", symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
+	printf("symoff: %x, nsyms: %x, stroff: %x, strsize: %x\n",
+		symTab->symoff, symTab->nsyms, symTab->stroff, symTab->strsize);
 	getchar();
 #endif
 

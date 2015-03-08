@@ -35,7 +35,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
 #define CPUID_MODEL_YONAH		0x0E			// Sossaman, Yonah
 #define CPUID_MODEL_MEROM		0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
-#define CPUID_MODEL_CONROE		0x0F			// 
+#define CPUID_MODEL_CONROE		0x0F			//
 #define CPUID_MODEL_CELERON		0x16			// Merom, Conroe (65nm), Celeron (45nm)
 #define CPUID_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPUID_MODEL_WOLFDALE		0x17			// Xeon 31xx, 33xx, 52xx, 54xx, Core 2 Quad 8xxx and 9xxx
@@ -337,6 +337,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 /* Maximum number of ram slots */
 #define MAX_RAM_SLOTS			8
+
 #define RAM_SLOT_ENUMERATOR		{0, 2, 4, 1, 3, 5, 6, 8, 10, 7, 9, 11}
 
 /* Maximum number of SPD bytes */

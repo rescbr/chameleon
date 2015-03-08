@@ -833,7 +833,7 @@ typedef struct SMBOemProcessorType
 typedef struct SMBOemProcessorBusSpeed
 {
 	SMB_STRUCT_HEADER			// Type 132
-	SMBWord    ProcessorBusSpeed;   // MT/s unit
+	SMBWord    ProcessorBusSpeed;		// MT/s unit
 } __attribute__((packed)) SMBOemProcessorBusSpeed;
 
 //----------------------------------------------------------------------------------------------------------

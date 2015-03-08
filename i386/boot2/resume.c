@@ -54,6 +54,7 @@ static void WakeKernel(IOHibernateImageHeader * header)
 	dst   = (unsigned long *) (header->restore1CodePhysPage << 12);
 	count = header->restore1PageCount;
 	proc  = (header->restore1CodeOffset + ((uint32_t) dst));
+
 	newSP = header->restore1StackOffset + (header->restore1CodePhysPage << 12);
 
 	src  = (unsigned long *) (((u_int32_t) &header->fileExtentMap[0]) 

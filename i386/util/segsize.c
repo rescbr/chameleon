@@ -103,7 +103,7 @@ main(int argc, char *argv[])
 //	    bool	isDATA;
 //	    unsigned	vmsize;
 		
-#define lcp	((struct load_command *)cp)    
+#define lcp	((struct load_command *)cp)
 		switch(swap(lcp->cmd)) {
 				
 			case LC_SEGMENT:

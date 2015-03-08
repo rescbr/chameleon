@@ -25,8 +25,8 @@
 #define DBGPAUSE()
 #endif
 
-static inline void		rebase_location(UInt32* location, char* base, int type);
-static inline void		bind_location(UInt32* location, char* value, UInt32 addend, int type);
+static inline void		rebase_location(UInt32 *location, char *base, int type);
+static inline void		bind_location(UInt32 *location, char *value, UInt32 addend, int type);
 
 // NOTE: Global so that modules can link with this
 static UInt64 textAddress = 0;
@@ -118,7 +118,7 @@ int init_module_system()
 							last = mod->mm_string;
 						}
 
-						char* name = strdup(last);
+						char *name = strdup(last);
 						name[strlen(last) - sizeof("dylib")] = 0;
 						DBG("Loading multiboot module %s\n", name);
 
@@ -271,7 +271,7 @@ int load_module(char* module)
  * adjust it's internal symbol list (sort) to optimize locating new symbols
  * NOTE: returns the address if the symbol is "start", else returns 0xFFFFFFFF
  */
-long long add_symbol(char* symbol, long long addr, char is64)
+long long add_symbol(char *symbol, long long addr, char is64)
 {
 	// This only can handle 32bit symbols
 	symbolList_t* entry;
@@ -300,7 +300,7 @@ long long add_symbol(char* symbol, long long addr, char is64)
  */
 void module_loaded(const char* name, void* start, const char* author, const char* description, UInt32 version, UInt32 compat)
 {
-	moduleList_t* new_entry = malloc(sizeof(moduleList_t));
+	moduleList_t *new_entry = malloc(sizeof(moduleList_t));
 	new_entry->next = loadedModules;
 
 	loadedModules = new_entry;
@@ -1069,7 +1069,6 @@ int replace_function(const char* symbol, void* newAddress)
 	return 0;
 }
 
-
 /*
  *	execute_hook(  const char* name )
  *		name - Name of the module hook
@@ -1105,8 +1104,6 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 		return 0;
 	}
 }
-
-
 
 /*
  *	register_hook_callback(  const char* name,  void(*callback)())
@@ -1229,9 +1226,9 @@ int replace_function(const char* symbol, void* newAddress)
 	return 0;
 }
 
-void start_built_in_module(const char* name,
-                           const char* author,
-                           const char* description,
+void start_built_in_module(const char *name,
+                           const char *author,
+                           const char *description,
                            UInt32 version,
                            UInt32 compat,
                            void(*start_function)(void))

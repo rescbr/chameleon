@@ -179,6 +179,10 @@ typedef enum {
 	kOPM,
 	kIkura,
 	kIkuraS,
+	/* AMD8000Controller */
+	kBaladi,
+	kExmoor,
+	kBasset,
 	kCfgEnd
 } ati_config_name_t;
 

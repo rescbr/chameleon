@@ -77,7 +77,7 @@ bool		gEnableCDROMRescan;
 bool		gScanSingleDrive;
 bool		useGUI;
 
-static int interruptsAvailable = 0;
+static int	interruptsAvailable = 0;
 
 static bool	gUnloadPXEOnExit = false;
 
@@ -230,7 +230,10 @@ static int ExecKernel(void *binary)
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
 
-		if (interruptsAvailable) DisableInterrupts();
+		if (interruptsAvailable)
+		{
+			DisableInterrupts();
+		}
 
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
@@ -243,7 +246,11 @@ static int ExecKernel(void *binary)
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
 
-		if (interruptsAvailable) DisableInterrupts();
+		if (interruptsAvailable)
+		{
+			DisableInterrupts();
+		}
+
 
 		startprog( kernelEntry, bootArgsPreLion );
 	}
@@ -251,7 +258,6 @@ static int ExecKernel(void *binary)
 	// Not reached
 	__builtin_unreachable();
 }
-
 
 //==========================================================================
 // LoadKernelCache - Try to load Kernel Cache.
@@ -435,9 +441,9 @@ void common_boot(int biosdev)
 	bool	 		firstRun = true;
 	bool	 		instantMenu;
 	bool	 		rescanPrompt;
-	int				status;
-	unsigned int	allowBVFlags = kBVFlagSystemVolume | kBVFlagForeignBoot;
-	unsigned int	denyBVFlags = kBVFlagEFISystem;
+	int			status;
+	unsigned int		allowBVFlags = kBVFlagSystemVolume | kBVFlagForeignBoot;
+	unsigned int		denyBVFlags = kBVFlagEFISystem;
 
 	// Set reminder to unload the PXE base code. Neglect to unload
 	// the base code will result in a hang or kernel panic.
@@ -451,7 +457,10 @@ void common_boot(int biosdev)
 
 	// Enable interrupts
 	interruptsAvailable = SetupInterrupts();
-	if (interruptsAvailable) EnableInterrupts();
+	if (interruptsAvailable)
+	{
+		EnableInterrupts();
+	}
 
 	// Initialize boot info structure.
 	initKernBootStruct();
@@ -847,7 +856,11 @@ void common_boot(int biosdev)
 	{
 		nbpUnloadBaseCode();
 	}
-	if (interruptsAvailable) DisableInterrupts();
+
+	if (interruptsAvailable)
+	{
+		DisableInterrupts();
+	}
 }
 
 /*!

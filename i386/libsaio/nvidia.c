@@ -1963,7 +1963,6 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
 	uint64_t vram_size = 0;
-	// unsigned long long vram_size = 0;
 
 	// First check if any value exist in the plist
 	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
@@ -2323,11 +2322,11 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
 	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
-	devprop_add_value(device, "VRAM,totalsize", (uint8_t*)&videoRam, 4);
-	devprop_add_value(device, "model", (uint8_t*)model, strlen(model) + 1);
-	devprop_add_value(device, "rom-revision", (uint8_t*)biosVersion, strlen(biosVersion) + 1);
-	devprop_add_value(device, "@0,display-cfg", default_dcfg_0, DCFG0_LEN);
-	devprop_add_value(device, "@1,display-cfg", default_dcfg_1, DCFG1_LEN);
+	devprop_add_value(device, "VRAM,totalsize", (uint8_t *)&videoRam, 4);
+	devprop_add_value(device, "model", (uint8_t *)model, strlen(model) + 1);
+	devprop_add_value(device, "rom-revision", (uint8_t *)biosVersion, strlen(biosVersion) + 1);
+	devprop_add_value(device, "@0,display-cfg", (uint8_t *)&default_dcfg_0, DCFG0_LEN);
+	devprop_add_value(device, "@1,display-cfg", (uint8_t *)&default_dcfg_1, DCFG1_LEN);
 
 	/******************** Added Marchrius.**********************/
 	//              For the AppleBacklightDisplay              //

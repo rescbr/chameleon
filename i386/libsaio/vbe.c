@@ -129,7 +129,7 @@ int setVBEDACFormat(unsigned char format)
 #define kC                30.0   // C = (C'-J) * (K/256) + J
 #define kM                300.0  // M = K/256 * M'
 
-int Round(double f)
+static int Round(double f)
 {
 	return (int)(f + 0.5);
 }

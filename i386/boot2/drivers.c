@@ -740,11 +740,12 @@ MatchPersonalities( void )
 //==========================================================================
 // MatchLibraries
 
-static long
-MatchLibraries( void )
+static long MatchLibraries( void )
 {
-	TagPtr     prop, prop2;
-	ModulePtr  module, module2;
+	TagPtr     prop;
+	TagPtr     prop2;
+	ModulePtr  module;
+	ModulePtr  module2;
 	long       done;
 
 	do {
@@ -798,8 +799,7 @@ MatchLibraries( void )
 // FindModule
 
 #if NOTDEF
-static ModulePtr
-FindModule( char * name )
+static ModulePtr FindModule( char *name )
 {
 	ModulePtr module;
 	TagPtr    prop;
@@ -825,15 +825,14 @@ FindModule( char * name )
 //==========================================================================
 // ParseXML
 
-static long
-ParseXML( char * buffer, ModulePtr * module, TagPtr * personalities )
+static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
 {
-	long       length, pos;
-	TagPtr     moduleDict, required;
-	ModulePtr  tmpModule;
-  
-	pos = 0;
-  
+	long		length;
+	long		pos = 0;
+	TagPtr		moduleDict;
+	TagPtr		required;
+	ModulePtr	tmpModule;
+
 	while (1)
 	{
 		length = XMLParseNextTag(buffer + pos, &moduleDict);
