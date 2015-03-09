@@ -107,6 +107,7 @@ void InterruptStub(void)
 					  "addl $4, %%esp\n\t"
 					  "iretl"
 					  :);
+	__builtin_unreachable();
 }
 
 static
@@ -131,6 +132,7 @@ void ExceptionWithCodeStub(void)
 					 "addl $8, %%esp\n\t"
 					 "iretl"
 					 :);
+	__builtin_unreachable();
 }
 
 /*

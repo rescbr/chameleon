@@ -70,7 +70,7 @@ struct seg_desc {
 };
 
 // turbo - GDT must be in first 64k segment
-struct seg_desc __attribute__ ((section("__INIT,__data"))) Gdt[ NGDTENT ] = {
+struct seg_desc __attribute__ ((section("__INIT,__data"), aligned(8))) Gdt[ NGDTENT ] = {
     /*  0x0 : null */
     {0x0000, 0x0000,  0x00, 0x00, 0x00, 0x00},
 

@@ -43,7 +43,7 @@ void dochainload();
 #define FIX_RETURN_ADDRESS_USING_FIRST_ARG(arg) \
     RETURN_ADDRESS_USING_FIRST_ARG(arg) -= OFFSET_1MEG
 
-extern void jump_to_chainbooter();
+extern void jump_to_chainbooter() __attribute__((noreturn));
 extern unsigned char chainbootdev;
 extern unsigned char chainbootflag;
 
