@@ -233,7 +233,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 
 //==========================================================================
 
-static const char * getNameForValue( const struct NamedValue * nameTable,
+static const char *getNameForValue( const struct NamedValue *nameTable,
                                      unsigned char value )
 {
 	const struct NamedValue *np;
@@ -1780,7 +1780,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 			valid = false;
 		}
 	}
-	
+
 	if(!valid)
 	{
 		int fh = -1;
@@ -2301,8 +2301,13 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 			return;
 		}
 
-		strcpy(str + len, bvr->OSisInstaller ? " (Installer) " : " ");
-		len += bvr->OSisInstaller ? 13 : 1;
+		strcpy(str + len, bvr->OSisInstaller ? " (Installer " : " (");
+		len += bvr->OSisInstaller ? 12 : 2;
+		strcpy(str + len, bvr->OSVersion);
+		len += strlen(bvr->OSVersion);
+		strcpy(str + len, ") ");
+		len += 2;
+
 		strMaxLen -= len;
 		p += len;
 	}
