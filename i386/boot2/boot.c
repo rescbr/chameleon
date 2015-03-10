@@ -152,6 +152,8 @@ static int ExecKernel(void *binary)
 
 	if ( ret != 0 )
 	{
+		printf("Decoding kernel failed.\n");
+		pause();
 		return ret;
 	}
 
@@ -897,6 +899,7 @@ bool checkOSVersion(const char * version)
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 	}
+
 }
 
 uint32_t getMacOSVerCurrent()
