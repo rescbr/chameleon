@@ -1042,3 +1042,10 @@ void delay(int us)
     bios(&bb);
 }
 
+void enableA20(void)
+{
+    bzero(&bb, sizeof bb);  // Note: may be called before BSS section is initialized
+    bb.intno = 0x15;
+    bb.eax.rr = 0x2401;
+    bios(&bb);
+}

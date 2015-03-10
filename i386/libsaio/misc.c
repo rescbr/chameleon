@@ -46,6 +46,7 @@
 
 #include "libsaio.h"
 
+#if UNUSED
 /*
  * keyboard controller (8042) I/O port addresses
  */
@@ -70,7 +71,7 @@
 
 //==========================================================================
 // Enable A20 gate to be able to access memory above 1MB
-
+static inline void flushKeyboardInputBuffer();
 static inline void flushKeyboardInputBuffer()
 {
     unsigned char ret;
@@ -107,6 +108,7 @@ void enableA20()
     /* wait until done */
     flushKeyboardInputBuffer();
 }
+#endif /* UNUSED */
 
 //==========================================================================
 // Return the platform name for this hardware.

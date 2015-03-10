@@ -1,3 +1,5 @@
+- Zenith432 : Fix bug in malloc_init, use bios for enableA20()
+- meklort : Slightly improve decive selection name - add os version.
 - Zenith432 : Interrupt Management
 - Bungo : Added ability to auto-select last booted partition as the boot volume.
 - Bungo : Added MacOSVerCurrent and MacOSVer2Int function to use instead of macros.
