@@ -1,3 +1,4 @@
+- Zenith432 : Sanitize 16-bit assembly
 - Zenith432 : Fix bug in malloc_init, use bios for enableA20()
 - meklort : Slightly improve decive selection name - add os version.
 - Zenith432 : Interrupt Management

@@ -40,11 +40,8 @@
 #include "memory.h"
 #include "mboot.h"
 
-#define data32  .byte 0x66
-#define retf    .byte 0xcb
-
     .file "boot2.s"
-    .section __INIT,__text	// turbo - This initialization code must reside within the first segment
+    .section __INIT,__text,regular,pure_instructions	// turbo - This initialization code must reside within the first segment
 
     //.data
     .section __INIT,__data	// turbo - Data that must be in the first segment
@@ -65,11 +62,14 @@ EXPORT(_chainbootflag) .byte 0x00
 # Returns:
 #
 LABEL(boot2)                    # Entry point at 0:BOOTER_ADDR (will be called by boot1)
-    pushl   %ecx                # Save general purpose registers
-    pushl   %ebx
-    pushl   %ebp
-    pushl   %esi
-    pushl   %edi
+
+    .code16
+
+    push    %cx                 # Save general purpose registers
+    push    %bx
+    push    %bp
+    push    %si
+    push    %di
     push    %ds                 # Save DS, ES
     push    %es
 
@@ -77,11 +77,11 @@ LABEL(boot2)                    # Entry point at 0:BOOTER_ADDR (will be called b
     mov     %ax, %ds            # Set DS and ES to match CS
     mov     %ax, %es
 
-    data32
-    call    __switch_stack      # Switch to new stack
+    calll   __switch_stack      # Switch to new stack
 
-    data32
-    call    __real_to_prot      # Enter protected mode.
+    calll   __real_to_prot      # Enter protected mode.
+
+    .code32
 
     fninit                      # FPU init
 
@@ -96,18 +96,21 @@ LABEL(boot2)                    # Entry point at 0:BOOTER_ADDR (will be called b
 
     call    __prot_to_real      # Back to real mode.
 
-    data32
-    call    __switch_stack      # Restore original stack
-    
+    .code16
+
+    calll   __switch_stack      # Restore original stack
+
     pop     %es                 # Restore original ES and DS
     pop     %ds
-    popl    %edi                # Restore all general purpose registers
-    popl    %esi                # except EAX.
-    popl    %ebp
-    popl    %ebx
-    popl    %ecx
+    pop     %di                 # Restore all general purpose registers
+    pop     %si                 # except AX.
+    pop     %bp
+    pop     %bx
+    pop     %cx
 
-    retf                        # Hardcode a far return
+    lret                        # Far return
+
+    .code32
 
 start_chain_boot:
     xorl    %edx, %edx
@@ -115,20 +118,21 @@ start_chain_boot:
 
     call    __prot_to_real      # Back to real mode.
 
-    data32
-    call    __switch_stack      # Restore original stack
-    
+    .code16
+
+    calll   __switch_stack      # Restore original stack
+
     pop     %es                 # Restore original ES and DS
     pop     %ds
-    popl    %edi                # Restore all general purpose registers
-    popl    %esi                # except EAX.
-    popl    %ebp
-    popl    %ebx
-    popl    %ecx
+    pop     %di                 # Restore all general purpose registers
+    pop     %si                 # except AX.
+    pop     %bp
+    pop     %bx
+    pop     %cx
 
-    data32
     ljmp    $0, $0x7c00         # Jump to boot code already in memory
 
+    .code32
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # Multiboot support added by David F. Elliott <dfe@cox.net> on 2007/06/26
@@ -153,7 +157,11 @@ start_chain_boot:
 # cannot do that and have GRUB find it because GRUB only searches the first
 # 8k of the binary.  Since __TEXT,__const follows __TEXT,__text (the code
 # section) and since the code is well over 8k long, it doesn't work.
-.align 4, 0x90 # Make sure we're on a 4-byte boundary.  Required by Multiboot.
+
+    //.data - the entire __INIT segment is less than 1k
+    .section __INIT,__data	// turbo
+
+    .align 2 # Make sure we're on a 4-byte boundary.  Required by Multiboot.
 _multiboot_header:
     # magic (NOTE: this shows up as 02b0 ad1b in a hex dump)
     .long   MULTIBOOT_HEADER_MAGIC
@@ -172,11 +180,10 @@ _multiboot_header:
     # entry_addr
     .long   (_multiboot_entry + OFFSET_1MEG)
 
-# Stick a couple of nop here so that we hopefully make disassemblers realize we have instructions again
-    nop
-    nop
-    nop
-.align 8, 0x90 # Align to 8 byte boundary which should be enough nops
+    //.text
+    .section __INIT,__text	// turbo
+
+    .align 3, 0x90 # Align to 8 byte boundary
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 _multiboot_entry:
@@ -210,7 +217,7 @@ _multiboot_entry:
     # The desired offset in this case is exactly 1 MB higher than the
     # assembler/linker thinks it is.  As mentioned above, we use the kernel
     # init code selector instead of the boot code selector.
-    jmp     $0x28,$(Lpost_gdt_switch+OFFSET_1MEG)
+    ljmp    $0x28,$(Lpost_gdt_switch+OFFSET_1MEG)
 Lpost_gdt_switch:
 
     # Now that we have the right code selector we also want the rest of the
@@ -276,7 +283,7 @@ Lhltloop:
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # _continue_at_low_address does some trickery to get the caller running from the low address with the right selector
     .globl _continue_at_low_address
-    .align 4, 0x90
+    .align 2, 0x90
 _continue_at_low_address:
     # Our stack frame has been set up with the return address on top
     # First, fix that to be 1 MB lower
@@ -286,7 +293,7 @@ _continue_at_low_address:
     lgdt    _Gdtr
     # Now jump to GDT selector 8 using the low address of this function
     # This finally puts us in low memory in the right selector (0x08)
-    jmpl $0x08,$L_continue_at_low_address_next
+    ljmp $0x08,$L_continue_at_low_address_next
 L_continue_at_low_address_next:
     # We don't need to set ss,ds,es,fs, or gs because they are already 0x10
     # and the old GDT had the same information for selector 0x10 as the new
@@ -309,6 +316,8 @@ _jump_to_chainbooter:
 
     call    __prot_to_real      # Back to real mode.
 
+    .code16
+
     # TODO: Set SS:SP to something reasonable?  For instance, Microsoft MBR
     # code starts out by setting up the stack at 0:7c00 for itself and leaves
     # that intact.  Thus the stack by default will grow down from the code
@@ -316,8 +325,9 @@ _jump_to_chainbooter:
     # 0:fff0 and it seems that most boot code doesn't care and simply sets
     # SS:SP itself as one of the first things it does.
 
-    data32
     ljmp    $0, $0x7c00         # Jump to boot code already in memory
+
+    .code32
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # _cause_crash jumps to offset 0 of a selector we know is not in our GDT
@@ -325,10 +335,10 @@ _jump_to_chainbooter:
 # We aren't using it right now so it's in an if 0 block.
 #if 0
     .globl _cause_crash
-    .align 4, 0x90
+    .align 2, 0x90
 _cause_crash:
     # Cause a crash, there is no GDT selector f0
-    jmp     $0xf0,$0
+    ljmp    $0xf0,$0
     hlt
     jmp _cause_crash
 #endif
@@ -338,8 +348,7 @@ _cause_crash:
 # See the comments above as to why we have OFFSET_1MEG.
     //.data
     .section __INIT,__data	// turbo
-    .align 4, 0x90
+    .align 2
 _Gdtr_high:
     .word GDTLIMIT
     .long vtop(_Gdt + OFFSET_1MEG)
-

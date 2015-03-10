@@ -37,9 +37,6 @@
 #include <architecture/i386/asm_help.h>
 #include "memory.h"
 
-#define data32  .byte 0x66
-#define addr32  .byte 0x67
-
 #define O_INT   0
 #define O_EAX   4
 #define O_EBX   8
@@ -80,24 +77,17 @@
     bits of code and data within the first 63.5k and modify the loaders to
     be able to load more than 63.5k.
  */
-    .align 4
+    .align 2
 save_eax:   .space 4
-    .align 4
 save_edx:   .space 4
-    .align 2
 save_es:    .space 2
-    .align 2
 save_flag:  .space 2
-    .align 4
 new_eax:    .space 4
-    .align 4
 new_edx:    .space 4
-    .align 2
 new_es:     .space 2
-    .align 2
 new_ds:     .space 2
 
-    .section __INIT,__text      // turbo - This code must reside within the first segment
+    .section __INIT,__text,regular,pure_instructions      // turbo - This code must reside within the first segment
 
 
 /*============================================================================
@@ -131,38 +121,29 @@ LABEL(_bios)
 
     call    __prot_to_real
 
-    data32
-    addr32
-    mov     OFFSET16(new_eax), %eax
-    data32
-    addr32
+    .code16
+
+    mov     new_eax, %eax   // OFFSET16 not needed due to special opcode for ax/eax
     mov     OFFSET16(new_edx), %edx
-    data32
-    addr32
-    mov     OFFSET16(new_es), %es
+    movw    OFFSET16(new_es), %es
 
     push    %ds     // Save DS
     // Replace DS. WARNING: Don't access data until it's restored!
-    addr32
-    data32
-    mov     OFFSET16(new_ds), %ds
+    movw    OFFSET16(new_ds), %ds
 
 do_int:
     int     $0x00
     pop     %ds     // Restore DS before we do anything else
 
     pushf
-    data32
-    addr32
-    movl    %eax, OFFSET16(save_eax)
-    popl    %eax                         // actually pop %ax
-    addr32
-    movl    %eax, OFFSET16(save_flag)  // actually movw
+    mov     %eax, save_eax
+    pop     %ax
+    mov     %ax,  save_flag
     mov     %es, %ax
-    addr32
-    movl    %eax, OFFSET16(save_es)    // actually movw
-    data32
-    call    __real_to_prot
+    mov     %ax,  save_es
+    calll    __real_to_prot
+
+    .code32
 
     movl    %edx, new_edx       // save new edx before clobbering
     movl    save_edx, %edx

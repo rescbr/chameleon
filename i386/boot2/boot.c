@@ -232,11 +232,6 @@ static int ExecKernel(void *binary)
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgs, NULL, NULL);
 
-		if (interruptsAvailable)
-		{
-			DisableInterrupts();
-		}
-
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
@@ -247,12 +242,6 @@ static int ExecKernel(void *binary)
 	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void*)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
-
-		if (interruptsAvailable)
-		{
-			DisableInterrupts();
-		}
-
 
 		startprog( kernelEntry, bootArgsPreLion );
 	}

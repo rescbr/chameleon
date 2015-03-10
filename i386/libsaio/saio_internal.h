@@ -30,8 +30,8 @@
 /* asm.s */
 extern void		real_to_prot(void);
 extern void		prot_to_real(void);
-extern void		halt(void);
-extern void		startprog(unsigned int address, void *arg);
+extern void		halt(void) __attribute__((noreturn));
+extern void		startprog(unsigned int address, void *arg) __attribute__((noreturn));
 extern void		loader(UInt32 code, UInt32 cmdptr);
 extern uint64_t		computeRand(void);
 

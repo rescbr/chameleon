@@ -124,9 +124,6 @@
 #include <architecture/i386/asm_help.h>
 #include "memory.h"
 
-#define data32  .byte 0x66
-#define addr32  .byte 0x67
-
     .file "asm.s"
 
 CR0_PE_ON  = 0x1
@@ -150,7 +147,7 @@ CODE16_SEG   = BASE_SEG
 .globl _Gdtr
     //.data
     .section __INIT,__data	// turbo - Data that must be in the first segment
-    .align 2, 0x90
+    .align 2
 _Gdtr:
     .word GDTLIMIT
     .long vtop(_Gdt)
@@ -161,7 +158,6 @@ _Gdtr:
     .section __INIT,__data	// turbo - Data that must be in the first segment
 // Real mode IDT
     .align 2
-.globl _Idtr_real
 _Idtr_real:
     .word  0x03ff
     .long 0x00000000
@@ -181,11 +177,12 @@ _Idtr_prot:
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // Data area for __switch_stack.
 //
+    .align 2
 save_sp: .long  STACK_OFS
-save_ss: .long  STACK_SEG
+save_ss: .word  STACK_SEG
 
     //.text
-    .section __INIT,__text      // turbo - This code must reside within the first segment
+    .section __INIT,__text,regular,pure_instructions      // turbo - This code must reside within the first segment
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // real_to_prot()
 //
@@ -194,34 +191,34 @@ save_ss: .long  STACK_SEG
 //
 LABEL(__real_to_prot)
 
+    .code16
+
     // Interrupts are disabled in protected mode.
 
     cli
 
     // Load the Global Descriptor Table Register (GDTR).
 
-    addr32
-    data32
-    lgdt    OFFSET16(_Gdtr)
+    lgdtl   OFFSET16(_Gdtr)
 
     // Enter protected mode by setting the PE bit in CR0.
 
     mov     %cr0, %eax
-    data32
-    or      $CR0_PE_ON, %eax
+    or      $CR0_PE_ON, %ax
     mov     %eax, %cr0
 
     // Make intrasegment jump to flush the processor pipeline and
     // reload CS register.
 
-    data32
-    ljmp    $0x08, $xprot
+    ljmpl   $0x08, $xprot
+
+    .code32
 
 xprot:
     // we are in USE32 mode now
     // set up the protected mode segment registers : DS, SS, ES, FS, GS
 
-    mov     $0x10, %eax
+    movw    $0x10, %ax
     movw    %ax, %ds
     movw    %ax, %ss
     movw    %ax, %es
@@ -248,9 +245,7 @@ xprot:
 
     popl    %eax
     addl    $CODE32_BASE, %eax
-    pushl   %eax
-
-    ret
+    jmp     *%eax
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // prot_to_real()
@@ -276,16 +271,17 @@ LABEL(__prot_to_real)
     ljmp    $0x18, $x16       // change to USE16 mode
 
 x16:
+
+    .code16
+
     mov     %cr0, %eax        // clear the PE bit of CR0
-    data32
     and     $CR0_PE_OFF, %eax
     mov     %eax, %cr0
 
     // make intersegment jmp to flush the processor pipeline
     // and reload CS register
 
-    data32
-    ljmp    $CODE16_SEG, $xreal - CODE32_BASE
+    ljmp    $CODE16_SEG, $xreal
 
 xreal:
     // we are in real mode now
@@ -299,33 +295,26 @@ xreal:
 
     // load stack segment register SS.
 
-    data32
-    movl    $STACK16_SEG, %eax
+    movw    $STACK16_SEG, %ax
     movw    %ax, %ss
 
     // clear top 16-bits of ESP and EBP.
 
-    data32
     movzwl  %sp, %esp
-    data32
     movzwl  %bp, %ebp
 
     // Modify caller's return address on the stack
     // from linear address to segment offset.
 
-    data32
     popl    %eax
-    data32
-    movzwl  %ax, %eax
-    data32
-    pushl   %eax
 
     // Reenable maskable interrupts.
 
     sti
 
-    data32
-    ret
+    jmp     *%ax
+
+    .code32
 
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 // halt()
@@ -345,18 +334,19 @@ LABEL(_halt)
 // Passes arg to the program in %eax.
 //
 LABEL(_startprog)
-    push    %ebp
-    mov     %esp, %ebp
+    cli
+    xor     %eax, %eax
+    mov     %eax, _Idtr_prot
+    movw    %ax,  _Idtr_prot + 4
+    lidt    _Idtr_prot
 
-    mov     0xc(%ebp), %eax  // argument to program - bootargs to mach_kernel
-    mov     0x8(%ebp), %ecx  // entry offset 
-    mov     $0x28, %ebx      // segment
-    push    %ebx
-    push    %ecx
+    add     $4, %esp        // discard return address
+    mov     $0x28, %eax     // segment
+    xchg    4(%esp), %eax   // argument to program - bootargs to mach_kernel
 
     // set up %ds and %es
 
-    mov     $0x20, %ebx
+    movw    $0x20, %bx
     movw    %bx, %ds
     movw    %bx, %es
 
@@ -386,36 +376,34 @@ LABEL(__bp)
 // AX, DI, and SI are clobbered.
 //
 LABEL(__switch_stack)
-    popl    %eax                # save return address
-    popl    %edi                # discard upper 16-bit
 
-    data32
-    addr32
-    movl    OFFSET16(save_ss), %esi   # new SS to SI
+    .code16
 
-    data32
-    addr32
+    pop     %ax                 # save return address
+    pop     %di                 # discard upper 16-bit
+
+    movw    OFFSET16(save_ss), %si    # new SS to SI
+
     movl    OFFSET16(save_sp), %edi   # new SP to DI
 
-    addr32
-    mov     %ss, OFFSET16(save_ss)    # save current SS to memory
+    movw    %ss, OFFSET16(save_ss)    # save current SS to memory
 
-    data32
-    addr32
     movl    %esp, OFFSET16(save_sp)   # save current SP to memory
 
     cli
     mov     %si, %ss            # switch stack
-    mov     %di, %sp
+    mov     %edi, %esp
     sti
 
-    pushl   %eax                # push IP of caller onto the new stack
+    push    %ax                 # push IP of caller onto the new stack
 
-    xorl    %eax, %eax
-    xorl    %esi, %esi
-    xorl    %edi, %edi
+    xor     %ax, %ax
+    xor     %si, %si
+    xor     %di, %di
 
     ret
+
+    .code32
 
 #ifndef BOOT1
 // - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -425,6 +413,8 @@ LABEL(__switch_stack)
 //
 LABEL(_loader)
     enter   $0, $0
+    pushfl
+    cli
     pushal
 
     #
@@ -442,20 +432,22 @@ LABEL(_loader)
 
     ###### Real Mode Begin ######
 
-    data32
-    call    __switch_stack      # Switch to NBP stack
+    .code16
+
+    calll   __switch_stack      # Switch to NBP stack
 
     int     $0x2b               # Call NBP
 
-    data32
-    call    __switch_stack      # Restore stack
+    calll   __switch_stack      # Restore stack
 
-    data32
-    call    __real_to_prot      # Back to protected mode
+    calll   __real_to_prot      # Back to protected mode
+
+    .code32
 
     ###### Real Mode End ######
 
     popal
+    popfl
     leave
     ret
 #endif

@@ -546,9 +546,6 @@ int checkSupportedVolume(enum volume_kind_t* pKind, struct buffer_t const* pBpbB
 			else
 				*pKind = _other;
 			break;
-		case _ntfs:
-			rc = 0;
-			break;
 		default:
 			break;
 	}
@@ -743,7 +740,6 @@ int main(int argc, char* const argv[])
 			case _exfat:
 			case _hfs:
 			case _msdos:
-			case _ntfs:
 				break;
 			default:
 				unsupported();
