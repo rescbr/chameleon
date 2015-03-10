@@ -1226,21 +1226,26 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		U32 index;
 		for (index=0; index < cpu->pkg_pstates.num_pstates; index ++)
 		{
-			PSTATE * pstate = &cpu->pkg_pstates.pstate[index];
+			PSTATE *pstate = &cpu->pkg_pstates.pstate[index];
 			
 			// Set ratio
 			pstate->ratio = computePstateRatio(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, cpu->pkg_pstates.num_pstates, index);
 			
 			// Compute frequency based on ratio
 			if ((index != 0) || (cpu->turbo_available == 0))
+			{
 				pstate->frequency = pstate->ratio * get_bclk();
+			}
 			else
+			{
 				pstate->frequency = ((pstate->ratio - 1) * get_bclk()) + 1;
-			
+			}
 			// Compute power based on ratio and other data
 			if (pstate->ratio >= cpu->max_ratio_as_mfg)
+			{
 				// Use max power in mW
 				pstate->power = TDP * 1000;
+			}
 			else
 			{
 				pstate->power = compute_pstate_power(cpu, pstate->ratio, TDP);
