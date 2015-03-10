@@ -954,14 +954,21 @@ void scanDisks(int biosdev, int *count)
 
 BVRef selectBootVolume(BVRef chain)
 {
-	bool filteredChain = false;
-	bool foundPrimary = false;
-	BVRef bvr	= NULL;
-	BVRef bvr1	= NULL;
-	BVRef bvr2	= NULL;
-	char dirSpec[] = "hd(%d,%d)/", fileSpec[] = "Volumes", *label;
-	u_int32_t time, lasttime = 0;
-	long flags;
+	bool filteredChain	= false;
+	bool foundPrimary	= false;
+
+	BVRef bvr		= NULL;
+	BVRef bvr1		= NULL;
+	BVRef bvr2		= NULL;
+
+//	char dirSpec[]		= "hd(%d,%d)/";
+//	char fileSpec[]		= "Volumes";
+	char *label;
+
+//	u_int32_t time;
+//	u_int32_t lasttime	= 0;
+
+//	long flags;
 	
 	if (chain->filtered)
 	{
@@ -1011,10 +1018,11 @@ BVRef selectBootVolume(BVRef chain)
 		}
 		free(val);
 	}
-
+/*
 	// Bungo: select last booted partition as the boot volume
 	// TODO: support other OSes (foreign boot)
-	for (bvr = chain; bvr; bvr = bvr->next) {
+	for (bvr = chain; bvr; bvr = bvr->next)
+	{
 		if (bvr->flags & (kBVFlagSystemVolume | kBVFlagForeignBoot))
 		{
 			time = 0;
@@ -1040,6 +1048,8 @@ BVRef selectBootVolume(BVRef chain)
 	// Bungo: code below selects first partition in the chain (last partition on disk),
 	// in my case Recovery HD, as boot volume, so I would prefer last booted partition
 	// as default boot volume - see the code above
+*/
+
 	/*
 	 * Scannig the volume chain backwards and trying to find
 	 * a HFS+ volume with valid boot record signature.
