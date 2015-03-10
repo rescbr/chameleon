@@ -168,21 +168,30 @@ typedef enum {
 	kSpikerush,
 	kTypha,
 	/* AMD7000Controller */
-	kAji,  //4 
-	kBuri, //4 M
-	kChutoro, //5 M
-	kDashimaki, //4
-	kEbi, //5 M
-	kGari, //5 M
-	kFutomaki, //5
-	kHamachi, //4
+	kNamako,
+	kAji,
+	kBuri,
+	kChutoro,
+	kDashimaki,
+	kEbi,
+	kGari,
+	kFutomaki,
+	kHamachi,
 	kOPM,
 	kIkura,
 	kIkuraS,
+	kJunsai,
+	kKani,
+	kKaniS,
+	kDashimakiS,
+	kMaguro,
+	kMaguroS,
 	/* AMD8000Controller */
 	kBaladi,
+	/* AMD9000Controller */
 	kExmoor,
 	kBasset,
+	kGreyhound,
 	kCfgEnd
 } ati_config_name_t;
 

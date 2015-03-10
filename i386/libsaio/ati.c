@@ -106,10 +106,10 @@ static card_config_t card_configs[] = {
 	{"Galago",	2},
 	{"Colobus",	2},
 	{"Mangabey",	2},
-	{"Nomascus",	5},
+	{"Nomascus",	4},
 	{"Orangutan",	2},
 	/* AMD6000Controller */
-	{"Pithecia",	3},
+	{"Pithecia",	2},
 	{"Bulrushes",	6},
 	{"Cattail",	4},
 	{"Hydrilla",	5},
@@ -127,6 +127,7 @@ static card_config_t card_configs[] = {
 	{"Spikerush",   4},
 	{"Typha",       5},
 	/* AMD7000Controller */
+	{"Namako",	4},
 	{"Aji",		4},
 	{"Buri",	4},
 	{"Chutoro",	5},
@@ -136,13 +137,20 @@ static card_config_t card_configs[] = {
 	{"Futomaki",	5},
 	{"Hamachi",	4},
 	{"OPM",         6},
-	{"Ikura",       6},
-	{"IkuraS",      1},
+	{"Ikura",	1},
+	{"IkuraS",	6},
+	{"Junsai",	6},
+	{"Kani",	1},
+	{"KaniS",	6},
+	{"DashimakiS",	4},
+	{"Maguro",	1},
+	{"MaguroS",	6},
 	/* AMD8000Controller */
-	{"Baladi",      5},	//desktop
-	{"Exmoor",      4},	//mobile
-	{"Basset",      4}
-
+	{"Baladi",      6},
+	/* AMD9000Controller */
+	{"Exmoor",	4},
+	{"Basset",	4},
+	{"Greyhound",	6}
 };
 
 static radeon_card_info_t radeon_cards[] = {
