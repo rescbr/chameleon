@@ -138,7 +138,7 @@ void Keylayout_start()
 
 	if (getValueForKey("KeyLayout", &val, &len, &bootInfo->chameleonConfig))
 	{
-		sprintf(layoutPath, "/Extra/Keymaps/%s", val);
+		snprintf(layoutPath, sizeof(layoutPath),"/Extra/Keymaps/%s", val);
 		// Add the extension if needed
 		if (len <= 4 || strcmp(val+len-4,".lyt") != 0)
 			strncat(layoutPath, ".lyt", sizeof(layoutPath) - strlen(layoutPath) - 1);
