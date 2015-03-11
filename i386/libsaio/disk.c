@@ -1331,7 +1331,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 				dpme.dpme_boot_block);
 				*/
 
-				if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0)
+				if (strncmp(dpme_p->dpme_type, "Apple_HFS", sizeof("Apple_HFS")) == 0)
 				{
 					bvr = newAPMBVRef(biosdev,
 					i,

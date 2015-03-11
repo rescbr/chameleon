@@ -301,7 +301,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		stop("Kernel overflows available space");
 	}
 
-	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0)))
+	if (vmsize && ((strncmp(segname, "__PRELINK_INFO", sizeof("__PRELINK_INFO")) == 0) || (strncmp(segname, "__PRELINK", sizeof("__PRELINK")) == 0)))
 	{
 		gHaveKernelCache = true;
 	}

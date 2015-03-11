@@ -379,7 +379,7 @@ char *DT__GetName(Node *node)
 	for (prop = node->properties; prop; prop = prop->next)
 	{
 		//DPRINTF("Prop '%s'\n", prop->name);
-		if (strcmp(prop->name, "name") == 0)
+		if (strncmp(prop->name, "name", sizeof("name")) == 0)
 		{
 			return prop->value;
 		}
@@ -497,7 +497,7 @@ void DT__PrintNode(Node *node, int level)
 	for (prop = node->properties; prop; prop = prop->next)
 	{
 		char c = *((char *)prop->value);
-		if (prop->length < 64 && (strcmp(prop->name, "name") == 0 || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'))
+		if (prop->length < 64 && (strncmp(prop->name, "name", sizeof("name") ) == 0 || (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_'))
 		{
 			printf("%s Property '%s' [%d] = '%s'\n", spaces, prop->name, prop->length, prop->value);
 		}

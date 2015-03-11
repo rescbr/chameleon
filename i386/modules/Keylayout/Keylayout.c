@@ -140,7 +140,7 @@ void Keylayout_start()
 	{
 		snprintf(layoutPath, sizeof(layoutPath),"/Extra/Keymaps/%s", val);
 		// Add the extension if needed
-		if (len <= 4 || strcmp(val+len-4,".lyt") != 0)
+		if (len <= 4 || strncmp(val+len-4,".lyt", sizeof(".lyt")) != 0)
 			strncat(layoutPath, ".lyt", sizeof(layoutPath) - strlen(layoutPath) - 1);
 
 		if (!load_keyboard_layout_file(layoutPath))
