@@ -1760,19 +1760,15 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if (getValueForKey(kProductVersion, &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
-			// crazybirdy
-			if (len > 4 && (val[3] == '1'))
+			strncat(str, val, MIN(len, 5));
+			if(str[4] == '.')
 			{
-				strncat(str, val, MIN(len, 5));
-			}
-			else
-			{
-				strncat(str, val, MIN(len, 4));
+				str[4] = '\0';
 			}
 		}
 		else
