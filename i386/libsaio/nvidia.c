@@ -1309,6 +1309,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE13B3,	"Quadro K2200M" }, //
 	{ 0x10DE13BA,	"Quadro K2200" },
 	{ 0x10DE13BB,	"Quadro K620" },
+	{ 0x10DE13BC,	"Quadro K1200" },
 	{ 0x10DE13BD,	"Tesla M40" }, // GM107GLM
 	{ 0x10DE13BE,	"GM107 CS1" }, //
 	{ 0x10DE13BF,	"GM107 INT52" }, //
@@ -1322,7 +1323,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE13D9,	"GeForce GTX 965M" },
 //	{ 0x10DE13F0,	"Graphics Device" }, // GM107GLM
 //	{ 0x10DE13F1,	"Graphics Device" }, // GM107GLM
-//	{ 0x10DE1401,	"Graphics Device" }, //
+	{ 0x10DE1401,	"GeForce GTX 960" },
 //	{ 0x10DE1402,	"Graphics Device" }, //
 //	{ 0x10DE143F,	"Graphics Device" }, //
 //	{ 0x10DE1600,	"Graphics Device" }, //
