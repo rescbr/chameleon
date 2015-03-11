@@ -1837,7 +1837,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		if (bvr->flags & kBVFlagBooter)
 		{
 			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			strcpy(fileSpec, ".disk_label.contentDetails");
+			strlcpy(fileSpec, ".disk_label.contentDetails", sizeof(fileSpec));
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
@@ -1860,7 +1860,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 				if (!error)
 				{
 					label[fileSize] = '\0';
-					strcpy(bvr->altlabel, label);
+					strlcpy(bvr->altlabel, label, sizeof(bvr->altlabel));
 				}
 			}
 		}
