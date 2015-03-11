@@ -353,6 +353,11 @@ void DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
 			{
 				buf = *buffer_p;
 			}
+			if (!buf)
+			{
+				*length = 0;
+				return;
+			}
 
 			bzero(buf, totalSize);
 
