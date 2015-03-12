@@ -657,7 +657,7 @@ void setupDeviceList(config_file_t *theme)
 	gui.layout = HorizontalLayout;
 	if(getValueForKey( "devices_layout", &string, &len, theme))
 	{
-		if (!strcmp (string, "vertical"))
+		if (!strncmp (string, "vertical",sizeof("vertical")))
 		{
 			gui.layout = VerticalLayout;
 		}

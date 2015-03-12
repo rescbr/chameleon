@@ -390,7 +390,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
         // return-via-reference tag should be left alone
 	}
 	/***** dict ****/
-	else if (!strcmp(tagName, kXMLTagDict))
+	else if (!strncmp(tagName, kXMLTagDict, sizeof(kXMLTagDict)))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeDict, 0);
 	}
@@ -403,13 +403,13 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 		length = ParseTagList(buffer + pos, tag, kTagTypeDict, 0);
 	}
 	/***** key ****/
-	else if (!strcmp(tagName, kXMLTagKey))
+	else if (!strncmp(tagName, kXMLTagKey, sizeof(kXMLTagKey)))
 	{
 		length = ParseTagKey(buffer + pos, tag);
 	}
 
 	/***** string ****/
-	else if (!strcmp(tagName, kXMLTagString))
+	else if (!strncmp(tagName, kXMLTagString, sizeof(kXMLTagString)))
 	{
 		length = ParseTagString(buffer + pos, tag);
 	}
@@ -478,7 +478,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	}
 
 	/***** integer ****/
-	else if (!strcmp(tagName, kXMLTagInteger))
+	else if (!strncmp(tagName, kXMLTagInteger, sizeof(kXMLTagInteger)))
 	{
 		length = ParseTagInteger(buffer + pos, tag);
 	}
@@ -552,13 +552,13 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 
 
 	/***** false ****/
-	else if (!strcmp(tagName, kXMLTagFalse))
+	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
 	{
 		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
 	}
 
 	/***** true ****/
-	else if (!strcmp(tagName, kXMLTagTrue))
+	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
 	{
 		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
 	}
@@ -570,7 +570,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 
 
 	/***** data ****/
-	else if (!strcmp(tagName, kXMLTagData))
+	else if (!strncmp(tagName, kXMLTagData, sizeof(kXMLTagData)))
 	{
 		length = ParseTagData(buffer + pos, tag);
 	}
@@ -578,7 +578,8 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagData(buffer + pos, tag);
 	}
-	else if (!strcmp(tagName, kXMLTagDate))
+
+	else if (!strncmp(tagName, kXMLTagDate, sizeof(kXMLTagDate)))
 	{
 		length = ParseTagDate(buffer + pos, tag);
 	}
@@ -587,8 +588,9 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	else if (!strncmp(tagName, kXMLTagDate " ", strlen(kXMLTagDate " ")))
 	{
 		length = ParseTagDate(buffer + pos, tag);
-	}	/***** array ****/
-	else if (!strcmp(tagName, kXMLTagArray))
+	}
+	/***** array ****/
+	else if (!strncmp(tagName, kXMLTagArray, sizeof(kXMLTagArray) ))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 0);
 	}
@@ -596,7 +598,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 0);
 	}
-	else if (!strcmp(tagName, kXMLTagArray "/"))
+	else if (!strncmp(tagName, kXMLTagArray "/", strlen(kXMLTagArray "/")))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 1);
 	}
