@@ -41,15 +41,15 @@ void SaveRefString(char *string, int id)
 		if(tmp->id == id)
 		{
 			tmp->string = malloc(strlen(string)+1);
-			sprintf(tmp->string, "%s", string);
+			snprintf(tmp->string, strlen(string)+1,"%s", string);
 			return;
 		}
 		tmp = tmp->next;
 	}
 
-	string_ref* new_ref = malloc(sizeof(string_ref));
+	string_ref *new_ref = malloc(sizeof(string_ref));
 	new_ref->string = malloc(strlen(string)+1);
-	sprintf(new_ref->string, "%s", string);
+	snprintf(new_ref->string, (strlen(string)+1)* sizeof(char),"%s", string);
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
