@@ -1729,7 +1729,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{
-			bvr->OSisInstaller = true;
+			bvr->OSisInstaller = false;
 			valid = true;
 		}
 		else
@@ -1739,7 +1739,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 
 			if (!loadConfigFile(dirSpec, &systemVersion))
 			{
-				bvr->OSisServer = true;
+				bvr->OSisServer = false;
 				valid = true;
 			}
 /*			else
@@ -1753,6 +1753,48 @@ static bool getOSVersion(BVRef bvr, char *str)
 			}
 */
 		}
+
+		if ( LION )
+		{
+			int fh = -1;
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			fh = open(dirSpec, 0);
+
+			if (fh >= 0)
+			{
+				valid = true;
+				bvr->OSisInstaller = true;
+				strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+				close(fh);
+			}
+			else
+			{
+				close(fh);
+			}
+		}
+
+// Mountain Lion ?
+
+		if ( MAVERICKS )
+		{
+			int fh = -1;
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			fh = open(dirSpec, 0);
+
+			if (fh >= 0)
+			{
+				valid = true;
+				bvr->OSisInstaller = true;
+				strcpy(bvr->OSVersion, "10.9"); // 10.9 +
+			}
+			else
+			{
+				close(fh);
+			}
+		}
+
+// Yosemite ?
+
 	}
 
 	if (valid)
@@ -1760,7 +1802,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 
-		if (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
 		{
 			// getValueForKey uses const char for val
 			// so copy it and trim
@@ -1777,36 +1819,6 @@ static bool getOSVersion(BVRef bvr, char *str)
 		}
 	}
 
-	if(!valid)
-	{
-		int fh = -1;
-		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
-		fh = open(dirSpec, 0);
-
-		if (fh >= 0)
-		{
-			valid = true;
-			bvr->OSisInstaller = true;
-			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
-			close(fh);
-		}
-		else
-		{
-			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			fh = open(dirSpec, 0);
-
-			if (fh >= 0)
-			{
-				valid = true;
-				bvr->OSisInstaller = true;
-				strcpy(bvr->OSVersion, "10.9"); // 10.9 +
-			}
-			else
-			{
-				close(fh);
-			}
-		}
-	}
 	return valid;
 }
 
