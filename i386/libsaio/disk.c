@@ -1837,7 +1837,9 @@ static void scanFSLevelBVRSettings(BVRef chain)
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
-				fh = open(strcat(dirSpec, fileSpec), 0);
+				strlcat(dirSpec, fileSpec, sizeof(dirSpec));
+				fh = open(dirSpec,0);
+
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{
