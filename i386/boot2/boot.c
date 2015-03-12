@@ -622,14 +622,22 @@ void common_boot(int biosdev)
 
 		if (getValueForKey(karch, &val, &len, &bootInfo->chameleonConfig))
 		{
-			if (strncmp(val, "i386", 4) == 0)
+			if (strncmp(val, "x86_64", sizeof("x86_64") ) == 0)
+			{
+				archCpuType = CPU_TYPE_X86_64;
+			}
+			else if (strncmp(val, "i386", sizeof("i386") ) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;
+			}
+			else
+			{
+				DBG("Incorrect parameter for option 'arch =' , please use x86_64 or i386\n");
 			}
 		}
 
 		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
-			if (strncmp(val, "i386", 4) == 0)
+			if (strncmp(val, "i386", sizeof("i386") ) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;
 			}
@@ -751,9 +759,9 @@ void common_boot(int biosdev)
 
 			bool bootFileWithDevice = false;
 			// Check if bootFile start with a device ex: bt(0,0)/Extra/mach_kernel
-			if (strncmp(bootInfo->bootFile,"bt(",3) == 0 ||
-				strncmp(bootInfo->bootFile,"hd(",3) == 0 ||
-				strncmp(bootInfo->bootFile,"rd(",3) == 0)
+			if (strncmp(bootInfo->bootFile, "bt(", sizeof("bt(") ) == 0 ||
+				strncmp(bootInfo->bootFile, "hd(", sizeof("hd(") ) == 0 ||
+				strncmp(bootInfo->bootFile, "rd(", sizeof("rd(") ) == 0)
 				bootFileWithDevice = true;
 
 			// bootFile must start with a / if it not start with a device name
