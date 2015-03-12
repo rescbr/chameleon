@@ -203,7 +203,7 @@ long LoadDrivers( char * dirSpec )
 		}
 
 		// Next try to load Extra extensions from the selected root partition.
-		strcpy(dirSpecExtra, "/Extra/");
+		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
 		if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 		{
 			// If failed, then try to load Extra extensions from the boot partition
@@ -215,7 +215,7 @@ long LoadDrivers( char * dirSpec )
 				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
 					// Next we'll try the base
-					strcpy(dirSpecExtra, "bt(0,0)/Extra/");
+					strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
 					FileLoadDrivers(dirSpecExtra, 0);
 				}
 			}
@@ -228,12 +228,15 @@ long LoadDrivers( char * dirSpec )
 			// The /Extra code is not disabled in this case due to a kernel patch that allows for this to happen.
 
 			// Also try to load Extensions from boot helper partitions.
-			if (gBootVolume->flags & kBVFlagBooter) {
-				strcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/");
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
-					strcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/");
-					if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
-						strcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/");
+			if (gBootVolume->flags & kBVFlagBooter)
+			{
+				strlcpy(dirSpecExtra, "/com.apple.boot.P/System/Library/", sizeof(dirSpecExtra));
+				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				{
+					strlcpy(dirSpecExtra, "/com.apple.boot.R/System/Library/", sizeof(dirSpecExtra));
+					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					{
+						strlcpy(dirSpecExtra, "/com.apple.boot.S/System/Library/", sizeof(dirSpecExtra));
 						FileLoadDrivers(dirSpecExtra, 0);
 					}
 				}
@@ -352,7 +355,7 @@ long FileLoadDrivers( char * dirSpec, long plugin )
 
 		// Make sure this is a kext.
 		length = strlen(name);
-		if (strcmp(name + length - 5, ".kext"))
+		if (strncmp(name + length - 5, ".kext", 5))
 		{
 			continue;
 		}
@@ -514,7 +517,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	if (tmpExecutablePath == 0) {
 		break;
 	}
-	strcpy(tmpExecutablePath, gFileSpec);
+	strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
 
 	if(name)
 	{
@@ -532,7 +535,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 		break;
 	}
 
-	strcpy(tmpBundlePath, gFileSpec);
+	strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
 
 	// Construct the file spec to the plist, then load it.
 
@@ -546,16 +549,20 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	}
 
 	length = LoadFile(gFileSpec);
+
 	if (length == -1)
 	{
 		break;
 	}
+
 	length = length + 1;
 	buffer = malloc(length);
+
 	if (buffer == 0)
 	{
 		break;
 	}
+
 	strlcpy(buffer, (char *)kLoadAddr, length);
 
 	// Parse the plist.
@@ -708,12 +715,12 @@ LoadMatchedModules( void )
 				driver->bundlePathLength = module->bundlePathLength;
 
 				// Save the plist, module and bundle.
-				strcpy(driver->plistAddr, module->plistAddr);
+				strlcpy(driver->plistAddr, module->plistAddr,driver->plistLength);
 				if (length != 0)
 				{
 					memcpy(driver->executableAddr, executableAddr, length);
 				}
-				strcpy(driver->bundlePathAddr, module->bundlePath);
+				strlcpy(driver->bundlePathAddr, module->bundlePath, module->bundlePathLength);
 
 				// Add an entry to the memory map.
 				snprintf(segName, sizeof(segName), "Driver-%lx", (unsigned long)driver);

@@ -265,8 +265,10 @@ static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HE
 static int getImageIndexByName(const char *name)
 {
 	int i;
-	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(name, images[i].name) == 0) {
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	{
+		if (strncmp(name, images[i].name, sizeof(images[i].name)) == 0)
+		{
 			return i; // found the name
 		}
 	}
@@ -284,7 +286,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 	// NOTE: This algorithm assumes that the embedded images are sorted.
 	// This is currently done using the make file. If the array is
 	// generated manualy, this *will* fail to work properly.
-	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
+	while((result = strncmp(name, embeddedImages[compareIndex].name, sizeof(embeddedImages[compareIndex].name))) != 0)
 	{
 		if (result > 0)	{ // We need to search a HIGHER index
 			if (compareIndex != lowerLimit) {
@@ -930,8 +932,9 @@ int initGUI(void)
 	config_file_t	*config;
     
 	config = &bootInfo->themeConfig;
-	if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-	return 1;
+	if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0)
+	{
+		return 1;
 	}
 #else
 

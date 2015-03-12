@@ -266,12 +266,12 @@ static void clearBootArgs(void)
 	execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
 }
 
-void addBootArg(const char * argStr)
+void addBootArg(const char *argStr)
 {
 	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
 	{
 		if(gBootArgsPtr != gBootArgs) *gBootArgsPtr++ = ' ';
-		strcat(gBootArgs, argStr);
+		strlcat(gBootArgs, argStr, BOOT_STRING_LEN);
 		gBootArgsPtr += strlen(argStr);
 	}
 }
