@@ -825,7 +825,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
 	{
 		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
-		sprintf(dirSpecSMBIOS, override_pathname);
+		strcpy(dirSpecSMBIOS, override_pathname);
 		err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	}
 	else

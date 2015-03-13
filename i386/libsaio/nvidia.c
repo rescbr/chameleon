@@ -2284,7 +2284,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-	snprintf(biosVersion, sizeof(biosVersion), "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
+	strncpy(biosVersion, (nvBiosOveride > 0) ? nvFilename : version_str, sizeof biosVersion);
 	snprintf(kNVCAP, sizeof(kNVCAP), "NVCAP_%04x", nvda_dev->device_id);
 
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->chameleonConfig) && len == NVCAP_LEN * 2)

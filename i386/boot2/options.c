@@ -752,12 +752,12 @@ char *getMemoryInfoString()
 		(i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
 		i++) {
 		bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
-                        (unsigned long)(mp->base >> 32),
-                        (unsigned long)(mp->base));
+                        (unsigned)(mp->base >> 32),
+                        (unsigned)(mp->base));
 		bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
-                        (unsigned long)(mp->length >> 32),
-                        (unsigned long)(mp->length),
-                        mp->type);
+                        (unsigned)(mp->length >> 32),
+                        (unsigned)(mp->length),
+                        (int) mp->type);
 		mp++;
 	}
 	return buff;

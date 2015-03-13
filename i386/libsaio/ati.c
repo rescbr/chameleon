@@ -2162,7 +2162,7 @@ bool read_vbios(bool from_pci)
 	if (from_pci)
 	{
 		rom_addr = (option_rom_header_t *)(pci_config_read32(card->pci_dev->dev.addr, PCI_ROM_ADDRESS) & ~0x7ff);
-		verbose(" @0x%x\n", rom_addr);
+		verbose(" @0x%x\n", (unsigned) rom_addr);
 	}
 	else
 	{
@@ -2171,7 +2171,7 @@ bool read_vbios(bool from_pci)
 	
 	if (!validate_rom(rom_addr, card->pci_dev))
 	{
-		verbose("There is no ROM @0x%x\n", rom_addr);
+		verbose("There is no ROM @0x%x\n", (unsigned) rom_addr);
 		return false;
 	}
 	card->rom_size = rom_addr->rom_size * 512;
@@ -2393,14 +2393,14 @@ static bool init_card(pci_dt_t *pci_dev)
 		return false;
 	}
    	verbose("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
-		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
+		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
 	
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
 
 	verbose("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
-		card->fb, card->mmio, card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
+		(unsigned) card->fb, (unsigned) card->mmio, (unsigned) card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
 	
 	card->posted = radeon_card_posted();
 	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");

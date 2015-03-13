@@ -742,6 +742,7 @@ static BVRef newFDiskBVRef( int biosdev,
 
 //==============================================================================
 
+static
 BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
                    const DPME * part,
                    FSInit initFunc, FSLoadFile loadFunc,
@@ -1537,7 +1538,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 		{
 			char stringuuid[100];
 			efi_guid_unparse_upper((EFI_GUID*)gptMap->ent_type, stringuuid);
-			verbose("Reading GPT partition %d, type %s\n", gptID, stringuuid);
+			verbose("Reading GPT partition %d, type %s\n", (unsigned) gptID, stringuuid);
 
 			// Getting fdisk like partition type.
 			fsType = probeFileSystem(biosdev, gptMap->ent_lba_start);
@@ -2360,7 +2361,7 @@ void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool useDev
 	}
 
 	// Set the devices label
-	snprintf(bvr->label, sizeof(bvr->label), p);
+	strncpy(bvr->label, p, sizeof bvr->label);
 }
 
 

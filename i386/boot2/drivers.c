@@ -212,7 +212,7 @@ long LoadDrivers( char * dirSpec )
 				|| (gRAMDiskVolume && gRAMDiskBTAliased) )
 			{
 				// Next try a specfic OS version folder ie 10.5
-				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion[0]);
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
 					// Next we'll try the base
 					strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
@@ -525,7 +525,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	}
 	else
 	{
-		snprintf(gFileSpec, 4096, "%s", dirSpec);
+		strncpy(gFileSpec, dirSpec, 4096);
 	}
 	bundlePathLength = strlen(gFileSpec) + 1;
 
