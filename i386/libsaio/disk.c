@@ -2291,7 +2291,7 @@ static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 
 //==============================================================================
 
-void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDeviceDescription )
+void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool useDeviceDescription )
 {
 	unsigned char type;
 	char *p = str;
