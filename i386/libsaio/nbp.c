@@ -107,7 +107,7 @@ static long NBPGetDirEntry(CICell ih, char * dirPath, long long * dirIndex,
 
 static void NBPGetDescription(CICell ih, char * str, long strMaxLen)
 {
-    sprintf( str, "Ethernet PXE Client" );
+    snprintf( str, strMaxLen, "Ethernet PXE Client" );
 }
 
 //==========================================================================

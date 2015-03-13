@@ -30,13 +30,14 @@
 #include "libsaio.h"
 
 // OS X Versions
-//#define YOSEMITE        checkOSVersion("10.10") // Yosemite
-//#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
-//#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
-//#define LION            checkOSVersion("10.7")  // Lion
-//#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
-//#define LEOPARD         checkOSVersion("10.5")  // Leopard
-//#define TIGER           checkOSVersion("10.4")  // Tiger
+//#define GALA            checkOSVersion("10.11") // Gala
+#define YOSEMITE        checkOSVersion("10.10") // Yosemite
+#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
+#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
+#define LION            checkOSVersion("10.7")  // Lion
+#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
+#define LEOPARD         checkOSVersion("10.5")  // Leopard
+#define TIGER           checkOSVersion("10.4")  // Tiger
 
 /*
  * Paths used by chameleon

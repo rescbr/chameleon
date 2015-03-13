@@ -233,7 +233,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 
 //==========================================================================
 
-static const char * getNameForValue( const struct NamedValue * nameTable,
+static const char *getNameForValue( const struct NamedValue *nameTable,
                                      unsigned char value )
 {
 	const struct NamedValue *np;
@@ -263,7 +263,7 @@ static const char * bios_error(int errnum)
 		return errname;
 	}
 
-	sprintf(errorstr, "Error 0x%02x", errnum);
+	snprintf(errorstr, sizeof(errorstr), "Error 0x%02x", errnum);
 	return errorstr; // No string, print error code only
 }
 
@@ -1331,7 +1331,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 				dpme.dpme_boot_block);
 				*/
 
-				if (strcmp(dpme_p->dpme_type, "Apple_HFS") == 0)
+				if (strncmp(dpme_p->dpme_type, "Apple_HFS", sizeof("Apple_HFS")) == 0)
 				{
 					bvr = newAPMBVRef(biosdev,
 					i,
@@ -1725,26 +1725,26 @@ static bool getOSVersion(BVRef bvr, char *str)
 	if (!valid)
 	{
 		// OS X Standard
-		sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 		if (!loadConfigFile(dirSpec, &systemVersion))
 		{
-			bvr->OSisInstaller = true;
+			bvr->OSisInstaller = false;
 			valid = true;
 		}
 		else
 		{
 			// OS X Server
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 			if (!loadConfigFile(dirSpec, &systemVersion))
 			{
-				bvr->OSisServer = true;
+				bvr->OSisServer = false;
 				valid = true;
 			}
 /*			else
 			{
-				sprintf(dirSpec, "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
+				snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
 				if (!loadConfigFile(dirSpec, &systemVersion))
 				{
@@ -1753,50 +1753,32 @@ static bool getOSVersion(BVRef bvr, char *str)
 			}
 */
 		}
-	}
 
-	if (valid)
-	{
-		const char *val;
-		int len;
-
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if ( LION )
 		{
-			// getValueForKey uses const char for val
-			// so copy it and trim
-			*str = '\0';
-			// crazybirdy
-			if (len > 4 && (val[3] == '1'))
+			int fh = -1;
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			fh = open(dirSpec, 0);
+
+			if (fh >= 0)
 			{
-				strncat(str, val, MIN(len, 5));
+				valid = true;
+				bvr->OSisInstaller = true;
+				strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+				close(fh);
 			}
 			else
 			{
-				strncat(str, val, MIN(len, 4));
+				close(fh);
 			}
 		}
-		else
-		{
-			valid = false;
-		}
-	}
-	
-	if(!valid)
-	{
-		int fh = -1;
-		sprintf(dirSpec, "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
-		fh = open(dirSpec, 0);
 
-		if (fh >= 0)
+// Mountain Lion ?
+
+		if ( MAVERICKS )
 		{
-			valid = true;
-			bvr->OSisInstaller = true;
-			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
-			close(fh);
-		}
-		else
-		{
-			sprintf(dirSpec, "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			int fh = -1;
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
 			fh = open(dirSpec, 0);
 
 			if (fh >= 0)
@@ -1810,7 +1792,33 @@ static bool getOSVersion(BVRef bvr, char *str)
 				close(fh);
 			}
 		}
+
+// Yosemite ?
+
 	}
+
+	if (valid)
+	{
+		const char *val;
+		int len;
+
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		{
+			// getValueForKey uses const char for val
+			// so copy it and trim
+			*str = '\0';
+			strncat(str, val, MIN(len, 5));
+			if(str[4] == '.')
+			{
+				str[4] = '\0';
+			}
+		}
+		else
+		{
+			valid = false;
+		}
+	}
+
 	return valid;
 }
 
@@ -1836,12 +1844,14 @@ static void scanFSLevelBVRSettings(BVRef chain)
 		//
 		if (bvr->flags & kBVFlagBooter)
 		{
-			sprintf(dirSpec, "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			strcpy(fileSpec, ".disk_label.contentDetails");
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			strlcpy(fileSpec, ".disk_label.contentDetails", sizeof(fileSpec));
 			ret = GetFileInfo(dirSpec, fileSpec, &flags, &time);
 			if (!ret)
 			{
-				fh = open(strcat(dirSpec, fileSpec), 0);
+				strlcat(dirSpec, fileSpec, sizeof(dirSpec));
+				fh = open(dirSpec,0);
+
 				fileSize = file_size(fh);
 				if (fileSize > 0 && fileSize < BVSTRLEN)
 				{
@@ -1860,7 +1870,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 				if (!error)
 				{
 					label[fileSize] = '\0';
-					strcpy(bvr->altlabel, label);
+					strlcpy(bvr->altlabel, label, sizeof(bvr->altlabel));
 				}
 			}
 		}
@@ -2191,7 +2201,7 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 	}
 
 	// Try to match hd(x,y) first.
-	sprintf(testStr, "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	snprintf(testStr, sizeof(testStr), "hd(%d,%d)", BIOS_DEV_UNIT(bvr), bvr->part_no);
 	if ( matchLen ? !strncmp(match, testStr, matchLen) : !strcmp(match, testStr) )
 	{
 		return true;
@@ -2281,7 +2291,7 @@ static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 
 //==============================================================================
 
-void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDeviceDescription )
+void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool useDeviceDescription )
 {
 	unsigned char type;
 	char *p = str;
@@ -2301,8 +2311,13 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 			return;
 		}
 
-		strcpy(str + len, bvr->OSisInstaller ? " (Installer) " : " ");
-		len += bvr->OSisInstaller ? 13 : 1;
+		strcpy(str + len, bvr->OSisInstaller ? " (Installer " : " (");
+		len += bvr->OSisInstaller ? 12 : 2;
+		strcpy(str + len, bvr->OSVersion);
+		len += strlen(bvr->OSVersion);
+		strcpy(str + len, ") ");
+		len += 2;
+
 		strMaxLen -= len;
 		p += len;
 	}
@@ -2336,7 +2351,7 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 
 		if (name == NULL)
 		{
-			sprintf(p, "TYPE %02X", type);
+			snprintf(p, strMaxLen, "TYPE %02X", type);
 		}
 		else
 		{
@@ -2345,7 +2360,7 @@ void getBootVolumeDescription( BVRef bvr, char * str, long strMaxLen, bool useDe
 	}
 
 	// Set the devices label
-	sprintf(bvr->label, p);
+	snprintf(bvr->label, sizeof(bvr->label), p);
 }
 
 

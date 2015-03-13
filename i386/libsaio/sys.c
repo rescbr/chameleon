@@ -78,6 +78,10 @@ static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x1
 #define DBG(x...)	msglog(x)
 #endif
 
+#ifndef DEBUG_FEATURE_LAST_BOOT
+#define DEBUG_FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
+#endif
+
 extern int multiboot_partition;
 extern int multiboot_partition_set;
 extern int multiboot_skip_partition;
@@ -954,15 +958,25 @@ void scanDisks(int biosdev, int *count)
 
 BVRef selectBootVolume(BVRef chain)
 {
-	bool filteredChain = false;
-	bool foundPrimary = false;
-	BVRef bvr	= NULL;
-	BVRef bvr1	= NULL;
-	BVRef bvr2	= NULL;
-	char dirSpec[] = "hd(%d,%d)/", fileSpec[] = "Volumes", *label;
-	u_int32_t time, lasttime = 0;
+	bool filteredChain	= false;
+	bool foundPrimary	= false;
+
+	BVRef bvr		= NULL;
+	BVRef bvr1		= NULL;
+	BVRef bvr2		= NULL;
+
+#if DEBUG_FEATURE_LAST_BOOT
+	char dirSpec[]		= "hd(%d,%d)/";
+	char fileSpec[]		= "Volumes";
+#endif
+	char *label;
+#if DEBUG_FEATURE_LAST_BOOT
+	u_int32_t time;
+	u_int32_t lasttime	= 0;
+
 	long flags;
-	
+#endif
+
 	if (chain->filtered)
 	{
 		filteredChain = true;
@@ -1012,9 +1026,11 @@ BVRef selectBootVolume(BVRef chain)
 		free(val);
 	}
 
+#if DEBUG_FEATURE_LAST_BOOT   // the above code cause "AllocateKernelMemory error"
 	// Bungo: select last booted partition as the boot volume
 	// TODO: support other OSes (foreign boot)
-	for (bvr = chain; bvr; bvr = bvr->next) {
+	for (bvr = chain; bvr; bvr = bvr->next)
+	{
 		if (bvr->flags & (kBVFlagSystemVolume | kBVFlagForeignBoot))
 		{
 			time = 0;
@@ -1040,6 +1056,8 @@ BVRef selectBootVolume(BVRef chain)
 	// Bungo: code below selects first partition in the chain (last partition on disk),
 	// in my case Recovery HD, as boot volume, so I would prefer last booted partition
 	// as default boot volume - see the code above
+#endif
+
 	/*
 	 * Scannig the volume chain backwards and trying to find
 	 * a HFS+ volume with valid boot record signature.

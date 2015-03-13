@@ -41,15 +41,15 @@ void SaveRefString(char *string, int id)
 		if(tmp->id == id)
 		{
 			tmp->string = malloc(strlen(string)+1);
-			sprintf(tmp->string, "%s", string);
+			snprintf(tmp->string, strlen(string)+1,"%s", string);
 			return;
 		}
 		tmp = tmp->next;
 	}
 
-	string_ref* new_ref = malloc(sizeof(string_ref));
+	string_ref *new_ref = malloc(sizeof(string_ref));
 	new_ref->string = malloc(strlen(string)+1);
-	sprintf(new_ref->string, "%s", string);
+	snprintf(new_ref->string, (strlen(string)+1)* sizeof(char),"%s", string);
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
@@ -133,7 +133,7 @@ TagPtr XMLGetProperty(TagPtr dict, const char *key)
 
 	if (dict->type != kTagTypeDict)
 	{
-		return 0;
+		return NULL;
 	}
 
 	tag = 0;
@@ -152,7 +152,7 @@ TagPtr XMLGetProperty(TagPtr dict, const char *key)
 			return tag->tag;
 		}
 	}
-	return 0;
+	return NULL;
 }
 
 //==========================================================================
@@ -255,24 +255,26 @@ TagPtr XMLGetElement( TagPtr dict, int id )
 	return tmp;
 }
 
+typedef const struct XMLEntity {
+	const char *name;
+	size_t nameLen;
+	char value;
+} XMLEntity;
+
+/* This is ugly, but better than specifying the lengths by hand */
+
+#define _e(str,c) {str,sizeof(str)-1,c}
+const XMLEntity ents[] = {
+	_e("quot;",'"'),  // double quotation mark
+	_e("apos;",'\''), // ampersand
+	_e("lt;",  '<'),  // apostrophe (apostrophe-quote)
+	_e("gt;",  '>'),  // less-than sign
+	_e("amp;", '&')   // greater-than sign
+};
+
 /* Function for basic XML character entities parsing */
-
-char *XMLDecode(const char* src)
+char *XMLDecode(const char *src)
 {
-	typedef const struct XMLEntity {
-		const char *name;
-		size_t nameLen;
-		char value;
-	} XMLEntity;
-
-	/* This is ugly, but better than specifying the lengths by hand */
-	#define _e(str,c) {str,sizeof(str)-1,c}
-	const XMLEntity ents[] = {
-		_e("quot;",'"'), _e("apos;",'\''),
-		_e("lt;",  '<'), _e("gt;",  '>'),
-		_e("amp;", '&')
-	};
-
 	size_t len;
 	const char *s;
 	char *out, *o;
@@ -372,9 +374,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 {
 	long	length = 0;
 	long	pos = 0;
-
-
-	char	*tagName;
+	char	*tagName = NULL;
 
 	length = GetNextTag(buffer, &tagName, 0);
 	if (length == -1)
@@ -390,7 +390,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
         // return-via-reference tag should be left alone
 	}
 	/***** dict ****/
-	else if (!strcmp(tagName, kXMLTagDict))
+	else if (!strncmp(tagName, kXMLTagDict, sizeof(kXMLTagDict)))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeDict, 0);
 	}
@@ -403,13 +403,13 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 		length = ParseTagList(buffer + pos, tag, kTagTypeDict, 0);
 	}
 	/***** key ****/
-	else if (!strcmp(tagName, kXMLTagKey))
+	else if (!strncmp(tagName, kXMLTagKey, sizeof(kXMLTagKey)))
 	{
 		length = ParseTagKey(buffer + pos, tag);
 	}
 
 	/***** string ****/
-	else if (!strcmp(tagName, kXMLTagString))
+	else if (!strncmp(tagName, kXMLTagString, sizeof(kXMLTagString)))
 	{
 		length = ParseTagString(buffer + pos, tag);
 	}
@@ -478,7 +478,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	}
 
 	/***** integer ****/
-	else if (!strcmp(tagName, kXMLTagInteger))
+	else if (!strncmp(tagName, kXMLTagInteger, sizeof(kXMLTagInteger)))
 	{
 		length = ParseTagInteger(buffer + pos, tag);
 	}
@@ -533,6 +533,11 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 			int integer = (int)GetRefString(id);
 
 			TagPtr tmpTag = NewTag();
+			if (tmpTag == 0)
+			{
+				return -1;
+			}
+
 			tmpTag->type = kTagTypeInteger;
 			tmpTag->string = (char*) integer;
 			tmpTag->tag = 0;
@@ -552,13 +557,13 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 
 
 	/***** false ****/
-	else if (!strcmp(tagName, kXMLTagFalse))
+	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
 	{
 		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
 	}
 
 	/***** true ****/
-	else if (!strcmp(tagName, kXMLTagTrue))
+	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
 	{
 		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
 	}
@@ -570,7 +575,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 
 
 	/***** data ****/
-	else if (!strcmp(tagName, kXMLTagData))
+	else if (!strncmp(tagName, kXMLTagData, sizeof(kXMLTagData)))
 	{
 		length = ParseTagData(buffer + pos, tag);
 	}
@@ -578,7 +583,8 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagData(buffer + pos, tag);
 	}
-	else if (!strcmp(tagName, kXMLTagDate))
+
+	else if (!strncmp(tagName, kXMLTagDate, sizeof(kXMLTagDate)))
 	{
 		length = ParseTagDate(buffer + pos, tag);
 	}
@@ -587,8 +593,9 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	else if (!strncmp(tagName, kXMLTagDate " ", strlen(kXMLTagDate " ")))
 	{
 		length = ParseTagDate(buffer + pos, tag);
-	}	/***** array ****/
-	else if (!strcmp(tagName, kXMLTagArray))
+	}
+	/***** array ****/
+	else if (!strncmp(tagName, kXMLTagArray, sizeof(kXMLTagArray) ))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 0);
 	}
@@ -596,7 +603,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 0);
 	}
-	else if (!strcmp(tagName, kXMLTagArray "/"))
+	else if (!strncmp(tagName, kXMLTagArray "/", strlen(kXMLTagArray "/")))
 	{
 		length = ParseTagList(buffer + pos, tag, kTagTypeArray, 1);
 	}
@@ -605,7 +612,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	else
 	{
 		// it wasn't parsed so we consumed no additional characters
-		*tag = 0;
+		*tag = NULL;
 		length = 0;
 	}
 
@@ -624,7 +631,7 @@ static long ParseTagList( char *buffer, TagPtr *tag, long type, long empty )
 {
 	long		pos = 0;
 	long		length = 0;
-	TagPtr		tagList = 0;
+	TagPtr		tagList = NULL;
 	TagPtr		tmpTag;
 
   
@@ -641,7 +648,7 @@ static long ParseTagList( char *buffer, TagPtr *tag, long type, long empty )
 			pos += length;
       
 			// detect end of list
-			if (tmpTag == 0)
+			if (tmpTag == NULL)
 			{
 				break;
 			}
@@ -657,7 +664,7 @@ static long ParseTagList( char *buffer, TagPtr *tag, long type, long empty )
 	}
   
 	tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		XMLFreeTag(tagList);
 		return -1;
@@ -698,14 +705,14 @@ static long ParseTagKey( char *buffer, TagPtr *tag )
 	}
 
 	tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		XMLFreeTag(subTag);
 		return -1;
 	}
   
 	string = NewSymbol(buffer);
-	if (string == 0)
+	if (string == NULL)
 	{
 		XMLFreeTag(subTag);
 		XMLFreeTag(tmpTag);
@@ -738,13 +745,13 @@ static long ParseTagString( char *buffer, TagPtr *tag )
 	}
   
 	TagPtr tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		return -1;
 	}
 
 	string = NewSymbol(buffer);
-	if (string == 0)
+	if (string == NULL)
 	{
 		XMLFreeTag(tmpTag);
 		return -1;
@@ -752,8 +759,8 @@ static long ParseTagString( char *buffer, TagPtr *tag )
   
 	tmpTag->type = kTagTypeString;
 	tmpTag->string = string;
-	tmpTag->tag = 0;
-	tmpTag->tagNext = 0;
+	tmpTag->tag = NULL;
+	tmpTag->tagNext = NULL;
 	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
 
 	*tag = tmpTag;
@@ -858,9 +865,9 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 
 	tmpTag->type = kTagTypeInteger;
 	tmpTag->string = (char *)integer;
-	tmpTag->tag = 0;
+	tmpTag->tag = NULL;
 	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
-	tmpTag->tagNext = 0;
+	tmpTag->tagNext = NULL;
 
 	*tag = tmpTag;
 
@@ -884,7 +891,7 @@ static long ParseTagData( char *buffer, TagPtr *tag )
 	}
 
 	tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		return -1;
 	}
@@ -897,10 +904,10 @@ static long ParseTagData( char *buffer, TagPtr *tag )
 	tmpTag->type = kTagTypeData;
 	tmpTag->string = string;
 
-	tmpTag->tag = 0;
+	tmpTag->tag = NULL;
 	tmpTag->offset = actuallen; // buffer_start ? buffer - buffer_start: 0;
 
-	tmpTag->tagNext = 0;
+	tmpTag->tagNext = NULL;
 
 	*tag = tmpTag;
 
@@ -922,7 +929,7 @@ static long ParseTagDate( char *buffer, TagPtr *tag )
 	}
 
 	tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		return -1;
 	}
@@ -931,9 +938,9 @@ static long ParseTagDate( char *buffer, TagPtr *tag )
 	getchar();
 
 	tmpTag->type = kTagTypeDate;
-	tmpTag->string = 0;
-	tmpTag->tag = 0;
-	tmpTag->tagNext = 0;
+	tmpTag->string = NULL;
+	tmpTag->tag = NULL;
+	tmpTag->tagNext = NULL;
 	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
 
 	*tag = tmpTag;
@@ -949,16 +956,17 @@ long ParseTagBoolean( char *buffer, TagPtr *tag, long type )
 	TagPtr tmpTag;
 
 	tmpTag = NewTag();
-	if (tmpTag == 0)
+	if (tmpTag == NULL)
 	{
 		return -1;
 	}
 
 	tmpTag->type = type;
-	tmpTag->string = 0;
-	tmpTag->tag = 0;
-	tmpTag->tagNext = 0;
+	tmpTag->string = NULL;
+	tmpTag->tag = NULL;
+	tmpTag->tagNext = NULL;
 	tmpTag->offset = buffer_start ? buffer - buffer_start: 0;
+
 
 	*tag = tmpTag;
 
@@ -973,7 +981,7 @@ static long GetNextTag( char *buffer, char **tag, long *start )
 	long	cnt;
 	long	cnt2;
 
-	if (tag == 0)
+	if (tag == NULL)
 	{
 		return -1;
 	}
@@ -1052,19 +1060,18 @@ static long FixDataMatchingTag( char *buffer, char *tag )
 
 #define kTagsPerBlock (0x1000)
 
-static TagPtr gTagsFree;
-
+static TagPtr    gTagsFree	= NULL;
 static TagPtr NewTag( void )
 {
 	long		cnt;
 	TagPtr		tag;
   
-	if (gTagsFree == 0)
+	if (gTagsFree == NULL)
 	{
 		tag = (TagPtr)malloc(kTagsPerBlock *sizeof(Tag));
-		if (tag == 0)
+		if (tag == NULL)
 		{
-			return 0;
+			return NULL;
 		}
 
 		// Initalize the new tags.
@@ -1092,7 +1099,7 @@ static TagPtr NewTag( void )
 void XMLFreeTag( TagPtr tag )
 {
 #if DOFREE
-	if (tag == 0)
+	if (tag == NULL)
 	{
 		return;
 	}
@@ -1107,8 +1114,8 @@ void XMLFreeTag( TagPtr tag )
   
 	// Clear and free the tag.
 	tag->type = kTagTypeNone;
-	tag->string = 0;
-	tag->tag = 0;
+	tag->string = NULL;
+	tag->tag = NULL;
 	tag->offset = 0;
 	tag->tagNext = gTagsFree;
 	gTagsFree = tag;
@@ -1130,7 +1137,7 @@ typedef struct Symbol Symbol, *SymbolPtr;
 
 static SymbolPtr FindSymbol(char *string, SymbolPtr *prevSymbol);
 
-static SymbolPtr gSymbolsHead;
+static SymbolPtr gSymbolsHead	= NULL;
 
 //==========================================================================
 // NewSymbol
@@ -1145,11 +1152,11 @@ static char *NewSymbol( char *string )
 	symbol = FindSymbol(string, 0);
 
 	// Add the new symbol.
-	if (symbol == 0)
+	if (symbol == NULL)
 	{
 		symbol = (SymbolPtr)malloc(sizeof(Symbol) + 1 + strlen(string));
-		if (symbol == 0)
-		{	//return 0;
+		if (symbol == NULL)
+		{
 			stop("NULL symbol!");
 		}
 
@@ -1180,11 +1187,11 @@ static char *NewSymbol( char *string )
 static void FreeSymbol( char *string )
 {
 	SymbolPtr symbol, prev;
-	prev = 0;
+	prev = NULL;
 
 	// Look for string in the list of symbols.
 	symbol = FindSymbol(string, &prev);
-	if (symbol == 0)
+	if (symbol == NULL)
 	{
 		return;
 	}
@@ -1198,7 +1205,7 @@ static void FreeSymbol( char *string )
 	}
 
 	// Remove the symbol from the list.
-	if (prev != 0)
+	if (prev != NULL)
 	{
 		prev->next = symbol->next;
 	}
@@ -1219,8 +1226,13 @@ static SymbolPtr FindSymbol( char *string, SymbolPtr *prevSymbol )
 {
 	SymbolPtr symbol, prev;
 
+	if (string == NULL)
+	{
+		return NULL;
+	}
+
 	symbol = gSymbolsHead;
-	prev = 0;
+	prev = NULL;
   
 	while (symbol != NULL)
 	{
@@ -1233,7 +1245,7 @@ static SymbolPtr FindSymbol( char *string, SymbolPtr *prevSymbol )
 		symbol = symbol->next;
 	}
   
-	if ((symbol != 0) && (prevSymbol != 0))
+	if ((symbol != NULL) && (prevSymbol != NULL))
 	{
 		*prevSymbol = prev;
 	}

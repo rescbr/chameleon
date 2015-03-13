@@ -71,7 +71,7 @@
 
 //==========================================================================
 // Enable A20 gate to be able to access memory above 1MB
-
+static inline void flushKeyboardInputBuffer();
 static inline void flushKeyboardInputBuffer()
 {
     unsigned char ret;

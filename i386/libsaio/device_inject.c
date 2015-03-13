@@ -74,14 +74,14 @@ void setupDeviceProperties(Node *node)
 
 DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString *)malloc(sizeof(struct DevPropString));
+	string = (DevPropString *)malloc(sizeof(DevPropString));
 
 	if(string == NULL)
 	{
 		return NULL;
 	}
 	
-	memset(string, 0, sizeof(struct DevPropString));
+	memset(string, 0, sizeof(DevPropString));
 	string->length = 12;
 	string->WHAT2 = 0x01000000;
 	return string;
@@ -175,7 +175,7 @@ DevPropDevice *devprop_add_device(DevPropString *string, char *path)
 	device->acpi_dev_path.length	= 0x0c;
 	device->acpi_dev_path.type	= 0x02;
 	device->acpi_dev_path.subtype	= 0x01;
-	device->acpi_dev_path._HID	= 0xd041030a;
+	device->acpi_dev_path._HID	= 0xd041030a; // 0x0a0341d0
 	
 	device->num_pci_devpaths = numpaths;
 	device->length = 24 + (6*numpaths);
@@ -274,7 +274,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 
 	if(!device->data)
 	{
-		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+		device->data = (uint8_t *)malloc(sizeof(uint8_t));
 	}
 	else
 	{

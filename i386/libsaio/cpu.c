@@ -16,7 +16,7 @@
 #if DEBUG_CPU
 #define DBG(x...)		printf(x)
 #else
-#define DBG(x...)		msglog(x)
+#define DBG(x...)
 #endif
 
 /*
@@ -28,9 +28,9 @@
 static uint64_t timeRDTSC(void)
 {
 	int		attempts = 0;
-	uint64_t    latchTime;
+	uint64_t    	latchTime;
 	uint64_t	saveTime,intermediate;
-	unsigned int timerValue, lastValue;
+	unsigned int	timerValue, lastValue;
 	//boolean_t	int_enabled;
 	/*
 	 * Table of correction factors to account for
@@ -51,18 +51,18 @@ static uint64_t timeRDTSC(void)
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-5))
 	};
 
-	//int_enabled = ml_set_interrupts_enabled(FALSE);
+	//int_enabled = ml_set_interrupts_enabled(false);
 
 restart:
 	if (attempts >= 9) // increase to up to 9 attempts.
 	{
-	        // This will flash-reboot. TODO: Use tscPanic instead.
+		// This will flash-reboot. TODO: Use tscPanic instead.
 		printf("Timestamp counter calibation failed with %d attempts\n", attempts);
 	}
 	attempts++;
 	enable_PIT2();		// turn on PIT2
 	set_PIT2(0);		// reset timer 2 to be zero
-	latchTime = rdtsc64();	// get the time stamp to time 
+	latchTime = rdtsc64();	// get the time stamp to time
 	latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
 	set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
 	saveTime = rdtsc64();	// now time how long a 20th a second is...
@@ -316,12 +316,14 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
+
 	if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
 	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}
 
 	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+
 	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
 	{
 		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
@@ -460,8 +462,8 @@ void scan_cpu(PlatformInfo_t *p)
 	// MSR is *NOT* available on the Intel Atom CPU
 	if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
 	{
-			p->CPU.NoCores		= 1;
-			p->CPU.NoThreads	= 2;
+		p->CPU.NoCores		= 1;
+		p->CPU.NoThreads	= 2;
 	}
 
 	/* setup features */
@@ -512,7 +514,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	tscFrequency = measure_tsc_frequency();
 	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
-	/* if usual method failed */
+	// if usual method failed
 	if ( tscFrequency < 1000 )	//TEST
 	{
 		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
@@ -786,9 +788,12 @@ void scan_cpu(PlatformInfo_t *p)
 				DBG("%d\n", currcoef);
 			}
 		}
-		if (!cpuFrequency) cpuFrequency = tscFrequency;
+		if (!cpuFrequency)
+		{
+			cpuFrequency = tscFrequency;
+		}
 	}
-	
+
 #if 0
 	if (!fsbFrequency)
 	{
