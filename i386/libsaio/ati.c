@@ -7,68 +7,12 @@
 
 #include "ati.h"
 
-static bool	doit	= false;
+/* vals */
+static value_t aty_name;
+static value_t aty_nameparent;
+card_t *card;
 
-static const char *chip_family_name[] = {
-	"UNKNOW",
-	"R420",
-	"R423",
-	"RV410",
-	"RV515",
-	"R520",
-	"RV530",
-	"RV560",
-	"RV570",
-	"R580",
-	/* IGP */
-	"RS600",
-	"RS690",
-	"RS740",
-	"RS780",
-	"RS880",
-	/* R600 */
-	"R600",
-	"RV610",
-	"RV620",
-	"RV630",
-	"RV635",
-	"RV670",
-	/* R700 */
-	"RV710",
-	"RV730",
-	"RV740",
-	"RV770",
-	"RV772",
-	"RV790",
-	/* Evergreen */
-	"Cedar",
-	"Cypress",
-	"Hemlock",
-	"Juniper",
-	"Redwood",
-	/* Northern Islands */
-	"Barts",
-	"Caicos",
-	"Cayman",
-	"Turks",
-	/* Southern Islands */
-	"Palm",
-	"Sumo",
-	"Sumo2",
-	"Aruba",
-	"Tahiti",
-	"Pitcairn",
-	"Verde",
-	"Oland",
-	"Hainan",
-	"Bonaire",
-	"Kaveri",
-	"Kabini",
-	"Hawaii",
-	/* ... */
-	"Mullins",
-	""
-};
+static bool	doit	= false;
 
 static card_config_t card_configs[] = {
 	{NULL,		0},
@@ -1766,7 +1710,68 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x0000,	0x00000000, CHIP_FAMILY_UNKNOW,	"AMD Unknown",			kNull		}
 };
 
-dev_prop_t ati_devprop_list[] = {
+static const char *chip_family_name[] = {
+	"UNKNOW",
+	"R420",
+	"R423",
+	"RV410",
+	"RV515",
+	"R520",
+	"RV530",
+	"RV560",
+	"RV570",
+	"R580",
+	/* IGP */
+	"RS600",
+	"RS690",
+	"RS740",
+	"RS780",
+	"RS880",
+	/* R600 */
+	"R600",
+	"RV610",
+	"RV620",
+	"RV630",
+	"RV635",
+	"RV670",
+	/* R700 */
+	"RV710",
+	"RV730",
+	"RV740",
+	"RV770",
+	"RV772",
+	"RV790",
+	/* Evergreen */
+	"Cedar",
+	"Cypress",
+	"Hemlock",
+	"Juniper",
+	"Redwood",
+	/* Northern Islands */
+	"Barts",
+	"Caicos",
+	"Cayman",
+	"Turks",
+	/* Southern Islands */
+	"Palm",
+	"Sumo",
+	"Sumo2",
+	"Aruba",
+	"Tahiti",
+	"Pitcairn",
+	"Verde",
+	"Oland",
+	"Hainan",
+	"Bonaire",
+	"Kaveri",
+	"Kabini",
+	"Hawaii",
+	/* ... */
+	"Mullins",
+	""
+};
+
+AtiDevProp ati_devprop_list[] = {
 	{FLAGTRUE,	false,	"@0,AAPL,boot-display",		get_bootdisplay_val,	NULVAL				},
 //	{FLAGTRUE,	false,	"@0,ATY,EFIDisplay",		NULL,			STRVAL("TMDSA")			},
 
@@ -1802,19 +1807,6 @@ dev_prop_t ati_devprop_list[] = {
 	{FLAGTRUE,	false,	NULL,				NULL,			NULVAL				}
 };
 
-bool get_hdmiaudio(value_t * val)
-{
-	bool doit = false;
-	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit){
-		val->type = kStr;
-		val->size = strlen("onboard-1") + 1;
-		val->data = (uint8_t *)"onboard-1";
-
-		return true;
-	}
-	return false;
-}
-
 bool get_bootdisplay_val(value_t *val)
 {
 	static uint32_t v = 0;
@@ -1833,6 +1825,20 @@ bool get_bootdisplay_val(value_t *val)
 	val->data = (uint8_t *)&v;
 
 	return true;
+}
+
+bool get_hdmiaudio(value_t * val)
+{
+	bool doit = false;
+	if(getBoolForKey(kEnableHDMIAudio, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		val->type = kStr;
+		val->size = strlen("onboard-1") + 1;
+		val->data = (uint8_t *)"onboard-1";
+
+		return true;
+	}
+	return false;
 }
 
 bool get_vrammemory_val(value_t *val)
@@ -1999,7 +2005,7 @@ void free_val(value_t *val)
 	bzero(val, sizeof(value_t));
 }
 
-void devprop_add_list(dev_prop_t devprop_list[])
+void devprop_add_list(AtiDevProp devprop_list[])
 {
 	int i, pnum;
 	value_t *val = malloc(sizeof(value_t));
@@ -2065,6 +2071,7 @@ bool validate_rom(option_rom_header_t *rom_header, pci_dt_t *pci_dev)
 	
 	if (rom_header->signature != 0xaa55)
 	{
+		//verbose("invalid ROM signature %x\n", rom_header->signature);
 		return false;
 	}
 
@@ -2072,11 +2079,13 @@ bool validate_rom(option_rom_header_t *rom_header, pci_dt_t *pci_dev)
 	
 	if (rom_pci_header->signature != 0x52494350)
 	{
+		//verbose("invalid ROM header %x\n", rom_pci_header->signature);
 		return false;
 	}
 	
 	if (rom_pci_header->vendor_id != pci_dev->vendor_id || rom_pci_header->device_id != pci_dev->device_id)
 	{
+		//verbose("invalid ROM vendor=%x deviceID=%d\n", rom_pci_header->vendor_id, rom_pci_header->device_id);
 		return false;
 	}
 	
@@ -2112,6 +2121,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 
 	if (!validate_rom((option_rom_header_t *)card->rom, card->pci_dev))
 	{
+		verbose("validate_rom fails\n");
 		card->rom_size = 0;
 		card->rom = 0;
 		return false;
@@ -2161,6 +2171,7 @@ bool read_vbios(bool from_pci)
 	
 	if (!validate_rom(rom_addr, card->pci_dev))
 	{
+		verbose("There is no ROM @0x%x\n", rom_addr);
 		return false;
 	}
 	card->rom_size = rom_addr->rom_size * 512;
@@ -2381,6 +2392,8 @@ static bool init_card(pci_dt_t *pci_dev)
 				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys.vendor_id, pci_dev->subsys_id.subsys.device_id);
 		return false;
 	}
+   	verbose("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
+		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
 	
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
@@ -2416,6 +2429,7 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
+		verbose("ATI Radeon EVERGREEN family\n");
 		card->flags |= EVERGREEN;
 	}
 

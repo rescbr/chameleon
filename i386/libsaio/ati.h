@@ -17,17 +17,12 @@
 #include "ati_reg.h"
 
 /* DEFINES */
-#define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 
-#define Reg32(reg)				(*(volatile uint32_t *)(card->mmio + reg))
-#define RegRead32(reg)			(Reg32(reg))
+#define Reg32(reg)		(*(volatile uint32_t *)(card->mmio + reg))
+#define RegRead32(reg)		(Reg32(reg))
 #define RegWrite32(reg, value)	(Reg32(reg) = value)
 
-/* Flags */
-#define MKFLAG(n)			(1 << n)
-#define FLAGTRUE			MKFLAG(0)
-#define EVERGREEN			MKFLAG(1)
-
+#define OFFSET_TO_GET_ATOMBIOS_STRINGS_START 0x6e
 #define DATVAL(x)			{kPtr, sizeof(x), (uint8_t *)x}
 #define STRVAL(x)			{kStr, sizeof(x), (uint8_t *)x}
 #define BYTVAL(x)			{kCst, 1, (uint8_t *)x}
@@ -106,6 +101,12 @@ typedef enum {
 	CHIP_FAMILY_MULLINS,
 	CHIP_FAMILY_LAST
 } ati_chip_family_t;
+
+//card to #ports
+typedef struct {
+	const char		*name;
+	uint8_t			ports;
+} card_config_t;
 
 typedef enum {
 	kNull,
@@ -193,38 +194,16 @@ typedef enum {
 	kBasset,
 	kGreyhound,
 	kCfgEnd
-} ati_config_name_t;
-
-/* Typedefs STRUCTS */
-typedef struct {
-	type_t					type;
-	uint32_t				size;
-	uint8_t					*data;
-} value_t;
-
-//card to #ports
-typedef struct {
-	const char		*name;
-	uint8_t			ports;
-} card_config_t;
+} config_name_t;
 
 //radeon card (includes teh AtiConfig)
 typedef struct {
-	uint16_t			device_id;
-	uint32_t			subsys_id;
-	ati_chip_family_t		chip_family;
-	const char			*model_name;
-	ati_config_name_t		cfg_name;
+	uint16_t		device_id;
+	uint32_t		subsys_id;
+	ati_chip_family_t	chip_family;
+	const char		*model_name;
+	config_name_t		cfg_name;
 } radeon_card_info_t;
-
-// dev_tree  representation
-typedef struct {
-	uint32_t				flags;
-	bool					all_ports;
-	char					*name;
-	bool					(*get_value)(value_t *val);
-	value_t					default_val;
-} dev_prop_t;
 
 typedef struct {
 	struct DevPropDevice	*device;
@@ -243,6 +222,29 @@ typedef struct {
 } card_t;
 
 
+/* Flags */
+#define MKFLAG(n)	(1 << n)
+#define FLAGTRUE	MKFLAG(0)
+#define EVERGREEN	MKFLAG(1)
+#define FLAGMOBILE	MKFLAG(2)
+#define FLAGOLD		MKFLAG(3)
+#define FLAGNOTFAKE	MKFLAG(4)
+
+/* Typedefs STRUCTS */
+typedef struct {
+	type_t			type;
+	uint32_t		size;
+	uint8_t			*data;
+} value_t;
+
+// dev_tree  representation
+typedef struct {
+	uint32_t	flags;
+	bool		all_ports;
+	char		*name;
+	bool		(*get_value)(value_t *val);
+	value_t		default_val;
+} AtiDevProp;
 
 /* functions */
 bool get_bootdisplay_val(value_t *val);
@@ -261,10 +263,5 @@ bool get_refclk_val(value_t *val);
 bool get_platforminfo_val(value_t *val);
 bool get_vramtotalsize_val(value_t *val);
 bool get_hdmiaudio(value_t * val);
-
-/* vals */
-static value_t aty_name;
-static value_t aty_nameparent;
-card_t *card;
 
 #endif
