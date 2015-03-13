@@ -16,7 +16,7 @@
 #if DEBUG_CPU
 #define DBG(x...)		printf(x)
 #else
-#define DBG(x...)		msglog(x)
+#define DBG(x...)
 #endif
 
 /*
@@ -514,7 +514,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	tscFrequency = measure_tsc_frequency();
 	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
-	/* if usual method failed */
+	// if usual method failed
 	if ( tscFrequency < 1000 )	//TEST
 	{
 		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
@@ -788,9 +788,12 @@ void scan_cpu(PlatformInfo_t *p)
 				DBG("%d\n", currcoef);
 			}
 		}
-		if (!cpuFrequency) cpuFrequency = tscFrequency;
+		if (!cpuFrequency)
+		{
+			cpuFrequency = tscFrequency;
+		}
 	}
-	
+
 #if 0
 	if (!fsbFrequency)
 	{
