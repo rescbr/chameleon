@@ -1018,16 +1018,15 @@ ReadPCIBusInfo(PCI_bus_info_t *pp)
 
 void sleep(int n)
 {
-	// FIXME: doesn't handle midnight wraparound
-	unsigned int endtime = (time18() + 18*n);
-#ifdef __i386__
-	while (time18() < endtime)
+	while (n >= 2048)
 	{
-		__asm__ volatile ("rep; nop");
+		delay(2048000000);
+		n -= 2048;
 	}
-#else
-	while (time18() < endtime);
-#endif
+	if (n > 0)
+	{
+		delay(n * 1000000);
+	}
 }
 
 
