@@ -303,16 +303,14 @@ xreal:
     movzwl  %sp, %esp
     movzwl  %bp, %ebp
 
-    // Modify caller's return address on the stack
-    // from linear address to segment offset.
-
-    popl    %eax
-
     // Reenable maskable interrupts.
 
     sti
 
-    jmp     *%ax
+    // Modify caller's return address on the stack
+    // from linear address to segment offset.
+
+    ret     $2
 
     .code32
 

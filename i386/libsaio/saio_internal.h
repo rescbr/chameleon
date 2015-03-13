@@ -33,7 +33,7 @@ extern void		prot_to_real(void);
 extern void		halt(void) __attribute__((noreturn));
 extern void		startprog(unsigned int address, void *arg) __attribute__((noreturn));
 extern void		loader(UInt32 code, UInt32 cmdptr);
-extern uint64_t		computeRand(void);
+extern uint32_t		computeRand(void);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
