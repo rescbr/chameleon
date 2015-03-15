@@ -253,7 +253,7 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				if ( MAVERICKS || YOSEMITE ) // issue 352
+				if ( MAVERICKS || YOSEMITE ) // ( MAVERICKS || YOSEMITE || GALA ) // issue 352
 				{
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
 					strcat(gExtensionsSpec, "Library/");

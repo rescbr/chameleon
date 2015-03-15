@@ -317,7 +317,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		else
 		{
 			// Lion, Mountain Lion, Mavericks and Yosemite prelink kernel cache file
-			// for 10.7 10.8 10.9 10.10
+			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
 			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
@@ -767,7 +767,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE ) // Is not Yosemite 10.10
+				if ( !YOSEMITE ) // ( !YOSEMITE || !GALA ) Is not Yosemite 10.10 or Gala 10.11
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}

@@ -1773,7 +1773,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 			}
 		}
 
-// Mountain Lion ?
+//		if ( MOUNTAIN_LION ){}
 
 		if ( MAVERICKS )
 		{
@@ -1793,7 +1793,9 @@ static bool getOSVersion(BVRef bvr, char *str)
 			}
 		}
 
-// Yosemite ?
+//		if ( YOSEMITE ){}
+
+//		if ( GALA ){}
 
 	}
 

@@ -330,15 +330,15 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 
 	}
 
-	// Patch DSDT Address if we have loaded DSDT.aml
-	if(new_dsdt)
+	// Patch DSDT address if we have loaded DSDT.aml
+	if (new_dsdt)
 	{
 		DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
-		fadt_mod->DSDT=(uint32_t)new_dsdt;
-		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		fadt_mod->DSDT = (uint32_t)new_dsdt;
+		if ((uint32_t)(&(fadt_mod->X_DSDT)) - (uint32_t)fadt_mod + 8<=fadt_mod->Length)
 		{
-			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+			fadt_mod->X_DSDT = (uint32_t)new_dsdt;
 		}
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);

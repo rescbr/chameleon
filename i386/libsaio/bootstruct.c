@@ -128,7 +128,7 @@ void reserveKernBootStruct(void)
 	}
 	else
 	{
-		// for 10.7 10.8 10.9 10.10
+		// for 10.7 10.8 10.9 10.10 10.11
 		void *oldAddr = bootArgs;
 		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
 		bcopy(oldAddr, bootArgs, sizeof(boot_args));
