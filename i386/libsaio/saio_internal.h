@@ -140,7 +140,7 @@ long AllocateMemoryRange(char *rangeName, long start, long length, long type);
 /* misc.c */
 extern int    checkForSupportedHardware();
 extern int	  isLaptop();
-extern void   getPlatformName(char *nameBuf);
+extern void   getPlatformName(char *nameBuf, int size);
 
 /* nbp.c */
 extern UInt32 nbpUnloadBaseCode();
