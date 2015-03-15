@@ -875,7 +875,7 @@ int getBootOptions(bool firstRun)
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
-		verbose("Scanning device %x...", gBIOSDev);
+		verbose("Scanning device %x...\n", gBIOSDev);
 	}
 
 	// When booting from CD, default to hard drive boot when possible. 
@@ -1424,7 +1424,7 @@ int processBootOptions()
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 	}
-	DBG("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
+	DBG("Boot UUID of '%s' %s (%s): %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))

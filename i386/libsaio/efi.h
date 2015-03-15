@@ -140,7 +140,7 @@ typedef struct {
 } EFI_GUID;
 
 #define APPLE_VENDOR_GUID \
-    {0xAC39C713, 0x7E50, 0x423D, {0x88, 0x9D, 0x27,0x8F, 0xCC, 0x34, 0x22, 0xB6} }
+    {0xAC39C713, 0x7E50, 0x423D, {0x88, 0x9D, 0x27, 0x8F, 0xCC, 0x34, 0x22, 0xB6} }
 
 #define EFI_GLOBAL_VARIABLE_GUID \
     {0x8BE4DF61, 0x93CA, 0x11D2, {0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C} }
@@ -187,7 +187,7 @@ typedef struct {
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
 typedef enum {
-	EfiReservedMemoryType,
+	EfiReservedMemoryType,	// 0
 	EfiLoaderCode,
 	EfiLoaderData,
 	EfiBootServicesCode,
@@ -201,7 +201,7 @@ typedef enum {
 	EfiMemoryMappedIO,
 	EfiMemoryMappedIOPortSpace,
 	EfiPalCode,
-	EfiMaxMemoryType
+	EfiMaxMemoryType	// 14
 } EFI_MEMORY_TYPE;
 
 typedef struct {
@@ -213,13 +213,11 @@ typedef struct {
 } __attribute__((aligned(8))) EFI_TABLE_HEADER;
 
 // possible caching types for the memory range
-
-#define EFI_MEMORY_UC   0x0000000000000001ULL
-#define EFI_MEMORY_WC   0x0000000000000002ULL
-#define EFI_MEMORY_WT   0x0000000000000004ULL
-#define EFI_MEMORY_WB   0x0000000000000008ULL
-#define EFI_MEMORY_UCE  0x0000000000000010ULL
-
+#define EFI_MEMORY_UC		0x0000000000000001ULL	/* uncached */
+#define EFI_MEMORY_WC		0x0000000000000002ULL	/* write-coalescing */
+#define EFI_MEMORY_WT		0x0000000000000004ULL	/* write-through */
+#define EFI_MEMORY_WB		0x0000000000000008ULL	/* write-back */
+#define EFI_MEMORY_UCE		0x0000000000000010ULL	/* uncached, exported */
 
 // physical memory protection on range
 

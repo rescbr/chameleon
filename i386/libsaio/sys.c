@@ -968,12 +968,9 @@ BVRef selectBootVolume(BVRef chain)
 #if DEBUG_FEATURE_LAST_BOOT
 	char dirSpec[]		= "hd(%d,%d)/";
 	char fileSpec[]		= "Volumes";
-#endif
 	char *label;
-#if DEBUG_FEATURE_LAST_BOOT
 	u_int32_t time;
 	u_int32_t lasttime	= 0;
-
 	long flags;
 #endif
 
@@ -993,8 +990,10 @@ BVRef selectBootVolume(BVRef chain)
 
 			if ( (bvr->part_no == multiboot_partition) && (bvr->biosdev == gBIOSDev) )
 			{
+#if DEBUG_FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("Multiboot partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 				return bvr;
 			}
 		}
@@ -1018,8 +1017,10 @@ BVRef selectBootVolume(BVRef chain)
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
+#if DEBUG_FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("User default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 				return bvr;
 			}
 		}
@@ -1128,8 +1129,10 @@ BVRef selectBootVolume(BVRef chain)
 	}
 
 	bvr = bvr2 ? bvr2 : (bvr1 ? bvr1 : chain);
+#if DEBUG_FEATURE_LAST_BOOT
 	label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 	DBG("Default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 	return bvr;
 }
 

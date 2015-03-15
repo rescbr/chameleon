@@ -562,7 +562,7 @@ static SMBWord structureCount	= 0;
 //=========== MacPro ===========
 #define kDefaultMacProFamily				"MacPro" // MacPro's family = "MacPro" not "Mac Pro"
 //#define KDefauktMacProBoardAssetTagNumber		"Pro-Enclosure"
-//#define kDefaultMacProBoardType			"0xB" // 11
+//#define kDefaultMacProBoardType			"0x0B" // 11
 
 #define kDefaultMacPro					"MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
