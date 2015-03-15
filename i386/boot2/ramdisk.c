@@ -29,7 +29,7 @@ void md0Ramdisk()
 				   &bootInfo->chameleonConfig))
 	{
 		// Use user specified md0 file
-		snprintf(filename, sizeof(filename), "%s", override_filename);
+		strncpy(filename, override_filename, sizeof(filename) );
 		fh = open(filename, 0);
 		
 		if(fh < 0)
@@ -47,12 +47,12 @@ void md0Ramdisk()
 
 	if(fh < 0)
 	{
-		sprintf(filename, "rd(0,0)/Extra/Postboot.img");
+		strcpy(filename, "rd(0,0)/Extra/Postboot.img");
 		fh = open(filename, 0);
 
 		if(fh < 0)
 		{
-			sprintf(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
+			strcpy(filename, "/Extra/Postboot.img");	// Check /Extra if not in rd(0,0)
 			fh = open(filename, 0);
 		}
 	}		

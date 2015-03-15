@@ -246,7 +246,7 @@ const char *getDDRSerial(const char *spd)
 	}
 	else
 	{
-		sprintf(asciiSerial, "0000000000000000");
+		strcpy(asciiSerial, "0000000000000000");
 	}
 
 	return strdup(asciiSerial);

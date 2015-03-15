@@ -104,7 +104,7 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	snprintf(dirSpec, sizeof(dirSpec), "%s", filename);
+	strncpy(dirSpec, filename, sizeof(dirSpec) );
 	fd = open(dirSpec, 0);
 	if (fd < 0)
 	{
@@ -390,11 +390,11 @@ int setupAcpi(void)
 	/* Try using the file specified with the DSDT option */
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
 	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
+		strncpy(dirSpec, filename, sizeof(dirSpec) );
 	}
 	else
 	{
-		sprintf(dirSpec, "DSDT.aml");
+		strcpy(dirSpec, "DSDT.aml");
 		//verbose("dirSpec, DSDT.aml");
 	}
 
@@ -428,7 +428,14 @@ int setupAcpi(void)
 		{
 			char filename[512];
 
-			sprintf(filename, i > 0 ? "SSDT-%d.aml" : "SSDT.aml", i);
+			if (i > 0)
+			{
+				sprintf(filename, "SSDT-%d.aml", i);
+			}
+			else
+			{
+				strcpy(filename, "SSDT.aml");
+			}
 
 			if ( (new_ssdt[ssdt_count] = loadACPITable(filename)) )
 			{
@@ -513,7 +520,7 @@ int setupAcpi(void)
 				if (tableSign(table, "DSDT"))
 				{
 					DBG("DSDT found\n");
-					verbose("Custom DSDT table was found\n");
+					DBG("Custom DSDT table was found\n");
 					if(new_dsdt)
 					{
 						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
@@ -630,7 +637,7 @@ int setupAcpi(void)
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
-						DBG("dropped (OEM)\n");
+						DBG("OEM SSDT tables was dropped\n");
 						dropoffset++;
 						continue;
 					}

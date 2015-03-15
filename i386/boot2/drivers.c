@@ -212,7 +212,7 @@ long LoadDrivers( char * dirSpec )
 				|| (gRAMDiskVolume && gRAMDiskBTAliased) )
 			{
 				// Next try a specfic OS version folder ie 10.5
-				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion);
+				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion[0]);
 				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
 					// Next we'll try the base
 					strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
@@ -355,7 +355,7 @@ long FileLoadDrivers( char * dirSpec, long plugin )
 
 		// Make sure this is a kext.
 		length = strlen(name);
-		if (strncmp(name + length - 5, ".kext", 5))
+		if (strncmp(name + length - 5, ".kext", sizeof(".kext") ))
 		{
 			continue;
 		}
@@ -525,7 +525,7 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	}
 	else
 	{
-		snprintf(gFileSpec, 4096, "%s", dirSpec);
+		strncpy(gFileSpec, dirSpec, 4096);
 	}
 	bundlePathLength = strlen(gFileSpec) + 1;
 
@@ -715,7 +715,7 @@ LoadMatchedModules( void )
 				driver->bundlePathLength = module->bundlePathLength;
 
 				// Save the plist, module and bundle.
-				strlcpy(driver->plistAddr, module->plistAddr,driver->plistLength);
+				strlcpy(driver->plistAddr, module->plistAddr, driver->plistLength);
 				if (length != 0)
 				{
 					memcpy(driver->executableAddr, executableAddr, length);

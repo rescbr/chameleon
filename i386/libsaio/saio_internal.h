@@ -33,7 +33,7 @@ extern void		prot_to_real(void);
 extern void		halt(void) __attribute__((noreturn));
 extern void		startprog(unsigned int address, void *arg) __attribute__((noreturn));
 extern void		loader(UInt32 code, UInt32 cmdptr);
-extern uint64_t		computeRand(void);
+extern uint32_t		computeRand(void);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -95,8 +95,8 @@ extern int    putchar(int ch);
 extern int    getchar(void);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
-extern int    verbose(const char *format, ...);
-extern void   stop(const char *format, ...) __attribute__ ((noreturn));
+extern int    verbose(const char *format, ...) __attribute__((format(printf,1,2)));
+extern void   stop(const char *format, ...) __attribute__ ((noreturn, format(printf,1,2)));
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
 extern uint64_t getRTCdatetime();

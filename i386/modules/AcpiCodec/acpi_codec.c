@@ -635,7 +635,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filen
 		if (GetChecksum(header, header->Length) == 0)
 		{
 			DBG("Found valid AML file : %s ", filename);
-			verbose("[ %s ] read and stored at: %x", acpi_file, tableAddr);
+			verbose("[ %s ] read and stored at: 0x%x", acpi_file, (unsigned) tableAddr);
 			printf("\n");
 			return tableAddr;
 		} 
@@ -4167,7 +4167,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 				fadt_mod->Header.Length   = 0x74;
 				fadt_mod->Header.Revision = 0x01; 
-				verbose("Warning: ACPI FADT length was < 0x74 which is the minimum for the ACPI FADT V1 specification, \n", fadt->Header.Revision );
+				verbose("Warning: ACPI FADT length was < 0x74 which is the minimum for the ACPI FADT V1 specification, \n" /*, fadt->Header.Revision */ );
 				verbose("         trying to convert it to Version 1. \n");				
                 
 			} 
@@ -4760,7 +4760,7 @@ EFI_STATUS setup_Acpi(void)
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
 		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
 		{
-			sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
+			strcpy(dirspec, "rd(0,0)/Extra/Acpi/");
 			acpidir_found = true;
 
 		}
@@ -4770,7 +4770,7 @@ EFI_STATUS setup_Acpi(void)
 			ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 			{
-				sprintf(dirspec, "/Extra/Acpi/");
+				strcpy(dirspec, "/Extra/Acpi/");
 				acpidir_found = true;
 				
 			}
@@ -4779,7 +4779,7 @@ EFI_STATUS setup_Acpi(void)
 				ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 				{
-					sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
+					strcpy(dirspec, "bt(0,0)/Extra/Acpi/");
 					acpidir_found = true;
 
 				} 

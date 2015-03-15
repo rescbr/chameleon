@@ -477,7 +477,7 @@ static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 	}
 	
 	*len = strlen(src);
-	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
+	dst = (EFI_CHAR16 *) malloc( ((*len)+1) * 2 );
 	for (; i < (*len); i++)
 	{
 		dst[i] = src[i];
@@ -723,6 +723,7 @@ void setupChosenNode()
 
 	length = strlen(bootInfo->bootFile);
 	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+
 //	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
 
 //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
@@ -738,12 +739,8 @@ void setupChosenNode()
 		//
 		UInt8 index = 0;
 		EFI_UINT16 PMTimerValue = 0;
-		EFI_UINT32 randomValue, tempValue, cpuTick;
-		EFI_UINT32 ecx, esi, edi = 0;
-		EFI_UINT32 rcx, rdx, rsi, rdi;
-
-		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
-		cpuTick = rcx = rdx = rsi = rdi = 0;
+		EFI_UINT32 randomValue = 0, cpuTick = 0;
+		EFI_UINT32 ecx = 0, edx = 0, esi = 0, edi = 0;
 
 		// LEAF_1 - Feature Information (Function 01h).
 		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
@@ -753,12 +750,12 @@ void setupChosenNode()
 			//
 			EFI_UINT32 seedBuffer[16] = {0};
 			//
-			// Main loop to get 16 qwords (four bytes each).
+			// Main loop to get 16 dwords (four bytes each).
 			//
 			for (index = 0; index < 16; index++)					// 0x17e12:
 			{
 				randomValue = computeRand();					// callq	0x18e20
-				cpuTick = getCPUTick();						// callq	0x121a7
+				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
 				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
 			}									// jb		0x17e12
@@ -776,6 +773,11 @@ void setupChosenNode()
 			//
 			do									// 0x17e55:
 			{
+				//
+				// FIXME: PM Timer is usually @ 0x408, but its position is relocatable
+				//   via PCI-to-ISA bridge.  The location is reported in ACPI FADT,
+				//   PM Timer Block address - zenith432
+				//
 				PMTimerValue = inw(0x408);					// in		(%dx),	%ax
 				esi = PMTimerValue;						// movzwl	%ax,	%esi
 
@@ -784,18 +786,18 @@ void setupChosenNode()
 					continue;						// jb		0x17e55		(retry)
 				}
 
-				cpuTick = getCPUTick();						// callq	0x121a7
-//				printf("value: 0x%llx\n", getCPUTick());
-				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				cpuTick = (EFI_UINT32) getCPUTick();		// callq	0x121a7
+//				printf("value: 0x%x\n", getCPUTick());
+				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
-				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
+				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
 				// shr		$0x10,	%rdx
-				rdi = rsi;							// mov		%rsi,	%rdi
-				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
-				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
-				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+				edi = esi;							// mov		%rsi,	%rdi
+				edi = (edi ^ cpuTick);						// xor		%rax,	%rdi
+				edi = (edi ^ ecx);						// xor		%rcx,	%rdi
+				edi = (edi ^ edx);						// xor		%rdx,	%rdi
 
-				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
+				seedBuffer[index] = (edi & 0xff);				// mov		%dil,	(%r15,%r12,1)
 
 				edi = (edi & 0x2f);						// and		$0x2f,	%edi
 				edi = (edi + esi);						// add		%esi,	%edi
@@ -825,7 +827,7 @@ static void setupSmbiosConfigFile(const char *filename)
 	if (getValueForKey(kSMBIOSKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
 	{
 		// Specify a path to a file, e.g. SMBIOS=/Extra/macProXY.plist
-		sprintf(dirSpecSMBIOS, override_pathname);
+		strcpy(dirSpecSMBIOS, override_pathname);
 		err = loadConfigFile(dirSpecSMBIOS, &bootInfo->smbiosConfig);
 	}
 	else

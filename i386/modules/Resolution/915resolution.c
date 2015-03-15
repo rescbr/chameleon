@@ -296,13 +296,13 @@ vbios_map * open_vbios(chipset_type forced_chipset)
 	
 	if (map->chipset == CT_UNKNOWN)
 	{
-		verbose(" Unknown chipset type: %08x.\n", map->chipset_id);
+		verbose(" Unknown chipset type: %08x.\n", (unsigned) map->chipset_id);
 		//verbose("915resolution only works with Intel 800/900 series graphic chipsets.\n");
 		//verbose("Chipset Id: %x\n", map->chipset_id);
 		close_vbios(map);
 		return 0;
 	} else {
-		verbose(" Detected chipset/proc id (DRAM controller): %08x\n", map->chipset_id);
+		verbose(" Detected chipset/proc id (DRAM controller): %08x\n", (unsigned) map->chipset_id);
 	}
 	
 	
@@ -922,7 +922,7 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 			/*if (mode.pixel_clock && (mode.h_active == x) && (mode.v_active == y) && !force) {*/
 			if (!getMode(&mode))
 			{
-				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode %d patched!\n", mode.h_active, mode.v_active, i);
+				verbose("\n Edid detailed timing descriptor found: %dx%d\n vbios mode %d patched!\n", mode.h_active, mode.v_active, (int) i);
 				mode_timing[i].usH_Total = mode.h_active + mode.h_blanking;
 				mode_timing[i].usH_Active = mode.h_active;
 				mode_timing[i].usH_SyncStart = mode.h_active + mode.h_sync_offset;

@@ -180,9 +180,13 @@ static void sym_validate_range(struct symbol *sym)
 			return;
 	}
 	if (sym->type == S_INT)
+	{
 		sprintf(str, "%d", val2);
+	}
 	else
+	{
 		sprintf(str, "0x%x", val2);
+	}
 	sym->curr.val = strdup(str);
 }
 

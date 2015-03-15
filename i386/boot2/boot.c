@@ -345,7 +345,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 
 				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.recovery.boot/kernelcache", kernelCacheFile);
+					strncpy(kernelCachePath, "/com.apple.recovery.boot/kernelcache", sizeof(kernelCachePath) );
 					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 					if ((flags & kFileTypeMask) != kFileTypeFlat)

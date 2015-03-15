@@ -143,8 +143,8 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 
 void showInfoBox(char *title, char *text);
 
-int  dprintf( window_t * window, const char * fmt, ...);
-int  gprintf( window_t * window, const char * fmt, ...);
+int  dprintf( window_t * window, const char * fmt, ...) __attribute__((format(printf,2,3)));
+int  gprintf( window_t * window, const char * fmt, ...) __attribute__((format(printf,2,3)));
 int	 vprf(const char * fmt, va_list ap);
 
 int  drawInfoMenu();

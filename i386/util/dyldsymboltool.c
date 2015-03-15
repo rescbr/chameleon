@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 	//dylib.dylib_info.cmdsize += offset;
 	//dylib.header.sizeofcmds += offset;
 	
-	sprintf(dylib.module_name, "%s", DYLIB_NAME);
+	strcpy(dylib.module_name, DYLIB_NAME);
 	
 	/* Load Commands - Symtable */
 	dylib.symtab.cmd = LC_SYMTAB;
