@@ -450,8 +450,11 @@ static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
 static const char DEV_PATH_SUP[] = "DevicePathsSupported";
+static const char START_POWER_EV[] = "StartupPowerEvents";
 static const char MACHINE_SIG_PROP[] = "machine-signature";
-static EFI_UINT32 DevPathSup = 1;
+static EFI_UINT8 const DEVICE_PATHS_SUPPORTED[] = { 0x01, 0x00, 0x00, 0x00 };
+static EFI_UINT8 const STARTUP_POWER_EVENTS[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static EFI_UINT8 const COMPAT_MODE[] = { 0x01, 0x00, 0x00, 0x00 };
 
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
@@ -618,8 +621,16 @@ static void setupEfiDeviceTree(void)
 
 	// New node: /efi/kernel-compatibility
 	Node *efiKernelComNode = DT__AddChild(node, "kernel-compatibility");
-	len = 1;
-	DT__AddProperty(efiKernelComNode, "x86_64", sizeof(uint32_t), (EFI_UINT32 *)&len);
+
+	if (MacOSVerCurrent >= MacOSVer2Int("10.9"))
+	{
+		DT__AddProperty(efiKernelComNode, "x86_64", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+	}
+	else
+	{
+		DT__AddProperty(efiKernelComNode, "i386", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+		DT__AddProperty(efiKernelComNode, "x86_64", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+	}
 
 	// Now fill in the /efi/platform Node
 	Node *efiPlatformNode = DT__AddChild(node, "platform");
@@ -644,7 +655,9 @@ static void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
-	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(EFI_UINT32), &DevPathSup);
+	DT__AddProperty(efiPlatformNode,START_POWER_EV, sizeof(STARTUP_POWER_EVENTS), (EFI_UINT8 *) &STARTUP_POWER_EVENTS);
+
+	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(DEVICE_PATHS_SUPPORTED), (EFI_UINT8 *) &DEVICE_PATHS_SUPPORTED);
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
