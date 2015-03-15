@@ -450,8 +450,9 @@ static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
 static const char DEV_PATH_SUP[] = "DevicePathsSupported";
+static const char MACHINE_SIG_PROP[] = "machine-signature";
 static EFI_UINT32 DevPathSup = 1;
-static EFI_UINT32 MachineSig = 0;  //Bungo
+
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
@@ -720,7 +721,7 @@ void setupChosenNode()
 
 //	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
 
-	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
+	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
 	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
 	{

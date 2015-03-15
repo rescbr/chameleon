@@ -159,4 +159,17 @@ struct acpi_2_fadt
 	uint8_t		notimp2[96];
 } __attribute__((packed));
 
+struct acpi_2_facs
+{
+	char		Signature[4];
+	uint32_t	Length;
+	uint32_t        HWSignature;
+	uint32_t        FWWakingVector32;
+	uint32_t        GlobalLock;
+	uint32_t        Flags;
+	uint64_t        FWWakingVector64;
+	uint8_t         Version;
+	uint8_t         Reserved[31];
+} __attribute__((packed));
+
 #endif /* !__LIBSAIO_ACPI_H */

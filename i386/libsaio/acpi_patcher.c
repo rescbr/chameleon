@@ -330,6 +330,18 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 
 	}
 
+	// Bungo: Save Hardware Signature (machine-signature)
+	if ((fadt_mod->FIRMWARE_CTRL > 0) && (fadt_mod->FIRMWARE_CTRL < 0xFFFFFFFF) && (((struct acpi_2_facs *)fadt_mod->FIRMWARE_CTRL)->Length >= 64))
+	{
+		Platform.HWSignature = ((struct acpi_2_facs *)fadt_mod->FIRMWARE_CTRL)->HWSignature;
+		DBG("\tHardware Signature=0x%08X: using.\n", Platform.HWSignature);
+	}
+	else
+	{
+		Platform.HWSignature = 0;
+		DBG("\tFixing Hardware Signature=0x%08X.\n", Platform.HWSignature);
+	}
+
 	// Patch DSDT address if we have loaded DSDT.aml
 	if (new_dsdt)
 	{
