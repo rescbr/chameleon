@@ -117,14 +117,14 @@ uint32_t crc32(uint32_t crc, const void *buf, size_t size)
 
 void efi_guid_unparse_upper(EFI_GUID const *pGuid, char *out)
 {
-    sprintf(out, "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
-        pGuid->Data1, /* - */
-        pGuid->Data2, /* - */
-        pGuid->Data3, /* - */
-        pGuid->Data4[0], pGuid->Data4[1], /* - */
-        pGuid->Data4[2], pGuid->Data4[3],
-        pGuid->Data4[4], pGuid->Data4[5],
-        pGuid->Data4[6], pGuid->Data4[7]);
+	sprintf(out, "%08X-%04X-%04X-%02X%02X-%02X%02X%02X%02X%02X%02X",
+		pGuid->Data1, /* - */
+		pGuid->Data2, /* - */
+		pGuid->Data3, /* - */
+		pGuid->Data4[0], pGuid->Data4[1], /* - */
+		pGuid->Data4[2], pGuid->Data4[3],
+		pGuid->Data4[4], pGuid->Data4[5],
+		pGuid->Data4[6], pGuid->Data4[7]);
 }
 
 bool efi_guid_is_null(EFI_GUID const *pGuid)

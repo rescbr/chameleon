@@ -155,13 +155,13 @@ int main(int argc, char *argv[])
 	dylib.symtab.cmdsize = sizeof(struct symtab_command);
 
 
-	FILE* outfile = fopen(argv[argc-1], "w");
+	FILE *outfile = fopen(argv[argc-1], "w");
 	fwrite(&dylib,	sizeof(dylib)	/* Sizeof header + module name */
 					, 1, outfile);
 	
-	char* symtab = malloc(dylib.symtab.stroff + dylib.symtab.strsize - sizeof(dylib) + 1); // Add extra 1 for last symbol
+	char *symtab = malloc(dylib.symtab.stroff + dylib.symtab.strsize - sizeof(dylib) + 1); // Add extra 1 for last symbol
 	bzero(symtab, dylib.symtab.nsyms * sizeof(struct nlist) + dylib.symtab.strsize + 1);
-	char* orig = symtab;
+	char *orig = symtab;
 	
 	//symtab += offset;
 	

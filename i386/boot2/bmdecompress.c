@@ -267,7 +267,7 @@ static void PreviewDecompress32(uint32_t * compressBuffer,
 void *
 DecompressData(void *srcbase, int *dw, int *dh, int *bitsPerPixel)
 {
-	uint32_t * src = (uint32_t *) srcbase;
+	uint32_t *src = (uint32_t *) srcbase;
 	void * ret;
 
 	*bitsPerPixel = 8 * ((int) src[0]);
