@@ -6,6 +6,15 @@
  */
 
 #include "ati.h"
+#ifndef DEBUG_ATI
+#define DEBUG_ATI 0
+#endif
+
+#if DEBUG_ATI
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)	msglog(x)
+#endif
 
 /* vals */
 static value_t aty_name;
@@ -54,10 +63,10 @@ static card_config_t card_configs[] = {
 	{"Galago",	2},
 	{"Colobus",	2},
 	{"Mangabey",	2},
-	{"Nomascus",	4},
+	{"Nomascus",	4}, // 5
 	{"Orangutan",	2},
 	/* AMD6000Controller */
-	{"Pithecia",	2},
+	{"Pithecia",	2}, // 3
 	{"Bulrushes",	6},
 	{"Cattail",	4},
 	{"Hydrilla",	5},
@@ -1090,7 +1099,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6606,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon HD 8790M",		kNull       }, // Mobile
 	{ 0x6607,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R5 M240",		kNull       }, // Mobile
 	{ 0x6608,	0x00000000, CHIP_FAMILY_OLAND,		"AMD FirePro W2100",		kNull       },
-	{ 0x6610,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 200 Series",	kNull       },
+	{ 0x6610,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 250",		kFutomaki       },
 	{ 0x6611,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 200 Series",	kNull       },
 	{ 0x6613,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 240",		kFutomaki	},
 //	{ 0x6620,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon",      kNull       }, // Mobile
@@ -1180,7 +1189,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6798,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7970X/8970/R9 280X",	kFutomaki	},
 	{ 0x6799,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kAji		},
 	{ 0x679A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950/8950/R9 280",	kFutomaki	},
-	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kFutomaki	},
 	{ 0x679E,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7870 XT",	kFutomaki	},
 	{ 0x679F,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950 Series",	kFutomaki	},
 
@@ -2388,32 +2397,32 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info == NULL) // Jief
 	{
-		verbose("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%04x:%04x] \n", 
+		DBG("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%04x:%04x] \n", 
 				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys.vendor_id, pci_dev->subsys_id.subsys.device_id);
 		return false;
 	}
-   	verbose("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
+   	DBG("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
 		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
 	
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
 
-	verbose("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
+	DBG("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
 		(unsigned) card->fb, (unsigned) card->mmio, (unsigned) card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
 	
 	card->posted = radeon_card_posted();
-	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
-	verbose("\n");
+	DBG("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
+	DBG("\n");
 	get_vram_size();
 	
 	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->chameleonConfig);
-	
+
 	if (add_vbios)
 	{
 		if (!load_vbios_file(kUseAtiROM, pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id))
 		{
-			verbose("reading Video BIOS from %s", card->posted ? "legacy space" : "PCI ROM");
+			DBG("reading Video BIOS from %s", card->posted ? "legacy space" : "PCI ROM");
 			if (card->posted)
 			{
 				read_vbios(false);
@@ -2429,7 +2438,7 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
-		verbose("ATI Radeon EVERGREEN family\n");
+		DBG("ATI Radeon EVERGREEN family\n");
 		card->flags |= EVERGREEN;
 	}
 
@@ -2444,7 +2453,7 @@ static bool init_card(pci_dt_t *pci_dev)
 		card->cfg_name = card_configs[card->info->cfg_name].name;
 		
 		// which means one of the fb's or kNull
-		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
+		DBG("Framebuffer set to device's default: %s\n", card->cfg_name);
 	}
 	else
 	{
@@ -2457,8 +2466,8 @@ static bool init_card(pci_dt_t *pci_dev)
 	// if a value bigger than 0 ?? is found, (do we need >= 0 ?? that's null FB on card_configs)
 	if (n_ports > 0)
 	{
-		card->ports = n_ports; // use it.
-		verbose("(AtiPorts) # of ports set to: %d\n", card->ports);
+		card->ports = (uint8_t)n_ports; // use it.
+		DBG("(AtiPorts) Nr of ports set to: %d\n", card->ports);
 	}
 	else
 	{
@@ -2471,7 +2480,7 @@ static bool init_card(pci_dt_t *pci_dev)
 			}
 		}
 
-		verbose("# of ports set to framebuffer's default: %d\n", card->ports);
+		DBG("Nr of ports set to framebuffer's default: %d\n", card->ports);
 	}
 
 
@@ -2539,7 +2548,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	stringlength = string->length;
 	// -------------------------------------------------
 
-	verbose("ATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
+	DBG("ATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
 			chip_family_name[card->info->chip_family], card->info->model_name,
 			(uint32_t)(card->vram_size / (1024 * 1024)), card->cfg_name,
 			ati_dev->vendor_id, ati_dev->device_id,

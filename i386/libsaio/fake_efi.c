@@ -18,6 +18,16 @@
 #include "pci.h"
 #include "sl.h"
 
+#ifndef DEBUG_EFI
+#define DEBUG_EFI 0
+#endif
+
+#if DEBUG_EFI
+#define DBG(x...)	printf(x)
+#else
+#define DBG(x...)
+#endif
+
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -764,7 +774,7 @@ void setupChosenNode()
 				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
 			}									// jb		0x17e12
 
-			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32*) &seedBuffer);
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32 *) &seedBuffer);
 		}
 		else
 		{
@@ -811,7 +821,7 @@ void setupChosenNode()
 			} while (index < 64);							// cmp		%r14d,	%r12d
 			// jne		0x17e55		(next)
 
-			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8*) &seedBuffer);
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8 *) &seedBuffer);
 
 		}
 	}
@@ -890,19 +900,21 @@ void saveOriginalSMBIOS(void)
 	node = DT__FindNode("/efi/platform", false);
 	if (!node)
 	{
-		verbose("/efi/platform node not found\n");
+		DBG("saveOriginalSMBIOS: '/efi/platform' node not found\n");
 		return;
 	}
 
 	origeps = getSmbios(SMBIOS_ORIGINAL);
 	if (!origeps)
 	{
+		DBG("saveOriginalSMBIOS: original SMBIOS not found\n");
 		return;
 	}
 
 	tableAddress = (void *)AllocateKernelMemory(origeps->dmi.tableLength);
 	if (!tableAddress)
 	{
+		DBG("saveOriginalSMBIOS: can not allocate memory for original SMBIOS\n");
 		return;
 	}
 

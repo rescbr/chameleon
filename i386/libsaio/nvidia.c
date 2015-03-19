@@ -1915,12 +1915,14 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
 	return size > 0 ? size : 0;
 }
 
-static int devprop_add_nvidia_template(struct DevPropDevice *device)
+static int devprop_add_nvidia_template(DevPropDevice *device)
 {
 	char tmp[16];
 
 	if (!device)
+	{
 		return 0;
+	}
 
 	if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_0))
 	{

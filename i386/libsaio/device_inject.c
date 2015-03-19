@@ -25,8 +25,8 @@
 
 uint32_t	devices_number	= 1;
 uint32_t	builtin_set	= 0;
-DevPropString	*string		= 0;
-uint8_t		*stringdata	= 0;
+DevPropString	*string		= NULL;
+uint8_t		*stringdata	= NULL;
 uint32_t	stringlength	= 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
