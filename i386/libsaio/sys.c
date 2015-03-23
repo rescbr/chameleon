@@ -72,7 +72,11 @@
 static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC};
 #endif
 
-#if DEBUG
+#ifndef DEBUG_SYS
+#define DEBUG_SYS 0
+#endif
+
+#if DEBUG_SYS
 #define DBG(x...)	printf(x)
 #else
 #define DBG(x...)	msglog(x)
@@ -998,6 +1002,13 @@ BVRef selectBootVolume(BVRef chain)
 			}
 		}
 	}
+
+#if 0
+	DBG("multiboot_partition_set = %d\n", multiboot_partition_set);
+	DBG("multiboot_partition = %d\n",  multiboot_partition);
+	DBG("multiboot_skip_partition_set = %d\n", multiboot_skip_partition_set);
+	DBG("multiboot_skip_partition = %d\n", multiboot_skip_partition);
+#endif
 
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
