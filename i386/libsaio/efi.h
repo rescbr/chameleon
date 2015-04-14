@@ -230,10 +230,9 @@ typedef struct {
 
 // physical memory protection on range
 
-#define EFI_MEMORY_WP 0x0000000000001000ULL
-#define EFI_MEMORY_RP 0x0000000000002000ULL
-#define EFI_MEMORY_XP 0x0000000000004000ULL
-
+#define EFI_MEMORY_WP 0x0000000000001000ULL	/* write-protect */
+#define EFI_MEMORY_RP 0x0000000000002000ULL	/* read-protect */
+#define EFI_MEMORY_XP 0x0000000000004000ULL	/* execute-protect */
 
 // range requires a runtime mapping
 
@@ -498,9 +497,12 @@ typedef struct {
 
 #define EFI_SYSTEM_TABLE_SIGNATURE      0x5453595320494249ULL
 #define EFI_SYSTEM_TABLE_REVISION       ((EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION))
-#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | 00)
-#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | 02)
-#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | 10)
+#define EFI_2_30_SYSTEM_TABLE_REVISION  ((2 << 16) | (30))
+#define EFI_2_20_SYSTEM_TABLE_REVISION  ((2 << 16) | (20))
+#define EFI_2_10_SYSTEM_TABLE_REVISION  ((2 << 16) | (10))
+#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | (00))
+#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | (10))
+#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | (02))
 
 typedef struct EFI_SYSTEM_TABLE_32 {
 	EFI_TABLE_HEADER              Hdr;

@@ -79,13 +79,19 @@ static uint64_t ptov64(uint32_t addr)
 }
 
 // ==========================================================================
-// ErmaC
-static inline uint64_t getCPUTick(void)
+
+EFI_UINT32 getCPUTick(void)
 {
-	uint32_t lowest;
-	uint32_t highest;
-	__asm__ volatile ("rdtsc" : "=a" (lowest), "=d" (highest));
-	return (uint64_t) highest << 32 | lowest;
+	uint32_t out;
+	__asm__ volatile (
+		"rdtsc\n"
+		"shl $32,%%edx\n"
+		"or %%edx,%%eax\n"
+		: "=a" (out)
+		:
+		: "%edx"
+	);
+	return out;
 }
 
 /*==========================================================================

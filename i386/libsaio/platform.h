@@ -23,8 +23,11 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_6				6
 #define CPUID_80			7
 #define CPUID_81			8
-#define CPUID_88			9
-#define CPUID_MAX			10
+#define CPUID_85			9
+#define CPUID_86			10
+#define CPUID_87			11
+#define CPUID_88			12
+#define CPUID_MAX			13
 
 #define CPUID_MODEL_ANY			0x00
 #define CPUID_MODEL_UNKNOWN		0x01
@@ -77,6 +80,14 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 #define CPUID_VENDOR_INTEL		0x756E6547
 #define CPUID_VENDOR_AMD		0x68747541
+
+/* This spells out "GenuineIntel".  */
+//#define is_intel \
+//  ebx == 0x756e6547 && ecx == 0x6c65746e && edx == 0x49656e69
+  /* This spells out "AuthenticAMD".  */
+//#define is_amd \
+//  ebx == 0x68747541 && ecx == 0x444d4163 && edx == 0x69746e65
+
 /* Unknown CPU */
 #define CPU_STRING_UNKNOWN		"Unknown CPU Type"
 
