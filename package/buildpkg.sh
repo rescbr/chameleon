@@ -11,6 +11,9 @@ declare -r SYMROOT="$2"
 declare -r PKG_BUILD_DIR="$3"
 declare -r SCPT_TPL_DIR="${PKGROOT}/Scripts.templates"
 
+# Add by FurtiF fix patch of brew gettext
+export PATH=${PATH}:/usr/local/opt/gettext/bin
+
 if [[ $# -lt 3 ]];then
     echo "Too few arguments. Aborting..." >&2 && exit 1
 fi
