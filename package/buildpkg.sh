@@ -113,6 +113,8 @@ declare -r packagename="Chameleon"
 declare -r chameleon_package_identity="org.chameleon"
 declare -r modules_packages_identity="${chameleon_package_identity}.modules"
 
+# Stages sub group name (contain options to skip installing one or all the bootloader stages)
+stages="Stages"
 # ====== FUNCTIONS ======
 trim () {
     local result="${1#"${1%%[![:space:]]*}"}"   # remove leading whitespace characters
@@ -504,7 +506,7 @@ main ()
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
-    addChoice --start-visible="false" --selected="!choices['noboot'].selected" \
+    addChoice --start-visible="false" --selected="!choices['BootNo'].selected" \
     --pkg-refs="$packageRefId" "${choiceId}"
 # End build boot choice package
 
@@ -512,17 +514,53 @@ main ()
     echo "================= Chameleon ================="
     addGroupChoices "Chameleon"
 
-    # build noboot choice package
-    choiceId="noboot"
+    # build BootNo choice package
+    choiceId="BootNo"
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
     mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts
-    cp -f ${PKGROOT}/Scripts/Main/BootNO ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
+    cp -f ${PKGROOT}/Scripts/Main/${choiceId} ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
-    addChoice --group="Chameleon" --selected="!choices['boot'].selected" \
+    addChoice --group="Chameleon" --start-selected="false" --selected="!(choices['boot'].selected || choices['SkipStage0'].selected || choices['SkipStage1'].selected || choices['SkipActivePartition'].selected)" \
     --pkg-refs="$packageRefId" "${choiceId}"
-# End build noboot choice package
+# End build BootNo choice package
+
+# build SkipStage0 choice package
+    choiceId="SkipStage0"
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts
+    cp -f ${PKGROOT}/Scripts/Main/${choiceId} ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
+
+    packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
+    addChoice --group="Chameleon" --start-selected="false" --selected="!choices['BootNo'].selected &amp;&amp; choices['SkipStage0'].selected" \
+    --pkg-refs="$packageRefId" "${choiceId}"
+# End build SkipStage0 choice package
+
+# build SkipStage1 choice package
+    choiceId="SkipStage1"
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts
+    cp -f ${PKGROOT}/Scripts/Main/${choiceId} ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
+
+    packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
+    addChoice --group="Chameleon" --start-selected="false" --selected="!choices['BootNo'].selected &amp;&amp; choices['SkipStage10'].selected" \
+    --pkg-refs="$packageRefId" "${choiceId}"
+# End build SkipStage1 choice package
+
+# build SkipActivePartition choice package
+    choiceId="SkipActivePartition"
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Root
+    mkdir -p ${PKG_BUILD_DIR}/${choiceId}/Scripts
+    cp -f ${PKGROOT}/Scripts/Main/${choiceId} ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
+
+    packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
+    buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
+    addChoice --group="Chameleon" --start-selected="false" --selected="!choices['BootNo'].selected &amp;&amp; choices['SkipActivePartition'].selected" \
+    --pkg-refs="$packageRefId" "${choiceId}"
+# End build SkipActivePartition choice package
 
 # End build Chameleon package
 
@@ -1144,9 +1182,17 @@ generateOutlineChoices() {
     if [[ -n "${subChoices}" ]]; then
         # Sub choices exists
         echo -e "$indentString<line choice=\"$1\">"
-        for subChoice in $subChoices;do
-            generateOutlineChoices $subChoice $(($indentLevel+1))
-        done
+            for subChoice in $subChoices;do
+                case "$subChoice" in
+                    BootNo)
+                        echo -e "$indentString<line choice=\"${stages}\">"
+                    ;;
+                    Standard)
+                    echo -e "$indentString</line>"
+                    ;;
+                esac
+                generateOutlineChoices $subChoice $(($indentLevel+1))
+            done
         echo -e "$indentString</line>"
     else
         echo -e "$indentString<line choice=\"$1\"/>"
@@ -1191,6 +1237,10 @@ generateChoices() {
 
         # Close the node
         choiceNode="${choiceNode}\n\t</choice>\n"
+        # Adding Stages subgroup
+        if [[ "${choiceId}" = "Chameleon" ]];then
+            choiceNode="${choiceNode}\t<choice\n\t\tid=\"${stages}\"\n\t\ttitle=\"${stages}_title\"\n\t\tdescription=\"${stages}_description\">\n\t</choice>\n\n"
+        fi
 
         echo -e "$choiceNode"
     done
