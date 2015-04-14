@@ -75,7 +75,7 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 	zalloc_base         = start ? start : (char *)ZALLOC_ADDR;
 	totalNodes          = nodes ? nodes : ZALLOC_NODES;
 	zalloced            = (zmem *) zalloc_base;
-	zavailable          = (zmem *) (zalloc_base + sizeof(zmem) * totalNodes);
+	zavailable          = (zmem *) zalloc_base + sizeof(zmem) * totalNodes;
 	zavailable[0].start = (char *)zavailable + sizeof(zmem) * totalNodes;
 
 	if (size == 0)

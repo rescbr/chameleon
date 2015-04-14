@@ -1040,7 +1040,7 @@ void delay(int us)
     bb.edx.rr = us & 0xFFFF;
     bios(&bb);
 }
-
+/* // reverted from commit 2602
 void enableA20(void)
 {
     bzero(&bb, sizeof bb);  // Note: may be called before BSS section is initialized
@@ -1048,3 +1048,4 @@ void enableA20(void)
     bb.eax.rr = 0x2401;
     bios(&bb);
 }
+*/
