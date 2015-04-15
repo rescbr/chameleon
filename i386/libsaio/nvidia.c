@@ -172,7 +172,8 @@ static nvidia_pci_info_t nvidia_card_vendors[] = {
 static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 0000 - 0040	
 	{ 0x10DE0000,	"Unknown" },
-	// 0040 - 004F	
+	// 0040 - 004F
+/*
 	{ 0x10DE0040,	"GeForce 6800 Ultra" },
 	{ 0x10DE0041,	"GeForce 6800" },
 	{ 0x10DE0042,	"GeForce 6800 LE" },
@@ -185,6 +186,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0049,	"NV40GL" },
 	{ 0x10DE004D,	"Quadro FX 3400" },
 	{ 0x10DE004E,	"Quadro FX 4000" },
+*/
 	// 0050 - 005F
 	// 0060 - 006F
 	// 0070 - 007F
@@ -199,9 +201,10 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0098,	"GeForce Go 7800" },
 	{ 0x10DE0099,	"GeForce Go 7800 GTX" },
 	{ 0x10DE009D,	"Quadro FX 4500" },
-	// 00A0 - 00AF	
-	// 00B0 - 00BF	
-	// 00C0 - 00CF	
+	// 00A0 - 00AF
+	// 00B0 - 00BF
+	// 00C0 - 00CF
+/*
 	{ 0x10DE00C0,	"GeForce 6800 GS" },
 	{ 0x10DE00C1,	"GeForce 6800" },
 	{ 0x10DE00C2,	"GeForce 6800 LE" },
@@ -222,11 +225,13 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE00F6,	"GeForce 6800 GS/XT" },
 	{ 0x10DE00F8,	"Quadro FX 3400/4400" },
 	{ 0x10DE00F9,	"GeForce 6800 Series GPU" },
+*/
 	// 0100 - 010F
 	// 0110 - 011F
 	// 0120 - 012F
 	// 0130 - 013F
 	// 0140 - 014F
+/*
 	{ 0x10DE0140,	"GeForce 6600 GT" },
 	{ 0x10DE0141,	"GeForce 6600" },
 	{ 0x10DE0142,	"GeForce 6600 LE" },
@@ -258,6 +263,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE016A,	"GeForce 7100 GS" },
 	{ 0x10DE016C,	"NVIDIA NV44GLM" },
 	{ 0x10DE016D,	"NVIDIA NV44GLM" },
+*/
 	// 0170 - 017F
 	// 0180 - 018F
 	// 0190 - 019F
@@ -289,6 +295,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE01DF,	"GeForce 7300 GS" },
 	// 01E0 - 01EF
 	// 01F0 - 01FF
+/*
 	{ 0x10DE01F0,	"GeForce4 MX" },
 	// 0200 - 020F
 	// 0210 - 021F
@@ -311,6 +318,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0247,	"GeForce Go 6100" },
 	// 0250 - 025F
 	{ 0x10DE025B,	"Quadro4 700 XGL" },
+*/
 	// 0260 - 026F
 	// 0270 - 027F
 	// 0280 - 028F
@@ -343,6 +351,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE02E4,	"GeForce 7950 GT" },
 	// 02F0 - 02FF
 	// 0300 - 030F
+/*
 	{ 0x10DE0301,	"GeForce FX 5800 Ultra" },
 	{ 0x10DE0302,	"GeForce FX 5800" },
 	{ 0x10DE0308,	"Quadro FX 2000" },
@@ -390,6 +399,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE034C,	"Quadro FX Go1000" },
 	{ 0x10DE034E,	"Quadro FX 1100" },
 	{ 0x10DE034F,	"NV36GL" },
+*/
 	// 0350 - 035F
 	// 0360 - 036F
 	// 0370 - 037F
