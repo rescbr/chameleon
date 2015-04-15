@@ -47,6 +47,10 @@
 #define DEBUG_GMA 0
 #endif
 
+#ifndef DEBUG_BDW
+#define DEBUG_BDW 1
+#endif
+
 #if DEBUG_GMA
 #define DBG(x...)	printf(x)
 #else
@@ -58,6 +62,11 @@ static uint8_t default_aapl_ivy[]		=	{ 0x05,0x00,0x62,0x01 }; // ivy_bridge_ig_v
 #define AAPL_LEN_IVY ( sizeof(default_aapl_ivy) / sizeof(uint8_t) )
 static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_vals[7]
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
+
+#if DEBUG_BDW
+static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0xe0,0x16 }; // broadwell_ig_vals[3]
+#define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
+#endif
 
 uint8_t GMAX3100_vals[23][4] = {
 	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
@@ -75,7 +84,7 @@ uint8_t GMAX3100_vals[23][4] = {
 	{ 0x00,0x00,0x00,0x00 },	//12 "AAPL01,Interlace"
 	{ 0x00,0x00,0x00,0x00 },	//13 "AAPL01,Inverter"
 	{ 0x08,0x52,0x00,0x00 },	//14 "AAPL01,InverterCurrent"
-	{ 0x00,0x00,0x00,0x00 },	//15 "AAPL01,InverterCurrency"
+	{ 0x00,0x00,0x00,0x00 },	//15 "AAPL01,InverterCurrency" 
 	{ 0x00,0x00,0x00,0x00 },	//16 "AAPL01,LinkFormat"
 	{ 0x01,0x00,0x00,0x00 },	//17 "AAPL01,LinkType"
 	{ 0x01,0x00,0x00,0x00 },	//18 "AAPL01,Pipe"
@@ -119,6 +128,30 @@ uint8_t haswell_ig_vals[17][4] = {
 	{ 0x08,0x00,0x2e,0x0a },	// 15 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT reserved GT3
 	{ 0x04,0x00,0x12,0x04 }		// 16 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 };
+
+#if DEBUG_BDW
+uint8_t broadwell_ig_vals[19][4] = {
+	{ 0x00,0x00,0x06,0x16 },	// 0  - 16060000 Broadwell GT1 (Intel HD Graphics)
+	{ 0x00,0x00,0x0e,0x16 },	// 1  - 160e0000 Broadwell GT1 (Intel HD Graphics)
+	{ 0x00,0x00,0x16,0x16 },	// 2  - 16160000 Broadwell GT2 (Intel HD Graphics 5500)
+	{ 0x00,0x00,0xe0,0x16 },	// 3  - 161e0000 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
+	{ 0x00,0x00,0x26,0x16 },	// 4  - 16260000 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x00,0x00,0x2b,0x16 },	// 5  - 162b0000 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x00,0x00,0x22,0x16 },	// 6  - 16220000 Broadwell GT3 (Intel Iris Pro Graphics 6200)
+	{ 0x01,0x00,0x0e,0x16 },	// 7  - 160e0001 Broadwell GT1 (Intel HD Graphics)
+	{ 0x01,0x00,0x1e,0x16 },	// 8  - 161e0001 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
+	{ 0x02,0x00,0x06,0x16 },	// 9  - 16060002 Broadwell GT1 (Intel HD Graphics)
+	{ 0x02,0x00,0x16,0x16 },	// 10 - 16160002 Broadwell GT2 (Intel HD Graphics 5500)
+	{ 0x02,0x00,0x26,0x16 },	// 11 - 16260002 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x02,0x00,0x22,0x16 },	// 12 - 16220002 Broadwell GT3 (Intel Iris Pro Graphics 6200)
+	{ 0x02,0x00,0x2b,0x16 },	// 13 - 162b0002 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x03,0x00,0x12,0x16 },	// 14 - 16120003 Broadwell GT2 (Intel HD Graphics 5600)
+	{ 0x04,0x00,0x2b,0x16 },	// 15 - 162b0004 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x04,0x00,0x26,0x16 },	// 16 - 16260004 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x05,0x00,0x26,0x16 },	// 17 - 16260005 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x06,0x00,0x26,0x16 }		// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+};
+#endif
 
 uint8_t HD2000_vals[16][4] = {
 	{ 0x00,0x00,0x00,0x00 },    //0 "AAPL00,PixelFormat"
@@ -749,6 +782,77 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 			break;
 
+#if DEBUG_BDW
+		/* Broadwell */
+		/* HD Graphics 5300 Mobile, HD Graphics 6000 Mobile, HD Graphics 6100 Mobile */
+		case GMA_BROADWELL_BDW_0bd0:    // 0bd0
+		case GMA_BROADWELL_BDW_0bd1:    // 0bd1
+		case GMA_BROADWELL_BDW_0bd2:    // 0bd2
+		case GMA_BROADWELL_BDW_0bd3:    // 0bd3
+		case GMA_BROADWELL_BDW_0bd4:    // 0bd4
+		case GMA_BROADWELL_BDW_1602:    // 1602
+		case GMA_BROADWELL_BDW_U_GT1:   // 1606
+		case GMA_BROADWELL_BDW_160B:    // 160b
+		case GMA_BROADWELL_BDW_160A:    // 160a
+		case GMA_BROADWELL_BDW_160D:    // 160d
+		case GMA_BROADWELL_BDW_160E:    // 160e
+		case GMA_BROADWELL_BDW_1612:    // 1612
+		case GMA_BROADWELL_BDW_U_GT2:   // 1616
+		case GMA_BROADWELL_BDW_161B:    // 161b
+		case GMA_BROADWELL_BDW_161A:    // 161a
+		case GMA_BROADWELL_BDW_161D:    // 161d
+		case GMA_BROADWELL_BDW_Y_GT2:   // 161e (MacBook) Intel HD Graphics 5300
+		case GMA_BROADWELL_BDW_1622:    // 1622
+		case GMA_BROADWELL_BDW_U_GT3:   // 1626 (MacBook Air) Intel HD Graphics 6000
+		case GMA_BROADWELL_BDW_162A:    // 162a
+		case GMA_BROADWELL_BDW_U_GT3_2: // 162b (MacBook Pro) Intel Iris Graphics 6100
+		case GMA_BROADWELL_BDW_162D:    // 162d
+		case GMA_BROADWELL_BDW_162E:    // 162e
+		case GMA_BROADWELL_BDW_1632:    // 1632
+		case GMA_BROADWELL_BDW_1636:    // 1636
+		case GMA_BROADWELL_BDW_163B:    // 163b
+		case GMA_BROADWELL_BDW_163A:    // 163a
+		case GMA_BROADWELL_BDW_163D:    // 163d
+		case GMA_BROADWELL_BDW_163E:    // 163e
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_BDW * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_BDW];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_BDW) == 0)
+				{
+					memcpy(default_aapl_broadwell, new_aapl0, AAPL_LEN_BDW);
+
+					verbose("Using user supplied AAPL,ig-platform-id\n");
+					verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+						default_aapl_broadwell[0], default_aapl_broadwell[1], default_aapl_broadwell[2], default_aapl_broadwell[3]);
+				}
+				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_broadwell, AAPL_LEN_BDW);
+			}
+			else if (getIntForKey(kIntelBdwFB, &n_igs, &bootInfo->chameleonConfig))
+			{
+				if ((n_igs >= 0) || (n_igs <= 19))
+				{
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					devprop_add_value(device, "AAPL,ig-platform-id", broadwell_ig_vals[n_igs], 4);
+				}
+				else
+				{
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 19.\n");
+				}
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x0f00260d; // set the default platform ig
+				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
+			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+			devprop_add_value(device, "built-in", &BuiltIn, 1);
+			devprop_add_value(device, "class-code", ClassFix, 4);
+
+			break;
+#endif
 		default:
 			break;
 	}
