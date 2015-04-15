@@ -100,7 +100,7 @@ uint8_t ivy_bridge_ig_vals[12][4] = {
 	{ 0x0b,0x00,0x66,0x01 }		//11 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 2, Ports: 3, FBMem: 2
 };
 
-uint8_t haswell_ig_vals[16][4] = { /* - TESTING DATA --*/
+uint8_t haswell_ig_vals[17][4] = {
 	{ 0x00,0x00,0x06,0x04 },	// 0 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - mobile GT1
 	{ 0x00,0x00,0x06,0x0c },	// 1 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - SDV mobile GT1
 	{ 0x00,0x00,0x16,0x04 },	// 2 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - mobile GT2
@@ -112,12 +112,12 @@ uint8_t haswell_ig_vals[16][4] = { /* - TESTING DATA --*/
 	{ 0x00,0x00,0x26,0x0d },	// 8 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - CRW mobile GT3
 	{ 0x02,0x00,0x16,0x04 },	// 9 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 1, Ports: 1, FBMem: 1 - mobile GT2
 	{ 0x03,0x00,0x22,0x0d },	// 10 "AAPL,ig-platform-id" //FB: 0MB, Pipes: 0, Ports: 0, FBMem: 0 - CRW Desktop GT3
-//	{ 0x04,0x00,0x12,0x04 },	// ?? "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x05,0x00,0x26,0x0a },	// 11 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x06,0x00,0x26,0x0a },	// 12 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x07,0x00,0x26,0x0d },	// 13 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 4, FBMem: 3 - CRW mobile GT3
 	{ 0x08,0x00,0x26,0x0a },	// 14 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x08,0x00,0x2e,0x0a },	// 15 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT reserved GT3
+	{ 0x04,0x00,0x12,0x04 }		// 16 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 };
 
 uint8_t HD2000_vals[16][4] = {
@@ -454,7 +454,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_IRONLAKE_M_G: // 0046
 			devprop_add_value(device, "built-in",		&BuiltIn, 1);
 			devprop_add_value(device, "class-code",		ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",		(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL,os-info",	HDx000_os_info, 20);
 			break;
 		/* 27A2, 27AE, 27A6, A001, A011, A012, */
@@ -513,7 +512,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		/* 0106 */
 		case GMA_SANDYBRIDGE_M_GT1: // HD Graphics 2000 Mobile
 			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL00,PixelFormat",		HD2000_vals[0], 4);
 			devprop_add_value(device, "AAPL00,T1",			HD2000_vals[1], 4);
 			devprop_add_value(device, "AAPL00,T2",			HD2000_vals[2], 4);
@@ -536,7 +534,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_SANDYBRIDGE_M_GT2: // HD Graphics 3000 Mobile
 		case GMA_SANDYBRIDGE_M_GT2_PLUS:
 			devprop_add_value(device, "class-code",			ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL00,PixelFormat",		HD3000_vals[0], 4);
 			devprop_add_value(device, "AAPL00,T1",			HD3000_vals[1], 4);
 			devprop_add_value(device, "AAPL00,T2",			HD3000_vals[2], 4);
@@ -563,7 +560,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
 			break;
@@ -576,7 +572,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 			device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
 			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
 			break;
@@ -650,7 +645,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
 			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+
 			break;
 
 		/* Haswell */
@@ -667,7 +662,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
 			devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
-//			devprop_add_value(device, "IOName",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 			devprop_add_value(device, "name",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
 
@@ -727,14 +721,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			}
 			else if (getIntForKey(kIntelAzulFB, &n_igs, &bootInfo->chameleonConfig))
 			{
-				if ((n_igs >= 0) || (n_igs <= 15))
+				if ((n_igs >= 0) || (n_igs <= 16))
 				{
 					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", haswell_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 15.\n");
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 16.\n");
 				}
 			}
 			else
@@ -746,7 +740,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
 			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+
 			break;
 
 		default:
