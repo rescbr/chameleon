@@ -20,52 +20,6 @@
 #endif
 
 
-boolean_t ForceAmdCpu = false;
-
-/* For AMD CPU's */
-boolean_t IsAmdCPU(void)
-{
-	if (ForceAmdCpu)
-	{
-		return true;
-	}
-
-	uint32_t ourcpuid[4];
-	do_cpuid(0, ourcpuid);
-	if (
-		/* This spells out "AuthenticAMD".  */
-		ourcpuid[ebx] == 0x68747541 && // Auth
-		ourcpuid[ecx] == 0x444D4163 && // cAMD
-		ourcpuid[edx] == 0x69746E65)   // enti
-	{
-		return true;
-	}
-
-	return false;
-};
-
-/* For Intel CPU's */
-boolean_t IsIntelCPU(void)
-{
-	uint32_t ourcpuid[4];
-	do_cpuid(0, ourcpuid);
-	if (
-		/* This spells out "GenuineIntel".  */
-		ourcpuid[ebx] == 0x756E6547 && // Genu
-		ourcpuid[ecx] == 0x6C65746E && // ntel
-		ourcpuid[edx] == 0x49656E69)   // ineI
-	{
-		return true;
-	}
-
-	if (!IsAmdCPU())
-	{
-		return true;
-	}
-
-	return false;
-}
-
 #define UI_CPUFREQ_ROUNDING_FACTOR	10000000
 
 clock_frequency_info_t gPEClockFrequencyInfo;
@@ -323,6 +277,7 @@ static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
 
 void scan_cpu(PlatformInfo_t *p)
 {
+//	scan();
 	uint64_t	busFCvtt2n;
 	uint64_t	tscFCvtt2n;
 	uint64_t	tscFreq			= 0;
@@ -355,102 +310,6 @@ void scan_cpu(PlatformInfo_t *p)
 	int		myfsb			= 0;
 	int		i			= 0;
 
-	if(IsIntelCPU())
-	{
-
-		do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
-
-		do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
-
-		/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
-		if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
-		{
-			for (i = 0; i < 0xFF; i++) // safe loop
-			{
-				do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
-				if (bitfield(reg[eax], 4, 0) == 0)
-				{
-					break;
-				}
-				cores_per_package = bitfield(reg[eax], 31, 26) + 1;
-			}
-	        }
-
-		do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
-
-		if (i > 0)
-		{
-			cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
-			threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
-		}
-
-		if (cores_per_package == 0)
-		{
-			cores_per_package = 1;
-		}
-
-		if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
-		{
-			do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
-		}
-
-		if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
-		{
-			do_cpuid(6, p->CPU.CPUID[CPUID_6]);
-		}
-
-		do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-
-		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-		{
-			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-			do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-		}
-		else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-		{
-			do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-		}
-	}
-	else if(IsAmdCPU())
-	{
-		do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
-
-		do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-		{
-			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-		}
-
-		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-		{
-			do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-		}
-
-		do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
-		do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
-		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-
-		cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
-		threads_per_core = cores_per_package;
-
-		if (cores_per_package == 0)
-		{
-			cores_per_package = 1;
-		}
-
-		p->CPU.NoThreads	= logical_per_package;
-		p->CPU.NoCores		= cores_per_package;
-
-		if (p->CPU.NoCores == 0)
-		{
-			p->CPU.NoCores = 1;
-			p->CPU.NoThreads	= 1;
-		}
-	}
-	else
-	{
-		stop("Unsupported CPU detected! System halted.");
-	}
 
 /*  http://www.flounder.com/cpuid_explorer2.htm
     EAX (Intel):
@@ -465,10 +324,15 @@ void scan_cpu(PlatformInfo_t *p)
     |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
     +--------+----------------+--------+----+----+--------+--------+--------+
 */
-	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
+	///////////////////-- MaxFn,Vendor --////////////////////////
+	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
+	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
+	/////////////////////////////////////////////////////////////
 
+	///////////////////-- Signature, stepping, features -- //////
+	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
 	cpuid_features = quad(p->CPU.CPUID[CPUID_1][ecx],p->CPU.CPUID[CPUID_1][edx]);
-	if (bit(28) & cpuid_features) // HTT/Multicore
+	if (bit(28) & p->CPU.CPUID[CPUID_1][edx]) // HTT/Multicore
 	{
 		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
 	}
@@ -476,10 +340,8 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		logical_per_package = 1;
 	}
+//	printf("logical %d\n",logical_per_package);
 
-	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
-
-	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
 	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
 	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);	// model = (cpu_feat_eax >> 4) & 0xF;
@@ -534,13 +396,64 @@ void scan_cpu(PlatformInfo_t *p)
 //		DBG("Brandstring = %s\n", p->CPU.BrandString);
 	}
 
-	/*
-	 * Find the number of enabled cores and threads
-	 * (which determines whether SMT/Hyperthreading is active).
-	 */
+	//char *vendor = p->CPU.cpuid_vendor;
+	switch (p->CPU.Vendor){
+		case CPUID_VENDOR_INTEL:
+		{
 
-	if(IsIntelCPU())
-	{
+            do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
+
+            do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
+
+            /* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
+            if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
+            {
+                for (i = 0; i < 0xFF; i++) // safe loop
+                {
+                    do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
+                    if (bitfield(reg[eax], 4, 0) == 0)
+                    {
+                        break;
+                    }
+                    cores_per_package = bitfield(reg[eax], 31, 26) + 1;
+                }
+            }
+
+            do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
+
+            if (i > 0)
+            {
+                cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
+                threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
+            }
+
+            if (cores_per_package == 0)
+            {
+                cores_per_package = 1;
+            }
+
+            if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
+            {
+                do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
+            }
+
+            if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
+            {
+                do_cpuid(6, p->CPU.CPUID[CPUID_6]);
+            }
+
+            do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+
+            if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+            {
+                do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+                do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+            }
+            else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+            {
+                do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+            }
+
 		switch (p->CPU.Model)
 		{
 			case CPUID_MODEL_NEHALEM:
@@ -591,6 +504,49 @@ void scan_cpu(PlatformInfo_t *p)
 			p->CPU.NoCores		= 4;
 			p->CPU.NoThreads	= 4;
 		}
+	}
+
+	break;
+
+	case CPUID_VENDOR_AMD:
+	{
+		do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
+
+		do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+		{
+			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+		}
+
+		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+		{
+			do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+		}
+
+		do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
+		do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
+		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+
+		cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
+		threads_per_core = cores_per_package;
+
+		if (cores_per_package == 0)
+		{
+			cores_per_package = 1;
+		}
+
+		p->CPU.NoCores		= cores_per_package;
+		p->CPU.NoThreads	= logical_per_package;
+
+		if (p->CPU.NoCores == 0)
+		{
+			p->CPU.NoCores = 1;
+			p->CPU.NoThreads	= 1;
+		}
+	}
+	break;
+	default :
+		stop("Unsupported CPU detected! System halted.");
 	}
 
 	/* setup features */
@@ -646,11 +602,11 @@ void scan_cpu(PlatformInfo_t *p)
 	// if usual method failed
 	if ( tscFreq < 1000 )	//TEST
 	{
-		tscFreq = timeRDTSC() * 20;//measure_tsc_frequency();
+		tscFreq = measure_tsc_frequency();//timeRDTSC() * 20;//measure_tsc_frequency();
 		// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
 	}
 
-	if (IsIntelCPU() && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)))
+	if (p->CPU.Vendor==CPUID_VENDOR_INTEL && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)))
 	{
 		int intelCPU = p->CPU.Model;
 		if (p->CPU.Family == 0x06)
@@ -825,7 +781,7 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 	}
 
-	else if (IsAmdCPU())
+	else if (p->CPU.Vendor==CPUID_VENDOR_AMD)
 	{
 		switch(p->CPU.Family)
 		{
@@ -1030,10 +986,8 @@ void scan_cpu(PlatformInfo_t *p)
 				busFrequency = ((tscFreq * 2) / ((currcoef * 2) + 1));
 				busFCvtt2n = ((1 * Giga) << 32) / busFrequency;
 				tscFCvtt2n = busFCvtt2n * 2 / (1 + (2 * currcoef));
-				//cpuFrequency = (busFrequency * ((currcoef * 2) + 1) / 2);//((1 * Giga)  << 32) / tscFCvtt2n;
 				cpuFrequency = ((1 * Giga)  << 32) / tscFCvtt2n;
 
-				//cpuFrequency = (busFrequency * ((currcoef * 2) + 1) / 2);
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 			}
 			else
