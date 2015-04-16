@@ -99,9 +99,9 @@ Options useful in the org.chameleon.Boot.plist file:
     VBIOS=Yes|No            Inject VBIOS to device-properties.
     display_0=<value>     Inject alternate value of display-cfg into NVDA,Display-A@0 (HEX).
     display_1=<value>     Inject alternate value of display-cfg into NVDA,Display-B@1 (HEX).
-    IntelCapriFB=<value>       For Intel HD 4xxx, range 0-11.
-    IntelAzulFB=<value>        For Intel HD 5xxx/IRIS, range 0-15.
-    IntelBdwFB=<value>         For Intel HD 6xxx/IRIS, range 0-19.
+    IntelCapriFB=<value>       For Intel Ivy Bridge, range 0-11.
+    IntelAzulFB=<value>        For Intel Haswell, range 0-16.
+    IntelBdwFB=<value>         For Intel Broadwell, range 0-18.
     InjectIntel-ig=<value>     Inject alternate value into AAPL,ig-platform-id (HEX).
 
     EnableBacklight=Yes	  Enable Back light option for NVIDIA and ATI

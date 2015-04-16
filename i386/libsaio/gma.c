@@ -64,7 +64,7 @@ static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
 
 #if DEBUG_BDW
-static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0xe0,0x16 }; // broadwell_ig_vals[3]
+static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[3]
 #define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
 #endif
 
@@ -134,7 +134,7 @@ uint8_t broadwell_ig_vals[19][4] = {
 	{ 0x00,0x00,0x06,0x16 },	// 0  - 16060000 Broadwell GT1 (Intel HD Graphics)
 	{ 0x00,0x00,0x0e,0x16 },	// 1  - 160e0000 Broadwell GT1 (Intel HD Graphics)
 	{ 0x00,0x00,0x16,0x16 },	// 2  - 16160000 Broadwell GT2 (Intel HD Graphics 5500)
-	{ 0x00,0x00,0xe0,0x16 },	// 3  - 161e0000 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
+	{ 0x00,0x00,0x1e,0x16 },	// 3  - 161e0000 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
 	{ 0x00,0x00,0x26,0x16 },	// 4  - 16260000 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 	{ 0x00,0x00,0x2b,0x16 },	// 5  - 162b0000 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
 	{ 0x00,0x00,0x22,0x16 },	// 6  - 16220000 Broadwell GT3 (Intel Iris Pro Graphics 6200)
@@ -838,12 +838,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 19.\n");
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 18.\n");
 				}
 			}
 			else
 			{
-				uint32_t ig_platform_id = 0x0f00260d; // set the default platform ig
+				uint32_t ig_platform_id = 0x161e0000; // set the default platform ig
 				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
 			}
 
