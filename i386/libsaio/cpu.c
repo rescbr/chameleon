@@ -300,6 +300,7 @@ void scan_cpu(PlatformInfo_t *p)
 	uint8_t		currcoef		= 0;
 	uint8_t		maxdiv			= 0;
 	uint8_t		maxcoef			= 0;
+	uint8_t		pic0_mask;
 	uint8_t		cpuMultN2		= 0;
 
 	const char	*newratio;
@@ -594,6 +595,9 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
+
+	pic0_mask = inb(0x21U);
+	outb(0x21U, 0xFFU);     // mask PIC0 interrupts for duration of timing tests
 
 	uint64_t cycles;
 	cycles = timeRDTSC();
@@ -1016,6 +1020,8 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
 
 #endif
+
+	outb(0x21U, pic0_mask);     // restore PIC0 interrupts
 
 	p->CPU.MaxCoef = maxcoef = currcoef;
 	p->CPU.MaxDiv = maxdiv = currdiv;
