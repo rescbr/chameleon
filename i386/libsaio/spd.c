@@ -137,12 +137,12 @@ static void init_spd(char *spd, uint32_t base, int slot)
 
 // Get Vendor Name from spd, 2 cases handled DDR3 and DDR2,
 // have different formats, always return a valid ptr.
-const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
+const char *getVendorName(RamSlotInfo_t *slot, uint32_t base, int slot_num)
 {
 	uint8_t bank = 0;
 	uint8_t code = 0;
 	int i = 0;
-	uint8_t * spd = (uint8_t *) slot->spd;
+	uint8_t *spd = (uint8_t *) slot->spd;
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
 	{
@@ -411,7 +411,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				slot->Vendor,
 				slot->PartNo,
 				slot->SerialNo);
-				slot->InUse = true;
+			slot->InUse = true;
 		}
 
 		// laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:

@@ -405,7 +405,7 @@ void devprop_free_string(DevPropString *string)
  * Decodes a sequence of 'len' hexadecimal chars from 'hex' into   *
  * a binary. returns -1 in case of error (i.e. badly formed chars) *
  *******************************************************************/
-int hex2bin(const char *hex, uint8_t *bin, int len)
+int hex2bin( const char *hex, uint8_t *bin, int len )
 {
 	char	*p;
 	int	i;

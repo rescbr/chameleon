@@ -230,9 +230,9 @@ typedef struct {
 
 // physical memory protection on range
 
-#define EFI_MEMORY_WP 0x0000000000001000ULL	/* write-protect */
-#define EFI_MEMORY_RP 0x0000000000002000ULL	/* read-protect */
-#define EFI_MEMORY_XP 0x0000000000004000ULL	/* execute-protect */
+#define EFI_MEMORY_WP		0x0000000000001000ULL	/* write-protect */
+#define EFI_MEMORY_RP		0x0000000000002000ULL	/* read-protect */
+#define EFI_MEMORY_XP		0x0000000000004000ULL	/* execute-protect */
 
 // range requires a runtime mapping
 

@@ -126,8 +126,8 @@ struct DiskBVMap {
  * biosbuf points to a sector within the track cache, and is
  * updated by Biosread().
  */
-static char * const trackbuf = (char *) ptov(BIOS_ADDR);
-static char * biosbuf;
+static char *const trackbuf = (char *) ptov(BIOS_ADDR);
+static char *biosbuf;
 
 static struct DiskBVMap *gDiskBVMap  = NULL;
 static struct disk_blk0 *gBootSector = NULL;
