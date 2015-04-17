@@ -33,9 +33,63 @@
 #define DBG(x...)  msglog(x)
 #endif
 
-extern uint8_t acpi_cpu_count;
-extern uint32_t acpi_cpu_p_blk;
-extern char* acpi_cpu_name[32];
+uint8_t acpi_cpu_count	= 0;
+uint32_t acpi_cpu_p_blk	= 0;
+char *acpi_cpu_name[32];
+
+void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
+{
+	uint32_t i;
+
+	DBG("ACPIpatcher: start finding cpu names. Length %d\n", length);
+
+	for (i=0; i<length-7; i++)
+	{
+		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
+		{
+			DBG("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
+
+			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
+
+			bool add_name = true;
+
+			uint8_t j;
+
+			for (j=0; j<4; j++)
+			{
+				char c = dsdt[offset+j];
+
+				if (!aml_isvalidchar(c))
+				{
+					add_name = false;
+					DBG("ACPIpatcher: invalid character found in ProcessorOP '0x%X'!\n", c);
+					break;
+				}
+			}
+
+			if (add_name)
+			{
+				acpi_cpu_name[acpi_cpu_count] = malloc(4);
+				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
+				i = offset + 5;
+
+				if (acpi_cpu_count == 0)
+				{
+					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
+				}
+
+				DBG("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+
+				if (++acpi_cpu_count == 32)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	DBG("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
+}
 
 static char const pss_ssdt_header[] =
 {

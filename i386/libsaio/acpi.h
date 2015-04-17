@@ -3,6 +3,9 @@
 
 #define ACPI_RANGE_START    (0x0E0000)
 #define ACPI_RANGE_END      (0x0FFFFF)
+#define EBDA_RANGE_MIN      (0x080000)
+#define EBDA_RANGE_END      (0x09FFFF)
+#define BDA_EBDA_START      (0x00040E)
 
 #define UINT64_LE_FROM_CHARS(a,b,c,d,e,f,g,h) \
 (   ((uint64_t)h << 56) \
@@ -16,6 +19,14 @@
 )
 
 #define ACPI_SIGNATURE_UINT64_LE UINT64_LE_FROM_CHARS('R','S','D',' ','P','T','R',' ')
+
+#define swapUint16(x) ((((uint16_t)x & 0xFF00) >> 8) | \
+                       (((uint16_t)x & 0x00FF) << 8))
+
+#define swapUint32(x) ((((uint32_t)x & 0xFF000000) >> 24) | \
+                       (((uint32_t)x & 0x00FF0000) >> 16) | \
+                       (((uint32_t)x & 0x0000FF00) >>  8) | \
+                       (((uint32_t)x & 0x000000FF) << 24))
 
 /* Per ACPI 3.0a spec */
 
@@ -33,6 +44,19 @@ struct acpi_2_rsdp
 	uint64_t		XsdtAddress;
 	uint8_t			ExtendedChecksum;
 	char			Reserved[3];
+} __attribute__((packed));
+
+struct acpi_2_header
+{
+	char			Signature[4];
+	uint32_t		Length;
+	uint8_t			Revision;
+	uint8_t			Checksum;
+	char			OEMID[6];
+	char			OEMTableId[8];
+	uint32_t		OEMRevision;
+	uint32_t		CreatorId;
+	uint32_t		CreatorRevision;
 } __attribute__((packed));
 
 // TODO Migrate
@@ -77,6 +101,16 @@ struct acpi_2_ssdt
 	uint32_t		CreatorRevision;
 } __attribute__((packed));
 
+struct ssdt_pmref
+{
+	char oemTabID[9];
+	char byte1;
+	uint32_t addr;
+	char byte2;
+	uint32_t length;
+	char byte3;
+} __attribute__((packed));
+
 // TODO Migrate
 struct acpi_2_dsdt
 {
@@ -103,7 +137,7 @@ struct acpi_2_fadt
 	uint32_t		OEMRevision;
 	uint32_t		CreatorId;
 	uint32_t		CreatorRevision;
-	uint32_t		FIRMWARE_CTRL;
+	uint32_t		FACS;
 	uint32_t		DSDT;
 	uint8_t			Model;			// JrCs
 	uint8_t			PM_Profile;		// JrCs
@@ -152,7 +186,7 @@ struct acpi_2_fadt
 	uint8_t         Reset_Value;
 	uint8_t         Reserved[3];
 
-	uint64_t	    X_FIRMWARE_CTRL;
+	uint64_t	    X_FACS;
 	uint64_t	    X_DSDT;
 /* End Asere */
 	/*We absolutely don't care about theese fields*/
