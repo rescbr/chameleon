@@ -119,7 +119,7 @@ int main(int argc, const char * argv[]) {
     
     if (ioctl(diskdevice, DKIOCGETPHYSICALBLOCKSIZE, &size) != -1) {
         printf("Physical %u", size);
-    } else if (!ioctl(diskdevice, DKIOCGETBLOCKSIZE, &size) != -1) {
+    } else if (ioctl(diskdevice, DKIOCGETBLOCKSIZE, &size) != -1) {
         printf("Locical %u\n", size);
     } else {
         printf("Standard 512");

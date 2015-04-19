@@ -1,0 +1,8 @@
+#!/bin/bash
+
+configFile="/private/tmp/InstallConfig.plist"
+
+# adding option to declare that we are installing the bootloader w/o writing the Stage1
+/usr/libexec/PlistBuddy -c "Add :SkipStage1 bool true" ${configFile}
+
+exit 0
