@@ -27,8 +27,8 @@ bool getProcessorInformationExternalClock(returnType *value)
 			{
 				switch (Platform.CPU.Model)
 				{
-						// removes FSB info from system profiler as on real mac's.
                         // sets external clock to 0
+                        // removes FSB info from system profiler as on real mac's.
 					case CPU_MODEL_SANDYBRIDGE:
 					case CPU_MODEL_IVYBRIDGE_XEON:
 					case CPU_MODEL_IVYBRIDGE:
@@ -36,6 +36,9 @@ bool getProcessorInformationExternalClock(returnType *value)
 					case CPU_MODEL_HASWELL_SVR:
 					case CPU_MODEL_HASWELL_ULT:
 					case CPU_MODEL_CRYSTALWELL:
+                    case CPU_MODEL_BROADWELL:
+                    case CPU_MODEL_BRODWELL_SVR:
+                    case CPU_MODEL_BRODWELL_MSVR:
 
 						value->word = 0;
 						break;
@@ -163,7 +166,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) { // Intel
 		if (!done) {
-/*			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, (uint32_t)Platform.CPU.Family, (uint32_t)Platform.CPU.Model); */
+			verbose("CPU is %s, family 0x%x, model 0x%x\n", Platform.CPU.BrandString, (uint32_t)Platform.CPU.Family, (uint32_t)Platform.CPU.Model);
 			done = true;
 		}
 		// Bungo: fixes Oem Processor Type - better matching IMHO
@@ -238,6 +241,9 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPU_MODEL_SANDYBRIDGE:			// 0x2A - Intel Core i3, i5, i7 LGA1155 (32nm)
                     case CPU_MODEL_IVYBRIDGE:			// 0x3A - Intel Core i3, i5, i7 LGA1155 (22nm)
+                    case CPU_MODEL_BROADWELL:           // 0x3C - Intel Core i3, i5, i7 (14nm)
+                    case CPU_MODEL_BRODWELL_SVR:        // 0x4F
+                    case CPU_MODEL_BRODWELL_MSVR:       // 0x56
 						if (strstr(Platform.CPU.BrandString, "Xeon(R)")) {
 							value->word = 0x501;		// 1281 - Xeon
 							return true;
@@ -312,6 +318,10 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 	static int idx = -1;
 	int	map;
 
+    if (!bootInfo->memDetect) {
+        return false;
+    }
+    
 	idx++;
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
@@ -322,7 +332,8 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 		}
 	}
 
-	return false;
+    value->byte = 2; // means Unknown
+    return true;
 //	value->byte = SMB_MEM_TYPE_DDR2;
 //	return true;
 }
@@ -338,6 +349,10 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 	static int idx = -1;
 	int	map;
 
+    if (!bootInfo->memDetect) {
+        return false;
+    }
+    
 	idx++;
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
@@ -348,7 +363,8 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 		}
 	}
 
-	return false;
+    value->dword = 0; // means Unknown
+    return true;
 //	value->dword = 800;
 //	return true;
 }
@@ -358,6 +374,10 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 	static int idx = -1;
 	int	map;
 
+    if (!bootInfo->memDetect) {
+        return false;
+    }
+    
 	idx++;
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
@@ -368,9 +388,6 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 		}
 	}
 
-	if (!bootInfo->memDetect) {
-		return false;
-	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -380,9 +397,13 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 	static int idx = -1;
 	int	map;
 
+    if (!bootInfo->memDetect) {
+        return false;
+    }
+    
 	idx++;
 
-	DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
+//	DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
 
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
@@ -393,9 +414,6 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 		}
 	}
 
-	if (!bootInfo->memDetect) {
-		return false;
-	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -405,6 +423,10 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	static int idx = -1;
 	int	map;
 
+    if (!bootInfo->memDetect) {
+        return false;
+    }
+    
 	idx++;
 	if (idx < MAX_RAM_SLOTS) {
 		map = Platform.DMI.DIMM[idx];
@@ -415,9 +437,6 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 		}
 	}
 
-	if (!bootInfo->memDetect) {
-		return false;
-	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }

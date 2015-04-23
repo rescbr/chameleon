@@ -50,8 +50,6 @@
  * These notices must be retained in any copies of any part of this
  * documentation and/or software.
  *
- * $Id: md5c.c,v 1.1 2005/06/24 22:47:12 curtisg Exp $
- *
  * This code is the same as the code published by RSA Inc.  It has been
  * edited for clarity and style only.
  */
@@ -151,7 +149,8 @@ MD5Update (context, input, inputLen)
 	index = (unsigned int)((context->count[0] >> 3) & 0x3F);
 
 	/* Update number of bits */
-	if ((context->count[0] += ((u_int32_t)inputLen << 3)) < ((u_int32_t)inputLen << 3)) {
+	if ((context->count[0] += ((u_int32_t)inputLen << 3)) < ((u_int32_t)inputLen << 3))
+    {
 		context->count[1]++;
 	}
 
@@ -161,7 +160,8 @@ MD5Update (context, input, inputLen)
 
 	/* Transform as many times as possible. */
 
-	if (inputLen >= partLen) {
+	if (inputLen >= partLen)
+    {
 		memcpy((void *)&context->buffer[index], (const void *)input,
 		    partLen);
 		MD5Transform (context->state, context->buffer);

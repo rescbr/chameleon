@@ -82,7 +82,7 @@ endif
 	@${MKDIRS} $(OBJROOT)/../boot2_modules/
 	
 	@### First pass, don't worry abount segment alignment.
-	@echo "\t[LD] boot.sys"
+	@echo "	[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \
 			-nostdlib -arch i386  -Wl,-pie \
 			-Wl,-read_only_relocs,suppress \
@@ -94,10 +94,10 @@ endif
 ifeq (${CONFIG_MODULES}, y)
 
 	@# Generate the Symbols.dylib file
-	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@echo "	[dyldsymboltool] Symbols.dylib"
 	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@echo "\t[LD] boot.sys"
+	@echo "	[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \
 			-nostdlib -arch i386  -Wl,-pie \
 			-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
@@ -114,10 +114,10 @@ ifeq (${CONFIG_MODULES}, y)
 	@${RM} $(SYMROOT)/${SYMBOLS_MODULE}
 
 	@# Generate the Symbols.dylib file
-	@echo "\t[dyldsymboltool] Symbols.dylib"
+	@echo "	[dyldsymboltool] Symbols.dylib"
 	@$(SYMROOT)/dyldsymboltool $(SYMROOT)/boot.sys $(SYMROOT)/${SYMBOLS_MODULE}
 
-	@echo "\t[LD] boot.sys"
+	@echo "	[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \
 			-nostdlib -arch i386  -Wl,-pie \
 			-Wl,-sectcreate,__DATA,__Symbols,$(SYMROOT)/Symbols.dylib \
@@ -142,7 +142,7 @@ ifeq (${CONFIG_MODULES}, y)
 	-o $(OBJROOT)/Symbols_LINKER_ONLY.dylib
 
 else
-	@echo "\t[LD] boot.sys"
+	@echo "	[LD] boot.sys"
 	@$(CC) -Wl,-preload -Wl,-alias,boot2,start \
 			-nostdlib -arch i386  -Wl,-pie \
 			-Wl,-segaddr,__INIT,`echo obase=16\; $$((0x${BOOT2ADDR})) | bc` \
@@ -155,7 +155,7 @@ else
 endif
 
 
-	@echo "\t[MACHOCONV] boot"
+	@echo "	[MACHOCONV] boot"
 	@$(SYMROOT)/machOconv ${SYMROOT}/$@.sys $(SYMROOT)/$@ &> /dev/null
 
 	@( size=`ls -l $(SYMROOT)/boot | awk '{ print $$5}'` ; \
@@ -190,7 +190,7 @@ $(SYMROOT)/art.h:
 	@echo "" >> $(SYMROOT)/art.h
 	@echo "embeddedpng_t embeddedImages[] = {" >> $(SYMROOT)/art.h
 	@cd $(SYMROOT)/embed && find . -name '*.png' | sort | cut -f 2 -d '/' | cut -f 1 -d '.' | \
-		awk '{ printf "\t{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
+		awk '{ printf "	{.name = \"%s\", .pngdata = __%s_png, .length = &__%s_png_len},\n", $$1, $$1, $$1 }' >> $(SYMROOT)/art.h
 	@echo "};" >> $(SYMROOT)/art.h
 
 	@echo "#endif /* !__BOOT2_ART_H */"  >> $(SYMROOT)/art.h ;\
@@ -204,7 +204,7 @@ $(SYMROOT)/embedded.h:
 
 clean-local:
 	@for o in $(SYMROOT)/boot $(SYMROOT)/boot.sys $(SYMROOT)/embedded.h $(OBJROOT)/Symbols_LINKER_ONLY.dylib; do \
-		if [ -f "$${o}" ];then echo "\t[RM] $${o}"; fi; done
-	@if [ -d "$(OBJROOT)" ];then echo "\t[RM] all objects in $(OBJROOT)"; fi
+		if [ -f "$${o}" ];then echo "	[RM] $${o}"; fi; done
+	@if [ -d "$(OBJROOT)" ];then echo "	[RM] all objects in $(OBJROOT)"; fi
 	@rm -f $(SYMROOT)/boot $(SYMROOT)/boot.sys $(SYMROOT)/embedded.h $(OBJS)
 	@rm -rf $(OBJROOT)

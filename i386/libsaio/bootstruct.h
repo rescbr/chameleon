@@ -47,7 +47,7 @@ extern Node *gMemoryMapNode;
 /*
  * Maximum number of boot drivers that can be loaded.
  */
-#define NDRIVERS  500
+#define NDRIVERS	500
 
 #define CONFIG_SIZE (40 * 4096)
 
@@ -74,7 +74,9 @@ typedef struct _PCI_bus_info_t {
 	unsigned char BIOSPresent;
 } PCI_bus_info_t;
 
-typedef struct {
+
+typedef struct
+{
 	unsigned long address;  // address where driver was loaded
 	unsigned long size;     // number of bytes
 	unsigned long type;     // driver type
@@ -90,7 +92,8 @@ typedef struct {
 /*
  * ACPI defined memory range types.
  */
-enum {
+enum
+{
 	kMemoryRangeUsable   = 1,    // RAM usable by the OS.
 	kMemoryRangeReserved = 2,    // Reserved. (Do not use)
 	kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.

@@ -1,0 +1,43 @@
+Chimera 4.0.0 includes:
+
+Used Chameleon 2.2 r2421 as the code base and incorporated any changes that didn't break Chimera 4.0.1 enhancements
+Added Broadwell CPU and IGP support.
+Added addition LPC device IDs in spd.c
+
+Files edited:
+
+i386/boot2/options.c
+i386/boot2/prompt.c
+i386/libsaio/acpi_patcher.c
+i386/libsaio/aml_generator.c
+i386/libsaio/ati.c
+i386/libsaio/ati.h
+i386/libsaio/bootargs.h
+i386/libsaio/bootstruct.c
+i386/libsaio/bootstruct.h
+i386/libsaio/console.c
+i386/libsaio/device_inject.c
+i386/libsaio/device_tree.c
+i386/libsaio/device_tree.h
+i386/libsaio/disk.c
+i386/libsaio/dram_controllers.c
+i386/libsaio/efi.h
+i386/libsaio/fake_efi.c
+i386/libsaio/hda.c
+i386/libsaio/load.c
+i386/libsaio/md5c.c
+i386/libsaio/nvidia.c
+i386/libsaio/platform.h
+i386/libsaio/saio_internal.h
+i386/libsaio/saio_types.h
+i386/libsaio/smbios_decode.c
+i386/libsaio/smbios_getters.c
+i386/libsaio/smbios_getters.h
+i386/libsaio/smbios.c
+i386/libsaio/smbios.h
+i386/libsaio/spd.c
+i386/libsaio/stringTable.c
+i386/libsaio/sys.c
+i386/libsaio/vbe.c
+
+Make.rules Changed to add -Wno-unused-const-variable to CFLAGS

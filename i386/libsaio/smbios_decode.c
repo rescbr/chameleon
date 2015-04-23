@@ -170,6 +170,25 @@ static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upg
 	"Socket LGA1356-3"              /* 2Ch */
 };
 
+static const char *SMBMemoryDeviceFormFactors[] =    // Bungo: strings for form factor (Table Type 17 - Memory Device)
+{
+    "Other",                    /* 01h */
+    "Unknown",                  /* 02h */
+    "SIMM",                     /* 03h */
+    "SIP",                      /* 04h */
+    "Chip",                     /* 05h */
+    "DIP",                      /* 06h */
+    "ZIP",                      /* 07h */
+    "Proprietary Card",         /* 08h */
+    "DIMM",                     /* 09h */
+    "TSOP",                     /* 0Ah */
+    "Row of chips",             /* 0Bh */
+    "RIMM",                     /* 0Ch */
+    "SODIMM",                   /* 0Dh */
+    "SRIMM",                    /* 0Eh */
+    "FB-DIMM"                   /* 0Fh */
+};
+
 /*=====
  7.18.2
  ====*/
@@ -382,6 +401,10 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 }
 
 //-------------------------------------------------------------------------------------------------------------------------
+// Memory Controller Information (Type 5)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
 // Memory Module Information (Type 6)
 //-------------------------------------------------------------------------------------------------------------------------
 //void decodeMemoryModule(SMBStructHeader *structHeader)
@@ -398,6 +421,22 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 //}
 
 //-------------------------------------------------------------------------------------------------------------------------
+// Cache Information (Type 7)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
+// Port Connector Information (Type 8)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
+// System Slot Information (Type 9)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
+// On Board Device Information (Type 10)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
 // OEM Strings (Type 11)
 //-------------------------------------------------------------------------------------------------------------------------
 void decodeSMBOEMStrings(SMBStructHeader *structHeader)
@@ -412,6 +451,17 @@ void decodeSMBOEMStrings(SMBStructHeader *structHeader)
 	}
 	DBG("\n");
 }
+//-------------------------------------------------------------------------------------------------------------------------
+// System Configuration Options (Type 12)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
+// BIOS Language Information (Type 13)
+//-------------------------------------------------------------------------------------------------------------------------
+
+//-------------------------------------------------------------------------------------------------------------------------
+// Physical Memory Array (Type 16)
+//-------------------------------------------------------------------------------------------------------------------------
 
 //-------------------------------------------------------------------------------------------------------------------------
 // MemoryDevice (Type 17)
@@ -421,11 +471,32 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	DBG("Memory Device\n");
 // Aray Handle
-	DBG("\tError Information Handle: 0x%x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
+    if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF) {
+        DBG("\tError Information Handle: No Error\n");
+    } else {
+        DBG("\tError Information Handle: 0x%x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
+    }
 // Total Width:
 // Data Width:
-// Size:
-// Form Factor:
+    switch (((SMBMemoryDevice *)structHeader)->memorySize) {
+        case 0:
+            DBG("\tSize: No Module Installed\n");
+            break;
+        case 0x7FFF:
+            DBG("\tSize: 32GB or more\n");
+            break;
+        case 0xFFFF:
+            DBG("\tSize: Unknown\n");
+            break;
+        default:
+            DBG("\tSize: %d %s\n", ((SMBMemoryDevice *)structHeader)->memorySize & 0x7FFF, ((((SMBMemoryDevice *)structHeader)->memorySize & 0x8000) == 0x8000) ? "kB" : "MB");
+            break;
+    }
+    if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F)) {
+        DBG("\tForm Factor: %s\n", OutOfSpecStr);
+    } else {
+        DBG("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
+    }
 // Set:
 	DBG("\tLocator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->deviceLocator, neverMask));
 	DBG("\tBank Locator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->bankLocator, neverMask));
@@ -480,7 +551,7 @@ void decodeOemProcessorBusSpeed(SMBStructHeader *structHeader)
 //}
 
 //-------------------------------------------------------------------------------------------------------------------------
-// Specific  (Type 134)
+// Specific (Type 134)
 //-------------------------------------------------------------------------------------------------------------------------
 //void decodeOem(SMBStructHeader *structHeader)
 //{

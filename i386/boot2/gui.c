@@ -31,6 +31,7 @@ static const char *theme_name = THEME_NAME_DEFAULT;
 
 int lasttime = 0; // we need this for animating maybe
 
+// ====================================================================
 
 /*
  * ATTENTION: the enum and the following array images[] MUST match !!!
@@ -74,7 +75,6 @@ enum {
 	iDeviceHFSRAID_Leo_o,
 	iDeviceHFSRAID_Tiger,
 	iDeviceHFSRAID_Tiger_o,
-    
 	iDeviceEXT3,
 	iDeviceEXT3_o,
 	iDeviceFreeBSD,     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -120,6 +120,8 @@ enum {
 	iFontSmall,
 };
 
+// ====================================================================
+
 image_t images[] = {
 	{.name = "background",                  .image = NULL},
 	{.name = "logo",                        .image = NULL},
@@ -159,7 +161,6 @@ image_t images[] = {
 	{.name = "device_hfsraid_leo_o",        .image = NULL},
 	{.name = "device_hfsraid_tiger",        .image = NULL},
 	{.name = "device_hfsraid_tiger_o",      .image = NULL},
-    
 	{.name = "device_ext3",                 .image = NULL},
 	{.name = "device_ext3_o",               .image = NULL},
 	{.name = "device_freebsd",              .image = NULL},     /* FreeBSD/OpenBSD detection,nawcom's code by valv, Icon credits to blackosx  */
@@ -204,6 +205,8 @@ image_t images[] = {
 	{.name = "font_console",                .image = NULL},
 	{.name = "font_small",                  .image = NULL},
 };
+
+// ====================================================================
 
 int imageCnt = 0;
 
@@ -352,6 +355,8 @@ static int loadThemeImage(const char *image, int alt_image)
 	return 1;
 }
 
+// ====================================================================
+
 static int loadGraphics(void)
 {
 	LOADPNG(background,                     IMG_REQUIRED);
@@ -442,6 +447,8 @@ static int loadGraphics(void)
 	return 0;
 }
 
+// ====================================================================
+
 static int unloadGraphics(void)
 {
 	int i;
@@ -460,6 +467,8 @@ static int unloadGraphics(void)
 	return 0;
 }
 
+// ====================================================================
+
 int freeBackBuffer( window_t *window )
 {
 	if (gui.backbuffer && gui.backbuffer->pixels) {
@@ -471,6 +480,8 @@ int freeBackBuffer( window_t *window )
 
 	return 1;
 }
+
+// ====================================================================
 
 pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t width, uint16_t height )
 {
@@ -496,6 +507,8 @@ pixmap_t *getCroppedPixmapAtPosition( pixmap_t *from, position_t pos, uint16_t w
 	return cropped;
 }
 
+// ====================================================================
+
 int createBackBuffer( window_t *window )
 {
 	gui.backbuffer = malloc(sizeof(pixmap_t));
@@ -514,6 +527,8 @@ int createBackBuffer( window_t *window )
 
 	return 0;
 }
+
+// ====================================================================
 
 int createWindowBuffer( window_t *window )
 {
@@ -535,6 +550,8 @@ int createWindowBuffer( window_t *window )
 	return 0;
 }
 
+// ====================================================================
+
 int freeWindowBuffer( window_t *window )
 {
 	if (window->pixmap && window->pixmap->pixels) {
@@ -544,6 +561,8 @@ int freeWindowBuffer( window_t *window )
 	}
 	return 1;
 }
+
+// ====================================================================
 
 void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 {
@@ -556,6 +575,8 @@ void fillPixmapWithColor(pixmap_t *pm, uint32_t color)
 		}
 	}
 }
+
+// ====================================================================
 
 void drawBackground()
 {
@@ -576,6 +597,8 @@ void drawBackground()
 	
 	memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 }
+
+// ====================================================================
 
 void setupDeviceList(config_file_t *theme)
 {
@@ -648,6 +671,8 @@ void setupDeviceList(config_file_t *theme)
 		createWindowBuffer(&gui.devicelist);
 	}
 }
+
+// ====================================================================
 
 void loadThemeValues(config_file_t *theme)
 {
@@ -848,6 +873,8 @@ void loadThemeValues(config_file_t *theme)
 	}
 }
 
+// ====================================================================
+
 int initGUI(void)
 {
 	int		val;
@@ -929,10 +956,14 @@ int initGUI(void)
 	return 1;
 }
 
+// ====================================================================
+
 bool is_image_loaded(int i)
 {	
 	return (images[i].image != NULL) ? true : false;
 }
+
+// ====================================================================
 
 void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelected)
 {
@@ -974,9 +1005,9 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 						devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID : iDeviceHFS);
 						break;
 				}
-				
+
 				break;
-				
+
 			}
 			case kPartitionTypeHPFS:
 				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
@@ -1028,6 +1059,8 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 	drawStrCenteredAt( device->label, &font_small, buffer, p);	
 
 }
+
+// ====================================================================
 
 void drawDeviceList (int start, int end, int selection)
 {
@@ -1133,6 +1166,8 @@ void drawDeviceList (int start, int end, int selection)
 	
 }
 
+// ====================================================================
+
 void clearGraphicBootPrompt()
 {
 	// clear text buffer
@@ -1149,6 +1184,8 @@ void clearGraphicBootPrompt()
 
 	return;
 }
+
+// ====================================================================
 
 void updateGraphicBootPrompt()
 {
@@ -1174,6 +1211,8 @@ void updateGraphicBootPrompt()
 	
 	return;
 }
+
+// ====================================================================
 
 static inline
 void vramwrite (void *data, int width, int height)
@@ -1209,6 +1248,8 @@ void vramwrite (void *data, int width, int height)
 	}
 }
 
+// ====================================================================
+
 void updateVRAM()
 {
 	if (gui.redraw) {
@@ -1234,11 +1275,15 @@ void updateVRAM()
 	}
 }
 
+// ====================================================================
+
 struct putc_info //Azi: exists on console.c & printf.c
 {
 	char * str;
 	char * last_str;
 };
+
+// ====================================================================
 
 static int
 sputc(int c, struct putc_info * pi) //Azi: same as above
@@ -1252,6 +1297,8 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 	*(pi->str)++ = c;
 	return c;
 }
+
+// ====================================================================
 
 int gprintf( window_t * window, const char * fmt, ...)
 {
@@ -1334,6 +1381,8 @@ int gprintf( window_t * window, const char * fmt, ...)
 	}
 	return 1;
 }
+
+// ====================================================================
 
 int dprintf( window_t * window, const char * fmt, ...)
 {
@@ -1418,6 +1467,8 @@ int dprintf( window_t * window, const char * fmt, ...)
 	return 1;
 }
 
+// ====================================================================
+
 int vprf(const char * fmt, va_list ap)
 {
 	int i;
@@ -1493,6 +1544,8 @@ int vprf(const char * fmt, va_list ap)
 	return 1;
 }
 
+// ====================================================================
+
 pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 	unsigned int cha = (unsigned int)ch - 32;
 	if (cha >= font->count) {
@@ -1501,6 +1554,8 @@ pixmap_t* charToPixmap(unsigned char ch, font_t *font) {
 	}
 	return font->chars[cha] ? font->chars[cha] : NULL;
 }
+
+// ====================================================================
 
 position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p) {
 	pixmap_t* pm = charToPixmap(ch, font);
@@ -1511,6 +1566,8 @@ position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, positio
 		return p;
 	}
 }
+
+// ====================================================================
 
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 {
@@ -1534,6 +1591,8 @@ void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p)
 		current_pos = drawChar(ch[i], font, blendInto, current_pos);
 	}
 }
+
+// ====================================================================
 
 void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t p)
 {
@@ -1566,6 +1625,8 @@ void drawStrCenteredAt(char *text, font_t *font, pixmap_t *blendInto, position_t
 	drawStr(text, font, blendInto, p);
 }
 
+// ====================================================================
+
 int destroyFont(font_t *font)
 {
 	int i;
@@ -1580,6 +1641,8 @@ int destroyFont(font_t *font)
 	}
 	return 0;
 }
+
+// ====================================================================
 
 int initFont(font_t *font, image_t *data)
 {
@@ -1637,6 +1700,8 @@ int initFont(font_t *font, image_t *data)
 	return 0;
 }
 
+// ====================================================================
+
 void colorFont(font_t *font, uint32_t color)
 {
 	if( !color ) {
@@ -1662,6 +1727,8 @@ void colorFont(font_t *font, uint32_t color)
 		}
 	}
 }
+
+// ====================================================================
 
 void makeRoundedCorners(pixmap_t *p)
 {
@@ -1706,6 +1773,8 @@ void makeRoundedCorners(pixmap_t *p)
 		}
 	}
 }
+
+// ====================================================================
 
 void showInfoBox(char *title, char *text_orig)
 {
@@ -1837,6 +1906,8 @@ void showInfoBox(char *title, char *text_orig)
 	free(text);
 }
 
+// ====================================================================
+
 void animateProgressBar()
 {
 	int y;
@@ -1856,6 +1927,8 @@ void animateProgressBar()
 		pixel(buffBar, buffBar->width-1, 0).value = buff;
 	}
 }
+
+// ====================================================================
 
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress)
 {
@@ -1917,6 +1990,8 @@ void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t 
 	free(progressbar.pixels);
 }
 
+// ====================================================================
+
 void drawInfoMenuItems()
 {
 	int i,n;
@@ -1959,6 +2034,8 @@ void drawInfoMenuItems()
 	gui.redraw = true;
 }
 
+// ====================================================================
+
 int drawInfoMenu()
 {
 	drawInfoMenuItems();
@@ -1969,6 +2046,8 @@ int drawInfoMenu()
 	
 	return 1;
 }
+
+// ====================================================================
 
 int updateInfoMenu(int key)
 {
@@ -2027,9 +2106,11 @@ int updateInfoMenu(int key)
 	return DO_NOT_BOOT;
 }
 
-uint16_t bootImageWidth = 0; 
-uint16_t bootImageHeight = 0; 
-uint8_t *bootImageData = NULL; 
+// ====================================================================
+
+uint16_t bootImageWidth = 0;
+uint16_t bootImageHeight = 0;
+uint8_t *bootImageData = NULL;
 static bool usePngImage = true;
 
 //==========================================================================
@@ -2128,6 +2209,7 @@ void drawBootGraphics(void)
 				free(bootImageData);
 			}
 			free(appleBootPict); 
-		} 
-	} 
+		}
+	}
 }
+// ====================================================================

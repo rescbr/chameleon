@@ -1,7 +1,7 @@
 ; Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
 ;
 ; @APPLE_LICENSE_HEADER_START@
-; 
+;
 ; Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
 ; Reserved.  This file contains Original Code and/or Modifications of
 ; Original Code as defined in and that are subject to the Apple Public
@@ -9,7 +9,7 @@
 ; except in compliance with the License.  Please obtain a copy of the
 ; License at http://www.apple.com/publicsource and read it before using
 ; this file.
-; 
+;
 ; The Original Code and all software distributed under the License are
 ; distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
 ; EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -17,7 +17,7 @@
 ; FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
 ; License for the specific language governing rights and limitations
 ; under the License.
-; 
+;
 ; @APPLE_LICENSE_HEADER_END@
 ;
 ; Partition Boot Loader: boot1h
@@ -74,7 +74,7 @@ kBoot1RelocAddr		EQU		0xE000								; boot1 relocated address
 kBoot1Sector1Addr	EQU		kBoot1RelocAddr + kSectorBytes		; boot1 load address for sector 1
 kHFSPlusBuffer		EQU		kBoot1Sector1Addr + kSectorBytes	; HFS+ Volume Header address
 
-kBoot2Sectors		EQU		(480 * 1024 - 512) / kSectorBytes	; max size of 'boot' file in sectors
+kBoot2Sectors		EQU		(480 * 1024 - 512) / kSectorBytes	; max size of 'boot' file in sectors = 448 but I want 472
 kBoot2Segment		EQU		0x2000								; boot2 load segment
 kBoot2Address		EQU		kSectorBytes						; boot2 load address
 
@@ -335,7 +335,7 @@ kForkTypeResource	EQU		0xFF
 	mov		si, %1
 	call	print_string
 %endmacro
-        
+
 %macro LogString 1
 	mov		di, %1
 	call	log_string
@@ -352,7 +352,7 @@ kForkTypeResource	EQU		0xFF
   %define PutChar(x)
   %define PrintHex(x)
 %endif
-	
+
 ;--------------------------------------------------------------------------
 ; Start of text segment.
 
@@ -388,7 +388,7 @@ start:
     mov		cx, kSectorBytes		; copy 256 words
     rep		movsb					; repeat string move (word) operation
     pop		si
-    
+
     ;
     ; Code relocated, jump to startReloc in relocated location.
     ;
@@ -406,7 +406,7 @@ startReloc:
     ; Initializing global variables.
     ;
     mov     eax, [si + part.lba]
-    mov     [gPartLBA], eax					; save the current partition LBA offset
+    mov     [gPartLBA], eax				; save the current partition LBA offset
     mov     [gBIOSDriveNumber], dl			; save BIOS drive number
 	mov		WORD [gMallocPtr], mallocStart	; set free space pointer
 
@@ -500,7 +500,7 @@ error:
 %if VERBOSE
     LogString(error_str)
 %endif
-	
+
 hang:
     hlt
     jmp     hang
@@ -1058,11 +1058,11 @@ lookUpBTree:
 	mov		bx, [bp + BTree.nodeBuffer + BTNodeDescriptor.numRecords]
 	xchg	bh, bl
 	dec		bx
-	
+
 .bsearch:
 	cmp		ax, bx
 	ja		.checkResult							; jump if lowerBound > upperBound
-	
+
 	mov		cx, ax
 	add		cx, bx
 	shr		cx, 1									; test index = (lowerBound + upperBound / 2)
@@ -1088,7 +1088,7 @@ lookUpBTree:
 	je		.checkResult
 	jl		.searchLessThanTrial
 	jg		.searchGreaterThanTrial
-	jmp		.bsearch	
+	jmp		.bsearch
 
 .searchLessThanTrial:
 	mov		bx, cx
@@ -1099,7 +1099,7 @@ lookUpBTree:
 	mov		ax, cx
 	inc		ax										; lowerBound = index + 1
 	jmp		.bsearch
-	
+
 .checkResult:
 	cmp		BYTE [bp + BTree.searchResult], 0
 	jge		.foundKey
@@ -1115,7 +1115,7 @@ lookUpBTree:
 	mov		bx, [bx]
 	mov		edx, [bx]
 	jmp		.readNode
-	
+
 .exit:
 	cmp		BYTE [bp + BTree.searchResult], 0
 	ret
@@ -1183,7 +1183,7 @@ getBTreeRecord:
 .exit:
 	pop		di									; restore address of trialKey
 
-%if UNUSED	
+%if UNUSED
 ;
 ; Print catalog trial key
 ;
@@ -1199,15 +1199,15 @@ getBTreeRecord:
 .printLoop:
 	lodsw
 	call	print_char
-	loop	.printLoop  
+	loop	.printLoop
 .printExit:
 	popad
 ;
 ;
 ;
 %endif ; UNUSED
-	
-%if UNUSED	
+
+%if UNUSED
 ;
 ; Print extent trial key
 ;
@@ -1230,7 +1230,7 @@ getBTreeRecord:
 	pop		si									; restore SI
 	call	bx									; call key compare proc
 	popad
-	ret 
+	ret
 
 ;--------------------------------------------------------------------------
 ; readExtent - read extents from a HFS+ file (multiple extent support)
@@ -1300,7 +1300,7 @@ readExtent:
 
 	pop		ebx
 	jmp		.beginExtentBlock
-	
+
 .continue:
 	mov		edx, [di + HFSPlusExtentDescriptor.blockCount]
 	call	blockToSector								; ECX = converted current extent's blockCount to sectors
@@ -1328,20 +1328,20 @@ readExtent:
 	mov		edx, [di + HFSPlusExtentDescriptor.startBlock]
 	call	blockToSector								; ECX = converted to sectors
 	add		ecx, eax									; file offset converted to sectors
-	
+
 	push	si
 	mov		ax, si
 	mov		edx, [bp + BTree.readBufferPtr]
 	call	readSectors
 	pop		si
-	
+
 	add		ebx, esi
 	mov		ax, si
 	cwde
 	shl		ax, 9										; convert SI (read sector count) to byte unit
 	add		[bp + BTree.readBufferPtr], eax
 	sub		[bp + BTree.readSize], esi
-	
+
 	jz		.exit
 
 .nextExtent:

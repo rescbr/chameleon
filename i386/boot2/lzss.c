@@ -64,53 +64,54 @@ struct encode_state {
 	int match_position, match_length;
 };
 
-int decompress_lzss(  u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen )
+int
+decompress_lzss(  u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32_t srclen )
 {
-    /* ring buffer of size N, with extra F-1 bytes to aid string comparison */
-    u_int8_t text_buf[N + F - 1];
-    u_int8_t *dststart = dst;
-    u_int8_t *dstend = dst + dstlen;
-    u_int8_t *srcend = src + srclen;
-    int  i, j, k, r, c;
-    unsigned int flags;
-    
-    dst = dststart;
-    srcend = src + srclen;
-    for (i = 0; i < N - F; i++)
-        text_buf[i] = ' ';
-    r = N - F;
-    flags = 0;
-    for ( ; ; ) {
-        if (((flags >>= 1) & 0x100) == 0) {
-            if (src < srcend) c = *src++; else break;
-            flags = c | 0xFF00;  /* uses higher byte cleverly */
-        }   /* to count eight */
-        if (flags & 1) {
-            if (src < srcend) c = *src++; else break;
-            *dst++ = c;
-            if (dst >= dstend) {
-                goto finish;
-            }
-            text_buf[r++] = c;
-            r &= (N - 1);
-        } else {
-            if (src < srcend) i = *src++; else break;
-            if (src < srcend) j = *src++; else break;
-            i |= ((j & 0xF0) << 4);
-            j  =  (j & 0x0F) + THRESHOLD;
-            for (k = 0; k <= j; k++) {
-                c = text_buf[(i + k) & (N - 1)];
-                *dst++ = c;
-                if (dst >= dstend) {
-                    goto finish;
-                }
-                text_buf[r++] = c;
-                r &= (N - 1);
-            }
-        }
-    }
+	/* ring buffer of size N, with extra F-1 bytes to aid string comparison */
+	u_int8_t text_buf[N + F - 1];
+	u_int8_t *dststart = dst;
+	u_int8_t *dstend = dst + dstlen;
+	u_int8_t *srcend = src + srclen;
+	int  i, j, k, r, c;
+	unsigned int flags;
+
+	dst = dststart;
+	srcend = src + srclen;
+	for (i = 0; i < N - F; i++)
+		text_buf[i] = ' ';
+	r = N - F;
+	flags = 0;
+	for ( ; ; ) {
+		if (((flags >>= 1) & 0x100) == 0) {
+			if (src < srcend) c = *src++; else break;
+			flags = c | 0xFF00;  /* uses higher byte cleverly */
+		}   /* to count eight */
+		if (flags & 1) {
+			if (src < srcend) c = *src++; else break;
+			*dst++ = c;
+			if (dst >= dstend) {
+				goto finish;
+			}
+			text_buf[r++] = c;
+			r &= (N - 1);
+		} else {
+			if (src < srcend) i = *src++; else break;
+			if (src < srcend) j = *src++; else break;
+			i |= ((j & 0xF0) << 4);
+			j  =  (j & 0x0F) + THRESHOLD;
+			for (k = 0; k <= j; k++) {
+				c = text_buf[(i + k) & (N - 1)];
+				*dst++ = c;
+				if (dst >= dstend) {
+					goto finish;
+				}
+				text_buf[r++] = c;
+				r &= (N - 1);
+			}
+		}
+	}
 finish:
-    return dst - dststart;
+	return dst - dststart;
 }
 
 /*
@@ -231,16 +232,16 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
 {
     /* Encoding state, mostly tree but some current match stuff */
     struct encode_state *sp;
-    
+
     int  i, c, len, r, s, last_match_length, code_buf_ptr;
     u_int8_t code_buf[17], mask;
     u_int8_t *srcend = src + srclen;
     u_int8_t *dstend = dst + dstlen;
-    
+
     /* initialize trees */
     sp = (struct encode_state *) malloc(sizeof(*sp));
     init_state(sp);
-    
+
     /*
      * code_buf[1..16] saves eight units of code, and code_buf[0] works
      * as eight flags, "1" representing that the unit is an unencoded
@@ -249,16 +250,16 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
      */
     code_buf[0] = 0;
     code_buf_ptr = mask = 1;
-    
+
     /* Clear the buffer with any character that will appear often. */
     s = 0;  r = N - F;
-    
+
     /* Read F bytes into the last F bytes of the buffer */
     for (len = 0; len < F && src < srcend; len++)
         sp->text_buf[r + len] = *src++;
     if (!len)
         return (void *) 0;  /* text of size zero */
-    
+
     /*
      * Insert the F strings, each of which begins with one or more
      * 'space' characters.  Note the order in which these strings are
@@ -266,7 +267,7 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
      */
     for (i = 1; i <= F; i++)
         insert_node(sp, r - i);
-    
+
     /*
      * Finally, insert the whole string just read.
      * The global variables match_length and match_position are set.
@@ -302,24 +303,24 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
             delete_node(sp, s);    /* Delete old strings and */
             c = *src++;
             sp->text_buf[s] = c;    /* read new bytes */
-            
+
             /*
              * If the position is near the end of buffer, extend the buffer
              * to make string comparison easier.
              */
             if (s < F - 1)
                 sp->text_buf[s + N] = c;
-            
+
             /* Since this is a ring buffer, increment the position modulo N. */
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
-            
+
             /* Register the string in text_buf[r..r+F-1] */
             insert_node(sp, r);
         }
         while (i++ < last_match_length) {
             delete_node(sp, s);
-            
+
             /* After the end of text, no need to read, */
             s = (s + 1) & (N - 1);
             r = (r + 1) & (N - 1);
@@ -328,7 +329,7 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
                 insert_node(sp, r);
         }
     } while (len > 0);   /* until length of string to be processed is zero */
-    
+
     if (code_buf_ptr > 1) {    /* Send remaining code. */
         for (i = 0; i < code_buf_ptr; i++)
             if (dst < dstend)
@@ -336,5 +337,6 @@ u_int8_t *compress_lzss( u_int8_t *dst, u_int32_t dstlen, u_int8_t *src, u_int32
             else
                 return (void *) 0;
     }
+
     return dst;
 }

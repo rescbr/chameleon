@@ -398,6 +398,24 @@ DT__GetName(Node *node)
 }
 
 //==============================================================================
+// Bungo
+Property *
+DT__GetProperty(Node *node, const char *name)
+{
+    Property *prop;
+    
+    for (prop = node->properties; prop; prop = prop->next)
+    {
+        if (strcmp(prop->name, name) == 0)
+        {
+            return prop;
+        }
+    }
+    
+    return NULL;
+}
+
+//==============================================================================
 
 Node *
 DT__FindNode(const char *path, bool createIfMissing)

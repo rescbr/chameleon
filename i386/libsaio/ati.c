@@ -45,10 +45,7 @@ static const char *chip_family_name[] = {
 	"Juniper",
 	"Redwood",
 	"Broadway",
-	//	"Madison",
-	//	"Park",
 	/* Northern Islands */
-	//	"Antilles",
 	"Barts",
 	"Caicos",
 	"Cayman",
@@ -56,10 +53,15 @@ static const char *chip_family_name[] = {
 	/* Southern Islands */
 	"Tahiti",
 	"Pitcairn",
-	//	"CapeVerde",
-	//	"Thames",
-	//	"Lombok",
-	//	"NewZealand",
+	"Verde",
+	"Oland",
+	"Hainan",
+	"Bonaire",
+	"Kaveri",
+	"Abini",
+	"Hawaii",
+	/* ... */
+	"Mullins",
 	""
 };
 
@@ -96,14 +98,14 @@ static card_config_t card_configs[] = {
 	{"Uakari",	4},
 	{"Zonalis",	6},
 	{"Alouatta",	4},
-	{"Hoolock",	3},
+	{"Hoolock",	1},
 	{"Vervet",	4},
 	{"Baboon",	3},
 	{"Eulemur",	3},
 	{"Galago",	2},
 	{"Colobus",	2},
 	{"Mangabey",	2},
-	{"Nomascus",	4},
+	{"Nomascus",	5},
 	{"Orangutan",	2},
 	/* AMD6000Controller */
 	{"Pithecia",	3},
@@ -2337,7 +2339,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 		return false;
 	}
 	// -------------------------------------------------
-	
+
 #if 0
 	uint64_t fb	= (uint32_t)card->fb;
 	uint64_t mmio	= (uint32_t)card->mmio;
@@ -2346,7 +2348,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	devprop_add_value(card->device, "ATY,RegisterSpaceOffset", &mmio, 8);
 	devprop_add_value(card->device, "ATY,IOSpaceOffset", &io, 8);
 #endif
-	
+
 	devprop_add_list(ati_devprop_list);
 
 	// -------------------------------------------------

@@ -525,7 +525,7 @@ static struct mem_controller_t dram_controllers[] = {
 	{ 0x8086, 0x29C0, "82G33/G31/P35/P31",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x29D0, "82Q33 Express",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x29E0, "82X38/X48 Express",		setup_p35, get_fsb_i965,	get_timings_p35		},
-//	{ 0x8086, 0x29F0, "3200/3210 Chipset",	NULL, NULL, NULL },
+    { 0x8086, 0x29F0, "3200/3210",			setup_p35, get_fsb_i965,	get_timings_p35		},
 
 	{ 0x8086, 0x2E00, "Eaglelake",		setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x2E10, "Q45/Q43",		setup_p35, get_fsb_i965,	get_timings_p35		},

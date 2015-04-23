@@ -333,7 +333,33 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_HASWELL_CRW_E_GT1,         HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_CRW_E_GT2,         HD_GRAPHICS }, /* ??? */
 	{GMA_HASWELL_CRW_E_GT3,         IRIS_5200 },
-	{GMA_HASWELL_CRW_M_GT2_PLUS_IG, HD_GRAPHICS }
+	{GMA_HASWELL_CRW_M_GT2_PLUS_IG, HD_GRAPHICS },
+    
+    /* Brodwell */
+    {GMA_BRODWELL_BDW_M_GT1,		HD_GRAPHICS },      /* 1602 */
+    {GMA_BRODWELL_BDW_M_GT2,		HD_GRAPHICS_5600},	/* 1612 */
+    {GMA_BRODWELL_BDW_M_GT3e,		IRIS_Pro_6200},     /* 1622 */
+    {GMA_BRODWELL_BDW_M_1632,		HD_GRAPHICS },		/* 1632 */
+    {GMA_BRODWELL_ULT_M_GT1,        HD_GRAPHICS },      /* 1606 */
+    {GMA_BRODWELL_ULT_M_GT2,        HD_GRAPHICS_5500},  /* 1616 */
+    {GMA_BRODWELL_ULT_M_GT3,		HD_GRAPHICS_6000},	/* 1626 */
+    {GMA_BRODWELL_ULT_M_1636,		HD_GRAPHICS },		/* 1636 */
+    {GMA_BRODWELL_BDW_S_GT1,        HD_GRAPHICS },      /* 160a */
+    {GMA_BRODWELL_BDW_S_GT2,		HD_GRAPHICS },		/* 161a */
+    {GMA_BRODWELL_BDW_S_GT3e,		IRIS_Pro_P6300},    /* 162a */
+    {GMA_BRODWELL_BDW_S_163A,		HD_GRAPHICS },		/* 163a */
+    {GMA_BRODWELL_LVT_M_GT1,        HD_GRAPHICS },      /* 160b */
+    {GMA_BRODWELL_LVT_M_GT2,        HD_GRAPHICS },      /* 161b */
+    {GMA_BRODWELL_LVT_M_GT3,		IRIS_6100 },		/* 162b */
+    {GMA_BRODWELL_LVT_M_163B,		HD_GRAPHICS },		/* 163b */
+    {GMA_BRODWELL_BDW_D_GT1,		HD_GRAPHICS },      /* 160d */
+    {GMA_BRODWELL_BDW_D_GT2,		HD_GRAPHICS },		/* 161d */
+    {GMA_BRODWELL_BDW_D_GT3,		HD_GRAPHICS },		/* 162d */
+    {GMA_BRODWELL_BDW_D_163D,		HD_GRAPHICS },		/* 163d */
+    {GMA_BRODWELL_ULX_M_GT1,        HD_GRAPHICS },      /* 160e */
+    {GMA_BRODWELL_ULX_M_GT2,		HD_GRAPHICS_5300},	/* 161e */
+    {GMA_BRODWELL_ULX_M_GT3,		HD_GRAPHICS },		/* 162e */
+    {GMA_BRODWELL_ULX_M_163E,		HD_GRAPHICS }		/* 163e */
 };
 
 #define GFX_DEVICES_LEN (sizeof(intel_gfx_chipsets) / sizeof(intel_gfx_chipsets[0]))
@@ -384,6 +410,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
     uint8_t ig_id_4k_mobile[4] =    { 0x03, 0x00, 0x66, 0x01 }; // MacMan
     uint8_t ig_id_4600[4] =         { 0x03, 0x00, 0x22, 0x0D }; // MacMan
     uint8_t ig_id_4600_mobile[4] =  { 0x06, 0x00, 0x26, 0x0A }; // MacMan
+    uint8_t ig_id_5500_mobile[4] =  { 0x00, 0x00, 0x16, 0x16 }; // MacMan
     uint8_t ig_platform_id[4] =     { 0x00, 0x00, 0x00, 0x00 }; // MacMan
     
 	devicepath = get_pci_dev_path(gma_dev);
@@ -482,14 +509,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Setting %s for snb-platform-id\n", value);
+                verbose("Setting 0x%s for snb-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,snb-platform-id", snb_id_3k, 4);
-                verbose("Using default snb-platform-id of 00030010\n");
+                verbose("Using default snb-platform-id of 0x00030010\n");
             }
             break;
             
@@ -515,14 +542,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Setting %s for snb-platform-id\n", value);
+                verbose("Setting 0x%s for snb-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,snb-platform-id", snb_id_3k_mobile, 4);
-                verbose("Using default snb-platform-id of 00030010\n");
+                verbose("Using default snb-platform-id of 0x00030010\n");
             }
             break;
 
@@ -535,25 +562,25 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for unsupported device id injection.\n", value);
+                verbose("Using 0x%s for unsupported device id injection.\n", value);
                 hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
             {
                 devprop_add_value(device, "device-id", hd3k_kmobile_device_id, 4); // MacMan Inject Mobile ID Instead of Patching Kext
-                verbose("Using default unsupported device id injection of 0126\n");
+                verbose("Using default unsupported device id injection of 0x0126\n");
             }
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for snb-platform-id\n", value);
+                verbose("Using 0x%s for snb-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,snb-platform-id", snb_id_3k, 4);
-                verbose("Using default snb-platform-id of 00030010\n");
+                verbose("Using default snb-platform-id of 0x00030010\n");
             }
             break;
             
@@ -580,14 +607,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Setting %s for snb-platform-id\n", value);
+                verbose("Setting 0x%s for snb-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,snb-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,snb-platform-id", snb_id_3k_mobile, 4);
-                verbose("Using default snb-platform-id of 00010000\n");
+                verbose("Using default snb-platform-id of 0x00010000\n");
             }
             break;
             
@@ -603,14 +630,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4k, 4);
-                verbose("Using default ig-platform-id of 0166000a\n");
+                verbose("Using default ig-platform-id of 0x0166000a\n");
             }
             break;
             
@@ -626,14 +653,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4k_mobile, 4);
-                verbose("Using default ig-platform-id of 01660003\n");
+                verbose("Using default ig-platform-id of 0x01660003\n");
             }
             break;
 
@@ -662,14 +689,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             }
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4k, 4);
-                verbose("Using default ig-platform-id of 0166000a\n");
+                verbose("Using default ig-platform-id of 0x0166000a\n");
             }
             break;
             
@@ -685,14 +712,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600, 4);
-                verbose("Using default ig-platform-id of 0d220003\n");
+                verbose("Using default ig-platform-id of 0x0d220003\n");
             }
             break;
 
@@ -714,14 +741,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600_mobile, 4);
-                verbose("Using default ig-platform-id of 0a260006\n");
+                verbose("Using default ig-platform-id of 0x0a260006\n");
             }
             break;
 
@@ -771,25 +798,25 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for unsupported device id injection.\n", value);
+                verbose("Using 0x%s for unsupported device id injection.\n", value);
                 hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
             {
                 devprop_add_value(device, "device-id",  hd4600_device_id, 4); // MacMan Inject Supported ID Instead of Patching Kext
-                verbose("Using default unsupported device id injection of 0412\n");
+                verbose("Using default unsupported device id injection of 0x0412\n");
             }
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600, 4);
-                verbose("Using default ig-platform-id of 0d220003\n");
+                verbose("Using default ig-platform-id of 0x0d220003\n");
             }
             break;
             
@@ -799,7 +826,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for unsupported device id injection.\n", value);
+                verbose("Using 0x%s for unsupported device id injection.\n", value);
                 hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
@@ -810,14 +837,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             }
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600, 4);
-                verbose("Using default ig-platform-id of 0d220003\n");
+                verbose("Using default ig-platform-id of 0x0d220003\n");
             }
             break;
 
@@ -834,25 +861,61 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
             if (getValueForKey(kIGPDeviceID, &value, &len, &bootInfo->chameleonConfig))    // MacMan
             {
-                verbose("Using %s for unsupported device id injection.\n", value);
+                verbose("Using 0x%s for unsupported device id injection.\n", value);
                 hex2devprop(value, igp_device_id, 2);
                 devprop_add_value(device, "device-id",igp_device_id, 4);
             }
             else
             {
                 devprop_add_value(device, "device-id", hd4600_mobile_device_id, 4); // MacMan Inject Supported ID Instead of Patching Kext
-                verbose("Using default unsupported device id injection of 0416\n");
+                verbose("Using default unsupported device id injection of 0x0416\n");
             }
             if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
             {
-                verbose("Using %s for ig-platform-id\n", value);
+                verbose("Using 0x%s for ig-platform-id\n", value);
                 hex2devprop(value, ig_platform_id, 4);
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
             }
             else
             {
                 devprop_add_value(device, "AAPL,ig-platform-id", ig_id_4600_mobile, 4);
-                verbose("Using default ig-platform-id of 0a260006\n");
+                verbose("Using default ig-platform-id of 0x0a260006\n");
+            }
+            break;
+            
+            //
+            // Supported Broadwell Desktop Device IDs
+            //
+            
+            //
+            // Currently none available as of 2015-04-08
+            //
+            
+            //
+            // Supported Broadwell Mobile Device IDs
+            //
+        case GMA_BRODWELL_ULT_M_GT1:	// HD Graphics ??? found in kext
+        case GMA_BRODWELL_ULX_M_GT1:	// HD Graphics ??? found in kext
+        case GMA_BRODWELL_BDW_M_GT2:	// HD Graphics 5600 and found in kext
+        case GMA_BRODWELL_ULT_M_GT2:	// HD Graphics 5500 and found in kext
+        case GMA_BRODWELL_ULX_M_GT2:	// HD Graphics 5300 and found in kext
+        case GMA_BRODWELL_ULT_M_GT3:	// HD Graphics 6000 and found in kext
+        case GMA_BRODWELL_BDW_M_GT3e:	// Iris Pro 6200 and found in kext
+        case GMA_BRODWELL_LVT_M_GT3:	// Iris 6100 and found in kext
+            devprop_add_value(device, "built-in",           &BuiltIn, 1);
+            devprop_add_value(device, "class-code",         ClassFix, 4);
+            devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
+            devprop_add_value(device, "hda-gfx",            (uint8_t *)"onboard-1", 10);
+            if (getValueForKey(kIGPlatformID, &value, &len, &bootInfo->chameleonConfig))
+            {
+                verbose("Using 0x%s for ig-platform-id\n", value);
+                hex2devprop(value, ig_platform_id, 4);
+                devprop_add_value(device, "AAPL,ig-platform-id", ig_platform_id, 4);
+            }
+            else
+            {
+                devprop_add_value(device, "AAPL,ig-platform-id", ig_id_5500_mobile, 4);
+                verbose("Using default ig-platform-id of 0x16160000\n");
             }
             break;
 

@@ -1,6 +1,6 @@
 /*
  *  graphics.h
- *  
+ *
  *
  *  Created by fassl on 22.12.08.
  *  Copyright 2008 __MyCompanyName__. All rights reserved.
@@ -26,13 +26,10 @@ void drawColorRectangle( unsigned short x, unsigned short y, unsigned short widt
 void drawDataRectangle( unsigned short x, unsigned short y, unsigned short width, unsigned short height, unsigned char * data );
 int convertImage( unsigned short width, unsigned short height, const unsigned char *imageData, unsigned char **newImageData );
 
-int initGraphicsMode ();
+int initGraphicsMode();
 
 void drawCheckerBoard();
 
-void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data);
-
-void drawCheckerBoard();
 void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data);
 
 int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData);

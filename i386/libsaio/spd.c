@@ -30,14 +30,14 @@ static const char *spd_memory_types[] =
 	"RAM",          /* 00h  Undefined */
 	"FPM",          /* 01h  FPM */
 	"EDO",          /* 02h  EDO */
-	"",		/* 03h  PIPELINE NIBBLE */
+	"",             /* 03h  PIPELINE NIBBLE */
 	"SDRAM",        /* 04h  SDRAM */
-	"",		/* 05h  MULTIPLEXED ROM */
+	"",             /* 05h  MULTIPLEXED ROM */
 	"DDR SGRAM",	/* 06h  SGRAM DDR */
 	"DDR SDRAM",	/* 07h  SDRAM DDR */
 	"DDR2 SDRAM",   /* 08h  SDRAM DDR 2 */
-	"",		/* 09h  Undefined */
-	"",		/* 0Ah  Undefined */
+	"",             /* 09h  Undefined */
+	"",             /* 0Ah  Undefined */
 	"DDR3 SDRAM"	/* 0Bh  SDRAM DDR 3 */
 };
 
@@ -382,32 +382,84 @@ static void read_smb_intel(pci_dt_t *smbus_dev) {
 
 static struct smbus_controllers_t smbus_controllers[] = {
 
-	{0x8086, 0x1C22, "6 Series",                                read_smb_intel },
-	{0x8086, 0x1D22, "C600/X79 Series",                         read_smb_intel },
-	{0x8086, 0x1D70, "C600/X79 Series",                         read_smb_intel },
-	{0x8086, 0x1D71, "C608/C606/X79 Series",                    read_smb_intel },
-	{0x8086, 0x1D72, "C608",                                    read_smb_intel },
-	{0x8086, 0x1E22, "7 Series/C210 Series",                    read_smb_intel },
-	{0x8086, 0x2330, "DH89xxCC",                                read_smb_intel },
-	{0x8086, 0x2413, "82801AA",                                 read_smb_intel },
-	{0x8086, 0x2423, "82801BA/BAM",                             read_smb_intel },
-	{0x8086, 0x2443, "82801BA/BAM",                             read_smb_intel },
-	{0x8086, 0x2483, "82801CA/CAM",                             read_smb_intel },
-	{0x8086, 0x24C3, "82801DB/DBL/DBM (ICH4/ICH4-L/ICH4-M)",    read_smb_intel },
-	{0x8086, 0x24D3, "82801EB/ER (ICH5/ICH5R)",                 read_smb_intel },
-	{0x8086, 0x25A4, "6300ESB",                                 read_smb_intel },
-	{0x8086, 0x266A, "82801FB/FBM/FR/FW/FRW (ICH6 Family)",     read_smb_intel },
-	{0x8086, 0x269B, "631xESB/632xESB/3100",                    read_smb_intel },
-	{0x8086, 0x27DA, "N10/ICH 7 Family",                        read_smb_intel },
-	{0x8086, 0x283E, "82801H (ICH8 Family) ",                   read_smb_intel },
-	{0x8086, 0x2930, "82801I (ICH9 Family)",                    read_smb_intel },
-	{0x8086, 0x3A30, "82801JI (ICH10 Family)",                  read_smb_intel },
-	{0x8086, 0x3A60, "82801JD/DO (ICH10 Family)",               read_smb_intel },
-	{0x8086, 0x3B30, "5 Series/3400 Series",                    read_smb_intel },
-	{0x8086, 0x5032, "EP80579",                                 read_smb_intel },
-	{0x8086, 0x8C22, "8 Series/C220",                           read_smb_intel },
-	{0x8086, 0x9C22, "Lynx Point-LP",                           read_smb_intel }
-
+    {0x8086, 0x1C22, "6 Series/C200 Series",                    read_smb_intel },
+    {0x8086, 0x1C41, "Mobile 6 Series",                         read_smb_intel },
+    {0x8086, 0x1C42, "6 Series/C200 Series",                    read_smb_intel },
+    {0x8086, 0x1C43, "Mobile 6 Series",                         read_smb_intel },
+    {0x8086, 0x1C44, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C46, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C47, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C49, "Mobile 6 Series",                         read_smb_intel },
+    {0x8086, 0x1C4A, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C4B, "Mobile 6 Series",                         read_smb_intel },
+    {0x8086, 0x1C4C, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C4D, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C4E, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C4F, "Mobile 6 Series",                         read_smb_intel },
+    {0x8086, 0x1C50, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1C52, "6 Series/C202 Series",                    read_smb_intel },
+    {0x8086, 0x1C54, "6 Series/C204 Series",                    read_smb_intel },
+    {0x8086, 0x1C56, "6 Series/C206 Series",                    read_smb_intel },
+    {0x8086, 0x1C5C, "6 Series",                                read_smb_intel },
+    {0x8086, 0x1D22, "C600/X79 Series",                         read_smb_intel },
+    {0x8086, 0x1D41, "C600/X79 Series",                         read_smb_intel },
+    {0x8086, 0x1D70, "C600/X79 Series",                         read_smb_intel },
+    {0x8086, 0x1D71, "C608/C606/X79 series",                    read_smb_intel },
+    {0x8086, 0x1D72, "C608",                                    read_smb_intel },
+    {0x8086, 0x1E22, "7 Series/C210 Series",                    read_smb_intel },
+    {0x8086, 0x1E42, "7 Series",                                read_smb_intel },
+    {0x8086, 0x1E43, "7 Series",                                read_smb_intel },
+    {0x8086, 0x1E44, "7 Series",                                read_smb_intel },
+    {0x8086, 0x1E55, "Mobile 7 Series",                         read_smb_intel },
+    {0x8086, 0x1E56, "7 Series",                                read_smb_intel },
+    {0x8086, 0x1E57, "Mobile 7 Series",                         read_smb_intel },
+    {0x8086, 0x1E58, "Mobile 7 Series",                         read_smb_intel },
+    {0x8086, 0x1E59, "Mobile 7 Series",                         read_smb_intel },
+    {0x8086, 0x1E5D, "Mobile 7 Series",                         read_smb_intel },
+    {0x8086, 0x2330, "DH89xxCC",                                read_smb_intel },
+    {0x8086, 0x2413, "82801AA",                                 read_smb_intel },
+    {0x8086, 0x2423, "82801AB",                                 read_smb_intel },
+    {0x8086, 0x2443, "82801BA/BAM",                             read_smb_intel },
+    {0x8086, 0x2483, "82801CA/CAM",                             read_smb_intel },
+    {0x8086, 0x24C3, "82801DB/DBL/DBM (ICH4/ICH4-L/ICH4-M)",    read_smb_intel },
+    {0x8086, 0x24D3, "82801EB/ER (ICH5/ICH5R)",                 read_smb_intel },
+    {0x8086, 0x25A4, "6300ESB",                                 read_smb_intel },
+    {0x8086, 0x266A, "82801FB/FBM/FR/FW/FRW (ICH6 Family)",     read_smb_intel },
+    {0x8086, 0x2670, "631xESB/632xESB/3100",                    read_smb_intel },
+    {0x8086, 0x269B, "631xESB/632xESB/3100",                    read_smb_intel },
+    {0x8086, 0x27B9, "82801GBM (ICH7-M)",                       read_smb_intel },
+    {0x8086, 0x27BD, "82801GHM (ICH7-M DH)",                    read_smb_intel },
+    {0x8086, 0x27DA, "82801GB/GBM/GR/GH/GHM (ICH7 Family)",     read_smb_intel },
+    {0x8086, 0x2811, "82801HEM (ICH8M-E)",                      read_smb_intel },
+    {0x8086, 0x2815, "82801HM (ICH8M)",                         read_smb_intel },
+    {0x8086, 0x283E, "82801H (ICH8 Family) ",                   read_smb_intel },
+    {0x8086, 0x2916, "82801IR (ICH9R)",                         read_smb_intel },
+    {0x8086, 0x2930, "82801I (ICH9 Family)",                    read_smb_intel },
+    {0x8086, 0x3A18, "82801JIB (ICH10)",                        read_smb_intel },
+    {0x8086, 0x3A30, "82801JI (ICH10 Family)",                  read_smb_intel },
+    {0x8086, 0x3A60, "82801JD/DO (ICH10 Family)",               read_smb_intel },
+    {0x8086, 0x3B00, "5 Series/3400 Series",                    read_smb_intel },
+    {0x8086, 0x3B01, "Mobile 5 Series",                         read_smb_intel },
+    {0x8086, 0x3B02, "5 Series",                                read_smb_intel },
+    {0x8086, 0x3B09, "Mobile 5 Series",                         read_smb_intel },
+    {0x8086, 0x3B30, "5 Series/3400 Series",                    read_smb_intel },
+    {0x8086, 0x5032, "EP80579",                                 read_smb_intel },
+    {0x8086, 0x8119, "6 Series/C200 Series",                    read_smb_intel },
+    {0x8086, 0x8119, "US15W",                                   read_smb_intel },
+    {0x8086, 0x8C22, "8 Series/C220 Series",                    read_smb_intel },
+    {0x8086, 0x8C44, "8 Series",                                read_smb_intel },
+    {0x8086, 0x8C4B, "Mobile 8 Series",                         read_smb_intel },
+    {0x8086, 0x8CA2, "9 Series",                                read_smb_intel },
+    {0x8086, 0x8D22, "X99/C610 Series",                         read_smb_intel },
+    {0x8086, 0x9C22, "8 Series",                                read_smb_intel },
+    {0x8086, 0x9C43, "8 Series",                                read_smb_intel },
+    {0x8086, 0x9CC1, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC2, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC3, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC5, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC6, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC7, "9 Series",                                read_smb_intel },
+    {0x8086, 0x9CC9, "9 Series",                                read_smb_intel }
 };
 
 // initial call : pci_dt = root_pci_dev;

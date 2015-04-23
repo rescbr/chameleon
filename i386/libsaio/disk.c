@@ -1039,8 +1039,10 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int * countPtr )
 			HFSGetDirEntry,
 			HFSGetFileBlock,
 			HFSGetUUID,
+			HFSGetDescription,
+			HFSFree,
 			0,
-			kBIOSDevTypeHardDrive);
+			kBIOSDevTypeHardDrive, 0);
 		bvr->next = map->bvr;
 		map->bvr = bvr;
 		map->bvrcnt++;
@@ -1077,6 +1079,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	{
 		return NULL;
 	}
+    bzero(buffer,BPS);
 
 	/* Check for alternate block size */
 	if (readBytes( biosdev, 0, 0, BPS, buffer ) != 0)
@@ -1095,6 +1098,7 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 			{
 				return NULL;
 			}
+            bzero(buffer,BPS);
 		}
 		factor = blksize / BPS;
 	}
@@ -1572,26 +1576,29 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 		
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion)) {
+		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+        {
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
-//			strncat(str, val, MIN(len, 4)); // removed since it breaks any OS X version greater than 10.9 i.e. Yosemite 10.10
             strncat(str, val, len);         // just copy the whole version number instead
 		} else {
 			valid = false;
 		}
 	}
 	
-	if(!valid) {
+	if(!valid)
+        {
 		int fh = -1;
 		sprintf(dirSpec, "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
 		fh = open(dirSpec, 0);
 
-		if (fh >= 0) {
+		if (fh >= 0)
+        {
 			valid = true;
 			bvr->OSisInstaller = true;
 			strcpy(bvr->OSVersion, "10.7"); // 10.7 +
+            close(fh);
 		} else {
 			close(fh);
 		}

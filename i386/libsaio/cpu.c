@@ -27,72 +27,72 @@
  */
 uint64_t timeRDTSC(void)
 {
-    int		attempts = 0;
-    uint64_t    latchTime;
-    uint64_t	saveTime,intermediate;
-    unsigned int timerValue, lastValue;
-    //boolean_t	int_enabled;
-    /*
-     * Table of correction factors to account for
-     *	 - timer counter quantization errors, and
-     *	 - undercounts 0..5
-     */
+	int		attempts = 0;
+	uint64_t    latchTime;
+	uint64_t	saveTime,intermediate;
+	unsigned int timerValue, lastValue;
+	//boolean_t	int_enabled;
+	/*
+	 * Table of correction factors to account for
+	 *	 - timer counter quantization errors, and
+	 *	 - undercounts 0..5
+	 */
 #define SAMPLE_CLKS_EXACT	(((double) CLKNUM) / 20.0)
 #define SAMPLE_CLKS_INT		((int) CLKNUM / 20)
 #define SAMPLE_NSECS		(2000000000LL)
 #define SAMPLE_MULTIPLIER	(((double)SAMPLE_NSECS)*SAMPLE_CLKS_EXACT)
 #define ROUND64(x)		((uint64_t)((x) + 0.5))
-    uint64_t	scale[6] = {
+	uint64_t	scale[6] = {
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-0)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-1)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-2)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-3)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-4)), 
 		ROUND64(SAMPLE_MULTIPLIER/(double)(SAMPLE_CLKS_INT-5))
-    };
-    
-    //int_enabled = ml_set_interrupts_enabled(FALSE);
-    
+	};
+
+	//int_enabled = ml_set_interrupts_enabled(FALSE);
+
 restart:
-    if (attempts >= 9) // increase to up to 9 attempts.
-    {
-        // This will flash-reboot. TODO: Use tscPanic instead.
-        printf("Timestamp counter calibation failed with %d attempts\n", attempts);
-    }
-    attempts++;
-    enable_PIT2();		// turn on PIT2
-    set_PIT2(0);		// reset timer 2 to be zero
-    latchTime = rdtsc64();	// get the time stamp to time 
-    latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
-    set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
-    saveTime = rdtsc64();	// now time how long a 20th a second is...
-    get_PIT2(&lastValue);
-    get_PIT2(&lastValue);	// read twice, first value may be unreliable
-    do {
+	if (attempts >= 9) // increase to up to 9 attempts.
+	{
+	        // This will flash-reboot. TODO: Use tscPanic instead.
+		printf("Timestamp counter calibation failed with %d attempts\n", attempts);
+	}
+	attempts++;
+	enable_PIT2();		// turn on PIT2
+	set_PIT2(0);		// reset timer 2 to be zero
+	latchTime = rdtsc64();	// get the time stamp to time
+	latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
+	set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
+	saveTime = rdtsc64();	// now time how long a 20th a second is...
+	get_PIT2(&lastValue);
+	get_PIT2(&lastValue);	// read twice, first value may be unreliable
+	do {
 		intermediate = get_PIT2(&timerValue);
 		if (timerValue > lastValue)
-        {
+		{
 			// Timer wrapped
 			set_PIT2(0);
 			disable_PIT2();
 			goto restart;
 		}
 		lastValue = timerValue;
-    } while (timerValue > 5);
-    printf("timerValue	  %d\n",timerValue);
-    printf("intermediate 0x%016llx\n",intermediate);
-    printf("saveTime	  0x%016llx\n",saveTime);
+	} while (timerValue > 5);
+	printf("timerValue	  %d\n",timerValue);
+	printf("intermediate 0x%016llx\n",intermediate);
+	printf("saveTime	  0x%016llx\n",saveTime);
     
-    intermediate -= saveTime;		// raw count for about 1/20 second
-    intermediate *= scale[timerValue];	// rescale measured time spent
-    intermediate /= SAMPLE_NSECS;	// so its exactly 1/20 a second
-    intermediate += latchTime;		// add on our save fudge
+	intermediate -= saveTime;		// raw count for about 1/20 second
+	intermediate *= scale[timerValue];	// rescale measured time spent
+	intermediate /= SAMPLE_NSECS;	// so its exactly 1/20 a second
+	intermediate += latchTime;		// add on our save fudge
     
-    set_PIT2(0);			// reset timer 2 to be zero
-    disable_PIT2();			// turn off PIT 2
+	set_PIT2(0);			// reset timer 2 to be zero
+	disable_PIT2();			// turn off PIT 2
 
-    //ml_set_interrupts_enabled(int_enabled);
-    return intermediate;
+	//ml_set_interrupts_enabled(int_enabled);
+	return intermediate;
 }
 
 /*
@@ -106,7 +106,7 @@ static uint64_t measure_tsc_frequency(void)
 	unsigned long pollCount;
 	uint64_t retval = 0;
 	int i;
-	
+
 	/* Time how many TSC ticks elapse in 30 msec using the 8254 PIT
 	 * counter 2. We run this loop 3 times to make sure the cache
 	 * is hot and we take the minimum delta from all of the runs.
@@ -126,18 +126,18 @@ static uint64_t measure_tsc_frequency(void)
 		/* The poll loop must have run at least a few times for accuracy */
 		if (pollCount <= 1) {
 			continue;
-        }
+		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the TSC delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
 		if ((tscEnd - tscStart) <= CALIBRATE_TIME_MSEC) {
 			continue;
-        }
+		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
 		if ( (tscEnd - tscStart) < tscDelta ) {
 			tscDelta = tscEnd - tscStart;
-        }
+		}
 	}
 	/* tscDelta is now the least number of TSC ticks the processor made in
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
@@ -146,7 +146,7 @@ static uint64_t measure_tsc_frequency(void)
 	 * Hz so we need to convert our milliseconds to seconds. Since we're
 	 * dividing by the milliseconds, we simply multiply by 1000.
 	 */
-	
+
 	/* Unlike linux, we're not limited to 32-bit, but we do need to take care
 	 * that we're going to multiply by 1000 first so we do need at least some
 	 * arithmetic headroom. For now, 32-bit should be enough.
@@ -176,7 +176,7 @@ static uint64_t measure_aperf_frequency(void)
 	unsigned long pollCount;
 	uint64_t retval = 0;
 	int i;
-	
+
 	/* Time how many APERF ticks elapse in 30 msec using the 8254 PIT
 	 * counter 2. We run this loop 3 times to make sure the cache
 	 * is hot and we take the minimum delta from all of the runs.
@@ -194,23 +194,23 @@ static uint64_t measure_aperf_frequency(void)
 		/* The poll loop must have run at least a few times for accuracy */
 		if (pollCount <= 1) {
 			continue;
-        }
+		}
 		/* The TSC must increment at LEAST once every millisecond.
 		 * We should have waited exactly 30 msec so the APERF delta should
 		 * be >= 30. Anything less and the processor is way too slow.
 		 */
 		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC) {
 			continue;
-        }
+		}
 		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
 		if ( (aperfEnd - aperfStart) < aperfDelta ) {
 			aperfDelta = aperfEnd - aperfStart;
-        }
+		}
 	}
 	/* mperfDelta is now the least number of MPERF ticks the processor made in
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
-	
+
 	if (aperfDelta > (1ULL<<32)) {
 		retval = 0;
 	} else {
@@ -285,29 +285,22 @@ void scan_cpu(PlatformInfo_t *p)
     +--------+----------------+--------+----+----+--------+--------+--------+
     |########|Extended family |Extmodel|####|type|familyid|  model |stepping|
     +--------+----------------+--------+----+----+--------+--------+--------+
-     
+
     EAX (AMD):
     31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
     +--------+----------------+--------+----+----+--------+--------+--------+
     |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
-   +--------+----------------+--------+----+----+--------+--------+--------+
+    +--------+----------------+--------+----+----+--------+--------+--------+
 */
-	
+
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-    // stepping = cpu_feat_eax & 0xF;
-	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);
-    // model = (cpu_feat_eax >> 4) & 0xF;
-	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);
-    // family = (cpu_feat_eax >> 8) & 0xF;
-	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);
-    // type = (cpu_feat_eax >> 12) & 0x3;
-	//p->CPU.Type		= bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);
-    // ext_model = (cpu_feat_eax >> 16) & 0xF;
-	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);
-    // ext_family = (cpu_feat_eax >> 20) & 0xFF;
-	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
-	
+	p->CPU.Stepping		= bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);     // stepping = cpu_feat_eax & 0xF;
+	p->CPU.Model		= bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);     // model = (cpu_feat_eax >> 4) & 0xF;
+	p->CPU.Family		= bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);    // family = (cpu_feat_eax >> 8) & 0xF;
+	//p->CPU.Type		= bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);   // type = (cpu_feat_eax >> 12) & 0x3;
+	p->CPU.ExtModel		= bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);   // ext_model = (cpu_feat_eax >> 16) & 0xF;
+	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);   // ext_family = (cpu_feat_eax >> 20) & 0xFF;
 	p->CPU.Model += (p->CPU.ExtModel << 4);
 	
 	if (p->CPU.Vendor == CPUID_VENDOR_INTEL &&
@@ -388,7 +381,7 @@ void scan_cpu(PlatformInfo_t *p)
 	if (p->CPU.NoThreads > p->CPU.NoCores) {
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
-	
+
 	tscFrequency = measure_tsc_frequency();
 	/* if usual method failed */
 	if ( tscFrequency < 1000 ) { //TEST
@@ -396,7 +389,7 @@ void scan_cpu(PlatformInfo_t *p)
 	}
 	fsbFrequency = 0;
 	cpuFrequency = 0;
-	
+
 	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((p->CPU.Family == 0x06) || (p->CPU.Family == 0x0f))) {
 		int intelCPU = p->CPU.Model;
 		if ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)) {
@@ -416,7 +409,8 @@ void scan_cpu(PlatformInfo_t *p)
                     p->CPU.Model == CPU_MODEL_HASWELL       ||
 					p->CPU.Model == CPU_MODEL_HASWELL_SVR   ||
 					p->CPU.Model == CPU_MODEL_HASWELL_ULT   ||
-					p->CPU.Model == CPU_MODEL_CRYSTALWELL )){
+					p->CPU.Model == CPU_MODEL_CRYSTALWELL   ||
+					p->CPU.Model == CPU_MODEL_BROADWELL )){
 				msr = rdmsr64(MSR_PLATFORM_INFO);
 //				DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
 				bus_ratio_max = bitfield(msr, 15, 8);	//MacMan: Changed bitfield to match Apple tsc.c
@@ -457,6 +451,7 @@ void scan_cpu(PlatformInfo_t *p)
                     case CPU_MODEL_HASWELL:         // Intel Core i3, i5, i7, Xeon E3 LGA1050 (22nm)
                     case CPU_MODEL_HASWELL_ULT:
                     case CPU_MODEL_CRYSTALWELL:
+                    case CPU_MODEL_BROADWELL:
 					{
 						msr = rdmsr64(MSR_IA32_PERF_STATUS);
 						currcoef = bitfield(msr, 15, 8);

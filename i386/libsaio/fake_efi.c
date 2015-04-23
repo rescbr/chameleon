@@ -93,6 +93,8 @@ EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
 Node *gEfiConfigurationTableNode = NULL;
 
+// ==========================================================================
+
 extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const *alias)
 {
 	EFI_UINTN i = 0;
@@ -145,6 +147,8 @@ extern EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char
 	}
 	return EFI_UNSUPPORTED;
 }
+
+// ==========================================================================
 
 //Azi: crc32 done in place, on the cases were it wasn't.
 /*static inline void fixupEfiSystemTableCRC32(EFI_SYSTEM_TABLE_64 *efiSystemTable)
@@ -572,9 +576,9 @@ void setupEfiDeviceTree(void)
 	node = DT__AddChild(node, "efi");
     /* Bungo
      if (archCpuType == CPU_TYPE_I386) {
-     DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
+        DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (char*)FIRMWARE_ABI_32_PROP_VALUE);
      } else { */
-    DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
+        DT__AddProperty(node, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (char *)FIRMWARE_ABI_64_PROP_VALUE);
     //	}
     
     DT__AddProperty(node, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);

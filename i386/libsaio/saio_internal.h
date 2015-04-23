@@ -81,8 +81,7 @@ extern void   finalizeBootStruct(void);
 /* cache.c */
 extern void   CacheReset();
 extern void   CacheInit(CICell ih, long blockSize);
-extern long   CacheRead(CICell ih, char *buffer, long long offset,
-                        long length, long cache);
+extern long   CacheRead(CICell ih, char *buffer, long long offset, long length, long cache);
 
 /* console.c */
 extern bool   gVerboseMode;

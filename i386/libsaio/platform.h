@@ -30,38 +30,49 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_88			9
 #define CPUID_MAX			10
 
-#define CPU_MODEL_PRESCOTT		0x03			// Celeron D, Pentium 4 (90nm)
-#define CPU_MODEL_NOCONA		0x04			// Xeon Nocona, Irwindale (90nm)
-#define CPU_MODEL_PRESLER		0x06			// Pentium 4, Pentium D (65nm)
-#define CPU_MODEL_PENTIUM_M		0x09			// Banias
-#define CPU_MODEL_DOTHAN		0x0D			// Dothan
-#define CPU_MODEL_YONAH			0x0E			// Sossaman, Yonah
-#define CPU_MODEL_MEROM			0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
-#define CPU_MODEL_CONROE		0x0F			// 
-#define CPU_MODEL_CELERON		0x16			// 
-#define CPU_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
-#define CPU_MODEL_WOLFDALE		0x17			// 
-#define CPU_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
-#define CPU_MODEL_ATOM			0x1C			// Pineview
-#define CPU_MODEL_XEON_MP		0x1D			// MP 7400
-#define CPU_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
-#define CPU_MODEL_DALES			0x1F			// Havendale, Auburndale
+#define CPU_MODEL_ANY               0x00
+#define CPU_MODEL_UNKNOWN           0x01
+#define CPU_MODEL_PRESCOTT          0x03			// Celeron D, Pentium 4 (90nm)
+#define CPU_MODEL_NOCONA            0x04			// Xeon Nocona, Irwindale (90nm)
+#define CPU_MODEL_PRESLER           0x06			// Pentium 4, Pentium D (65nm)
+#define CPU_MODEL_PENTIUM_M         0x09			// Banias
+#define CPU_MODEL_DOTHAN            0x0D			// Dothan
+#define CPU_MODEL_YONAH             0x0E			// Sossaman, Yonah
+#define CPU_MODEL_MEROM             0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
+#define CPU_MODEL_CONROE            0x0F			//
+#define CPU_MODEL_CELERON           0x16			//
+#define CPU_MODEL_PENRYN            0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
+#define CPU_MODEL_WOLFDALE          0x17			//
+#define CPU_MODEL_NEHALEM           0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
+#define CPU_MODEL_ATOM              0x1C			// Pineview
+#define CPU_MODEL_XEON_MP           0x1D			// MP 7400
+#define CPU_MODEL_FIELDS            0x1E			// Lynnfield, Clarksfield, Jasper Forest
+#define CPU_MODEL_DALES             0x1F			// Havendale, Auburndale
 #define CPU_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
-#define CPU_MODEL_ATOM_SAN		0x26			// Lincroft
-#define CPU_MODEL_LINCROFT		0x27			// 
+#define CPU_MODEL_ATOM_SAN          0x26			// Lincroft
+#define CPU_MODEL_LINCROFT          0x27			//
 #define CPU_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
-#define CPU_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
-#define CPU_MODEL_JAKETOWN		0x2D			// Sandy Bridge-E, Sandy Bridge-EP
+#define CPU_MODEL_WESTMERE          0x2C			// Gulftown, Westmere-EP, Westmere-WS
+#define CPU_MODEL_JAKETOWN          0x2D			// Sandy Bridge-E, Sandy Bridge-EP
 #define CPU_MODEL_NEHALEM_EX		0x2E			// Beckton
 #define CPU_MODEL_WESTMERE_EX		0x2F			// Westmere-EX
-#define CPU_MODEL_ATOM_2000		0x36			// Cedarview
-#define CPU_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
-#define CPU_MODEL_HASWELL		0x3C			// Haswell DT
+#define CPU_MODEL_ATOM_2000         0x36			// Cedarview / Saltwell
+#define CPU_MODEL_SILVERMONT		0x37			// Atom Silvermont
+#define CPU_MODEL_IVYBRIDGE         0x3A			// Ivy Bridge
+#define CPU_MODEL_HASWELL           0x3C			// Haswell DT
+#define CPU_MODEL_BROADWELL         0x3D			// Broadwell / Core-AVX2
 #define CPU_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
-#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell MB
+#define CPU_MODEL_HASWELL_SVR		0x3F			// Haswell Server
 //#define CPU_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPU_MODEL_HASWELL_ULT		0x45			// Haswell ULT
-#define CPU_MODEL_CRYSTALWELL		0x46			// Haswell ULX
+#define CPU_MODEL_CRYSTALWELL		0x46			// Crystal Well
+// 4A silvermont / atom
+#define CPU_MODEL_AVOTON            0x4D			// Silvermont/Avoton Atom C2000
+// 4E Core???
+#define CPU_MODEL_BRODWELL_SVR		0x4F			// Broadwell Server
+#define CPU_MODEL_BRODWELL_MSVR		0x56			// Broadwell Micro Server
+// 5A silvermont / atom
+// 5D silvermont / atom
 
 /* CPU Features */
 #define CPU_FEATURE_MMX			0x00000001		// MMX Instruction Set
@@ -98,6 +109,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define SMB_MEM_TYPE_DDR2		19
 #define SMB_MEM_TYPE_FBDIMM		20
 #define SMB_MEM_TYPE_DDR3		24			// Supported in 10.5.6+ AppleSMBIOS
+#define SMB_MEM_TYPE_DDR4		26
 
 /* Memory Configuration Types */ 
 #define SMB_MEM_CHANNEL_UNKNOWN		0
@@ -131,10 +143,13 @@ typedef struct _RamSlotInfo_t
 
 //==============================================================================
 
-typedef struct _PlatformInfo_t {
+typedef struct _PlatformInfo_t
+{
 	struct CPU {
 		uint32_t		Features;				// CPU Features like MMX, SSE2, VT, MobileCPU
 		uint32_t		Vendor;					// Vendor
+		uint32_t		CoresPerPackage;
+		uint32_t		LogicalPerPackage;
 		uint32_t		Signature;				// Processor Signature
 		uint32_t		Stepping;				// Stepping
 		//uint16_t		Type;					// Type
@@ -177,7 +192,7 @@ typedef struct _PlatformInfo_t {
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
-	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable... according ACPI2.0 (FACP: PM_Profile)
+	uint8_t				Type;			// System Type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;
 } PlatformInfo_t;
 

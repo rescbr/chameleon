@@ -28,9 +28,11 @@
 
 #include <vers.h>
 
- char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION " r" I386BOOT_CHAMELEONREVISION "\n"
+/*char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chameleon v" I386BOOT_CHAMELEONVERSION " r" I386BOOT_CHAMELEONREVISION "\n"
                     "Build date: " I386BOOT_BUILDDATE "\n"
-                    "%dMB memory\n";
+                    "%dMB memory\n";*/
+
+char bootBanner[] = "\nDarwin/x86 boot v" I386BOOT_VERSION " - Chimera v4.1.0\n" "Build date: " I386BOOT_BUILDDATE "\n" "%dMB memory\n";
 
 char bootPrompt[] =
     "Press Enter to start up Darwin/x86 with no options, or you can:\n"

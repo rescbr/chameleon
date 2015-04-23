@@ -109,14 +109,14 @@ typedef struct Boot_Video	Boot_Video;
 
 /* Snapshot constants of previous revisions that are supported */
 
-#define kBootArgsEfiMode32		32
-#define kBootArgsEfiMode64		64
+#define kBootArgsEfiMode32              32
+#define kBootArgsEfiMode64              64
 
 typedef struct boot_args {
     uint16_t    Revision;	/* Revision of boot_args structure */
     uint16_t    Version;	/* Version of boot_args structure */
 
-    uint8_t     efiMode;    /* 32 = 32-bit, 64 = 64-bit */
+    uint8_t     efiMode;    /* 32 means 32-bit mode, 64 means 64-bit mode */
     uint8_t     debugMode;  /* Bit field with behavior changes */
     uint8_t     __reserved1[2];
 
@@ -178,7 +178,7 @@ typedef struct boot_args_pre_lion {
     uint32_t    efiRuntimeServicesPageCount;
     uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
 
-    uint8_t     efiMode;       /* 32 = 32-bit, 64 = 64-bit */
+    uint8_t     efiMode;       /* 32 means 32-bit mode, 64 means 64-bit mode */
     uint8_t     __reserved1[3];
     uint32_t    __reserved2[1];
     uint32_t    performanceDataStart; /* physical address of log */

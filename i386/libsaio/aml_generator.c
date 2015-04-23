@@ -67,7 +67,8 @@ void aml_destroy_node(AML_CHUNK* node)
 	{
 		AML_CHUNK* next = child->Next;
 
-		if (child->Buffer) {
+		if (child->Buffer)
+        {
 			free(child->Buffer);
 		}
 		free(child);
@@ -76,7 +77,8 @@ void aml_destroy_node(AML_CHUNK* node)
 	}
 
 	// Free node
-	if (node->Buffer) {
+	if (node->Buffer)
+	{
 		free(node->Buffer);
 	}
 
@@ -87,7 +89,8 @@ AML_CHUNK* aml_add_buffer(AML_CHUNK* parent, char* buffer, uint32_t size)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+	{
 		node->Type = AML_CHUNK_NONE;
 		node->Length = (uint16_t)size;
 		node->Buffer = malloc(node->Length);
@@ -101,7 +104,8 @@ AML_CHUNK* aml_add_byte(AML_CHUNK* parent, uint8_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+	{
 		node->Type = AML_CHUNK_BYTE;
 		node->Length = 1;
 		node->Buffer = malloc(node->Length);
@@ -114,7 +118,8 @@ AML_CHUNK* aml_add_word(AML_CHUNK* parent, uint16_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+	{
 		node->Type = AML_CHUNK_WORD;
 		node->Length = 2;
 		node->Buffer = malloc(node->Length);
@@ -128,7 +133,8 @@ AML_CHUNK* aml_add_dword(AML_CHUNK* parent, uint32_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+	{
 		node->Type = AML_CHUNK_DWORD;
 		node->Length = 4;
 		node->Buffer = malloc(node->Length);
@@ -144,7 +150,8 @@ AML_CHUNK* aml_add_qword(AML_CHUNK* parent, uint64_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+	{
 		node->Type = AML_CHUNK_QWORD;
 		node->Length = 8;
 		node->Buffer = malloc(node->Length);
@@ -162,7 +169,8 @@ AML_CHUNK* aml_add_qword(AML_CHUNK* parent, uint64_t value)
 
 uint32_t aml_fill_simple_name(char* buffer, char* name)
 {
-	if (strlen(name) < 4) {
+	if (strlen(name) < 4)
+    {
 		verbose("aml_fill_simple_name: simple name %s has incorrect lengh! Must be 4.\n", name);
 		return 0;
 	}
@@ -175,7 +183,8 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 	int len, offset, count;
 	uint32_t root = 0;
 
-	if (!node) {
+	if (!node)
+    {
 		return 0;
 	}
 
@@ -183,16 +192,19 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 	offset = 0;
 	count = len >> 2;
 
-	if ((len % 4) > 1 || count == 0) {
+	if ((len % 4) > 1 || count == 0)
+    {
 		verbose("aml_fill_name: pathname %s has incorrect length! Must be 4, 8, 12, 16, etc...\n", name);
 		return 0;
 	}
 
-	if (((len % 4) == 1) && (name[0] == '\\')) {
+	if (((len % 4) == 1) && (name[0] == '\\'))
+    {
 		root++;
 	}
 
-	if (count == 1) {
+	if (count == 1)
+    {
 		node->Length = (uint16_t)(4 + root);
 		node->Buffer = malloc(node->Length+4);
 		memcpy(node->Buffer, name, 4 + root);
@@ -200,7 +212,8 @@ uint32_t aml_fill_name(AML_CHUNK* node, char* name)
 		return (uint32_t)offset;
 	}
 
-	if (count == 2) {
+	if (count == 2)
+    {
 		node->Length = 2 + 8;
 		node->Buffer = malloc(node->Length+4);
 		node->Buffer[offset++] = 0x5c; // Root Char
@@ -224,7 +237,8 @@ AML_CHUNK* aml_add_scope(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_SCOPE;
 
 		aml_fill_name(node, name);
@@ -236,7 +250,8 @@ AML_CHUNK* aml_add_name(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_NAME;
 
 		aml_fill_name(node, name);
@@ -248,7 +263,8 @@ AML_CHUNK* aml_add_method(AML_CHUNK* parent, char* name, uint8_t args)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		unsigned int offset = aml_fill_name(node, name);
 		node->Type = AML_CHUNK_METHOD;
 
@@ -263,7 +279,8 @@ AML_CHUNK* aml_add_package(AML_CHUNK* parent)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_PACKAGE;
 
 		node->Length = 1;
@@ -276,7 +293,8 @@ AML_CHUNK* aml_add_alias(AML_CHUNK* parent, char* name1, char* name2)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_ALIAS;
 
 		node->Length = 8;
@@ -292,7 +310,8 @@ AML_CHUNK* aml_add_return_name(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_RETURN;
 		aml_fill_name(node, name);
 	}
@@ -304,7 +323,8 @@ AML_CHUNK* aml_add_return_byte(AML_CHUNK* parent, uint8_t value)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_RETURN;
 		aml_add_byte(node, value);
 	}
@@ -316,7 +336,8 @@ AML_CHUNK* aml_add_device(AML_CHUNK* parent, char* name)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_DEVICE;
 		aml_fill_name(node, name);
 	}
@@ -328,7 +349,8 @@ AML_CHUNK* aml_add_local0(AML_CHUNK* parent)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_LOCAL0;
 		node->Length = 1;
 	}
@@ -340,7 +362,8 @@ AML_CHUNK* aml_add_store(AML_CHUNK* parent)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_STORE_OP;
 		node->Length = 1;
 	}
@@ -352,7 +375,8 @@ AML_CHUNK* aml_add_byte_buffer(AML_CHUNK* parent, char* data, uint32_t size)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		int offset = 0;
 		node->Type = AML_CHUNK_BUFFER;
 		node->Length = (uint8_t)(size + 2);
@@ -369,16 +393,17 @@ AML_CHUNK* aml_add_string_buffer(AML_CHUNK* parent, char* StringBuf)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		unsigned int offset = 0;
 		unsigned int len = strlen(StringBuf);
 		node->Type = AML_CHUNK_BUFFER;
 		node->Length = (uint8_t)(len + 3);
 		node->Buffer = malloc (node->Length);
 		node->Buffer[offset++] = AML_CHUNK_BYTE;
-		node->Buffer[offset++] = (char)len;
+		node->Buffer[offset++] = (char)(len+1);
 		memcpy(node->Buffer+offset, StringBuf, len);
-		node->Buffer[offset+len] = '\0';
+//		node->Buffer[offset+len] = '\0';
 	}
 
 	return node;
@@ -388,13 +413,14 @@ AML_CHUNK* aml_add_string(AML_CHUNK* parent, char* StringBuf)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		int len = strlen(StringBuf);
 		node->Type = AML_CHUNK_STRING;
 		node->Length = (uint8_t)(len + 1);
-		node->Buffer = malloc (len);
+		node->Buffer = malloc (len+1);
 		memcpy(node->Buffer, StringBuf, len);
-		node->Buffer[len] = '\0';
+//		node->Buffer[len] = '\0';
 	}
 
 	return node;
@@ -404,7 +430,8 @@ AML_CHUNK* aml_add_return(AML_CHUNK* parent)
 {
 	AML_CHUNK* node = aml_create_node(parent);
 
-	if (node) {
+	if (node)
+    {
 		node->Type = AML_CHUNK_RETURN;
 		//aml_add_byte(node, value);
 	}
@@ -426,13 +453,15 @@ uint8_t aml_get_size_length(uint32_t size)
 
 uint32_t aml_calculate_size(AML_CHUNK* node)
 {
-	if (node) {
+	if (node)
+    {
 		// Calculate child nodes size
 		AML_CHUNK* child = node->First;
 		uint8_t child_count = 0;
 
 		node->Size = 0;
-		while (child) {
+		while (child)
+        {
 			child_count++;
 
 			node->Size += (uint16_t)aml_calculate_size(child);
@@ -440,7 +469,8 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 			child = child->Next;
 		}
 
-		switch (node->Type) {
+		switch (node->Type)
+        {
 			case AML_CHUNK_NONE:
 			case AML_STORE_OP:
 			case AML_CHUNK_LOCAL0:
@@ -466,7 +496,8 @@ uint32_t aml_calculate_size(AML_CHUNK* node)
 				break;
 				
 			case AML_CHUNK_BYTE:
-				if (node->Buffer[0] == 0x0 || node->Buffer[0] == 0x1) {
+				if (node->Buffer[0] == 0x0 || node->Buffer[0] == 0x1)
+                {
 					node->Size += node->Length;
 				} else {
 					node->Size += 1 + node->Length;
@@ -529,7 +560,8 @@ uint32_t aml_write_qword(uint64_t value, char* buffer, uint32_t offset)
 
 uint32_t aml_write_buffer(const char* value, uint32_t size, char* buffer, uint32_t offset)
 {
-	if (size > 0) {
+	if (size > 0)
+    {
 		memcpy(buffer + offset, value, size);
 	}
 
@@ -538,7 +570,8 @@ uint32_t aml_write_buffer(const char* value, uint32_t size, char* buffer, uint32
 
 uint32_t aml_write_size(uint32_t size, char* buffer, uint32_t offset)
 {
-	if (size <= 0x3f) { /* simple 1 byte length in 6 bits */
+	if (size <= 0x3f) /* simple 1 byte length in 6 bits */
+    {
 		buffer[offset++] = (char)size;
 	} else if (size <= 0xfff) {
 		buffer[offset++] = 0x40 | (size & 0xf); /* 0x40 is type, 0x0X is first nibble of length */
@@ -559,11 +592,13 @@ uint32_t aml_write_size(uint32_t size, char* buffer, uint32_t offset)
 
 uint32_t aml_write_node(AML_CHUNK* node, char* buffer, uint32_t offset)
 {
-	if (node && buffer) {
+	if (node && buffer)
+    {
 		uint32_t old = offset;
 		AML_CHUNK* child = node->First;
 
-		switch (node->Type) {
+		switch (node->Type)
+        {
 			case AML_CHUNK_NONE:
 				offset = aml_write_buffer(node->Buffer, node->Length, buffer, offset);
 				break;

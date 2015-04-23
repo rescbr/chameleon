@@ -92,8 +92,8 @@ kPartTypePMBR		EQU  0xee			; On all GUID Partition Table disks a Protective MBR 
 										; in LBA 0 (that is, the first block) precedes the
 										; GUID Partition Table Header to maintain compatibility
 										; with existing tools that do not understand GPT partition structures.
-							  			; The Protective MBR has the same format as a legacy MBR
-					  					; and contains one partition entry with an OSType set to 0xEE
+										; The Protective MBR has the same format as a legacy MBR
+										; and contains one partition entry with an OSType set to 0xEE
 										; reserving the entire space used on the disk by the GPT partitions,
 										; including all headers.
 
@@ -283,7 +283,7 @@ find_boot:
 										; to boot an inactive but boot1h aware HFS+ partition
 										; by scanning the MBR partition entries again.
 
-.start_scan:							
+.start_scan:
     mov     cx, kPartCount          	; number of partition entries per table
 
 .loop:
@@ -322,7 +322,7 @@ find_boot:
 											        ; signature check.
     jmp     .tryToBoot
 
-.Pass2:    
+.Pass2:
     cmp	    BYTE [si + part.type], kPartTypeHFS		; In pass 2 we're going to find a HFS+ partition
                                                     ; equipped with boot1h in its boot record
                                                     ; regardless if it's active or not.
@@ -473,6 +473,7 @@ checkGPT:
     jmp	    SHORT initBootLoader    
     
 .gpt_continue:
+
     add	    si, bx									; advance SI to next partition entry
     loop    .gpt_loop								; loop through all partition entries	
 
@@ -519,7 +520,7 @@ loadBootSector:
 	je		.checkBootSignature
 	cmp		ax, kHFSPCaseSignature	; 'HX'
     je		.checkBootSignature
-	
+
 	;
 	; Looking for boot1f32 magic string.
 	;
@@ -535,7 +536,9 @@ loadBootSector:
     cmp     WORD [di + kSectorBytes - 2], kBootSignature
 
 .exit:
+
     popa
+
     ret
 
 
@@ -737,7 +740,7 @@ print_hex:
 
     popad
     ret
-	
+
 print_nibble:
     and     al, 0x0f
     add     al, '0'

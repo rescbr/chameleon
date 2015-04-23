@@ -15,6 +15,8 @@ int multiboot_partition_set=0;
 int multiboot_skip_partition=0;
 int multiboot_skip_partition_set=0;
 
+void boot(int biosdev);
+
 // Global multiboot info, if using multiboot.
 struct multiboot_info *gMI;
 
@@ -61,29 +63,7 @@ static long multiboot_LoadExtraDrivers(FileLoadDrivers_t FileLoadDrivers_p);
 // would be on the stack which would possibly be using way too much stack.
 void multiboot_to_boot(int multiboot_magic, struct multiboot_info *mi_orig)
 {
-    uint32_t bootdevice = hi_multiboot(multiboot_magic, mi_orig);
-    if(bootdevice != BAD_BOOT_DEVICE)
-    {
-        // boot only returns to do a chain load.
-        for(;;)
-        {   // NOTE: boot only uses the last byte (the drive number)
-            common_boot(bootdevice);
-            if(chainbootflag)
-                chainLoad();
-            else
-                waitThenReload();
-        }
-    }
-    // Avoid returning to high-memory address which isn't valid in the segment
-    // we are now in.
-    // Calling sleep() ensures the user ought to be able to use Ctrl+Alt+Del
-    // because the BIOS will have interrupts on.
-    for(;;)
-        sleep(10);
-    // NOTE: *IF* we needed to return we'd have to fix up our return address to
-    // be in low memory using the same trick as below.
-    // However, there doesn't seem to be any point in returning to assembly
-    // particularly when the remaining code merely halts the processor.
+    hi_multiboot(multiboot_magic, mi_orig);
 }
 
 void chainLoad()
@@ -344,6 +324,31 @@ uint32_t hi_multiboot(int multiboot_magic, struct multiboot_info *mi_orig)
     // Since we call multiboot ourselves, its return address will be correct.
     // That is unless it's inlined in which case it does not matter.
     uint32_t bootdevice = multiboot(multiboot_magic, mi_p);
+
+    if(bootdevice != BAD_BOOT_DEVICE)
+    {
+        // boot only returns to do a chain load.
+        for(;;)
+        {   // NOTE: boot only uses the last byte (the drive number)
+            boot(bootdevice);
+            if(chainbootflag)
+                chainLoad();
+            else
+                waitThenReload();
+        }
+    }
+
+    // Avoid returning to high-memory address which isn't valid in the segment
+    // we are now in.
+    // Calling sleep() ensures the user ought to be able to use Ctrl+Alt+Del
+    // because the BIOS will have interrupts on.
+    for(;;)
+        sleep(10);
+    // NOTE: *IF* we needed to return we'd have to fix up our return address to
+    // be in low memory using the same trick as below.
+    // However, there doesn't seem to be any point in returning to assembly
+    // particularly when the remaining code merely halts the processor.
+
     // We're about to exit and temporaryBootArgs will no longer be valid
     bootArgs = NULL;
     return bootdevice;

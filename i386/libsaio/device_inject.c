@@ -20,7 +20,7 @@
 #if DEBUG_INJECT
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)	msglog(x)
 #endif
 
 uint32_t devices_number = 1;
@@ -251,9 +251,11 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 	return 1;
 }
 
+// devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
-	char *buffer = (char*)malloc(string->length * 2);
+    int len = string->length * 2;
+    char *buffer = (char*)malloc(len);
 	char *ptr = buffer;
 
 	if(!buffer)
@@ -261,44 +263,68 @@ char *devprop_generate_string(DevPropString *string)
 		return NULL;
 	}
 
-	sprintf(buffer, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
+	snprintf(buffer, len, "%08x%08x%04x%04x", dp_swap32(string->length), string->WHAT2,
 			dp_swap16(string->numentries), string->WHAT3);
 	buffer += 24;
+    len -= 24;
 	int i = 0, x = 0;
 
 	while(i < string->numentries)
 	{
-		sprintf(buffer, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
+        if (!(i < DEV_PROP_DEVICE_MAX_ENTRIES)) {
+            break;
+        }
+        
+        if(!len) {
+            break;
+        }
+        
+        snprintf(buffer, len, "%08x%04x%04x", dp_swap32(string->entries[i]->length),
 				dp_swap16(string->entries[i]->numentries), string->entries[i]->WHAT2);
 		
 		buffer += 16;
-		sprintf(buffer, "%02x%02x%04x%08x%08x", string->entries[i]->acpi_dev_path.type,
+        len -= 16;
+		snprintf(buffer, len, "%02x%02x%04x%08x%08x", string->entries[i]->acpi_dev_path.type,
 				string->entries[i]->acpi_dev_path.subtype,
 				dp_swap16(string->entries[i]->acpi_dev_path.length),
 				string->entries[i]->acpi_dev_path._HID,
 				dp_swap32(string->entries[i]->acpi_dev_path._UID));
 
 		buffer += 24;
+        len -= 24;
 		for(x = 0;x < string->entries[i]->num_pci_devpaths; x++)
 		{
-			sprintf(buffer, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
+            if(!len) {
+                break;
+            }
+            snprintf(buffer, len, "%02x%02x%04x%02x%02x", string->entries[i]->pci_dev_path[x].type,
 					string->entries[i]->pci_dev_path[x].subtype,
 					dp_swap16(string->entries[i]->pci_dev_path[x].length),
 					string->entries[i]->pci_dev_path[x].function,
 					string->entries[i]->pci_dev_path[x].device);
 			buffer += 12;
+            len -= 12;
 		}
-		
-		sprintf(buffer, "%02x%02x%04x", string->entries[i]->path_end.type,
+        
+        if(!len) {
+            break;
+        }
+        
+        snprintf(buffer, len, "%02x%02x%04x", string->entries[i]->path_end.type,
 				string->entries[i]->path_end.subtype,
 				dp_swap16(string->entries[i]->path_end.length));
 		
 		buffer += 8;
+        len -= 8;
 		uint8_t *dataptr = string->entries[i]->data;
 		for(x = 0; (uint32_t)x < (string->entries[i]->length) - (24 + (6 * string->entries[i]->num_pci_devpaths)) ; x++)
 		{
-			sprintf(buffer, "%02x", *dataptr++);
-			buffer += 2;
+            if(!len) {
+                break;
+            }
+            snprintf(buffer, len, "%02x", *dataptr++);
+            buffer += 2;
+            len -= 2;
 		}
 		i++;
 	}

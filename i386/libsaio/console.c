@@ -91,8 +91,7 @@ void initBooterLog(void)
 	msgbuf = malloc(BOOTER_LOG_SIZE);
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
-//	msglog("%s\n", "Chimera 4.0.0 Branch of " "Chameleon " I386BOOT_CHAMELEONVERSION " (svn-r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
-    msglog("%s\n", "Chimera 4.0.1 Branch of Chameleon" " [" I386BOOT_BUILDDATE "]");
+    msglog("%s\n", "Chimera 4.1.0 Branch of Chameleon" " [" I386BOOT_BUILDDATE "]");
 }
 
 void msglog(const char * fmt, ...)
@@ -186,11 +185,13 @@ int printf(const char * fmt, ...)
 		// Kabyl: BooterLog
 		struct putc_info pi;
 
-		if (!msgbuf) {
+		if (!msgbuf)
+        {
 			return 0;
 		}
 
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+        {
 			return 0;
 		}
 		pi.str = cursor;
@@ -220,11 +221,13 @@ int verbose(const char * fmt, ...)
 		// Kabyl: BooterLog
 		struct putc_info pi;
 
-		if (!msgbuf) {
+		if (!msgbuf)
+        {
 			return 0;
 		}
 
-		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+		if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+        {
 			return 0;
 		}
 		pi.str = cursor;

@@ -109,8 +109,8 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_INTEL_PCH2,       "5 Series/3400 Series" },
 	{ HDA_INTEL_SCH,        "System Controller Hub (SCH Poulsbo)" },
     { HDA_INTEL_SCH2,       "9 Series" },
-	{ HDA_INTEL_LPT1,       "Lynx Point" },
-	{ HDA_INTEL_LPT2,       "Lynx Point" },
+	{ HDA_INTEL_LPT1,       "Wellsburg" },
+	{ HDA_INTEL_LPT2,       "Wellsburg" },
 	{ HDA_INTEL_LYNX,       "Lynx Point-LP" },
 	{ HDA_INTEL_LYNX2,      "Lynx Point-LP" },
 	//10de  NVIDIA Corporation
