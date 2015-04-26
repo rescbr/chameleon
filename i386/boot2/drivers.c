@@ -1020,6 +1020,12 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void *)binary, NULL, NULL, NULL);
 
+/* ================================================================ */
+
+	// Entry point
+
+/* ================================================================ */
+
 	ret = DecodeMachO(binary, rentry, raddr, rsize);
 	if (ret < 0 && archCpuType == CPU_TYPE_X86_64)
 	{

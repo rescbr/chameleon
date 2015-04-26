@@ -1928,6 +1928,7 @@ static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
 static int devprop_add_nvidia_template(DevPropDevice *device)
 {
 	char tmp[16];
+	DBG("devprop_add_nvidia_template\n");
 
 	if (!device)
 	{
@@ -2349,10 +2350,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
+
 	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t *)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t *)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t *)biosVersion, strlen(biosVersion) + 1);
+
 	devprop_add_value(device, "@0,display-cfg", (uint8_t *)&default_dcfg_0, DCFG0_LEN);
 	devprop_add_value(device, "@1,display-cfg", (uint8_t *)&default_dcfg_1, DCFG1_LEN);
 

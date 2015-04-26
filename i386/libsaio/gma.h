@@ -216,6 +216,7 @@ typedef struct{
 #define GMA_HASWELL_ULT_B_GT1      GFX_MODEL_CONSTRUCT(INTEL, 0x0A0B)
 #define GMA_HASWELL_ULT_B_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x0A1B)
 #define GMA_HASWELL_ULT_B_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x0A2B)
+
 #define GMA_HASWELL_ULT_E_GT1      GFX_MODEL_CONSTRUCT(INTEL, 0x0A0E) // Intel(R) HD Graphics
 #define GMA_HASWELL_ULT_E_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x0A1E) // Intel(R) HD Graphics 4400
 #define GMA_HASWELL_ULT_E_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x0A2E) // Haswell ULT E GT3
@@ -250,7 +251,7 @@ typedef struct{
 #define GMA_HASWELL_CRW_M_GT2_PLUS_IG    GFX_MODEL_CONSTRUCT(INTEL, 0x0D36) // Crystal Well Integrated Graphics Controller
 #define GMA_HASWELL_CRW_S_GT2_PLUS_IG    GFX_MODEL_CONSTRUCT(INTEL, 0x0D3A)
 
-/* Brodwell */
+/* Broadwell */
 #define GMA_BROADWELL_BDW_0bd0      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd0) // Intel Broadwell HD Graphics HAS GT0 Drivers // AppleIntelBDWGraphics.kext
 #define GMA_BROADWELL_BDW_0bd1      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd1) // Intel Broadwell HD Graphics HAS GT1 Drivers // AppleIntelBDWGraphics.kext
 #define GMA_BROADWELL_BDW_0bd2      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd2) // Intel Broadwell HD Graphics HAS GT2 Drivers // AppleIntelBDWGraphics.kext

@@ -196,7 +196,7 @@ typedef enum {
 	kCfgEnd
 } config_name_t;
 
-//radeon card (includes teh AtiConfig)
+//radeon card (includes the AtiConfig)
 typedef struct {
 	uint16_t		device_id;
 	uint32_t		subsys_id;

@@ -7,6 +7,9 @@
 
 #include "convert.h"
 
+
+/* ======================================================= */
+
 /** Transform a 16 bytes hexadecimal value UUID to a string */
 const char *getStringFromUUID(const EFI_CHAR8 *eUUID)
 {
@@ -20,6 +23,8 @@ const char *getStringFromUUID(const EFI_CHAR8 *eUUID)
 		    uuid[12],uuid[13],uuid[14],uuid[15]);
 	return msg ;
 }
+
+/* ======================================================= */
 
 /** Parse an UUID string into an (EFI_CHAR8 *) buffer */
 EFI_CHAR8 *getUUIDFromString(const char *source)
@@ -66,6 +71,8 @@ EFI_CHAR8 *getUUIDFromString(const char *source)
 	return uuid;
 }
 
+/* ======================================================= */
+
 /** XXX AsereBLN replace by strtoul */
 uint32_t ascii_hex_to_int(char *buff) 
 {
@@ -85,6 +92,8 @@ uint32_t ascii_hex_to_int(char *buff)
 	}
 	return	value;
 }
+
+/* ======================================================= */
 
 void *convertHexStr2Binary(const char *hexStr, int *outLength)
 {
@@ -151,6 +160,10 @@ void *convertHexStr2Binary(const char *hexStr, int *outLength)
 		return NULL;
 	}
 }
+
+/* ======================================================= */
+
+/* ======================================================= */
 
 // FIXME: can't use my original code here,
 // Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
