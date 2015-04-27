@@ -52,17 +52,18 @@
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "nvidia.h"
 #include "nvidia_helper.h"
 
 #ifndef DEBUG_NVIDIA
-#define DEBUG_NVIDIA 0
+	#define DEBUG_NVIDIA 0
 #endif
 
 #if DEBUG_NVIDIA
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 #define NVIDIA_ROM_SIZE				0x20000
@@ -93,8 +94,8 @@ const char *nvidia_name_1[]             =	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]          =	{ "AAPL,slot-name", "Slot-1"		 };
 
 static uint8_t default_NVCAP[]= {
-	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
+	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
+	0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
 	0x00, 0x00, 0x00, 0x00
 };
 

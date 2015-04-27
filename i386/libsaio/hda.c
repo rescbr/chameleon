@@ -66,17 +66,18 @@
 #include "pci_root.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "hda.h"
 //#include "aml_generator.h"
 
 #ifndef DEBUG_HDA
-#define DEBUG_HDA 0
+	#define DEBUG_HDA 0
 #endif
 
 #if DEBUG_HDA
-#define DBG(x...)  verbose(x)
+	#define DBG(x...)  verbose(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 extern uint32_t devices_number;

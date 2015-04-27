@@ -14,13 +14,13 @@
 #include "vers.h"
 
 #ifndef DEBUG_GUI
-#define DEBUG_GUI 0
+	#define DEBUG_GUI 0
 #endif
 
 #if DEBUG_GUI
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 #define IMG_REQUIRED -1

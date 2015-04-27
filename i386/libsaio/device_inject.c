@@ -14,13 +14,13 @@
 #include "convert.h"
 
 #ifndef DEBUG_INJECT
-#define DEBUG_INJECT 0
+	#define DEBUG_INJECT 0
 #endif
 
 #if DEBUG_INJECT
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 uint32_t	devices_number	= 1;
@@ -396,42 +396,6 @@ void devprop_free_string(DevPropString *string)
 
 	free(string);
 	string = NULL;
-}
-
-/* ======================================================= */
-
-
-/*******************************************************************
- * Decodes a sequence of 'len' hexadecimal chars from 'hex' into   *
- * a binary. returns -1 in case of error (i.e. badly formed chars) *
- *******************************************************************/
-int hex2bin( const char *hex, uint8_t *bin, int len )
-{
-	char	*p;
-	int	i;
-	char	buf[3];
-
-	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2)
-	{
-		printf("[ERROR] bin2hex input error\n");
-		return -1;
-	}
-
-	buf[2] = '\0';
-	p = (char *) hex;
-
-	for (i = 0; i < len; i++)
-	{
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
-		{
-			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
-			return -2;
-		}
-		buf[0] = *p++;
-		buf[1] = *p++;
-		bin[i] = (unsigned char) strtoul(buf, NULL, 16);
-	}
-	return 0;
 }
 
 /* ======================================================= */

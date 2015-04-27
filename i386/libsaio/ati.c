@@ -7,13 +7,13 @@
 
 #include "ati.h"
 #ifndef DEBUG_ATI
-#define DEBUG_ATI 0
+	#define DEBUG_ATI 0
 #endif
 
 #if DEBUG_ATI
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 /* vals */

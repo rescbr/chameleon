@@ -39,22 +39,23 @@
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "gma.h"
 #include "vbe.h"
 #include "graphics.h"
 
 #ifndef DEBUG_GMA
-#define DEBUG_GMA 0
+	#define DEBUG_GMA 0
 #endif
 
 #ifndef DEBUG_BDW
-#define DEBUG_BDW 1
+	#define DEBUG_BDW 1
 #endif
 
 #if DEBUG_GMA
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 static bool	doit	= false;
@@ -64,7 +65,7 @@ static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
 
 #if DEBUG_BDW
-static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[3]
+static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[2]
 #define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
 #endif
 
@@ -843,7 +844,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			}
 			else
 			{
-				uint32_t ig_platform_id = 0x161e0000; // set the default platform ig
+				uint32_t ig_platform_id = 0x16160000; // set the default platform ig
 				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
 			}
 

@@ -19,13 +19,13 @@
 #include "sl.h"
 
 #ifndef DEBUG_EFI
-#define DEBUG_EFI 0
+	#define DEBUG_EFI 0
 #endif
 
 #if DEBUG_EFI
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 extern void setup_pci_devs(pci_dt_t *pci_dt);

@@ -57,13 +57,17 @@
 #include "device_tree.h"
 
 #ifndef DEBUG_BOOT2
-#define DEBUG_BOOT2 0
+	#define DEBUG_BOOT2 0
+#endif
+
+#ifndef DEBUG_INTERRUPTS
+	#define DEBUG_INTERRUPTS 0
 #endif
 
 #if DEBUG_BOOT2
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 /*
@@ -77,7 +81,9 @@ bool		gEnableCDROMRescan;
 bool		gScanSingleDrive;
 bool		useGUI;
 
-static int	interruptsAvailable = 0;
+#if DEBUG_INTERRUPTS
+	static int	interruptsAvailable = 0;
+#endif
 
 static bool	gUnloadPXEOnExit = false;
 
@@ -446,12 +452,14 @@ void common_boot(int biosdev)
 	// Initialize boot-log
 	initBooterLog();
 
+#if DEBUG_INTERRUPTS
 	// Enable interrupts
 	interruptsAvailable = SetupInterrupts();
 	if (interruptsAvailable)
 	{
 		EnableInterrupts();
 	}
+#endif
 
 	// Initialize boot info structure.
 	initKernBootStruct();
@@ -856,10 +864,13 @@ void common_boot(int biosdev)
 		nbpUnloadBaseCode();
 	}
 
+#if DEBUG_INTERRUPTS
 	if (interruptsAvailable)
 	{
 		DisableInterrupts();
 	}
+#endif
+
 }
 
 /*!
