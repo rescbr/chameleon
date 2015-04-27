@@ -72,7 +72,7 @@ void initKernBootStruct( void )
 
 		// Get system memory map. Also update the size of the
 		// conventional/extended memory for backwards compatibility.
-		
+
 		bootInfo->memoryMapCount =
 			getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
 						  (unsigned long *) &bootInfo->convmem,
@@ -219,7 +219,7 @@ void finalizeBootStruct(void)
 	bootArgsPreLion->MemoryMapSize = bootArgs->MemoryMapSize;
 	bootArgsPreLion->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize;
 	bootArgsPreLion->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion;
-	
+
 	bootArgsPreLion->deviceTreeP = bootArgs->deviceTreeP;
 	bootArgsPreLion->deviceTreeLength = bootArgs->deviceTreeLength;
 
