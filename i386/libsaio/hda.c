@@ -94,31 +94,38 @@ static uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 static hda_controller_devices know_hda_controller[] = {
 	//8086  Intel Corporation
-	{ HDA_INTEL_OAK,	"Oaktrail"	/*, 0, 0 */ },
-	{ HDA_INTEL_BAY,	"BayTrail"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW1,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW2,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW3,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_CPT,	"Cougar Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_PATSBURG,	"Patsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_PPT1,	"Panther Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPT1,	"Lynx Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPT2,	"Lynx Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_WCPT,	"Wildcat Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_WELLS1,	"Wellsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_WELLS2,	"Wellsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPTLP1,	"Lynx Point-LP"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPTLP2,	"Lynx Point-LP"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801F,	"82801F"	/*, 0, 0 */ },
-	{ HDA_INTEL_63XXESB,	"631x/632xESB"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801G,	"82801G"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801H,	"82801H"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801I,	"82801I"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801JI,	"82801JI"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801JD,	"82801JD"	/*, 0, 0 */ },
-	{ HDA_INTEL_PCH,	"5 Series/3400 Series" /*, 0, 0 */ },
-	{ HDA_INTEL_PCH2,	"5 Series/3400 Series" /*, 0, 0 */ },
-	{ HDA_INTEL_SCH,	"SCH"		/*, 0, 0 */ },
+	{ HDA_INTEL_OAK,	"Oaktrail"		/*, 0, 0 */ },
+	{ HDA_INTEL_BAY,	"BayTrail"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW1,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW2,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW3,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_BDW,	"Broadwell"		/*, 0, 0 */ },
+	{ HDA_INTEL_CPT,	"Cougar Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_PATSBURG,	"Patsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_PPT1,	"Panther Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_BRASWELL,	"Braswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801F,	"82801F"		/*, 0, 0 */ },
+	{ HDA_INTEL_63XXESB,	"631x/632xESB"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801G,	"82801G"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801H,	"82801H"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801I,	"82801I"		/*, 0, 0 */ },
+	{ HDA_INTEL_ICH9,	"ICH9"			/*, 0, 0 */ },
+	{ HDA_INTEL_82801JI,	"82801JI"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801JD,	"82801JD"		/*, 0, 0 */ },
+	{ HDA_INTEL_PCH,	"5 Series/3400 Series"	/*, 0, 0 */ },
+	{ HDA_INTEL_PCH2,	"5 Series/3400 Series"	/*, 0, 0 */ },
+	{ HDA_INTEL_SCH,	"SCH"			/*, 0, 0 */ },
+	{ HDA_INTEL_LPT1,	"Lynx Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_LPT2,	"Lynx Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_WCPT,	"Wildcat Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS1,	"Wellsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS2,	"Wellsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_WCPTLP,	"Wildcat Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP1,	"Lynx Point-LP"		/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP2,	"Lynx Point-LP"		/*, 0, 0 */ },
+	{ HDA_INTEL_SRSPLP,	"Sunrise Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_SRSP,	"Sunrise Point"		/*, 0, 0 */ },
+
 	//10de  NVIDIA Corporation
 	{ HDA_NVIDIA_MCP51,	"MCP51" /*, 0, HDAC_QUIRK_MSI */ },
 	{ HDA_NVIDIA_MCP55,	"MCP55" /*, 0, HDAC_QUIRK_MSI */ },
@@ -161,6 +168,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
 	{ HDA_ATI_SB600,	"SB600" /*, 0, 0 */ },
 	{ HDA_ATI_RS600,	"RS600" /*, 0, 0 */ },
+	{ HDA_ATI_HUDSON,	"Hudson" /*, 0, 0 */ },
 	{ HDA_ATI_RS690,	"RS690" /*, 0, 0 */ },
 	{ HDA_ATI_RS780,	"RS780" /*, 0, 0 */ },
 	{ HDA_ATI_RS880,	"RS880" /*, 0, 0 */ },
@@ -183,6 +191,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_ATI_RV940,	"RV940" /*, 0, 0 */ },
 	{ HDA_ATI_RV970,	"RV970" /*, 0, 0 */ },
 	{ HDA_ATI_R1000,	"R1000" /*, 0, 0 */ }, // HDMi
+	{ HDA_ATI_SI,		"SI" /*, 0, 0 */ },
 	{ HDA_ATI_VERDE,	"Cape Verde" /*, 0, ? */ }, // HDMi
 	//17f3  RDC Semiconductor, Inc.
 	{ HDA_RDC_M3010,	"M3010" /*, 0, 0 */ },
@@ -210,6 +219,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_CS4206, 0,          "Cirrus Logic CS4206" },
 	{ HDA_CODEC_CS4207, 0,          "Cirrus Logic CS4207" },
 	{ HDA_CODEC_CS4210, 0,          "Cirrus Logic CS4210" },
+
 	{ HDA_CODEC_ALC221, 0,          "Realtek ALC221" },
 	{ HDA_CODEC_ALC260, 0,          "Realtek ALC260" },
 	{ HDA_CODEC_ALC262, 0,          "Realtek ALC262" },
@@ -607,26 +617,32 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_INTEL_HSW1:
 		case HDA_INTEL_HSW2:
 		case HDA_INTEL_HSW3:
+		case HDA_INTEL_BDW:
 		case HDA_INTEL_CPT:
 		case HDA_INTEL_PATSBURG:
 		case HDA_INTEL_PPT1:
-		case HDA_INTEL_LPT1:
-		case HDA_INTEL_LPT2:
-		case HDA_INTEL_WCPT:
-		case HDA_INTEL_WELLS1:
-		case HDA_INTEL_WELLS2:
-		case HDA_INTEL_LPTLP1:
-		case HDA_INTEL_LPTLP2:
+		case HDA_INTEL_BRASWELL:
 		case HDA_INTEL_82801F:
 		case HDA_INTEL_63XXESB:
 		case HDA_INTEL_82801G:
 		case HDA_INTEL_82801H:
 		case HDA_INTEL_82801I:
+		case HDA_INTEL_ICH9:
 		case HDA_INTEL_82801JI:
 		case HDA_INTEL_82801JD:
 		case HDA_INTEL_PCH:
 		case HDA_INTEL_PCH2:
 		case HDA_INTEL_SCH:
+		case HDA_INTEL_LPT1:
+		case HDA_INTEL_LPT2:
+		case HDA_INTEL_WCPT:
+		case HDA_INTEL_WELLS1:
+		case HDA_INTEL_WELLS2:
+		case HDA_INTEL_WCPTLP:
+		case HDA_INTEL_LPTLP1:
+		case HDA_INTEL_LPTLP2:
+		case HDA_INTEL_SRSPLP:
+		case HDA_INTEL_SRSP:
 
 	/* if the key value kHDEFLayoutID as a value set that value, if not will assign a default layout */
 	if (getValueForKey(kHDEFLayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDEF_LEN * 2)
@@ -700,6 +716,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	*************************************************************************************************************/
 	case HDA_ATI_SB450:
 	case HDA_ATI_SB600:
+	case HDA_ATI_HUDSON:
 	case HDA_ATI_RS600:
 	case HDA_ATI_RS690:
 	case HDA_ATI_RS780:
@@ -722,6 +739,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	case HDA_ATI_RV930:
 	case HDA_ATI_RV910:
 	case HDA_ATI_R1000:
+	case HDA_ATI_SI:
 	case HDA_ATI_VERDE:
 
             /* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
