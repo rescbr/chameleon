@@ -556,10 +556,11 @@ static const char *memory_channel_types[] =
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++) {
+	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
+	{
 		if ((dram_controllers[i].vendor == dram_dev->vendor_id) && (dram_controllers[i].device == dram_dev->device_id)) {
 			verbose("%s%s DRAM Controller [%4x:%4x] at %02x:%02x.%x\n", 
-				(dram_dev->vendor_id == 0x8086) ? "Intel Corporation " : "" ,
+				(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
 				dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
 				dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
 

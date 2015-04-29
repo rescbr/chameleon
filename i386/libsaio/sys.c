@@ -73,17 +73,17 @@ static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x1
 #endif
 
 #ifndef DEBUG_SYS
-#define DEBUG_SYS 0
+	#define DEBUG_SYS 0
 #endif
 
 #if DEBUG_SYS
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 #ifndef DEBUG_FEATURE_LAST_BOOT
-#define DEBUG_FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
+	#define DEBUG_FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
 #endif
 
 extern int multiboot_partition;

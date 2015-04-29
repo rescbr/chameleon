@@ -196,7 +196,6 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_EXTFEATURE_EM64T		bit(29)	/* Extended Mem 64 Technology */
 
 
-
 #define CPUID_EXTFEATURE_LAHF		hbit(0)	/* LAFH/SAHF instructions */
 
 /*
@@ -288,7 +287,21 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_CONFIG_TDP_CONTROL		0x64B		// write once to lock
 #define MSR_TURBO_ACTIVATION_RATIO	0x64C
 
-//AMD
+/* AMD Defined MSRs */
+#define MSR_K6_EFER			0xC0000080
+#define MSR_K6_STAR			0xC0000081
+#define MSR_K6_WHCR			0xC0000082
+#define MSR_K6_UWCCR			0xC0000085
+#define MSR_K6_EPMR			0xC0000086
+#define MSR_K6_PSOR			0xC0000087
+#define MSR_K6_PFIR			0xC0000088
+
+#define MSR_K7_EVNTSEL0			0xC0010000
+#define MSR_K7_PERFCTR0			0xC0010004
+#define MSR_K7_HWCR			0xC0010015
+#define MSR_K7_CLK_CTL			0xC001001b
+#define MSR_K7_FID_VID_CTL		0xC0010041
+
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_LIMIT		0xC0010061	// max enabled p-state (msr >> 4) & 7
 #define K10_COFVID_CONTROL		0xC0010062	// switch to p-state
@@ -407,10 +420,10 @@ typedef struct _PlatformInfo_t
 		uint64_t		Frequency;		// Ram Frequency
 		uint32_t		Divider;		// Memory divider
 		uint8_t			CAS;			// CAS 1/2/2.5/3/4/5/6/7
-		uint8_t			TRC;	
+		uint8_t			TRC;
 		uint8_t			TRP;
 		uint8_t			RAS;
-		uint8_t			Channels;		// Channel Configuration Single,Dual or Triple
+		uint8_t			Channels;		// Channel Configuration Single,Dual, Triple or Quad
 		uint8_t			NoSlots;		// Maximum no of slots available
 		uint8_t			Type;			// Standard SMBIOS v2.5 Memory Type
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];		// Information about each slot
