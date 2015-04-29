@@ -29,7 +29,7 @@
 	http://forum.voodooprojects.org/index.php/topic,1029.0.html
 
 	Original Intel HDx000 code from valv
-	Intel Ivy Bridge and Haswell code from ErmaC:
+	Intel Ivy Bridge, Haswell and Broadwell code from ErmaC:
 	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
 */
 
@@ -45,7 +45,7 @@
 #include "graphics.h"
 
 #ifndef DEBUG_GMA
-	#define DEBUG_GMA 0
+#define DEBUG_GMA 0
 #endif
 
 #ifndef DEBUG_BDW
@@ -59,8 +59,13 @@
 #endif
 
 static bool	doit	= false;
+
+static uint8_t default_aapl_snb[]		=	{ 0x00,0x03,0x00,0x01 };
+#define AAPL_LEN_SNB ( sizeof(default_aapl_snb) / sizeof(uint8_t) )
+
 static uint8_t default_aapl_ivy[]		=	{ 0x05,0x00,0x62,0x01 }; // ivy_bridge_ig_vals[5]
 #define AAPL_LEN_IVY ( sizeof(default_aapl_ivy) / sizeof(uint8_t) )
+
 static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_vals[7]
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
 
@@ -312,7 +317,7 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_IVYBRIDGE_D_GT2,		HD_GRAPHICS_4000 },	/* 0162 */
 	{GMA_IVYBRIDGE_S_GT1,		HD_GRAPHICS },		/* 015a */
 	{GMA_IVYBRIDGE_S_GT2,		"HD Graphics P4000" },  /* 016a */
-	{GMA_IVYBRIDGE_S_GT3,		 HD_GRAPHICS },		/* 015e */
+	{GMA_IVYBRIDGE_S_GT3,		HD_GRAPHICS },		/* 015e */
 	{GMA_IVYBRIDGE_S_GT4,		HD_GRAPHICS_2500 },	/* 0172 */
   	{GMA_IVYBRIDGE_S_GT5,		HD_GRAPHICS_2500 },	/* 0176 */
 
@@ -551,7 +556,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 		/* 0106 */
 		case GMA_SANDYBRIDGE_M_GT1: // HD Graphics 2000 Mobile
-			devprop_add_value(device, "class-code", ClassFix, 4);
+			devprop_add_value(device, "class-code",			ClassFix, 4);
 			devprop_add_value(device, "AAPL00,PixelFormat",		HD2000_vals[0], 4);
 			devprop_add_value(device, "AAPL00,T1",			HD2000_vals[1], 4);
 			devprop_add_value(device, "AAPL00,T2",			HD2000_vals[2], 4);
@@ -568,6 +573,25 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "graphic-options",		HD2000_vals[13], 4);
 			devprop_add_value(device, "AAPL,tbl-info",		HD2000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
 			break;
 
 		/* 0116, 0126 */
@@ -590,8 +614,28 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "graphic-options",		HD3000_vals[13], 4);
 			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
-			devprop_add_value(device, "AAPL,snb-platform-id",	HD3000_vals[16], 4);// previusly commented
-		break;
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00010000; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
+			break;
 
 		/* 0102 */
 		/* HD Graphics 2000 */
@@ -600,8 +644,29 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
-			devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
+			devprop_add_value(device, "AAPL,tbl-info",		HD2000_tbl_info, 18);
+			devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
 			break;
 
 		/* Sandy Bridge */
@@ -610,10 +675,38 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_SANDYBRIDGE_GT2_PLUS: // 0122
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
+
+			verbose("Injecting a valid desktop GPU device id (0x0126) instead of patching kexts.\n");
 			device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
+			devprop_add_value(device, "vendor-id",			(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
-			devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
+			devprop_add_value(device, "compatible",			(uint8_t *)"pci8086,0126", 13);
+			devprop_add_value(device, "name",			(uint8_t *)"pci8086,0126", 13);
+			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
+
+			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
+			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
 			break;
 
 		/* Ivy Bridge */
@@ -697,6 +790,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_E_GT2: // 041e
 		case GMA_HASWELL_ULT_M_GT2: // 0a16
 		case GMA_HASWELL_ULT_E_GT2: // 0a1e
+
 			verbose("Injecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
 			device_id = 0x00000412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
@@ -853,7 +947,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "class-code", ClassFix, 4);
 
 			break;
-#endif
+#endif // DEBUG_BDW
 		default:
 			break;
 	}

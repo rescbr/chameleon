@@ -24,12 +24,13 @@
  */
 
 /*
- Original patch by Nawcom
- http://forum.voodooprojects.org/index.php/topic,1029.0.html
- 
- Original Intel HDx000 code from valv
- Intel HD4xx and HD5xx code by ErmaC http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
- */
+	Original patch by Nawcom
+	http://forum.voodooprojects.org/index.php/topic,1029.0.html
+
+	Original Intel HDx000 code from valv
+	Intel Ivy Bridge, Haswell and Broadwell code from ErmaC:
+	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
+*/
 
 #ifndef __LIBSAIO_GMA_H
 #define __LIBSAIO_GMA_H
@@ -70,10 +71,10 @@ typedef struct{
 #define HD_GRAPHICS_5500    "HD Graphics 5500"
 #define HD_GRAPHICS_5600    "HD Graphics 5600"
 #define HD_GRAPHICS_6000    "HD Graphics 6000"
-#define IRIS_6100           "Iris graphics 6100"
+#define IRIS_6100           "Iris Graphics 6100"
 #define IRIS_6200           "Iris Pro Graphics 6200"
 #define IRIS_6300           "Iris Pro Graphics P6300"
-#define INTEL_VENDORID		0x8086
+#define INTEL_VENDORID       0x8086
 
 /* http://cgit.freedesktop.org/xorg/driver/xf86-video-intel/tree/src/intel_driver.h */
 /* http://people.redhat.com/agk/patches/linux/patches-3.6/git-update1.patch */
