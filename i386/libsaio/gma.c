@@ -676,12 +676,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 
-			verbose("Injecting a valid desktop GPU device id (0x0126) instead of patching kexts.\n");
-			device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
+//			verbose("Injecting a valid desktop GPU device id (0x0126) instead of patching kexts.\n");
+//			device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
 			devprop_add_value(device, "vendor-id",			(uint8_t *)INTEL_VENDORID, 4);
-			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			devprop_add_value(device, "compatible",			(uint8_t *)"pci8086,0126", 13);
-			devprop_add_value(device, "name",			(uint8_t *)"pci8086,0126", 13);
+//			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
+//			devprop_add_value(device, "compatible",			(uint8_t *)"pci8086,0126", 13);
+//			devprop_add_value(device, "name",			(uint8_t *)"pci8086,0126", 13);
 			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
 
 			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
