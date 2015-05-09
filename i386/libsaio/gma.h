@@ -74,7 +74,7 @@ typedef struct{
 #define IRIS_6100           "Iris Graphics 6100"
 #define IRIS_6200           "Iris Pro Graphics 6200"
 #define IRIS_6300           "Iris Pro Graphics P6300"
-#define INTEL_VENDORID       0x8086
+#define INTEL_VENDORID      0x8086
 
 /* http://cgit.freedesktop.org/xorg/driver/xf86-video-intel/tree/src/intel_driver.h */
 /* http://people.redhat.com/agk/patches/linux/patches-3.6/git-update1.patch */

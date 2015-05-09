@@ -334,8 +334,10 @@ typedef struct
  * instead of their own, which is beyond my comprehension
  * (see HDA_CODEC_STAC9221 below).
  */
-#define APPLE_INTEL_MAC		0x76808384
-#define APPLE_MACBOOKPRO55	0xcb7910de
+#define APPLE_INTEL_MAC         0x76808384
+#define APPLE_MACBOOKAIR31      0x0d9410de
+#define APPLE_MACBOOKPRO55      0xcb7910de
+#define APPLE_MACBOOKPRO71      0xcb8910de
 
 /* LG Electronics */
 #define LG_VENDORID		0x1854
@@ -381,7 +383,8 @@ typedef struct
 #define HDA0_LEN ( sizeof(default_HDEF_layout_id) / sizeof(uint8_t) )
 #define HDA1_LEN ( sizeof(default_HDAU_layout_id) / sizeof(uint8_t) )
 
-/* codec information */
+/* =================== C O D E C   I N F O R M A T I O N ===================== */
+
 #define HDA_CODEC_CONSTRUCT(vendor, id) (((uint32_t)(vendor##_VENDORID) << 16) | ((id) & 0xffff))
 
 /* Cirrus Logic */
@@ -689,7 +692,7 @@ typedef struct
 #define HDA_CODEC_INTELIP2	HDA_CODEC_CONSTRUCT(INTEL, 0x2804)
 #define HDA_CODEC_INTELCPT	HDA_CODEC_CONSTRUCT(INTEL, 0x2805)
 #define HDA_CODEC_INTELPPT	HDA_CODEC_CONSTRUCT(INTEL, 0x2806)
-#define HDA_CODEC_INTELHSW	HDA_CODEC_CONSTRUCT(INTEL, 0x2807)
+#define HDA_CODEC_INTELLLP	HDA_CODEC_CONSTRUCT(INTEL, 0x2807)
 #define HDA_CODEC_INTELCL	HDA_CODEC_CONSTRUCT(INTEL, 0x29fb)
 #define HDA_CODEC_INTELXXXX	HDA_CODEC_CONSTRUCT(INTEL, 0xffff)
 

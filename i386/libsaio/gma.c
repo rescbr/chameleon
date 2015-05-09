@@ -45,7 +45,7 @@
 #include "graphics.h"
 
 #ifndef DEBUG_GMA
-#define DEBUG_GMA 0
+	#define DEBUG_GMA 0
 #endif
 
 #ifndef DEBUG_BDW
