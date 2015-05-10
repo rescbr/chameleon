@@ -1904,28 +1904,6 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	return nvidia_card_generic[0].name;
 }
 
-static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
-{
-	int fd;
-	int size;
-
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
-	{
-		return 0;
-	}
-
-	size = file_size(fd);
-
-	if (size)
-	{
-		*buf = malloc(size);
-		size = read(fd, (char *)buf, size);
-	}
-	close(fd);
-
-	return size > 0 ? size : 0;
-}
-
 static int devprop_add_nvidia_template(DevPropDevice *device)
 {
 	char tmp[16];
@@ -1984,13 +1962,35 @@ static int devprop_add_nvidia_template(DevPropDevice *device)
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
 	snprintf(tmp, sizeof(tmp), "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, (uint32_t)strlen(tmp));
 	devices_number++;
 
 	return 1;
 }
 
-unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
+static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
+{
+	int fd;
+	int size;
+
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
+		return 0;
+	}
+
+	size = file_size(fd);
+
+	if (size)
+	{
+		*buf = malloc(size);
+		size = read(fd, (char *)buf, size);
+	}
+	close(fd);
+
+	return size > 0 ? size : 0;
+}
+
+uint64_t mem_detect(volatile uint8_t *regs, uint16_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
 	uint64_t vram_size = 0;
 
@@ -2004,6 +2004,24 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 
 			return vram_size;
 		}
+	}
+
+	// Finally, if vram_size still not set do the calculation with our own method
+	if (nvCardType < NV_ARCH_50)
+	{
+		vram_size  = (uint64_t)(REG32( NV04_PFB_FIFO_DATA ));
+		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
+	}
+	else if (nvCardType < NV_ARCH_C0)
+	{
+		vram_size = (uint64_t)(REG32( NV04_PFB_FIFO_DATA ));
+		vram_size |= (vram_size & 0xff) << 32;
+		vram_size &= 0xffffffff00ll;
+	}
+	else
+	{ // >= NV_ARCH_C0
+		vram_size = REG32( NVC0_MEM_CTRLR_RAM_AMOUNT ) << 20;
+		vram_size *= REG32( NVC0_MEM_CTRLR_COUNT );
 	}
 
 	// Then, Workaround for 9600M GT, GT 210/420/430/440/525M/540M & GTX 560M
@@ -2058,26 +2076,6 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			break;
 	}
 
-	if (!vram_size)
-	{
-		// Finally, if vram_size still not set do the calculation with our own method
-		if (nvCardType < NV_ARCH_50)
-		{
-			vram_size  = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
-			vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
-		}
-		else if (nvCardType < NV_ARCH_C0)
-		{
-			vram_size = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
-			vram_size |= (vram_size & 0xff) << 32;
-			vram_size &= 0xffffffff00ll;
-		}
-		else
-		{ // >= NV_ARCH_C0
-			vram_size = REG32(NVC0_MEM_CTRLR_RAM_AMOUNT) << 20;
-			vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
-		}
-	}
 	DBG("mem_detected %ld\n", vram_size);
 	return vram_size;
 }
@@ -2091,22 +2089,22 @@ static bool checkNvRomSig(uint8_t * aRom)
 
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
-	struct DevPropDevice		*device		= NULL;
-	char				*devicepath	= NULL;
+	DevPropDevice	*device		= NULL;
+	char		*devicepath	= NULL;
+	uint8_t		*rom		= NULL;
+	uint16_t	nvCardType	= 0;
+	uint64_t	videoRam	= 0;
+	uint32_t	bar[7];
+	uint32_t	boot_display	= 0;
+	int		nvPatch		= 0;
+	char		*model		= NULL;
+	char		nvFilename[64];
 	option_rom_pci_header_t		*rom_pci_header;
 	volatile uint8_t		*regs;
-	uint8_t				*rom		= NULL;
-	uint8_t				nvCardType	= 0;
-	uint64_t			videoRam	= 0;
 	uint32_t			nvBiosOveride;
-	uint32_t			bar[7];
-	uint32_t			boot_display	= 0;
-	int				nvPatch = 0;
 	int				len;
 	char				biosVersion[64];
-	char				nvFilename[64];
 	char				kNVCAP[12];
-	char				*model		= NULL;
 	const char			*value;
 
 	fill_card_list();
