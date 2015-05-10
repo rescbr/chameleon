@@ -1,6 +1,7 @@
 /*
  * Copyright 2008 Islam Ahmed Zaid. All rights reserved. <azismed@gmail.com>
  * AsereBLN: 2009: cleanup and bugfix
+ * Bronya:   2015 Improve AMD support, cleanup and bugfix
  */
 
 #include "libsaio.h"
@@ -332,7 +333,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 	///////////////////-- Signature, stepping, features -- //////
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
-	cpuid_features = quad(p->CPU.CPUID[CPUID_1][ecx],p->CPU.CPUID[CPUID_1][edx]);
+	cpuid_features = quad(p->CPU.CPUID[CPUID_1][ecx], p->CPU.CPUID[CPUID_1][edx]);
 	if (bit(28) & p->CPU.CPUID[CPUID_1][edx]) // HTT/Multicore
 	{
 		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
@@ -459,25 +460,26 @@ void scan_cpu(PlatformInfo_t *p)
 		{
 			case CPUID_MODEL_NEHALEM:
 			case CPUID_MODEL_FIELDS:
-			case CPUID_MODEL_DALES:
+			case CPUID_MODEL_CLARKDALE:
 			case CPUID_MODEL_NEHALEM_EX:
 			case CPUID_MODEL_JAKETOWN:
 			case CPUID_MODEL_SANDYBRIDGE:
 			case CPUID_MODEL_IVYBRIDGE:
-
+			case CPUID_MODEL_HASWELL_U5:
+			case CPUID_MODEL_ATOM_3700:
 			case CPUID_MODEL_HASWELL:
 			case CPUID_MODEL_HASWELL_SVR:
 			//case CPUID_MODEL_HASWELL_H:
 			case CPUID_MODEL_HASWELL_ULT:
-			case CPUID_MODEL_CRYSTALWELL:
+			case CPUID_MODEL_HASWELL_ULX:
 			//case CPUID_MODEL_:
-				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+				msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
 				p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
 				p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 				break;
 
-			case CPUID_MODEL_DALES_32NM:
-			case CPUID_MODEL_WESTMERE:
+			case CPUID_MODEL_DALES:
+			case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
 			case CPUID_MODEL_WESTMERE_EX:
 				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 				p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
@@ -620,8 +622,8 @@ void scan_cpu(PlatformInfo_t *p)
 			{
 				case CPUID_MODEL_NEHALEM:
 				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_CLARKDALE:
 				case CPUID_MODEL_DALES:
-				case CPUID_MODEL_DALES_32NM:
 				case CPUID_MODEL_WESTMERE:
 				case CPUID_MODEL_NEHALEM_EX:
 				case CPUID_MODEL_WESTMERE_EX:
@@ -630,11 +632,13 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_JAKETOWN:
 				case CPUID_MODEL_IVYBRIDGE_XEON:
 				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_ATOM_3700:
 				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_U5:
 				case CPUID_MODEL_HASWELL_SVR:
 
 				case CPUID_MODEL_HASWELL_ULT:
-				case CPUID_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULX:
 /* --------------------------------------------------------- */
 					msr = rdmsr64(MSR_PLATFORM_INFO);
 					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
@@ -686,6 +690,7 @@ void scan_cpu(PlatformInfo_t *p)
 					{
 						cpuFrequency = tscFreq;
 					}
+
 					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
 					{
 						max_ratio = atoi(newratio);

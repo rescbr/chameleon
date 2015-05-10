@@ -46,8 +46,8 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_ATOM		0x1C			// Pineview, Bonnell
 #define CPUID_MODEL_XEON_MP		0x1D			// MP 7400
 #define CPUID_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
-#define CPUID_MODEL_DALES		0x1F			// Havendale, Auburndale
-#define CPUID_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
+#define CPUID_MODEL_CLARKDALE		0x1F			// Havendale, Auburndale
+#define CPUID_MODEL_DALES		0x25			// Clarkdale, Arrandale
 #define CPUID_MODEL_ATOM_SAN		0x26			// Lincroft
 #define CPUID_MODEL_LINCROFT		0x27			// Bonnell
 #define CPUID_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
@@ -57,15 +57,15 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_WESTMERE_EX		0x2F			// Westmere-EX
 //#define CPUID_MODEL_BONNELL_ATOM	0x35			// Atom Family Bonnell
 #define CPUID_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
-#define CPUID_MODEL_SILVERMONT		0x37			// Atom E3000, Z3000 Atom Silvermont
+#define CPUID_MODEL_ATOM_3700		0x37			// Atom E3000, Z3000 Atom Silvermont
 #define CPUID_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPUID_MODEL_HASWELL		0x3C			// Haswell DT
-#define CPUID_MODEL_BROADWELL		0x3D			// Core M, Broadwell / Core-AVX2
+#define CPUID_MODEL_HASWELL_U5		0x3D			// Haswell U5  5th generation Broadwell, Core M / Core-AVX2
 #define CPUID_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
 #define CPUID_MODEL_HASWELL_SVR		0x3F			// Haswell Server, Xeon E5-2600/1600 v3 (Haswell-E)
 //#define CPUID_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPUID_MODEL_HASWELL_ULT		0x45			// Haswell ULT, 4th gen Core, Xeon E3-12xx v3
-#define CPUID_MODEL_CRYSTALWELL		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
+#define CPUID_MODEL_HASWELL_ULX		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
 //#define CPUID_MODEL_			0x4A			// Future Atom E3000, Z3000 silvermont / atom
 #define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000
 //#define CPUID_MODEL_			0x4E			// Future Core
@@ -84,12 +84,13 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 /* This spells out "GenuineIntel".  */
 //#define is_intel \
 //  ebx == 0x756e6547 && ecx == 0x6c65746e && edx == 0x49656e69
-  /* This spells out "AuthenticAMD".  */
+
+/* This spells out "AuthenticAMD".  */
 //#define is_amd \
 //  ebx == 0x68747541 && ecx == 0x444d4163 && edx == 0x69746e65
 
 /* Unknown CPU */
-#define CPU_STRING_UNKNOWN		"Unknown CPU Type"
+#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
 
 //definitions from Apple XNU
 

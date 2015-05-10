@@ -1170,8 +1170,8 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 						break;
 					} 
 					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_CLARKDALE:
 					case CPUID_MODEL_DALES:
-					case CPUID_MODEL_DALES_32NM:
 					case CPUID_MODEL_NEHALEM: 
 					case CPUID_MODEL_NEHALEM_EX:
 					case CPUID_MODEL_WESTMERE:
@@ -1507,8 +1507,8 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						break;
 					} 
 					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_CLARKDALE:
 					case CPUID_MODEL_DALES:
-					case CPUID_MODEL_DALES_32NM:
 					case CPUID_MODEL_NEHALEM: 
 					case CPUID_MODEL_NEHALEM_EX:
 					case CPUID_MODEL_WESTMERE:

@@ -696,8 +696,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						switch (Platform.CPU.Model)
 						{
 							case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-							case CPUID_MODEL_DALES:
-							case CPUID_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+							case CPUID_MODEL_CLARKDALE:
+							case CPUID_MODEL_DALES:		// Intel Core i3, i5 LGA1156 (32nm)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaultiMacNehalemBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
@@ -1042,8 +1042,8 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 			{
 				case 0x19:			// Intel Core i5 650 @3.20 Ghz
 				case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-				case CPUID_MODEL_DALES:
-				case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+				case CPUID_MODEL_CLARKDALE:
+				case CPUID_MODEL_DALES:	// Intel Core i3, i5 LGA1156 (32nm)
 				case CPUID_MODEL_NEHALEM:	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 				case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 				case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
@@ -1055,7 +1055,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPUID_MODEL_HASWELL:
 				case CPUID_MODEL_HASWELL_SVR:
 				case CPUID_MODEL_HASWELL_ULT:
-				case CPUID_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULX:
 
 					break;
 
