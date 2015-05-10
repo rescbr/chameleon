@@ -11,13 +11,13 @@
 #include "boot.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 0
+	#define DEBUG_CPU 0
 #endif
 
 #if DEBUG_CPU
-#define DBG(x...)		printf(x)
+	#define DBG(x...)		printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 
@@ -362,6 +362,161 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Model += (p->CPU.ExtModel << 4);
 	}
 
+	switch (p->CPU.Vendor)
+	{
+		case CPUID_VENDOR_INTEL:
+		{
+
+			do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
+
+			do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
+
+			/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
+			if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
+			{
+				for (i = 0; i < 0xFF; i++) // safe loop
+				{
+					do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
+					if (bitfield(reg[eax], 4, 0) == 0)
+					{
+						break;
+					}
+					cores_per_package = bitfield(reg[eax], 31, 26) + 1;
+				}
+			}
+
+			do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
+
+			if (i > 0)
+			{
+				cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
+				threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
+			}
+
+			if (cores_per_package == 0)
+			{
+				cores_per_package = 1;
+			}
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
+			{
+				do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
+			}
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
+			{
+				do_cpuid(6, p->CPU.CPUID[CPUID_6]);
+			}
+
+			do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+
+			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+			{
+				do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+			}
+			else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+			{
+				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+			}
+
+			switch (p->CPU.Model)
+			{
+				case CPUID_MODEL_NEHALEM:
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_CLARKDALE:
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_JAKETOWN:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_HASWELL_U5:
+				case CPUID_MODEL_ATOM_3700:
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
+				//case CPUID_MODEL_HASWELL_H:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_HASWELL_ULX:
+				//case CPUID_MODEL_:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
+					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
+				case CPUID_MODEL_WESTMERE_EX:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+			}
+
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores		= cores_per_package;
+				p->CPU.NoThreads	= logical_per_package;
+			}
+
+			// MSR is *NOT* available on the Intel Atom CPU
+			//workaround for N270. I don't know why it detected wrong
+			if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+			{
+				p->CPU.NoCores		= 1;
+				p->CPU.NoThreads	= 2;
+			}
+
+			//workaround for Quad
+			if ( strstr(p->CPU.BrandString, "Quad") )
+			{
+				p->CPU.NoCores		= 4;
+				p->CPU.NoThreads	= 4;
+			}
+		}
+
+		break;
+
+		case CPUID_VENDOR_AMD:
+		{
+			do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
+
+			do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+			{
+				do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+			}
+
+			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+			{
+				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+			}
+
+			do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+
+			cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
+			threads_per_core = cores_per_package;
+
+			if (cores_per_package == 0)
+			{
+				cores_per_package = 1;
+			}
+
+			p->CPU.NoCores		= cores_per_package;
+			p->CPU.NoThreads	= logical_per_package;
+
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores = 1;
+				p->CPU.NoThreads	= 1;
+			}
+		}
+		break;
+
+		default :
+			stop("Unsupported CPU detected! System halted.");
+	}
+
 	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
 	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
@@ -396,160 +551,6 @@ void scan_cpu(PlatformInfo_t *p)
 		}
 		p->CPU.BrandString[47] = '\0';
 //		DBG("Brandstring = %s\n", p->CPU.BrandString);
-	}
-
-	//char *vendor = p->CPU.cpuid_vendor;
-	switch (p->CPU.Vendor){
-		case CPUID_VENDOR_INTEL:
-		{
-
-            do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
-
-            do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
-
-            /* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
-            if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
-            {
-                for (i = 0; i < 0xFF; i++) // safe loop
-                {
-                    do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
-                    if (bitfield(reg[eax], 4, 0) == 0)
-                    {
-                        break;
-                    }
-                    cores_per_package = bitfield(reg[eax], 31, 26) + 1;
-                }
-            }
-
-            do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
-
-            if (i > 0)
-            {
-                cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
-                threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
-            }
-
-            if (cores_per_package == 0)
-            {
-                cores_per_package = 1;
-            }
-
-            if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
-            {
-                do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
-            }
-
-            if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
-            {
-                do_cpuid(6, p->CPU.CPUID[CPUID_6]);
-            }
-
-            do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-
-            if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-            {
-                do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-                do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-            }
-            else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-            {
-                do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-            }
-
-		switch (p->CPU.Model)
-		{
-			case CPUID_MODEL_NEHALEM:
-			case CPUID_MODEL_FIELDS:
-			case CPUID_MODEL_CLARKDALE:
-			case CPUID_MODEL_NEHALEM_EX:
-			case CPUID_MODEL_JAKETOWN:
-			case CPUID_MODEL_SANDYBRIDGE:
-			case CPUID_MODEL_IVYBRIDGE:
-			case CPUID_MODEL_HASWELL_U5:
-			case CPUID_MODEL_ATOM_3700:
-			case CPUID_MODEL_HASWELL:
-			case CPUID_MODEL_HASWELL_SVR:
-			//case CPUID_MODEL_HASWELL_H:
-			case CPUID_MODEL_HASWELL_ULT:
-			case CPUID_MODEL_HASWELL_ULX:
-			//case CPUID_MODEL_:
-				msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
-				p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
-				p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
-				break;
-
-			case CPUID_MODEL_DALES:
-			case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
-			case CPUID_MODEL_WESTMERE_EX:
-				msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-				p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
-				p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
-				break;
-		}
-
-		if (p->CPU.NoCores == 0)
-		{
-			p->CPU.NoCores		= cores_per_package;
-			p->CPU.NoThreads	= logical_per_package;
-		}
-
-		// MSR is *NOT* available on the Intel Atom CPU
-		//workaround for N270. I don't know why it detected wrong
-		if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
-		{
-			p->CPU.NoCores		= 1;
-			p->CPU.NoThreads	= 2;
-		}
-
-		//workaround for Quad
-		if ( strstr(p->CPU.BrandString, "Quad") )
-		{
-			p->CPU.NoCores		= 4;
-			p->CPU.NoThreads	= 4;
-		}
-	}
-
-	break;
-
-	case CPUID_VENDOR_AMD:
-	{
-		do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
-
-		do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-		{
-			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-		}
-
-		if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-		{
-			do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-		}
-
-		do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
-		do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
-		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-
-		cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
-		threads_per_core = cores_per_package;
-
-		if (cores_per_package == 0)
-		{
-			cores_per_package = 1;
-		}
-
-		p->CPU.NoCores		= cores_per_package;
-		p->CPU.NoThreads	= logical_per_package;
-
-		if (p->CPU.NoCores == 0)
-		{
-			p->CPU.NoCores = 1;
-			p->CPU.NoThreads	= 1;
-		}
-	}
-	break;
-	default :
-		stop("Unsupported CPU detected! System halted.");
 	}
 
 	/* setup features */

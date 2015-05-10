@@ -1,3 +1,4 @@
+- Bronya : Improve support for AMD CPU.
 - Bungo : Added "machine-signature"
 - Zenith432 : Protect timing code in scan_cpu() from interrupts, use bios for sleep()
 - Zenith432 : Fix setupChosenNode, Tweak asm.s
