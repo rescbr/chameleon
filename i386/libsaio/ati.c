@@ -2034,7 +2034,7 @@ void devprop_add_list(AtiDevProp devprop_list[])
 					{
 						if (devprop_list[i].get_value(val))
 						{
-							devprop_list[i].name[1] = 0x30 + pnum; // convert to ascii
+							devprop_list[i].name[1] = (uint8_t)(0x30 + pnum); // convert to ascii
 							devprop_add_value(card->device, devprop_list[i].name, val->data, val->size);
 							free_val(val);
 						}
@@ -2058,7 +2058,7 @@ void devprop_add_list(AtiDevProp devprop_list[])
 					{
 						if (devprop_list[i].default_val.type != kNul)
 						{
-							devprop_list[i].name[1] = 0x30 + pnum; // convert to ascii
+							devprop_list[i].name[1] = (uint8_t)(0x30 + pnum); // convert to ascii
 							devprop_add_value(card->device, devprop_list[i].name,
 								devprop_list[i].default_val.type == kCst ?
 								(uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
