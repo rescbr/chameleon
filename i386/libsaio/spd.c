@@ -457,8 +457,8 @@ static struct smbus_controllers_t smbus_controllers[] = {
 	{0x8086, 0x9C22, "HSW-ULT",		read_smb_intel }
 
 	// AMD
-//	0x1002 0x4385 "AMD SB600/700"
-//	0x1022 0x780B "AMD SB800/900"
+//	{0x1002, 0x4385, "AMD SB600/700",	... },
+//	{0x1022, 0x780B, "AMD SB800/900",	... }
 
 };
 
