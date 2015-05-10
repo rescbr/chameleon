@@ -9,13 +9,13 @@
 #include "bootstruct.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
+	#define DEBUG_SMBIOS 0
 #endif
 
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 #define XEON "Xeon"

@@ -5,13 +5,13 @@
 #include "modules.h"
 
 #ifndef DEBUG_PCI_SETUP
-#define DEBUG_PCI_SETUP 0
+	#define DEBUG_PCI_SETUP 0
 #endif
 
 #if DEBUG_PCI_SETUP
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 extern bool setup_ati_devprop(pci_dt_t *ati_dev);

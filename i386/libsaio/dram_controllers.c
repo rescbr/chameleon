@@ -487,7 +487,7 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 static struct mem_controller_t dram_controllers[] = {
 
 	// Default unknown chipset
-	{ 0, 0, "",	NULL, NULL, NULL },
+	{ 0, 0, "",					NULL, NULL, NULL },
 
 	// Intel
 //	{ 0x8086, 0x0100, "2rd Gen Core processor",	NULL, NULL, NULL },
