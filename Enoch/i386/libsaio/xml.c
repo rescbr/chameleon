@@ -28,13 +28,13 @@
 #include "xml.h"
 
 #ifndef DEBUG_XML
-#define DEBUG_XML 0
+	#define DEBUG_XML 0
 #endif
 
 #if DEBUG_XML
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 string_ref *ref_strings = NULL;
@@ -51,15 +51,15 @@ void SaveRefString(char *string, int id)
 		if(tmp->id == id)
 		{
 			tmp->string = malloc(strlen(string)+1);
-			sprintf(tmp->string, "%s", string);
+			strncpy(tmp->string, string, strlen(string)+1);
 			return;
 		}
 		tmp = tmp->next;
 	}
 
-	string_ref* new_ref = malloc(sizeof(string_ref));
+	string_ref *new_ref = malloc(sizeof(string_ref));
 	new_ref->string = malloc(strlen(string)+1);
-	snprintf(new_ref->string, (strlen(string)+1)* sizeof(char),"%s", string);
+	strncpy(new_ref->string, string, (strlen(string)+1)* sizeof(char));
 	new_ref->id = id;
 	new_ref->next = ref_strings;
 	ref_strings = new_ref;
@@ -74,7 +74,7 @@ char *GetRefString(int id)
 		tmp = tmp->next;
 	}
 	//verbose("Unable to locate Ref String %d\n", id);
-	return "";
+	return "Unknown";
 }
 
 struct Module {
@@ -265,7 +265,6 @@ TagPtr XMLGetElement( TagPtr dict, int id )
 	return tmp;
 }
 
-/* Function for basic XML character entities parsing */
 typedef const struct XMLEntity {
 	const char *name;
 	size_t nameLen;
@@ -273,7 +272,7 @@ typedef const struct XMLEntity {
 } XMLEntity;
 
 /* This is ugly, but better than specifying the lengths by hand */
-// <!-- a comment XML -->
+
 #define _e(str,c) {str,sizeof(str)-1,c}
 const XMLEntity ents[] = {
 	_e("quot;",'"'),  // double quotation mark
@@ -283,6 +282,7 @@ const XMLEntity ents[] = {
 	_e("amp;", '&')   // greater-than sign
 };
 
+/* Function for basic XML character entities parsing */
 char *XMLDecode(const char *src)
 {
 	size_t len;
@@ -379,7 +379,7 @@ long XMLParseFile( char * buffer, TagPtr *dict )
 
 //==========================================================================
 // ParseNextTag
-
+// TODO: cleanup
 long XMLParseNextTag( char *buffer, TagPtr *tag )
 {
 	long	length = 0;

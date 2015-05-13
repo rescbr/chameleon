@@ -1,3 +1,12 @@
+- Bronya : Improve support for AMD CPU.
+- Bungo : Added "machine-signature"
+- Zenith432 : Protect timing code in scan_cpu() from interrupts, use bios for sleep()
+- Zenith432 : Fix setupChosenNode, Tweak asm.s
+- Zenith432 : Change identity snprintf to strncpy + misc printf issues
+- cparm : Implement strlcat()
+- Zenith432 : Sanitize 16-bit assembly
+- Zenith432 : Fix bug in malloc_init, use bios for enableA20()
+- meklort : Slightly improve decive selection name - add os version.
 - Zenith432 : Interrupt Management
 - Bungo : Added ability to auto-select last booted partition as the boot volume.
 - Bungo : Added MacOSVerCurrent and MacOSVer2Int function to use instead of macros.
@@ -7,6 +16,8 @@
 - Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service.
 - Zenith432 : Use caching with ExFat filesystem.
 - Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff).
+- ErmaC : C6 & C7 States credits to Clover Team.
+- ErmaC : define recursive cpu series for BrandString.
 - Zenith432 : saio_types.h, biosfn.c - minor typo in bios-defined data structure that isn't actually used.
 fake_efi.c - eliminate redundant scan of bt(0,0) in setupSmbiosConfigFile.  loadConfigFile already does a fall-back scan of bt(0,0), so another scan isn't needed.
 sys.c - While scanning a volume, getOSVersion looks for 5 files and switches back-n-forth between hd(X,Y)/....SystemVersion.plist on the newly scanned volume and bt(0,0)/hd(X,Y)/...SystemVersion.plist - which is an invalid path - should always return an error.
@@ -20,27 +31,25 @@ Change to sys.c - Eliminate a dubious recursion in diskScanBootVolumes().  It re
 - ErmaC : Add UseIntelHDMI for hda-gfx = onboard-1 or 2 that vale will be injected into the GFX0 and HDEF devices. credits Clover Team
 - ErmaC : Improve gma detection for HD4600
 - cparm : Merge (security, stability, bugs fixes) improvements.
-- ErmaC : C6 & C7 States credits to Clover Team.
 - Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
 - Zenith432 : add EXFAT boot support by Zenith432
 - zenith432 : Merge patch from issue 386 (boot2 does not know how to read files from FAT partitions on GPT)
-- ErmaC : define recursive cpu series for BrandString
 - meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
 		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
 - ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name
 - ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
 - ErmaC : Add more chameleon UI stuff (default) made by blackosx
-- ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
 - ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
-- bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (MakeInc.dir)
 - bitshoveler : CacheInit(), CacheRead() prototypes: use u_int32_t instead of long where appropriate (saio_internal.h)
 - bitshoveler : Improved defensiveness against malloc failure (disk.c)
 - bitshoveler : Use u_int32_t instead of long where appropriate (cache.c)
 - bitshoveler : Make some constant arrays static; other minor fixes (acpi_patcher.c)
+- bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
 - bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
+- ErmaC : Rollback changes for msdos.c (2327) thx to bltz
 - bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
 - bitshoveler : Comment out some unused functions by expanding "#if UNUSED" conditional (stringTable.c)
 - bitshoveler : Comment out unused static functions, which cause build to fail in "release" mode (vbe.c)

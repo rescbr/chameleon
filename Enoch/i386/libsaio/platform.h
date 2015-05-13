@@ -23,8 +23,11 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_6				6
 #define CPUID_80			7
 #define CPUID_81			8
-#define CPUID_88			9
-#define CPUID_MAX			10
+#define CPUID_85			9
+#define CPUID_86			10
+#define CPUID_87			11
+#define CPUID_88			12
+#define CPUID_MAX			13
 
 #define CPUID_MODEL_ANY			0x00
 #define CPUID_MODEL_UNKNOWN		0x01
@@ -43,8 +46,8 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_ATOM		0x1C			// Pineview, Bonnell
 #define CPUID_MODEL_XEON_MP		0x1D			// MP 7400
 #define CPUID_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
-#define CPUID_MODEL_DALES		0x1F			// Havendale, Auburndale
-#define CPUID_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
+#define CPUID_MODEL_CLARKDALE		0x1F			// Havendale, Auburndale
+#define CPUID_MODEL_DALES		0x25			// Clarkdale, Arrandale
 #define CPUID_MODEL_ATOM_SAN		0x26			// Lincroft
 #define CPUID_MODEL_LINCROFT		0x27			// Bonnell
 #define CPUID_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
@@ -54,15 +57,15 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_WESTMERE_EX		0x2F			// Westmere-EX
 //#define CPUID_MODEL_BONNELL_ATOM	0x35			// Atom Family Bonnell
 #define CPUID_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
-#define CPUID_MODEL_SILVERMONT		0x37			// Atom E3000, Z3000 Atom Silvermont
+#define CPUID_MODEL_ATOM_3700		0x37			// Atom E3000, Z3000 Atom Silvermont
 #define CPUID_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
 #define CPUID_MODEL_HASWELL		0x3C			// Haswell DT
-#define CPUID_MODEL_BROADWELL		0x3D			// Core M, Broadwell / Core-AVX2
+#define CPUID_MODEL_HASWELL_U5		0x3D			// Haswell U5  5th generation Broadwell, Core M / Core-AVX2
 #define CPUID_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
 #define CPUID_MODEL_HASWELL_SVR		0x3F			// Haswell Server, Xeon E5-2600/1600 v3 (Haswell-E)
 //#define CPUID_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPUID_MODEL_HASWELL_ULT		0x45			// Haswell ULT, 4th gen Core, Xeon E3-12xx v3
-#define CPUID_MODEL_CRYSTALWELL		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
+#define CPUID_MODEL_HASWELL_ULX		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
 //#define CPUID_MODEL_			0x4A			// Future Atom E3000, Z3000 silvermont / atom
 #define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000
 //#define CPUID_MODEL_			0x4E			// Future Core
@@ -77,8 +80,17 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 #define CPUID_VENDOR_INTEL		0x756E6547
 #define CPUID_VENDOR_AMD		0x68747541
+
+/* This spells out "GenuineIntel".  */
+//#define is_intel \
+//  ebx == 0x756e6547 && ecx == 0x6c65746e && edx == 0x49656e69
+
+/* This spells out "AuthenticAMD".  */
+//#define is_amd \
+//  ebx == 0x68747541 && ecx == 0x444d4163 && edx == 0x69746e65
+
 /* Unknown CPU */
-#define CPU_STRING_UNKNOWN		"Unknown CPU Type"
+#define CPU_STRING_UNKNOWN		"Unknown CPU Typ"
 
 //definitions from Apple XNU
 
@@ -185,7 +197,6 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_EXTFEATURE_EM64T		bit(29)	/* Extended Mem 64 Technology */
 
 
-
 #define CPUID_EXTFEATURE_LAHF		hbit(0)	/* LAFH/SAHF instructions */
 
 /*
@@ -277,7 +288,21 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_CONFIG_TDP_CONTROL		0x64B		// write once to lock
 #define MSR_TURBO_ACTIVATION_RATIO	0x64C
 
-//AMD
+/* AMD Defined MSRs */
+#define MSR_K6_EFER			0xC0000080
+#define MSR_K6_STAR			0xC0000081
+#define MSR_K6_WHCR			0xC0000082
+#define MSR_K6_UWCCR			0xC0000085
+#define MSR_K6_EPMR			0xC0000086
+#define MSR_K6_PSOR			0xC0000087
+#define MSR_K6_PFIR			0xC0000088
+
+#define MSR_K7_EVNTSEL0			0xC0010000
+#define MSR_K7_PERFCTR0			0xC0010004
+#define MSR_K7_HWCR			0xC0010015
+#define MSR_K7_CLK_CTL			0xC001001b
+#define MSR_K7_FID_VID_CTL		0xC0010041
+
 #define K8_FIDVID_STATUS		0xC0010042
 #define K10_COFVID_LIMIT		0xC0010061	// max enabled p-state (msr >> 4) & 7
 #define K10_COFVID_CONTROL		0xC0010062	// switch to p-state
@@ -365,30 +390,19 @@ typedef struct _RamSlotInfo_t
 typedef struct _PlatformInfo_t
 {
 	struct CPU {
-		uint32_t		Vendor;			// Vendor - char Vendor[16];
-		char			BrandString[48];	// 48 Byte Branding String
+		uint32_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
+		uint32_t		Vendor;			// Vendor
+		uint32_t		CoresPerPackage;
+		uint32_t		LogicalPerPackage;
+		uint32_t		Signature;		// Processor Signature
+		uint32_t		Stepping;		// Stepping
 		//uint16_t		Type;			// Type
-		uint32_t		Family;			// Family
 		uint32_t		Model;			// Model
 		uint32_t		ExtModel;		// Extended Model
+		uint32_t		Family;			// Family
 		uint32_t		ExtFamily;		// Extended Family
-		uint32_t		Stepping;		// Stepping
-		uint64_t		Features;		// CPU Features like MMX, SSE2, VT, MobileCPU
-		uint64_t		ExtFeatures;
-		//uint32_t		CoresPerPackage;
-		//uint32_t		LogicalPerPackage;
-		uint32_t		Signature;		// Processor Signature
-		//uint8_t		Brand;
-		//uint8_t		ProcessorFlag;
-
 		uint32_t		NoCores;		// No Cores per Package
 		uint32_t		NoThreads;		// Threads per Package
-
-		//uint32_t		CacheSize[LCACHE_MAX];
-		//uint32_t		CacheLineSize;
-
-		//uint8_t		cache_info[64];		// list of cache descriptors
-
 		uint8_t			MaxCoef;		// Max Multiplier
 		uint8_t			MaxDiv;			// Min Multiplier
 		uint8_t			CurrCoef;		// Current Multiplier
@@ -398,19 +412,19 @@ typedef struct _PlatformInfo_t
 		uint64_t		CPUFrequency;		// CPU Frequency Hz
 		uint32_t		MaxRatio;		// Max Bus Ratio
 		uint32_t		MinRatio;		// Min Bus Ratio
+		char			BrandString[48];	// 48 Byte Branding String
 		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
 
-		uint32_t		MCodeVersion;		// CPU Microcode version
 	} CPU;
 
 	struct RAM {
 		uint64_t		Frequency;		// Ram Frequency
 		uint32_t		Divider;		// Memory divider
 		uint8_t			CAS;			// CAS 1/2/2.5/3/4/5/6/7
-		uint8_t			TRC;	
+		uint8_t			TRC;
 		uint8_t			TRP;
 		uint8_t			RAS;
-		uint8_t			Channels;		// Channel Configuration Single,Dual or Triple
+		uint8_t			Channels;		// Channel Configuration Single,Dual, Triple or Quad
 		uint8_t			NoSlots;		// Maximum no of slots available
 		uint8_t			Type;			// Standard SMBIOS v2.5 Memory Type
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];		// Information about each slot
@@ -425,7 +439,7 @@ typedef struct _PlatformInfo_t
 
 	uint8_t				Type;			// system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;			// system-id (SMBIOS Table 1: system uuid)
-//	uint32_t			HWSignature;		// machine-signature (FACS: Hardware Signature)
+	uint32_t			HWSignature;		// machine-signature (FACS: Hardware Signature)
 } PlatformInfo_t;
 
 extern PlatformInfo_t Platform;

@@ -266,12 +266,12 @@ static void clearBootArgs(void)
 	execute_hook("ClearArgs", NULL, NULL, NULL, NULL);
 }
 
-void addBootArg(const char * argStr)
+void addBootArg(const char *argStr)
 {
 	if ( (gBootArgsPtr + strlen(argStr) + 1) < gBootArgsEnd)
 	{
 		if(gBootArgsPtr != gBootArgs) *gBootArgsPtr++ = ' ';
-		strcat(gBootArgs, argStr);
+		strlcat(gBootArgs, argStr, BOOT_STRING_LEN);
 		gBootArgsPtr += strlen(argStr);
 	}
 }
@@ -752,12 +752,12 @@ char *getMemoryInfoString()
 		(i < bootInfo->memoryMapCount) && (bufflen < 1024); /* prevent buffer overflow */
 		i++) {
 		bufflen += snprintf(buff+bufflen, 1024-bufflen, "Base 0x%08x%08x, ",
-                        (unsigned long)(mp->base >> 32),
-                        (unsigned long)(mp->base));
+                        (unsigned)(mp->base >> 32),
+                        (unsigned)(mp->base));
 		bufflen += snprintf(buff+bufflen, 1024-bufflen, "length 0x%08x%08x, type %d\n",
-                        (unsigned long)(mp->length >> 32),
-                        (unsigned long)(mp->length),
-                        mp->type);
+                        (unsigned)(mp->length >> 32),
+                        (unsigned)(mp->length),
+                        (int) mp->type);
 		mp++;
 	}
 	return buff;
@@ -875,7 +875,7 @@ int getBootOptions(bool firstRun)
 			printf(getVBEInfoString());
 		}
 		changeCursor(0, kMenuTopRow, kCursorTypeUnderline, 0);
-		verbose("Scanning device %x...", gBIOSDev);
+		verbose("Scanning device %x...\n", gBIOSDev);
 	}
 
 	// When booting from CD, default to hard drive boot when possible. 
@@ -1424,7 +1424,7 @@ int processBootOptions()
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 	}
-	DBG("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
+	DBG("Boot UUID of '%s' %s (%s): %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))

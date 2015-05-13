@@ -30,10 +30,10 @@
 /* asm.s */
 extern void		real_to_prot(void);
 extern void		prot_to_real(void);
-extern void		halt(void);
-extern void		startprog(unsigned int address, void *arg);
+extern void		halt(void) __attribute__((noreturn));
+extern void		startprog(unsigned int address, void *arg) __attribute__((noreturn));
 extern void		loader(UInt32 code, UInt32 cmdptr);
-extern uint64_t		computeRand(void);
+extern uint32_t		computeRand(void);
 
 /* bios.s */
 extern void   bios(biosBuf_t *bb);
@@ -72,6 +72,7 @@ extern unsigned long getMemoryMap(struct MemoryRange * rangeArray, unsigned long
 extern unsigned long getExtendedMemorySize();
 extern unsigned long getConventionalMemorySize();
 extern void   sleep(int n);
+extern void   enableA20(void);
 
 /* bootstruct.c */
 extern void   initKernBootStruct(void);
@@ -94,8 +95,8 @@ extern int    putchar(int ch);
 extern int    getchar(void);
 extern int    printf(const char *format, ...);
 extern int    error(const char *format, ...);
-extern int    verbose(const char *format, ...);
-extern void   stop(const char *format, ...) __attribute__ ((noreturn));
+extern int    verbose(const char *format, ...) __attribute__((format(printf,1,2)));
+extern void   stop(const char *format, ...) __attribute__ ((noreturn, format(printf,1,2)));
 //Azi: replace getc/getchar with ? console.c
 extern void   pause();
 extern uint64_t getRTCdatetime();
@@ -134,13 +135,12 @@ extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );
-long AllocateMemoryRange(char * rangeName, long start, long length, long type);
+long AllocateMemoryRange(char *rangeName, long start, long length, long type);
 
 /* misc.c */
-extern void   enableA20(void);
 extern int    checkForSupportedHardware();
 extern int	  isLaptop();
-extern void   getPlatformName(char *nameBuf);
+extern void   getPlatformName(char *nameBuf, int size);
 
 /* nbp.c */
 extern UInt32 nbpUnloadBaseCode();

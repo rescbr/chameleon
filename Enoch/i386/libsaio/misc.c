@@ -70,7 +70,7 @@
 
 //==========================================================================
 // Enable A20 gate to be able to access memory above 1MB
-
+static inline void flushKeyboardInputBuffer();
 static inline void flushKeyboardInputBuffer()
 {
     unsigned char ret;
@@ -113,8 +113,8 @@ void enableA20()
 //
 #ifndef BOOT1
 void
-getPlatformName(char *nameBuf)
+getPlatformName(char *nameBuf, int size)
 {
-    strcpy(nameBuf, "ACPI");
+    strlcpy(nameBuf, "ACPI", size);
 }
 #endif

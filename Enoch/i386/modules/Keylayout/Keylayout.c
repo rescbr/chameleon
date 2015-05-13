@@ -145,8 +145,7 @@ void Keylayout_start()
 
 		if (!load_keyboard_layout_file(layoutPath))
 		{
-			DBG("Can't load %s keyboard layout file. Keylayout will not be used !\n",
-				layoutPath);
+			DBG("Can't load %s keyboard layout file. Keylayout will not be used !\n", layoutPath);
 			sleep(2);
 		}
 		else if (!replace_function("_getchar", &getchar_replacement))

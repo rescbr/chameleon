@@ -21,6 +21,7 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -33,54 +34,79 @@
 
 int	infile, outfile;
 
+void *cmds;
+
 struct mach_header	mh;
-void *		cmds;
 
 static bool	swap_ends;
 
+//==============================================================================
+
 static unsigned long swap(unsigned long x)
 {
-    if (swap_ends)
-	return OSSwapInt32(x);
-    else
-	return x;
+	if (swap_ends)
+	{
+		return OSSwapInt32(x);
+	}
+	else
+	{
+		return x;
+	}
 }
 
-int
-main(int argc, char *argv[])
+
+//==============================================================================
+
+int main(int argc, char *argv[])
 {
-    kern_return_t	result;
-    vm_address_t	data;
-    int			nc, ncmds;
-    char *		cp;
-    
+	kern_return_t	result;
+	vm_address_t	data;
+	int			nc, ncmds;
+	char *		cp;
+
 	if (argc == 2)
 	{
 		infile = open(argv[1], O_RDONLY);
+
 		if (infile < 0)
 		{
-			goto usage;
+			goto filenotfound;
 		}
+
 		outfile = fileno(stdout);
 	}
 	else if (argc == 3)
 	{
 		infile = open(argv[1], O_RDONLY);
-		if (infile < 0){
-			goto usage;
+
+		if (infile < 0)
+		{
+			goto filenotfound;
 		}
-		outfile = open(argv[2], O_WRONLY|O_CREAT|O_TRUNC, 0644);
+
+		outfile = open(argv[2], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+
 		if (outfile < 0)
 		{
-			goto usage;
+			goto openerror;
 		}
-	} else {
-usage:
-		fprintf(stderr, "usage: machOconv inputfile [outputfile]\n");
-		exit(1);
 	}
-    
+	else
+	{
+		fprintf(stderr, "Usage: machOconv inputfile [outputfile]\n");
+		exit(1);
+
+		filenotfound:
+			fprintf(stderr, "Error: File Not Found\n");
+			exit(1);
+
+		openerror:
+			fprintf(stderr, "Error: Open Failed\n");
+			exit(1);
+	}
+
 	nc = read(infile, &mh, sizeof (mh));
+
 	if (nc < 0)
 	{
 		perror("read mach header");
@@ -89,7 +115,7 @@ usage:
 
 	if (nc < (int)sizeof (mh))
 	{
-		fprintf(stderr, "read mach header: premature EOF %d\n", nc);
+		fprintf(stderr, "Error: read mach header: premature EOF %d\n", nc);
 		exit(1);
 	}
 
@@ -100,31 +126,36 @@ usage:
 	else if (mh.magic == MH_CIGAM)
 	{
 		swap_ends = true;
-	} else {
-		fprintf(stderr, "bad magic number %lx\n", (unsigned long)mh.magic);
+	}
+	else
+	{
+		fprintf(stderr, "Error: bad magic number %lx\n", (unsigned long)mh.magic);
 		exit(1);
 	}
 
 	cmds = calloc(swap(mh.sizeofcmds), sizeof (char));
+
 	if (cmds == 0)
 	{
-		fprintf(stderr, "alloc load commands: no memory\n");
+		fprintf(stderr, "Error: alloc load commands: no memory\n");
 		exit(1);
 	}
 
 	nc = read(infile, cmds, swap(mh.sizeofcmds));
-	if (nc < 0) 
+
+	if (nc < 0)
 	{
 		perror("read load commands");
 		exit(1);
 	}
+
 	if (nc < (int)swap(mh.sizeofcmds))
 	{
-		fprintf(stderr, "read load commands: premature EOF %d\n", nc);
+		fprintf(stderr, "Error: read load commands: premature EOF %d\n", nc);
 		exit(1);
 	}
 
-	unsigned long vmstart = (unsigned long)-1;
+	unsigned long vmstart = (unsigned long) -1;
 
 	// First pass: determine actual load address
 	for (ncmds = swap(mh.ncmds), cp = cmds; ncmds > 0; ncmds--)
@@ -135,7 +166,7 @@ usage:
 		switch(swap(lcp->cmd))
 		{
 			case LC_SEGMENT:
-				if(vmstart > swap(scp->vmaddr)) 
+				if (vmstart > swap(scp->vmaddr)) 
 				{
 					vmstart = swap(scp->vmaddr);
 				}
@@ -156,15 +187,19 @@ usage:
 		switch(swap(lcp->cmd))
 		{
 			case LC_SEGMENT:
-				isDATA = (strcmp(scp->segname, "__DATA") == 0);
+				isDATA = (strncmp(scp->segname, "__DATA", sizeof("__DATA")) == 0);
+
 				if (isDATA)
 				{
 					vmsize = swap(scp->filesize);
-				} else {
+				}
+				else
+				{
 					vmsize = swap(scp->vmsize);
 				}
 
 				result = vm_allocate(mach_task_self(), &data, vmsize, true);
+
 				if (result != KERN_SUCCESS)
 				{
 					mach_error("vm_allocate segment data", result);
@@ -173,10 +208,13 @@ usage:
 
 				lseek(infile, swap(scp->fileoff), L_SET);
 				nc = read(infile, (void *)data, swap(scp->filesize));
-				if (nc < 0) {
+
+				if (nc < 0)
+				{
 					perror("read segment data");
 					exit(1);
 				}
+
 				if (nc < (int)swap(scp->filesize))
 				{
 					fprintf(stderr, "read segment data: premature EOF %d\n", nc);
@@ -185,6 +223,7 @@ usage:
 
 				lseek(outfile, swap(scp->vmaddr) - vmstart, L_SET);
 				nc = write(outfile, (void *)data, vmsize);
+
 				if (nc < (int)vmsize)
 				{
 					perror("write segment data");

@@ -29,7 +29,7 @@
 	http://forum.voodooprojects.org/index.php/topic,1029.0.html
 
 	Original Intel HDx000 code from valv
-	Intel Ivy Bridge and Haswell code from ErmaC:
+	Intel Ivy Bridge, Haswell and Broadwell code from ErmaC:
 	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
 */
 
@@ -39,25 +39,40 @@
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "gma.h"
 #include "vbe.h"
 #include "graphics.h"
 
 #ifndef DEBUG_GMA
-#define DEBUG_GMA 0
+	#define DEBUG_GMA 0
+#endif
+
+#ifndef DEBUG_BDW
+	#define DEBUG_BDW 1
 #endif
 
 #if DEBUG_GMA
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 static bool	doit	= false;
+
+static uint8_t default_aapl_snb[]		=	{ 0x00,0x03,0x00,0x01 };
+#define AAPL_LEN_SNB ( sizeof(default_aapl_snb) / sizeof(uint8_t) )
+
 static uint8_t default_aapl_ivy[]		=	{ 0x05,0x00,0x62,0x01 }; // ivy_bridge_ig_vals[5]
 #define AAPL_LEN_IVY ( sizeof(default_aapl_ivy) / sizeof(uint8_t) )
+
 static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_vals[7]
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
+
+#if DEBUG_BDW
+static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[2]
+#define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
+#endif
 
 uint8_t GMAX3100_vals[23][4] = {
 	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
@@ -100,7 +115,7 @@ uint8_t ivy_bridge_ig_vals[12][4] = {
 	{ 0x0b,0x00,0x66,0x01 }		//11 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 2, Ports: 3, FBMem: 2
 };
 
-uint8_t haswell_ig_vals[16][4] = { /* - TESTING DATA --*/
+uint8_t haswell_ig_vals[17][4] = {
 	{ 0x00,0x00,0x06,0x04 },	// 0 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - mobile GT1
 	{ 0x00,0x00,0x06,0x0c },	// 1 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - SDV mobile GT1
 	{ 0x00,0x00,0x16,0x04 },	// 2 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - mobile GT2
@@ -112,13 +127,37 @@ uint8_t haswell_ig_vals[16][4] = { /* - TESTING DATA --*/
 	{ 0x00,0x00,0x26,0x0d },	// 8 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - CRW mobile GT3
 	{ 0x02,0x00,0x16,0x04 },	// 9 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 1, Ports: 1, FBMem: 1 - mobile GT2
 	{ 0x03,0x00,0x22,0x0d },	// 10 "AAPL,ig-platform-id" //FB: 0MB, Pipes: 0, Ports: 0, FBMem: 0 - CRW Desktop GT3
-//	{ 0x04,0x00,0x12,0x04 },	// ?? "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x05,0x00,0x26,0x0a },	// 11 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x06,0x00,0x26,0x0a },	// 12 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x07,0x00,0x26,0x0d },	// 13 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 4, FBMem: 3 - CRW mobile GT3
 	{ 0x08,0x00,0x26,0x0a },	// 14 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x08,0x00,0x2e,0x0a },	// 15 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT reserved GT3
+	{ 0x04,0x00,0x12,0x04 }		// 16 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 };
+
+#if DEBUG_BDW
+uint8_t broadwell_ig_vals[19][4] = {
+	{ 0x00,0x00,0x06,0x16 },	// 0  - 16060000 Broadwell GT1 (Intel HD Graphics)
+	{ 0x00,0x00,0x0e,0x16 },	// 1  - 160e0000 Broadwell GT1 (Intel HD Graphics)
+	{ 0x00,0x00,0x16,0x16 },	// 2  - 16160000 Broadwell GT2 (Intel HD Graphics 5500)
+	{ 0x00,0x00,0x1e,0x16 },	// 3  - 161e0000 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
+	{ 0x00,0x00,0x26,0x16 },	// 4  - 16260000 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x00,0x00,0x2b,0x16 },	// 5  - 162b0000 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x00,0x00,0x22,0x16 },	// 6  - 16220000 Broadwell GT3 (Intel Iris Pro Graphics 6200)
+	{ 0x01,0x00,0x0e,0x16 },	// 7  - 160e0001 Broadwell GT1 (Intel HD Graphics)
+	{ 0x01,0x00,0x1e,0x16 },	// 8  - 161e0001 Broadwell GT2 (MacBook) (Intel HD Graphics 5300)
+	{ 0x02,0x00,0x06,0x16 },	// 9  - 16060002 Broadwell GT1 (Intel HD Graphics)
+	{ 0x02,0x00,0x16,0x16 },	// 10 - 16160002 Broadwell GT2 (Intel HD Graphics 5500)
+	{ 0x02,0x00,0x26,0x16 },	// 11 - 16260002 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x02,0x00,0x22,0x16 },	// 12 - 16220002 Broadwell GT3 (Intel Iris Pro Graphics 6200)
+	{ 0x02,0x00,0x2b,0x16 },	// 13 - 162b0002 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x03,0x00,0x12,0x16 },	// 14 - 16120003 Broadwell GT2 (Intel HD Graphics 5600)
+	{ 0x04,0x00,0x2b,0x16 },	// 15 - 162b0004 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
+	{ 0x04,0x00,0x26,0x16 },	// 16 - 16260004 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x05,0x00,0x26,0x16 },	// 17 - 16260005 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x06,0x00,0x26,0x16 }		// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+};
+#endif
 
 uint8_t HD2000_vals[16][4] = {
 	{ 0x00,0x00,0x00,0x00 },    //0 "AAPL00,PixelFormat"
@@ -272,51 +311,51 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	// 010E /* ??? */
 
 	/* Ivy */
-	{GMA_IVYBRIDGE_M_GT1,		HD_GRAPHICS_2500 },
-	{GMA_IVYBRIDGE_M_GT2,		HD_GRAPHICS_4000 },
-	{GMA_IVYBRIDGE_D_GT1,		HD_GRAPHICS_2500 },
-	{GMA_IVYBRIDGE_D_GT2,		HD_GRAPHICS_4000 },
-	{GMA_IVYBRIDGE_S_GT1,		HD_GRAPHICS },
-	{GMA_IVYBRIDGE_S_GT2,		"HD Graphics P4000" },
-	{GMA_IVYBRIDGE_S_GT3,		 HD_GRAPHICS },		// 015e
- 	{GMA_IVYBRIDGE_S_GT4,		HD_GRAPHICS_2500 },	// 0172 /* HD Graphics 2500 Mobile */
-  	{GMA_IVYBRIDGE_S_GT5,		HD_GRAPHICS_2500 },	// 0176 /* HD Graphics 2500 Mobile */
+	{GMA_IVYBRIDGE_M_GT1,		HD_GRAPHICS_2500 },	/* 0156 */
+	{GMA_IVYBRIDGE_M_GT2,		HD_GRAPHICS_4000 },	/* 0166 */
+	{GMA_IVYBRIDGE_D_GT1,		HD_GRAPHICS_2500 },	/* 0152 */
+	{GMA_IVYBRIDGE_D_GT2,		HD_GRAPHICS_4000 },	/* 0162 */
+	{GMA_IVYBRIDGE_S_GT1,		HD_GRAPHICS },		/* 015a */
+	{GMA_IVYBRIDGE_S_GT2,		"HD Graphics P4000" },  /* 016a */
+	{GMA_IVYBRIDGE_S_GT3,		HD_GRAPHICS },		/* 015e */
+	{GMA_IVYBRIDGE_S_GT4,		HD_GRAPHICS_2500 },	/* 0172 */
+  	{GMA_IVYBRIDGE_S_GT5,		HD_GRAPHICS_2500 },	/* 0176 */
 
 	/* Haswell */
 	// 0090 /* ??? */
 	// 0091 /* ??? */
 	// 0092 /* ??? */
-	{GMA_HASWELL_D_GT1,		HD_GRAPHICS },
+	{GMA_HASWELL_D_GT1,		HD_GRAPHICS },		/* 0422 */
 	{GMA_HASWELL_D_GT2,		HD_GRAPHICS_4600 },	/* 0412 */
-	{GMA_HASWELL_D_GT3,		HD_GRAPHICS_5000 },	/* ??? */
-	{GMA_HASWELL_M_GT1,		HD_GRAPHICS },
+	{GMA_HASWELL_D_GT3,		HD_GRAPHICS_5000 },	/* 0422 */
+	{GMA_HASWELL_M_GT1,		HD_GRAPHICS },		/* 0426 */
 	{GMA_HASWELL_M_GT2,		HD_GRAPHICS_4600 },	/* 0416 */
-	{GMA_HASWELL_M_GT3,		HD_GRAPHICS_5000 },	/* ??? */
-	{GMA_HASWELL_S_GT1,		HD_GRAPHICS },
-	{GMA_HASWELL_S_GT2,		"HD Graphics P4600/P4700" },
-	{GMA_HASWELL_S_GT3,		HD_GRAPHICS_5000 },	/* ??? */
-	{GMA_HASWELL_B_GT1,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_B_GT2,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_B_GT3,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_E_GT1,		HD_GRAPHICS },
+	{GMA_HASWELL_M_GT3,		HD_GRAPHICS_5000 },	/* 0426 */
+	{GMA_HASWELL_S_GT1,		HD_GRAPHICS },		/* 040a */
+	{GMA_HASWELL_S_GT2,		"HD Graphics P4600/P4700" },    /* 041a */
+	{GMA_HASWELL_S_GT3,		HD_GRAPHICS_5000 },	/* 042a */
+	{GMA_HASWELL_B_GT1,		HD_GRAPHICS },		/* 040b */
+	{GMA_HASWELL_B_GT2,		HD_GRAPHICS },		/* 041b */
+	{GMA_HASWELL_B_GT3,		HD_GRAPHICS },		/* 042b */
+	{GMA_HASWELL_E_GT1,		HD_GRAPHICS },		/* 040e */
 	{GMA_HASWELL_E_GT2,		HD_GRAPHICS_4400 },	/* 041e */
-	{GMA_HASWELL_E_GT3,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_D_GT1,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_D_GT2,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_D_GT3,		IRIS_5100 },
-	{GMA_HASWELL_ULT_M_GT1,		HD_GRAPHICS },
+	{GMA_HASWELL_E_GT3,		HD_GRAPHICS },		/* 042e */
+	{GMA_HASWELL_ULT_D_GT1,		HD_GRAPHICS },		/* 0a02 */
+	{GMA_HASWELL_ULT_D_GT2,		HD_GRAPHICS },		/* 0a12 */
+	{GMA_HASWELL_ULT_D_GT3,		IRIS_5100 },		/* 0a22 */
+	{GMA_HASWELL_ULT_M_GT1,		HD_GRAPHICS },		/* 0a06 */
 	{GMA_HASWELL_ULT_M_GT2,		HD_GRAPHICS_4400 },	/* 0a16 */
 	{GMA_HASWELL_ULT_M_GT3,		HD_GRAPHICS_5000 },	/* 0a26 */
-	{GMA_HASWELL_ULT_S_GT1,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_S_GT2,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_S_GT3,		IRIS_5100 },
-	{GMA_HASWELL_ULT_B_GT1,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_B_GT2,		HD_GRAPHICS },		/* ??? */
-	{GMA_HASWELL_ULT_B_GT3,		IRIS_5100 },
+	{GMA_HASWELL_ULT_S_GT1,		HD_GRAPHICS },		/* 0a0a */
+	{GMA_HASWELL_ULT_S_GT2,		HD_GRAPHICS },		/* 0a1a */
+	{GMA_HASWELL_ULT_S_GT3,		IRIS_5100 },		/* 0a2a */
+	{GMA_HASWELL_ULT_B_GT1,		HD_GRAPHICS },		/* 0a0b */
+	{GMA_HASWELL_ULT_B_GT2,		HD_GRAPHICS },		/* 0a1b */
+	{GMA_HASWELL_ULT_B_GT3,		IRIS_5100 },		/* 0a2b */
 	{GMA_HASWELL_ULT_E_GT1,		HD_GRAPHICS_4400 },	/* 0a0e */
 	{GMA_HASWELL_ULT_E_GT2,		HD_GRAPHICS_4200 },	/* 0a1e */
 	// 0A2A /* ??? */
-	{GMA_HASWELL_ULT_E_GT3,		IRIS_5100 },
+	{GMA_HASWELL_ULT_E_GT3,		IRIS_5100 },		/* 0a2e */
 	{GMA_HASWELL_SDV_D_GT1_IG,	HD_GRAPHICS },		// 0C02 /* Intel Haswell HD Graphics - GTL */
 	// 0C04 /* DRAM Controller */
 	{GMA_HASWELL_SDV_M_GT1_IG,	HD_GRAPHICS },		// 0C06 /* Intel Haswell HD Graphics - GTL */
@@ -324,22 +363,61 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_HASWELL_SDV_M_GT2_IG,	HD_GRAPHICS },		// 0C16 /* Intel Haswell HD Graphics - GTH */
 	{GMA_HASWELL_SDV_D_GT2_PLUS_IG,	HD_GRAPHICS },		// 0C22 /* Intel Haswell HD Graphics - GTH */
 	{GMA_HASWELL_SDV_M_GT2_PLUS_IG,	HD_GRAPHICS },		// 0C26 /* Intel Haswell HD Graphics - GTH */
+
+//	{GMA_HASWELL_SDV_S_GT1_IG,	HD_GRAPHICS },      /* 0c0a */
+//	{GMA_HASWELL_SDV_S_GT2_IG,	HD_GRAPHICS },      /* 0c1a */
+//	{GMA_HASWELL_SDV_S_GT2_PLUS_IG,	HD_GRAPHICS },      /* 0c2a */
+
 	{GMA_HASWELL_CRW_D_GT1,		HD_GRAPHICS },		/* 0d02 */
-	{GMA_HASWELL_CRW_D_GT2,		HD_GRAPHICS_4600 },
+	{GMA_HASWELL_CRW_D_GT2,		HD_GRAPHICS_4600 },	/* 0d12 */
 	{GMA_HASWELL_CRW_D_GT3,		IRIS_5200 },		/* 0d22 */
+//	{GMA_HASWELL_CRW_D_GT2_PLUS_IG,		HD_GRAPHICS },	/* 0d32 */
 	{GMA_HASWELL_CRW_M_GT1,		HD_GRAPHICS },		/* 0d06 */
 	{GMA_HASWELL_CRW_M_GT2,		HD_GRAPHICS_4600 },	/* 0d16 */
 	{GMA_HASWELL_CRW_M_GT3,		IRIS_5200 },		/* 0d26 */
 	{GMA_HASWELL_CRW_S_GT1,		HD_GRAPHICS },		/* 0d0a */
 	{GMA_HASWELL_CRW_S_GT2,		HD_GRAPHICS },		/* 0d1a */
-	{GMA_HASWELL_CRW_S_GT3,		IRIS_5200 },
+	{GMA_HASWELL_CRW_S_GT3,		IRIS_5200 },		/* 0d2a */
 	{GMA_HASWELL_CRW_B_GT1,		HD_GRAPHICS },		/* 0d0b */
 	{GMA_HASWELL_CRW_B_GT2,		HD_GRAPHICS },		/* 0d1b */
-	{GMA_HASWELL_CRW_B_GT3,		IRIS_5200 },
+	{GMA_HASWELL_CRW_B_GT3,		IRIS_5200 },		/* 0d2b */
 	{GMA_HASWELL_CRW_E_GT1,		HD_GRAPHICS },		/* 0d0e */
 	{GMA_HASWELL_CRW_E_GT2,		HD_GRAPHICS },		/* od1e */
-	{GMA_HASWELL_CRW_E_GT3,		IRIS_5200 },
-	{GMA_HASWELL_CRW_M_GT2_PLUS_IG,	HD_GRAPHICS }
+	{GMA_HASWELL_CRW_E_GT3,		IRIS_5200 },		/* 0d2e */
+	{GMA_HASWELL_CRW_M_GT2_PLUS_IG,	HD_GRAPHICS },		/* 0d36 */
+	{GMA_HASWELL_CRW_S_GT2_PLUS_IG,	HD_GRAPHICS },		/* 0d3a */
+
+	/* Broadwell */
+	{GMA_BROADWELL_BDW_0bd0,		HD_GRAPHICS },		/* 0bd0 */
+	{GMA_BROADWELL_BDW_0bd1,		HD_GRAPHICS },		/* 0bd1 */
+	{GMA_BROADWELL_BDW_0bd2,		HD_GRAPHICS },		/* 0bd2 */
+	{GMA_BROADWELL_BDW_0bd3,		HD_GRAPHICS },		/* 0bd3 */
+	{GMA_BROADWELL_BDW_0bd4,		HD_GRAPHICS },		/* 0bd4 */
+
+	{GMA_BROADWELL_BDW_1602,		HD_GRAPHICS },		/* 1602 */
+	{GMA_BROADWELL_BDW_U_GT1,		HD_GRAPHICS },		/* 1606 */
+	{GMA_BROADWELL_BDW_160B,		HD_GRAPHICS },		/* 160b */
+	{GMA_BROADWELL_BDW_160A,		HD_GRAPHICS },		/* 160a */
+	{GMA_BROADWELL_BDW_160D,		HD_GRAPHICS },		/* 160d */
+	{GMA_BROADWELL_BDW_160E,		HD_GRAPHICS },		/* 160e */
+	{GMA_BROADWELL_BDW_1612,		HD_GRAPHICS_5600},	/* 1612 */
+ 	{GMA_BROADWELL_BDW_U_GT2,		HD_GRAPHICS_5500 },	/* 1616 */
+	{GMA_BROADWELL_BDW_161B,		HD_GRAPHICS },		/* 161b */
+	{GMA_BROADWELL_BDW_161A,		HD_GRAPHICS },		/* 161a */
+	{GMA_BROADWELL_BDW_161D,		HD_GRAPHICS },		/* 161d */
+	{GMA_BROADWELL_BDW_Y_GT2,		HD_GRAPHICS_5300 },	/* 161e */
+	{GMA_BROADWELL_BDW_1622,		IRIS_6200},		/* 1622 */
+	{GMA_BROADWELL_BDW_U_GT3,		HD_GRAPHICS_6000 },	/* 1626 */
+	{GMA_BROADWELL_BDW_162A,		IRIS_6300},		/* 162a */
+	{GMA_BROADWELL_BDW_U_GT3_2,		IRIS_6100 },		/* 162b */
+	{GMA_BROADWELL_BDW_162D,		IRIS_6300 },		/* 162d */
+	{GMA_BROADWELL_BDW_162E,		HD_GRAPHICS },		/* 162e */
+	{GMA_BROADWELL_BDW_1632,		HD_GRAPHICS },		/* 1632 */
+	{GMA_BROADWELL_BDW_1636,		HD_GRAPHICS },		/* 1636 */
+	{GMA_BROADWELL_BDW_163B,		HD_GRAPHICS },		/* 163b */
+	{GMA_BROADWELL_BDW_163A,		HD_GRAPHICS },		/* 163a */
+	{GMA_BROADWELL_BDW_163D,		HD_GRAPHICS },		/* 163d */
+	{GMA_BROADWELL_BDW_163E,		HD_GRAPHICS }		/* 163e */
 };
 
 #define GFX_DEVICES_LEN (sizeof(intel_gfx_chipsets) / sizeof(intel_gfx_chipsets[0]))
@@ -421,7 +499,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_IRONLAKE_M_G: // 0046
 			devprop_add_value(device, "built-in",		&BuiltIn, 1);
 			devprop_add_value(device, "class-code",		ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",		(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL,os-info",	HDx000_os_info, 20);
 			break;
 		/* 27A2, 27AE, 27A6, A001, A011, A012, */
@@ -479,8 +556,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 		/* 0106 */
 		case GMA_SANDYBRIDGE_M_GT1: // HD Graphics 2000 Mobile
-			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
+			devprop_add_value(device, "class-code",			ClassFix, 4);
 			devprop_add_value(device, "AAPL00,PixelFormat",		HD2000_vals[0], 4);
 			devprop_add_value(device, "AAPL00,T1",			HD2000_vals[1], 4);
 			devprop_add_value(device, "AAPL00,T2",			HD2000_vals[2], 4);
@@ -497,13 +573,31 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "graphic-options",		HD2000_vals[13], 4);
 			devprop_add_value(device, "AAPL,tbl-info",		HD2000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
 			break;
 
 		/* 0116, 0126 */
 		case GMA_SANDYBRIDGE_M_GT2: // HD Graphics 3000 Mobile
 		case GMA_SANDYBRIDGE_M_GT2_PLUS:
 			devprop_add_value(device, "class-code",			ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
 			devprop_add_value(device, "AAPL00,PixelFormat",		HD3000_vals[0], 4);
 			devprop_add_value(device, "AAPL00,T1",			HD3000_vals[1], 4);
 			devprop_add_value(device, "AAPL00,T2",			HD3000_vals[2], 4);
@@ -520,8 +614,28 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "graphic-options",		HD3000_vals[13], 4);
 			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
-			devprop_add_value(device, "AAPL,snb-platform-id",	HD3000_vals[16], 4);// previusly commented
-		break;
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00010000; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
+			break;
 
 		/* 0102 */
 		/* HD Graphics 2000 */
@@ -530,9 +644,29 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
-			devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
-			devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
+			devprop_add_value(device, "AAPL,tbl-info",		HD2000_tbl_info, 18);
+			devprop_add_value(device, "AAPL,os-info",		HD2000_os_info, 20);
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
 			break;
 
 		/* Sandy Bridge */
@@ -541,11 +675,33 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_SANDYBRIDGE_GT2_PLUS: // 0122
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
-			device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
-			devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
-			//devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
-			devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
-			devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
+
+			devprop_add_value(device, "vendor-id",			(uint8_t *)INTEL_VENDORID, 4);
+
+
+			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
+			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SNB * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SNB];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SNB) == 0)
+				{
+					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
+
+					verbose("Using user supplied AAPL,snb-platform-id\n");
+					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
+				}
+				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x00030010; // set the default platform ig
+				devprop_add_value(device, "AAPL,snb-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
 			break;
 
 		/* Ivy Bridge */
@@ -617,7 +773,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
 			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+
 			break;
 
 		/* Haswell */
@@ -629,13 +785,11 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_E_GT2: // 041e
 		case GMA_HASWELL_ULT_M_GT2: // 0a16
 		case GMA_HASWELL_ULT_E_GT2: // 0a1e
+
 			verbose("Injecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
 			device_id = 0x00000412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
-			devprop_add_value(device, "compatible",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
-//			devprop_add_value(device, "IOName",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
-			devprop_add_value(device, "name",	(uint8_t *)"pci8086,0412", 13); // GT2 Desktop
 			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
 
 		case GMA_HASWELL_D_GT1: // 0402
@@ -676,6 +830,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_CRW_E_GT2: // 0d1e
 		case GMA_HASWELL_CRW_E_GT3: // 0d2e
 		case GMA_HASWELL_CRW_M_GT2_PLUS_IG: // 0d36
+		case GMA_HASWELL_CRW_S_GT2_PLUS_IG: // 0d3a
 
 			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_HSW * 2)
 			{
@@ -693,14 +848,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			}
 			else if (getIntForKey(kIntelAzulFB, &n_igs, &bootInfo->chameleonConfig))
 			{
-				if ((n_igs >= 0) || (n_igs <= 15))
+				if ((n_igs >= 0) || (n_igs <= 16))
 				{
 					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", haswell_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 15.\n");
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 16.\n");
 				}
 			}
 			else
@@ -712,9 +867,80 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
 			devprop_add_value(device, "class-code", ClassFix, 4);
-			//devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10);
+
 			break;
 
+#if DEBUG_BDW
+		/* Broadwell */
+		/* HD Graphics 5300 Mobile, HD Graphics 6000 Mobile, HD Graphics 6100 Mobile */
+		case GMA_BROADWELL_BDW_0bd0:    // 0bd0
+		case GMA_BROADWELL_BDW_0bd1:    // 0bd1
+		case GMA_BROADWELL_BDW_0bd2:    // 0bd2
+		case GMA_BROADWELL_BDW_0bd3:    // 0bd3
+		case GMA_BROADWELL_BDW_0bd4:    // 0bd4
+		case GMA_BROADWELL_BDW_1602:    // 1602
+		case GMA_BROADWELL_BDW_U_GT1:   // 1606
+		case GMA_BROADWELL_BDW_160B:    // 160b
+		case GMA_BROADWELL_BDW_160A:    // 160a
+		case GMA_BROADWELL_BDW_160D:    // 160d
+		case GMA_BROADWELL_BDW_160E:    // 160e
+		case GMA_BROADWELL_BDW_1612:    // 1612
+		case GMA_BROADWELL_BDW_U_GT2:   // 1616
+		case GMA_BROADWELL_BDW_161B:    // 161b
+		case GMA_BROADWELL_BDW_161A:    // 161a
+		case GMA_BROADWELL_BDW_161D:    // 161d
+		case GMA_BROADWELL_BDW_Y_GT2:   // 161e (MacBook) Intel HD Graphics 5300
+		case GMA_BROADWELL_BDW_1622:    // 1622
+		case GMA_BROADWELL_BDW_U_GT3:   // 1626 (MacBook Air) Intel HD Graphics 6000
+		case GMA_BROADWELL_BDW_162A:    // 162a
+		case GMA_BROADWELL_BDW_U_GT3_2: // 162b (MacBook Pro) Intel Iris Graphics 6100
+		case GMA_BROADWELL_BDW_162D:    // 162d
+		case GMA_BROADWELL_BDW_162E:    // 162e
+		case GMA_BROADWELL_BDW_1632:    // 1632
+		case GMA_BROADWELL_BDW_1636:    // 1636
+		case GMA_BROADWELL_BDW_163B:    // 163b
+		case GMA_BROADWELL_BDW_163A:    // 163a
+		case GMA_BROADWELL_BDW_163D:    // 163d
+		case GMA_BROADWELL_BDW_163E:    // 163e
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_BDW * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_BDW];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_BDW) == 0)
+				{
+					memcpy(default_aapl_broadwell, new_aapl0, AAPL_LEN_BDW);
+
+					verbose("Using user supplied AAPL,ig-platform-id\n");
+					verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+						default_aapl_broadwell[0], default_aapl_broadwell[1], default_aapl_broadwell[2], default_aapl_broadwell[3]);
+				}
+				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_broadwell, AAPL_LEN_BDW);
+			}
+			else if (getIntForKey(kIntelBdwFB, &n_igs, &bootInfo->chameleonConfig))
+			{
+				if ((n_igs >= 0) || (n_igs <= 19))
+				{
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					devprop_add_value(device, "AAPL,ig-platform-id", broadwell_ig_vals[n_igs], 4);
+				}
+				else
+				{
+					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 18.\n");
+				}
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x16160000; // set the default platform ig
+				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
+			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+			devprop_add_value(device, "built-in", &BuiltIn, 1);
+			devprop_add_value(device, "class-code", ClassFix, 4);
+
+			break;
+#endif // DEBUG_BDW
 		default:
 			break;
 	}

@@ -241,7 +241,7 @@ PRT_parse(disk, prt, offset, reloff, partn, pn)
 
 	/* Zero out entry if not used */
         if (partn->id == DOSPTYP_UNUSED ) {
-	  memset(partn, 0, sizeof(*partn));
+	  memset(partn, 0, sizeof(prt_t));
         }
 }
 
@@ -353,7 +353,7 @@ PRT_fix_BN(disk, part, pn)
 
 	/* Zero out entry if not used */
 	if (part->id == DOSPTYP_UNUSED ) {
-		memset(part, 0, sizeof(*part));
+		memset(part, 0, sizeof(prt_t));
 		return;
 	}
 
@@ -390,7 +390,7 @@ PRT_fix_CHS(disk, part, pn)
 
 	/* Zero out entry if not used */
 	if (part->id == DOSPTYP_UNUSED ) {
-		memset(part, 0, sizeof(*part));
+		memset(part, 0, sizeof(prt_t));
 		return;
 	}
 

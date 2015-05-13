@@ -14,13 +14,13 @@
 #include "vers.h"
 
 #ifndef DEBUG_GUI
-#define DEBUG_GUI 0
+	#define DEBUG_GUI 0
 #endif
 
 #if DEBUG_GUI
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 #define IMG_REQUIRED -1
@@ -54,6 +54,8 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
+//	iDeviceHFS_gala,
+//	iDeviceHFS_gala_o,
 	iDeviceHFS_yos,
 	iDeviceHFS_yos_o,
 	iDeviceHFS_mav,
@@ -71,6 +73,8 @@ enum {
 
 	iDeviceHFSRAID,
 	iDeviceHFSRAID_o,
+//	iDeviceHFSRAID_gala,
+//	iDeviceHFSRAID_gala_o,
 	iDeviceHFSRAID_yos,
 	iDeviceHFSRAID_yos_o,
 	iDeviceHFSRAID_mav,
@@ -91,6 +95,8 @@ enum {
 
 	iDeviceHFSFUSION,
 	iDeviceHFSFUSION_o,
+//	iDeviceHFSFUSION_gala,
+//	iDeviceHFSFUSION_gala_o,
 	iDeviceHFSFUSION_yos,
 	iDeviceHFSFUSION_yos_o,
 	iDeviceHFSFUSION_mav,
@@ -153,6 +159,8 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
+//	{.name = "device_hfsplus_gala",         .image = NULL},
+//	{.name = "device_hfsplus_gala_o",       .image = NULL},
 	{.name = "device_hfsplus_yos",          .image = NULL},
 	{.name = "device_hfsplus_yos_o",        .image = NULL},
 	{.name = "device_hfsplus_mav",          .image = NULL},
@@ -170,6 +178,8 @@ image_t images[] = {
 
 	{.name = "device_hfsraid",              .image = NULL},
 	{.name = "device_hfsraid_o",            .image = NULL},
+//	{.name = "device_hfsraid_gala",         .image = NULL},
+//	{.name = "device_hfsraid_gala_o",       .image = NULL},
 	{.name = "device_hfsraid_yos",          .image = NULL},
 	{.name = "device_hfsraid_yos_o",        .image = NULL},
 	{.name = "device_hfsraid_mav",          .image = NULL},
@@ -190,6 +200,8 @@ image_t images[] = {
 
 	{.name = "device_hfsfusion",            .image = NULL},
 	{.name = "device_hfsfusion_o",          .image = NULL},
+//	{.name = "device_hfsfusion_gala",       .image = NULL},
+//	{.name = "device_hfsfusion_gala_o",     .image = NULL},
 	{.name = "device_hfsfusion_yos",        .image = NULL},
 	{.name = "device_hfsfusion_yos_o",      .image = NULL},
 	{.name = "device_hfsfusion_mav",        .image = NULL},
@@ -283,8 +295,10 @@ static unsigned long screen_params[4] = {DEFAULT_SCREEN_WIDTH, DEFAULT_SCREEN_HE
 static int getImageIndexByName(const char *name)
 {
 	int i;
-	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++) {
-		if (strcmp(name, images[i].name) == 0) {
+	for (i = 0; i < sizeof(images) / sizeof(images[0]); i++)
+	{
+		if (strncmp(name, images[i].name, sizeof(images[i].name)) == 0)
+		{
 			return i; // found the name
 		}
 	}
@@ -302,7 +316,7 @@ static int getEmbeddedImageIndexByName(const char *name)
 	// NOTE: This algorithm assumes that the embedded images are sorted.
 	// This is currently done using the make file. If the array is
 	// generated manualy, this *will* fail to work properly.
-	while((result = strcmp(name, embeddedImages[compareIndex].name)) != 0)
+	while((result = strncmp(name, embeddedImages[compareIndex].name, sizeof(embeddedImages[compareIndex].name))) != 0)
 	{
 		if (result > 0)	{ // We need to search a HIGHER index
 			if (compareIndex != lowerLimit) {
@@ -402,6 +416,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+//	LOADPNG(device_hfsplus_gala,            iDeviceHFS);
+//	LOADPNG(device_hfsplus_gala_o,          iDeviceHFS_gala);
 	LOADPNG(device_hfsplus_yos,             iDeviceHFS);
 	LOADPNG(device_hfsplus_yos_o,           iDeviceHFS_yos);
 	LOADPNG(device_hfsplus_mav,             iDeviceHFS);
@@ -419,6 +435,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
+//	LOADPNG(device_hfsraid_gala,            iDeviceHFSRAID);
+//	LOADPNG(device_hfsraid_gala_o,          iDeviceHFSRAID_gala);
 	LOADPNG(device_hfsraid_yos,             iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_yos_o,           iDeviceHFSRAID_yos);
 	LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
@@ -439,6 +457,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsfusion,               iDeviceHFS);
 	LOADPNG(device_hfsfusion_o,             iDeviceHFSFUSION);
+//	LOADPNG(device_hfsfusion_gala,          iDeviceHFSFUSION);
+//	LOADPNG(device_hfsfusion_gala_o,        iDeviceHFSFUSION_gala);
 	LOADPNG(device_hfsfusion_yos,           iDeviceHFSFUSION);
 	LOADPNG(device_hfsfusion_yos_o,         iDeviceHFSFUSION_yos);
 	LOADPNG(device_hfsfusion_mav,           iDeviceHFSFUSION);
@@ -565,7 +585,7 @@ int createBackBuffer( window_t *window )
 	gui.backbuffer = malloc(sizeof(pixmap_t));
 	if(!gui.backbuffer)
 	{
-//		DBG("Unable to allocate memory for gui.backbuffer");
+		DBG("Unable to allocate memory for gui.backbuffer");
 		return 1;
 	}
 
@@ -574,7 +594,7 @@ int createBackBuffer( window_t *window )
 	{
 		free(gui.backbuffer);
 		gui.backbuffer = 0;
-//		DBG("Unable to allocate memory for gui.backbuffer->pixels");
+		DBG("Unable to allocate memory for gui.backbuffer->pixels");
 		return 1;
 	}
 	
@@ -591,7 +611,7 @@ int createWindowBuffer( window_t *window )
 	window->pixmap = malloc(sizeof(pixmap_t));
 	if(!window->pixmap)
 	{
-//		DBG("Unable to allocate memory for window->pixmap");
+		DBG("Unable to allocate memory for window->pixmap");
 		return 1;
 	}
 
@@ -600,7 +620,7 @@ int createWindowBuffer( window_t *window )
 	{
 		free(window->pixmap);
 		window->pixmap = 0;
-//		DBG("Unable to allocate memory for window->pixmap->pixels");
+		DBG("Unable to allocate memory for window->pixmap->pixels");
 		return 1;
 	}
 	
@@ -957,12 +977,13 @@ int initGUI(void)
 	config_file_t	*config;
     
 	config = &bootInfo->themeConfig;
-	if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0) {
-	return 1;
+	if (ParseXMLFile((char *)__theme_plist, &config->dictionary) != 0)
+	{
+		return 1;
 	}
 #else
 
-//		DBG("Unable to load %s theme plist.\n",theme_name);
+		DBG("Unable to load %s theme plist.\n",theme_name);
 
 		return 1;
 
@@ -1106,10 +1127,6 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 				break;
 
 			}
-			//case kPartitionTypeOSXBoot:
-			//	devicetype = iDeviceHFSRECOVERY;		// Use Recovery icon
-			//	break;
-
 			case kPartitionTypeHPFS:
 				devicetype = iDeviceNTFS;		// Use HPFS / NTFS icon
 				break;
@@ -2125,6 +2142,7 @@ void animateProgressBar()
 	}
 }
 #endif
+
 // ====================================================================
 
 void drawProgressBar(pixmap_t *blendInto, uint16_t width, position_t p, uint8_t progress)

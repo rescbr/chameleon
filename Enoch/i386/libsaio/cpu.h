@@ -10,6 +10,85 @@
 
 extern void scan_cpu(PlatformInfo_t *);
 
+struct clock_frequency_info_t
+{
+	unsigned long bus_clock_rate_hz;
+	unsigned long cpu_clock_rate_hz;
+	unsigned long dec_clock_rate_hz;
+	unsigned long bus_clock_rate_num;
+	unsigned long bus_clock_rate_den;
+	unsigned long bus_to_cpu_rate_num;
+	unsigned long bus_to_cpu_rate_den;
+	unsigned long bus_to_dec_rate_num;
+	unsigned long bus_to_dec_rate_den;
+	unsigned long timebase_frequency_hz;
+	unsigned long timebase_frequency_num;
+	unsigned long timebase_frequency_den;
+	unsigned long long bus_frequency_hz;
+	unsigned long long bus_frequency_min_hz;
+	unsigned long long bus_frequency_max_hz;
+	unsigned long long cpu_frequency_hz;
+	unsigned long long cpu_frequency_min_hz;
+	unsigned long long cpu_frequency_max_hz;
+	unsigned long long prf_frequency_hz;
+	unsigned long long prf_frequency_min_hz;
+	unsigned long long prf_frequency_max_hz;
+	unsigned long long mem_frequency_hz;
+	unsigned long long mem_frequency_min_hz;
+	unsigned long long mem_frequency_max_hz;
+	unsigned long long fix_frequency_hz;
+};
+
+typedef struct clock_frequency_info_t clock_frequency_info_t;
+
+extern clock_frequency_info_t gPEClockFrequencyInfo;
+
+
+struct mach_timebase_info
+{
+	uint32_t	numer;
+	uint32_t	denom;
+};
+
+struct hslock
+{
+	int		lock_data;
+};
+typedef struct hslock hw_lock_data_t, *hw_lock_t;
+
+#define hw_lock_addr(hwl)	(&((hwl).lock_data))
+
+typedef struct uslock_debug
+{
+	void		*lock_pc;	/* pc where lock operation began    */
+	void		*lock_thread;	/* thread that acquired lock */
+	unsigned long	duration[2];
+	unsigned short	state;
+	unsigned char	lock_cpu;
+	void		*unlock_thread;	/* last thread to release lock */
+	unsigned char	unlock_cpu;
+	void		*unlock_pc;	/* pc where lock operation ended    */
+} uslock_debug;
+
+typedef struct slock
+{
+	hw_lock_data_t	interlock;	/* must be first... see lock.c */
+	unsigned short	lock_type;	/* must be second... see lock.c */
+#define USLOCK_TAG	0x5353
+	uslock_debug	debug;
+} usimple_lock_data_t, *usimple_lock_t;
+
+#if !defined(decl_simple_lock_data)
+typedef usimple_lock_data_t	*simple_lock_t;
+typedef usimple_lock_data_t	simple_lock_data_t;
+
+#define	decl_simple_lock_data(class,name) \
+class	simple_lock_data_t	name;
+#endif	/* !defined(decl_simple_lock_data) */
+
+typedef struct mach_timebase_info	*mach_timebase_info_t;
+typedef struct mach_timebase_info	mach_timebase_info_data_t;
+
 // DFE: These two constants come from Linux except CLOCK_TICK_RATE replaced with CLKNUM
 #define CALIBRATE_TIME_MSEC	30		/* 30 msecs */
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)

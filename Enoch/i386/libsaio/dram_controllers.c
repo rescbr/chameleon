@@ -222,8 +222,7 @@ static void get_fsb_im965(pci_dt_t *dram_dev)
 
 	// Compute RAM Frequency
 	Platform.RAM.Frequency = (Platform.CPU.FSBFrequency * mch_ratio) / 100000;
-
-	DBG("ram_fsb %d\n", Platform.RAM.Frequency);
+	// DBG("ram_fsb %d\n", Platform.RAM.Frequency);
 }
 
 
@@ -238,7 +237,7 @@ static void get_fsb_nhm(pci_dt_t *dram_dev)
 
 	// Compute RAM Frequency
 	Platform.RAM.Frequency = Platform.CPU.FSBFrequency * mch_ratio / 2;
-	DBG("ram_fsb %d\n", Platform.RAM.Frequency);
+	// DBG("ram_fsb %d\n", Platform.RAM.Frequency);
 }
 
 /*
@@ -488,79 +487,57 @@ static void get_timings_nhm(pci_dt_t *dram_dev)
 static struct mem_controller_t dram_controllers[] = {
 
 	// Default unknown chipset
-	{ 0, 0, "",	NULL, NULL, NULL },
+	{ 0, 0, "",					NULL, NULL, NULL },
 
 	// Intel
-//	{ 0x8086, 0x0100, "2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0104, "2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x010C, "Xeon E3-1200/2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0150, "Xeon E3-1200 v2/3rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0154, "3rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0158, "Xeon E3-1200 v2/Ivy Bridge",	NULL, NULL, NULL },
-//	{ 0x8086, 0x015C, "Xeon E3-1200 v2/3rd Gen Core processor",	NULL, NULL, NULL },
-
-//	{ 0x8086, 0x0BF0, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF1, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF2, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF3, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF4, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF5, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF6, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF7, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-
-//	{ 0x8086, 0x0C00, "Haswell",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0C04, "Haswell",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0C08, "Haswell",	NULL, NULL, NULL },
-
-	{ 0x8086, 0x7190, "VMWare",	NULL, NULL, NULL },
+	{ 0x8086, 0x7190, "VMWare",			NULL, NULL, NULL },
 
 	{ 0x8086, 0x1A30, "82845 845 [Brookdale]",	NULL, NULL, NULL },
 	
 	{ 0x8086, 0x2970, "82946GZ/PL/GL",		setup_p35, get_fsb_i965,	get_timings_i965	},
 	{ 0x8086, 0x2990, "82Q963/Q965",		setup_p35, get_fsb_i965,	get_timings_i965	},
-	{ 0x8086, 0x29A0, "P965/G965",		setup_p35, get_fsb_i965,	get_timings_i965	},
+	{ 0x8086, 0x29A0, "P965/G965",			setup_p35, get_fsb_i965,	get_timings_i965	},
 
-	{ 0x8086, 0x2A00, "GM965/GL960",	setup_p35, get_fsb_im965,	get_timings_im965	},
-	{ 0x8086, 0x2A10, "GME965/GLE960",	setup_p35, get_fsb_im965,	get_timings_im965	},
-	{ 0x8086, 0x2A40, "PM/GM45/47",		setup_p35, get_fsb_im965,	get_timings_im965	},
+	{ 0x8086, 0x2A00, "GM965/GL960",		setup_p35, get_fsb_im965,	get_timings_im965	},
+	{ 0x8086, 0x2A10, "GME965/GLE960",		setup_p35, get_fsb_im965,	get_timings_im965	},
+	{ 0x8086, 0x2A40, "PM/GM45/47",			setup_p35, get_fsb_im965,	get_timings_im965	},
 
-	{ 0x8086, 0x29B0, "82Q35 Express",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x29C0, "82G33/G31/P35/P31",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x29D0, "82Q33 Express",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x29E0, "82X38/X48 Express",		setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29B0, "Q35",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29C0, "P35/G33",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29D0, "Q33",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x29E0, "X38/X48",			setup_p35, get_fsb_i965,	get_timings_p35		},
 	{ 0x8086, 0x29F0, "3200/3210",			setup_p35, get_fsb_i965,	get_timings_p35		},
 
-	{ 0x8086, 0x2E00, "Eaglelake",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x2E10, "Q45/Q43",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x2E20, "P45/G45",		setup_p35, get_fsb_i965,	get_timings_p35		},
-	{ 0x8086, 0x2E30, "G41",		setup_p35, get_fsb_i965,	get_timings_p35		},
-//	{ 0x8086, 0x2E40, "4 Series Chipset",		NULL, NULL, NULL },
-//	{ 0x8086, 0x2E90, "4 Series Chipset",		NULL, NULL, NULL },
+	{ 0x8086, 0x2E00, "Eaglelake",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x2E10, "Q45/Q43",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x2E20, "P45/G45",			setup_p35, get_fsb_i965,	get_timings_p35		},
+	{ 0x8086, 0x2E30, "G41",			setup_p35, get_fsb_i965,	get_timings_p35		},
 
-	{ 0x8086, 0xD131, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0xD132, "NHM IMC",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0xD131, "NHM IMC",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0xD132, "NHM IMC",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0x3400, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0x3401, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 	{ 0x8086, 0x3402, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0x3403, "5500",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0x3404, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0x3405, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0x3406, "5520",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
-	{ 0x8086, 0x3407, "5520/5500/X58",		setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0x3403, "5500",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0x3404, "X58",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0x3405, "X58",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0x3406, "5520",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
+	{ 0x8086, 0x3407, "X58",			setup_nhm, get_fsb_nhm,		get_timings_nhm		},
 };
 
 static const char *memory_channel_types[] =
 {
-	"Unknown", "Single", "Dual", "Triple"
+	"Unknown", "Single", "Dual", "Triple" /*, "Quad" */
 };
 
 void scan_dram_controller(pci_dt_t *dram_dev)
 {
 	int i;
-	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++) {
+	for(i = 1; i < sizeof(dram_controllers) / sizeof(dram_controllers[0]); i++)
+	{
 		if ((dram_controllers[i].vendor == dram_dev->vendor_id) && (dram_controllers[i].device == dram_dev->device_id)) {
 			verbose("%s%s DRAM Controller [%4x:%4x] at %02x:%02x.%x\n", 
-				(dram_dev->vendor_id == 0x8086) ? "Intel Corporation " : "" ,
+				(dram_dev->vendor_id == 0x8086) ? "Intel " : "" ,
 				dram_controllers[i].name, dram_dev->vendor_id, dram_dev->device_id,
 				dram_dev->dev.bits.bus, dram_dev->dev.bits.dev, dram_dev->dev.bits.func);
 

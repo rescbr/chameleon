@@ -44,7 +44,7 @@ int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
 			return 0;
 		}
 
-		if(!devprop_add_value(device, "device_type", (uint8_t *)"Ethernet Controller", 20))
+		if(!devprop_add_value(device, "device_type", (uint8_t *)"ethernet", 9))
 		{
 			return 0;
 		}
@@ -169,7 +169,7 @@ void setup_eth_builtin(pci_dt_t *eth_dev)
 
 		devprop_add_network_template(device, eth_dev->vendor_id);
 		devprop_add_value(device, "model", (uint8_t *)name_model, (strlen(name_model) + 1));
-		devprop_add_value(device, "device_type", (uint8_t *)"Ethernet Controller", 20);
+		devprop_add_value(device, "device_type", (uint8_t *)"ethernet", 9);
 
 		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
 		if(stringdata)

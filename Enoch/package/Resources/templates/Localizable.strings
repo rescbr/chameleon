@@ -22,14 +22,33 @@ boot0 (On the drive's MBR) responsible for loading boot1.
 boot1 (On the partition's boot-sector) to finding boot2.
 boot2 (On the partition's root directory) for loading kernel etc.";
 
-"Standard_title" = "Standard";
-"Standard_description" = "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one.";
+"BootNo_title" = "Don't install the Bootloader";
+"BootNo_description" = "Useful if you only want to install the extra's.";
 
-"noboot_title" = "Don't install the Bootloader";
-"noboot_description" = "Useful if you only want to install the extra's.";
+"Stages_title" = "Bootloader Stages";
+"Stages_description" = "Here you can chose to skip the bootloader installation completely or partially.
+This can be usefull if you want to write Extra's, or skip some stage (0,1 and activation of the target partition).
+Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.
+boot is always copied to the target partition when you are skipping one or more stages.";
+
+"SkipStage0_title" = "Skip Stage 0";
+"SkipStage0_description" = "Avoid writing stage 0 to the target disk.
+Stage 2 is always copied/replaced.";
+
+"SkipStage1_title" = "Skip Stage 1";
+"SkipStage1_description" = "Avoid writing stage 1 to the partition boot sector.
+Stage 2 is always copied/replaced.";
+
+"SkipActivePartition_title" = "Skip Activation";
+"SkipActivePartition_description" = "Prevents activation of the target partition.
+Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.
+Stage 2 is always copied/replaced.";
+
+"Standard_title" = "Install Chameleon in the chosen partition.";
+"Standard_description" = "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one.";
 
 "EFI_title" = "Install Chameleon in the ESP";
-"EFI_description" = "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system.";
+"EFI_description" = "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system.";
 
 // ============================================================================
 // Modules

@@ -44,6 +44,16 @@
 #include "libsaio.h"
 
 
+#ifndef DEBUG_MEMRANGE
+	#define DEBUG_MEMRANGE 1
+#endif
+
+#if DEBUG_MEMRANGE
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)	msglog(x)
+#endif
+
 #define MAX_DRIVES 8
 
 static biosBuf_t bb;
@@ -126,7 +136,9 @@ unsigned int time18(void)
 #endif
 }
 
-//#if 0 /* COMMENTED */
+#if DEBUG_MEMRANGE
+
+static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
 {
 	int i, still_changing, newcount = count;
@@ -183,7 +195,7 @@ static unsigned long rerangeMemoryMap(unsigned long count)
 
 	return newcount;
 }
-//#endif /* COMMENTED */
+#endif
 
 unsigned long getMemoryMap( MemoryRange *   rangeArray,
                             unsigned long   maxRangeCount,
@@ -195,7 +207,9 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 	MemoryRange *	range = (MemoryRange *)BIOS_ADDR;
 	unsigned long	count = 0;
+#if DEBUG_MEMRANGE
 	unsigned long	rerangedCount;
+#endif
 	unsigned long long	conMemSize = 0;
 	unsigned long long	extMemSize = 0;
 
@@ -265,10 +279,10 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 	*conMemSizePtr = conMemSize / 1024;  // size in KB
 	*extMemSizePtr = extMemSize / 1024;  // size in KB
 
-//#if 0 /* COMMENTED */
+#if DEBUG_MEMRANGE
 	rerangedCount = rerangeMemoryMap(count);
 	range += rerangedCount - count;
-//#endif /* COMMENTED */
+#endif
 
 	// Copy out data
 	bcopy((char *)BIOS_ADDR, rangeArray, ((char *)range - (char *)BIOS_ADDR));
@@ -590,7 +604,7 @@ int is_no_emulation(int drive)
 /*
  * BIOS drive information.
  */
-void print_drive_info(boot_drive_info_t *dp)
+static void print_drive_info(boot_drive_info_t *dp)
 {
 //	printf("buf_size = %x\n", dp->params.buf_size);
 	printf("info_flags = %x\n", dp->params.info_flags);
@@ -821,7 +835,7 @@ void setActiveDisplayPage( int page )
 
 #if DEBUG
 
-int terminateDiskEmulation()
+static int terminateDiskEmulation()
 {
 	static char cd_spec[0x13];
 
@@ -834,7 +848,7 @@ int terminateDiskEmulation()
 	return bb.eax.r.h;
 }
 
-int readDriveParameters(int drive, struct driveParameters *dp)
+static int readDriveParameters(int drive, struct driveParameters *dp)
 {
 	bb.intno = 0x13;
 	bb.edx.r.l = drive;
@@ -1016,16 +1030,15 @@ ReadPCIBusInfo(PCI_bus_info_t *pp)
 
 void sleep(int n)
 {
-	// FIXME: doesn't handle midnight wraparound
-	unsigned int endtime = (time18() + 18*n);
-#ifdef __i386__
-	while (time18() < endtime)
+	while (n >= 2048)
 	{
-		__asm__ volatile ("rep; nop");
+		delay(2048000000);
+		n -= 2048;
 	}
-#else
-	while (time18() < endtime);
-#endif
+	if (n > 0)
+	{
+		delay(n * 1000000);
+	}
 }
 
 
@@ -1039,4 +1052,12 @@ void delay(int us)
     bb.edx.rr = us & 0xFFFF;
     bios(&bb);
 }
-
+/* // reverted from commit 2602
+void enableA20(void)
+{
+    bzero(&bb, sizeof bb);  // Note: may be called before BSS section is initialized
+    bb.intno = 0x15;
+    bb.eax.rr = 0x2401;
+    bios(&bb);
+}
+*/

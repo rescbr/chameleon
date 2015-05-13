@@ -72,11 +72,6 @@ typedef struct {
 	machineFlags_t    flags;
 } biosBuf_t;
 
-
-/*
- * Used in biosfn.c and disk.c
- */
-
 #define EBIOS_FIXED_DISK_ACCESS		0x01
 #define EBIOS_LOCKING_ACCESS		0x02
 #define EBIOS_ENHANCED_DRIVE_INFO	0x04

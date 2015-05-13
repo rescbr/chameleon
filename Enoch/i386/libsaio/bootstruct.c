@@ -72,7 +72,7 @@ void initKernBootStruct( void )
 
 		// Get system memory map. Also update the size of the
 		// conventional/extended memory for backwards compatibility.
-		
+
 		bootInfo->memoryMapCount =
 			getMemoryMap( bootInfo->memoryMap, kMemoryMapCountMax,
 						  (unsigned long *) &bootInfo->convmem,
@@ -98,7 +98,7 @@ void initKernBootStruct( void )
 			stop("Couldn't create root node");
 		}
 
-		getPlatformName(platformName);
+		getPlatformName(platformName, sizeof(platformName));
 		nameLen = strlen(platformName) + 1;
 		DT__AddProperty(node, "compatible", nameLen, platformName);
 		DT__AddProperty(node, "model", nameLen, platformName);
@@ -119,19 +119,19 @@ void initKernBootStruct( void )
 
 void reserveKernBootStruct(void)
 {
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.7") ) // OS X 10.7 and newer
-	{
-		// for 10.7 10.8 10.9 10.10
-		void *oldAddr = bootArgs;
-		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
-		bcopy(oldAddr, bootArgs, sizeof(boot_args));
-	}
-	else
+	if ( TIGER || LEOPARD || SNOW_LEOPARD )
 	{
 		// for 10.4 10.5 10.6
 		void *oldAddr = bootArgsPreLion;
 		bootArgsPreLion = (boot_args_pre_lion *)AllocateKernelMemory(sizeof(boot_args_pre_lion));
 		bcopy(oldAddr, bootArgsPreLion, sizeof(boot_args_pre_lion));
+	}
+	else
+	{
+		// for 10.7 10.8 10.9 10.10 10.11
+		void *oldAddr = bootArgs;
+		bootArgs = (boot_args *)AllocateKernelMemory(sizeof(boot_args));
+		bcopy(oldAddr, bootArgs, sizeof(boot_args));
 	}
 }
 
@@ -219,7 +219,7 @@ void finalizeBootStruct(void)
 	bootArgsPreLion->MemoryMapSize = bootArgs->MemoryMapSize;
 	bootArgsPreLion->MemoryMapDescriptorSize = bootArgs->MemoryMapDescriptorSize;
 	bootArgsPreLion->MemoryMapDescriptorVersion = bootArgs->MemoryMapDescriptorVersion;
-	
+
 	bootArgsPreLion->deviceTreeP = bootArgs->deviceTreeP;
 	bootArgsPreLion->deviceTreeLength = bootArgs->deviceTreeLength;
 

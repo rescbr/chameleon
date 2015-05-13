@@ -52,6 +52,52 @@
 #include "pci.h"
 #include "pci_root.h"
 
+boolean_t ForceAmdCpu = false;
+
+/* For AMD CPU's */
+boolean_t IsAmdCPU(void)
+{
+	if (ForceAmdCpu)
+	{
+		return true;
+	}
+
+	uint32_t ourcpuid[4];
+	do_cpuid(0, ourcpuid);
+	if (
+		/* This spells out "AuthenticAMD".  */
+		ourcpuid[ebx] == 0x68747541 && // Auth
+		ourcpuid[ecx] == 0x444D4163 && // cAMD
+		ourcpuid[edx] == 0x69746E65)   // enti
+	{
+		return true;
+	}
+
+	return false;
+};
+
+/* For Intel CPU's */
+boolean_t IsIntelCPU(void)
+{
+	uint32_t ourcpuid[4];
+	do_cpuid(0, ourcpuid);
+	if (
+		/* This spells out "GenuineIntel".  */
+		ourcpuid[ebx] == 0x756E6547 && // Genu
+		ourcpuid[ecx] == 0x6C65746E && // ntel
+		ourcpuid[edx] == 0x49656E69)   // ineI
+	{
+		return true;
+	}
+
+	if (!IsAmdCPU())
+	{
+		return true;
+	}
+
+	return false;
+}
+
 U64 rsd_p;
 ACPI_TABLES acpi_tables;
 U32 uuid32;
@@ -635,7 +681,7 @@ static void *loadACPITable(U32 *new_table_list, char *dirspec, const char *filen
 		if (GetChecksum(header, header->Length) == 0)
 		{
 			DBG("Found valid AML file : %s ", filename);
-			verbose("[ %s ] read and stored at: %x", acpi_file, tableAddr);
+			verbose("[ %s ] read and stored at: 0x%x", acpi_file, (unsigned) tableAddr);
 			printf("\n");
 			return tableAddr;
 		} 
@@ -1005,171 +1051,175 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 	boolean_t	fine_grain_clock_mod = 0;
 
 #if BUILD_ACPI_TSS || pstate_power_support
-	if (Platform.CPU.CPUID[CPUID_0][0] >= 0x5) {        
-		/*
-		 * Extract the Monitor/Mwait Leaf info:
-		 */
-        sub_Cstates  = Platform.CPU.CPUID[CPUID_5][3];
-        extensions   = Platform.CPU.CPUID[CPUID_5][2];	
-	}
-	
-	if (Platform.CPU.CPUID[CPUID_0][0] >= 6) {
-		dynamic_acceleration = bitfield(Platform.CPU.CPUID[CPUID_6][0], 1, 1); // "Dynamic Acceleration Technology (Turbo Mode)"
-		invariant_APIC_timer = bitfield(Platform.CPU.CPUID[CPUID_6][0], 2, 2); //  "Invariant APIC Timer"
-        fine_grain_clock_mod = bitfield(Platform.CPU.CPUID[CPUID_6][0], 4, 4);
-	}
-    cpu->turbo_available = (U32)dynamic_acceleration;
-	
+	if(IsIntelCPU())
 	{
-		U32 temp32 = 0;
-		U64 temp64=  0;
-		int tdp;
-		if (getIntForKey("TDP", &tdp, &bootInfo->chameleonConfig))
+		if (Platform.CPU.CPUID[CPUID_0][0] >= 0x5)
 		{
-			temp32 = (U32) (tdp*8) ; 
-			
-			int tdc;
-			if (getIntForKey("TDC", &tdc, &bootInfo->chameleonConfig))
-			{
-				temp32 = (U32) (temp32) | tdc<<16 ; 
-				
-			}
-			else if (tdp)
-			{
-				temp32 = (U32) (temp32) | ((tdp)*8)<<16 ;
-			}
-			
+			/*
+			 * Extract the Monitor/Mwait Leaf info:
+			 */
+	        	sub_Cstates  = Platform.CPU.CPUID[CPUID_5][3];
+	        	extensions   = Platform.CPU.CPUID[CPUID_5][2];	
 		}
-		else if (!is_sandybridge() && !is_jaketown())
-		{
-			if (turbo_enabled && cpu->turbo_available)
-			{
-				temp64 = rdmsr64(MSR_TURBO_POWER_CURRENT_LIMIT);
-				temp32 = (U32)temp64;
-			} 
-			else 
-			{
-				// Unfortunately, Intel don't provide a better method for non turbo processors
-				// and it will give a TDP of 95w (for ex. mine is 65w) , to fix this issue,
-				// you can set this value by simply adding the option TDP = XX (XX is an integer)
-				// in your boot.plist 
-				temp32 = (U32)0x02a802f8;
-			}
-			
-		}
-		if (temp32) {
-			cpu->tdp_limit = ( temp32 & 0x7fff );
-			cpu->tdc_limit = ( (temp32 >> 16) & 0x7fff );
-		}
-	}    
-    
-#endif
-    
-	switch (Platform.CPU.Family)
-	{
-		case 0x06: 
-		{
-			switch (Platform.CPU.Model) 
-			{
-				case CPUID_MODEL_DOTHAN: 
-				case CPUID_MODEL_YONAH: // Yonah
-				case CPUID_MODEL_MEROM: // Merom
-				case CPUID_MODEL_PENRYN: // Penryn
-				case CPUID_MODEL_ATOM: // Intel Atom (45nm)
-				{
-					
-					cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
-					cpu->core_c4_supported = ((sub_Cstates >> 16) & 0xf) ? 1 : 0;
-					
-					if (Platform.CPU.Model == CPUID_MODEL_ATOM)
-					{
-						cpu->core_c2_supported = cpu->core_c3_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
-						cpu->core_c6_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
-                        
-					} 
-					else
-					{
-						cpu->core_c3_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
-						cpu->core_c2_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
-						cpu->core_c6_supported = 0;
-                        
-					}
-                    
-					cpu->core_c7_supported = 0;
-                    
-#if BETA
-					GetMaxRatio(&cpu->max_ratio_as_mfg);
-					U64 msr = rdmsr64(MSR_IA32_PERF_STATUS);
-					U16 idlo = (msr >> 48) & 0xffff;
-					U16 idhi = (msr >> 32) & 0xffff;
-					cpu->min_ratio        = (U32) (idlo  >> 8) & 0xff;
-					cpu->max_ratio_as_cfg = (U32) (idhi  >> 8) & 0xff;
-					
-#else
-					if (Platform.CPU.MaxCoef) 
-					{
-						if (Platform.CPU.MaxDiv) 
-						{
-							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (Platform.CPU.MaxCoef * 10) + 5;
-						}
-						else 
-						{
-							cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) Platform.CPU.MaxCoef * 10;
-						}
-					}
-#endif
-					
-					break;
-				} 
-				case CPUID_MODEL_FIELDS:
-				case CPUID_MODEL_DALES:
-				case CPUID_MODEL_DALES_32NM:
-				case CPUID_MODEL_NEHALEM: 
-				case CPUID_MODEL_NEHALEM_EX:
-				case CPUID_MODEL_WESTMERE:
-				case CPUID_MODEL_WESTMERE_EX:
-				case CPUID_MODEL_SANDYBRIDGE:
-				case CPUID_MODEL_JAKETOWN:
-				{		
-					
-					cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
-					cpu->core_c3_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
-					cpu->core_c6_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
-					cpu->core_c7_supported = ((sub_Cstates >> 16) & 0xf) ? 1 : 0;
-					cpu->core_c2_supported = 0;
-					cpu->core_c4_supported = 0;
-					
-					GetMaxRatio(&cpu->max_ratio_as_mfg);
-                    U64 platform_info = rdmsr64(MSR_PLATFORM_INFO);                    
-                    cpu->max_ratio_as_cfg = (U32) ((U32)platform_info >> 8) & 0xff; 
-					cpu->min_ratio        = (U32) ((platform_info >> 40) & 0xff);
-					
-                    cpu->tdc_tdp_limits_for_turbo_flag = (platform_info & (1ULL << 29)) ? 1 : 0;
-					cpu->ratio_limits_for_turbo_flag   = (platform_info & (1ULL << 28)) ? 1 : 0;
-					cpu->xe_available = cpu->tdc_tdp_limits_for_turbo_flag | cpu->ratio_limits_for_turbo_flag;
-					
 
-                    
-					if (is_sandybridge() || is_jaketown())
-					{
-						cpu->package_power_limit = rdmsr64(MSR_PKG_RAPL_POWER_LIMIT);
-						cpu->package_power_sku_unit = rdmsr64(MSR_RAPL_POWER_UNIT);
-					}
-					break;
-				}
-				default:
-					verbose ("Unsupported CPU\n");
-					return /*(0)*/;
-					break;
-			}
+		if (Platform.CPU.CPUID[CPUID_0][0] >= 6)
+		{
+			dynamic_acceleration = bitfield(Platform.CPU.CPUID[CPUID_6][0], 1, 1); // "Dynamic Acceleration Technology (Turbo Mode)"
+			invariant_APIC_timer = bitfield(Platform.CPU.CPUID[CPUID_6][0], 2, 2); //  "Invariant APIC Timer"
+		        fine_grain_clock_mod = bitfield(Platform.CPU.CPUID[CPUID_6][0], 4, 4);
 		}
-		default:			
-			break;
+		cpu->turbo_available = (U32)dynamic_acceleration;
+
+		{
+			U32 temp32 = 0;
+			U64 temp64=  0;
+			int tdp;
+			if (getIntForKey("TDP", &tdp, &bootInfo->chameleonConfig))
+			{
+				temp32 = (U32) (tdp*8) ; 
+		
+				int tdc;
+				if (getIntForKey("TDC", &tdc, &bootInfo->chameleonConfig))
+				{
+					temp32 = (U32) (temp32) | tdc<<16 ;
+				}
+				else if (tdp)
+				{
+					temp32 = (U32) (temp32) | ((tdp)*8)<<16 ;
+				}
+			}
+			else if (!is_sandybridge() && !is_jaketown())
+			{
+				if (turbo_enabled && cpu->turbo_available)
+				{
+					temp64 = rdmsr64(MSR_TURBO_POWER_CURRENT_LIMIT);
+					temp32 = (U32)temp64;
+				} 
+				else 
+				{
+					// Unfortunately, Intel don't provide a better method for non turbo processors
+					// and it will give a TDP of 95w (for ex. mine is 65w) , to fix this issue,
+					// you can set this value by simply adding the option TDP = XX (XX is an integer)
+					// in your boot.plist 
+					temp32 = (U32)0x02a802f8;
+				}
+
+			}
+			if (temp32)
+			{
+				cpu->tdp_limit = ( temp32 & 0x7fff );
+				cpu->tdc_limit = ( (temp32 >> 16) & 0x7fff );
+			}
+		}    
+
+#endif
+
+		switch (Platform.CPU.Family)
+		{
+			case 0x06: 
+			{
+				switch (Platform.CPU.Model) 
+				{
+					case CPUID_MODEL_DOTHAN: 
+					case CPUID_MODEL_YONAH: // Yonah
+					case CPUID_MODEL_MEROM: // Merom
+					case CPUID_MODEL_PENRYN: // Penryn
+					case CPUID_MODEL_ATOM: // Intel Atom (45nm)
+					{
+
+						cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
+						cpu->core_c4_supported = ((sub_Cstates >> 16) & 0xf) ? 1 : 0;
+
+						if (Platform.CPU.Model == CPUID_MODEL_ATOM)
+						{
+							cpu->core_c2_supported = cpu->core_c3_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
+							cpu->core_c6_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
+
+						} 
+						else
+						{
+							cpu->core_c3_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
+							cpu->core_c2_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
+							cpu->core_c6_supported = 0;
+
+						}
+
+						cpu->core_c7_supported = 0;
+
+#if BETA
+						GetMaxRatio(&cpu->max_ratio_as_mfg);
+						U64 msr = rdmsr64(MSR_IA32_PERF_STATUS);
+						U16 idlo = (msr >> 48) & 0xffff;
+						U16 idhi = (msr >> 32) & 0xffff;
+						cpu->min_ratio        = (U32) (idlo  >> 8) & 0xff;
+						cpu->max_ratio_as_cfg = (U32) (idhi  >> 8) & 0xff;
+
+#else
+						if (Platform.CPU.MaxCoef) 
+						{
+							if (Platform.CPU.MaxDiv) 
+							{
+								cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) (Platform.CPU.MaxCoef * 10) + 5;
+							}
+							else 
+							{
+								cpu->max_ratio_as_cfg = cpu->max_ratio_as_mfg = (U32) Platform.CPU.MaxCoef * 10;
+							}
+						}
+#endif
+						break;
+					} 
+					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_CLARKDALE:
+					case CPUID_MODEL_DALES:
+					case CPUID_MODEL_NEHALEM: 
+					case CPUID_MODEL_NEHALEM_EX:
+					case CPUID_MODEL_WESTMERE:
+					case CPUID_MODEL_WESTMERE_EX:
+					case CPUID_MODEL_SANDYBRIDGE:
+					case CPUID_MODEL_JAKETOWN:
+					{		
+						cpu->core_c1_supported = ((sub_Cstates >> 4) & 0xf) ? 1 : 0;
+						cpu->core_c3_supported = ((sub_Cstates >> 8) & 0xf) ? 1 : 0;
+						cpu->core_c6_supported = ((sub_Cstates >> 12) & 0xf) ? 1 : 0;
+						cpu->core_c7_supported = ((sub_Cstates >> 16) & 0xf) ? 1 : 0;
+						cpu->core_c2_supported = 0;
+						cpu->core_c4_supported = 0;
+
+						GetMaxRatio(&cpu->max_ratio_as_mfg);
+						U64 platform_info = rdmsr64(MSR_PLATFORM_INFO);                    
+						cpu->max_ratio_as_cfg = (U32) ((U32)platform_info >> 8) & 0xff; 
+						cpu->min_ratio        = (U32) ((platform_info >> 40) & 0xff);
+
+						cpu->tdc_tdp_limits_for_turbo_flag = (platform_info & (1ULL << 29)) ? 1 : 0;
+						cpu->ratio_limits_for_turbo_flag   = (platform_info & (1ULL << 28)) ? 1 : 0;
+						cpu->xe_available = cpu->tdc_tdp_limits_for_turbo_flag | cpu->ratio_limits_for_turbo_flag;
+
+						if (is_sandybridge() || is_jaketown())
+						{
+							cpu->package_power_limit = rdmsr64(MSR_PKG_RAPL_POWER_LIMIT);
+							cpu->package_power_sku_unit = rdmsr64(MSR_RAPL_POWER_UNIT);
+						}
+						break;
+					}
+					default:
+						verbose ("Unsupported CPU\n");
+						return /*(0)*/;
+						break;
+				}
+			}
+			default:			
+				break;
+		}
 	}
-    
+	else
+	{
+		extensions   = Platform.CPU.CPUID[CPUID_5][2];
+	}
+
 	cpu->mwait_supported = (extensions & (1UL << 0)) ? 1 : 0;	
-    
-    cpu->invariant_apic_timer_flag = (U32)invariant_APIC_timer;
+
+	cpu->invariant_apic_timer_flag = (U32)invariant_APIC_timer;
     
 #if DEBUG_ACPI
 	printf("CPU INFO : \n");
@@ -1178,29 +1228,25 @@ static void collect_cpu_info(CPU_DETAILS * cpu)
 #endif
 	printf("max_ratio_as_cfg : %d\n", cpu->max_ratio_as_cfg);
 	printf("max_ratio_as_mfg : %d\n", cpu->max_ratio_as_mfg);
-    
+
 	printf("turbo_available : %d\n",cpu->turbo_available);
-    
+
 	printf("core_c1_supported : %d\n",cpu->core_c1_supported);
 	printf("core_c2_supported : %d\n",cpu->core_c1_supported);
 	printf("core_c3_supported : %d\n",cpu->core_c3_supported);
 	printf("core_c6_supported : %d\n",cpu->core_c6_supported);
 	printf("core_c7_supported : %d\n",cpu->core_c7_supported);
 	printf("mwait_supported : %d\n",cpu->mwait_supported);
-    
+
 #if BUILD_ACPI_TSS || pstate_power_support
 	if (is_sandybridge() || is_jaketown())
 	{
-        
 		printf("package_power_limit : %d\n",cpu->package_power_limit);
 		printf("package_power_sku_unit : %d\n",cpu->package_power_sku_unit); 
-        
 	}
 #endif
-	
 	DBG("invariant_apic_timer_flag : %d\n",cpu->invariant_apic_timer_flag);
-	
-    
+
 #endif
 }
 
@@ -1225,21 +1271,26 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 		U32 index;
 		for (index=0; index < cpu->pkg_pstates.num_pstates; index ++)
 		{
-			PSTATE * pstate = &cpu->pkg_pstates.pstate[index];
+			PSTATE *pstate = &cpu->pkg_pstates.pstate[index];
 			
 			// Set ratio
 			pstate->ratio = computePstateRatio(cpu->max_ratio_as_cfg, cpu->min_ratio, cpu->turbo_available, cpu->pkg_pstates.num_pstates, index);
 			
 			// Compute frequency based on ratio
 			if ((index != 0) || (cpu->turbo_available == 0))
+			{
 				pstate->frequency = pstate->ratio * get_bclk();
+			}
 			else
+			{
 				pstate->frequency = ((pstate->ratio - 1) * get_bclk()) + 1;
-			
+			}
 			// Compute power based on ratio and other data
 			if (pstate->ratio >= cpu->max_ratio_as_mfg)
+			{
 				// Use max power in mW
 				pstate->power = TDP * 1000;
+			}
 			else
 			{
 				pstate->power = compute_pstate_power(cpu, pstate->ratio, TDP);
@@ -1311,19 +1362,19 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 //-----------------------------------------------------------------------------
 static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 {	
-    
 	struct p_state p_states[32];
 	U8 p_states_count = 0;	
-	
-    if (!cpu)
-    {
-        return (0);
-    }
-    
+
+	if (!cpu)
+	{
+		return (0);
+	}
+
+	if(IsIntelCPU())
 	{
 #if UNUSED
 		struct p_state initial;
-#endif	
+#endif
 		struct p_state maximum, minimum;
 		// Retrieving P-States, ported from code by superhai (c)
 		switch (Platform.CPU.Family)
@@ -1456,8 +1507,8 @@ static U32 BuildPstateInfo(CPU_DETAILS * cpu)
 						break;
 					} 
 					case CPUID_MODEL_FIELDS:
+					case CPUID_MODEL_CLARKDALE:
 					case CPUID_MODEL_DALES:
-					case CPUID_MODEL_DALES_32NM:
 					case CPUID_MODEL_NEHALEM: 
 					case CPUID_MODEL_NEHALEM_EX:
 					case CPUID_MODEL_WESTMERE:
@@ -4162,7 +4213,7 @@ patch_fadt(ACPI_TABLE_FADT *fadt, ACPI_TABLE_DSDT *new_dsdt, bool UpdateFADT)
 				memcpy(fadt_mod, fadt, fadt->Header.Length);
 				fadt_mod->Header.Length   = 0x74;
 				fadt_mod->Header.Revision = 0x01; 
-				verbose("Warning: ACPI FADT length was < 0x74 which is the minimum for the ACPI FADT V1 specification, \n", fadt->Header.Revision );
+				verbose("Warning: ACPI FADT length was < 0x74 which is the minimum for the ACPI FADT V1 specification, \n" /*, fadt->Header.Revision */ );
 				verbose("         trying to convert it to Version 1. \n");				
                 
 			} 
@@ -4755,7 +4806,7 @@ EFI_STATUS setup_Acpi(void)
 		ret = GetFileInfo("rd(0,0)/Extra/", "Acpi", &flags, &time);
 		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)) 
 		{
-			sprintf(dirspec, "rd(0,0)/Extra/Acpi/");
+			strcpy(dirspec, "rd(0,0)/Extra/Acpi/");
 			acpidir_found = true;
 
 		}
@@ -4765,7 +4816,7 @@ EFI_STATUS setup_Acpi(void)
 			ret = GetFileInfo("/Extra/", "Acpi", &flags, &time);
 			if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 			{
-				sprintf(dirspec, "/Extra/Acpi/");
+				strcpy(dirspec, "/Extra/Acpi/");
 				acpidir_found = true;
 				
 			}
@@ -4774,7 +4825,7 @@ EFI_STATUS setup_Acpi(void)
 				ret = GetFileInfo("bt(0,0)/Extra/", "Acpi", &flags, &time);
 				if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
 				{
-					sprintf(dirspec, "bt(0,0)/Extra/Acpi/");
+					strcpy(dirspec, "bt(0,0)/Extra/Acpi/");
 					acpidir_found = true;
 
 				} 

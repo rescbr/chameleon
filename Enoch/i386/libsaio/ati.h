@@ -102,6 +102,7 @@ typedef enum {
 	CHIP_FAMILY_LAST
 } ati_chip_family_t;
 
+//card to #ports
 typedef struct {
 	const char		*name;
 	uint8_t			ports;
@@ -168,24 +169,34 @@ typedef enum {
 	kSpikerush,
 	kTypha,
 	/* AMD7000Controller */
-	kAji,  //4 
-	kBuri, //4 M
-	kChutoro, //5 M
-	kDashimaki, //4
-	kEbi, //5 M
-	kGari, //5 M
-	kFutomaki, //5
-	kHamachi, //4
+	kNamako,
+	kAji,
+	kBuri,
+	kChutoro,
+	kDashimaki,
+	kEbi,
+	kGari,
+	kFutomaki,
+	kHamachi,
 	kOPM,
 	kIkura,
 	kIkuraS,
+	kJunsai,
+	kKani,
+	kKaniS,
+	kDashimakiS,
+	kMaguro,
+	kMaguroS,
 	/* AMD8000Controller */
 	kBaladi,
+	/* AMD9000Controller */
 	kExmoor,
 	kBasset,
+	kGreyhound,
 	kCfgEnd
 } config_name_t;
 
+//radeon card (includes the AtiConfig)
 typedef struct {
 	uint16_t		device_id;
 	uint32_t		subsys_id;
@@ -236,9 +247,9 @@ card_t *card;
 
 /* Typedefs STRUCTS */
 typedef struct {
-	type_t					type;
-	uint32_t				size;
-	uint8_t					*data;
+	type_t			type;
+	uint32_t		size;
+	uint8_t			*data;
 } value_t;
 
 // dev_tree  representation
@@ -268,6 +279,5 @@ bool get_platforminfo_val(value_t *val);
 bool get_vramtotalsize_val(value_t *val);
 bool get_dual_link_val(value_t *val);
 bool get_hdmiaudio(value_t * val);
-
 
 #endif

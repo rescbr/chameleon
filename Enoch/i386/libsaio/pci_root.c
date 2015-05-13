@@ -94,11 +94,11 @@ int getPciRootUID(void)
 	// Try using the file specified with the DSDT option
 	if (getValueForKey(kDSDT, &dsdt_filename, &len, &bootInfo->chameleonConfig))
 	{
-		snprintf(dsdt_dirSpec, sizeof(dsdt_dirSpec), dsdt_filename);
+		strncpy(dsdt_dirSpec, dsdt_filename, sizeof(dsdt_dirSpec) );
 	}
 	else
 	{
-		sprintf(dsdt_dirSpec, "DSDT.aml");
+		strcpy(dsdt_dirSpec, "DSDT.aml");
 	}
 
 	int fd = search_and_get_acpi_fd(dsdt_dirSpec, &dsdt_filename);

@@ -568,7 +568,7 @@ static long ReadFile(void * file, u_int64_t * length, void * base, u_int64_t off
 
 	if (offset > fileLength)
 	{
-		printf("ReadFile(HFS%c): Offset is too large.\n", gIsHFSPlus ? "+" : "");
+		printf("ReadFile(HFS%s): Offset is too large.\n", gIsHFSPlus ? "+" : "");
 
 		return -1;
 	}
@@ -727,7 +727,7 @@ static long ResolvePathToCatalogEntry(char * filePath, long * flags, void * entr
 
 		if ((SWAP_BE32(hfsPlusFile->userInfo.fdType) == kHardLinkFileType) && (SWAP_BE32(hfsPlusFile->userInfo.fdCreator) == kHFSPlusCreator))
 		{
-			sprintf(gLinkTemp, "%s/%s%ld", HFSPLUSMETADATAFOLDER, HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
+			sprintf(gLinkTemp, "%s/%s%d", HFSPLUSMETADATAFOLDER, HFS_INODE_PREFIX, SWAP_BE32(hfsPlusFile->bsdInfo.special.iNodeNum));
 			result = ResolvePathToCatalogEntry(gLinkTemp, flags, entry, kHFSRootFolderID, &tmpDirIndex);
 		}
 	}

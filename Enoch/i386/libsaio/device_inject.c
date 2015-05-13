@@ -14,13 +14,13 @@
 #include "convert.h"
 
 #ifndef DEBUG_INJECT
-#define DEBUG_INJECT 0
+	#define DEBUG_INJECT 0
 #endif
 
 #if DEBUG_INJECT
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 uint32_t	devices_number	= 1;
@@ -73,14 +73,14 @@ void setupDeviceProperties(Node *node)
 
 DevPropString *devprop_create_string(void)
 {
-	string = (struct DevPropString *)malloc(sizeof(struct DevPropString));
+	string = (DevPropString *)malloc(sizeof(DevPropString));
 
 	if(string == NULL)
 	{
 		return NULL;
 	}
 	
-	memset(string, 0, sizeof(struct DevPropString));
+	memset(string, 0, sizeof(DevPropString));
 	string->length = 12;
 	string->WHAT2 = 0x01000000;
 	return string;
@@ -174,7 +174,7 @@ DevPropDevice *devprop_add_device(DevPropString *string, char *path)
 	device->acpi_dev_path.length	= 0x0c;
 	device->acpi_dev_path.type	= 0x02;
 	device->acpi_dev_path.subtype	= 0x01;
-	device->acpi_dev_path._HID	= 0xd041030a;
+	device->acpi_dev_path._HID	= 0xd041030a; // 0x0a0341d0
 	
 	device->num_pci_devpaths = numpaths;
 	device->length = 24 + (6*numpaths);
@@ -273,7 +273,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 
 	if(!device->data)
 	{
-		device->data = (uint8_t*)malloc(sizeof(uint8_t));
+		device->data = (uint8_t *)malloc(sizeof(uint8_t));
 	}
 	else
 	{
@@ -399,41 +399,4 @@ void devprop_free_string(DevPropString *string)
 
 /* ======================================================= */
 
-
-/*******************************************************************
- * Decodes a sequence of 'len' hexadecimal chars from 'hex' into   *
- * a binary. returns -1 in case of error (i.e. badly formed chars) *
- *******************************************************************/
-int hex2bin(const char *hex, uint8_t *bin, int len)
-{
-	char	*p;
-	int	i;
-	char	buf[3];
-
-	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2)
-	{
-		printf("[ERROR] bin2hex input error\n");
-		return -1;
-	}
-
-	buf[2] = '\0';
-	p = (char *) hex;
-
-	for (i = 0; i < len; i++)
-	{
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
-		{
-			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
-			return -2;
-		}
-		buf[0] = *p++;
-		buf[1] = *p++;
-		bin[i] = (unsigned char) strtoul(buf, NULL, 16);
-	}
-	return 0;
-}
-
-/* ======================================================= */
-
 /* a fine place for this code */
-

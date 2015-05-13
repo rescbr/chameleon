@@ -51,6 +51,7 @@
 		361BC70B14BD97C800236488 /* pkg.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = pkg.zip; path = Icons/pkg.zip; sourceTree = "<group>"; };
 		361BC70C14BD97C800236488 /* tm.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = tm.zip; path = Icons/tm.zip; sourceTree = "<group>"; };
 		361DAA8F177D152200CFBF68 /* IntelAzul.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelAzul.txt; path = OptionalSettings/IntelAzul.txt; sourceTree = "<group>"; };
+		361EE41A1A96706600AE9455 /* interrupts.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = interrupts.c; sourceTree = "<group>"; };
 		362317A617510EB900A25D5D /* br */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = br; path = package/Resources/br.lproj/Conclusion.rtfd; sourceTree = SOURCE_ROOT; };
 		362317A817510EB900A25D5D /* br */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = br; path = package/Resources/br.lproj/Welcome.rtfd; sourceTree = SOURCE_ROOT; };
 		362317AA17510ECE00A25D5D /* pt */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = pt; path = package/Resources/pt.lproj/Conclusion.rtfd; sourceTree = SOURCE_ROOT; };
@@ -980,7 +981,7 @@
 		A354B631149514DE00D81AA5 /* CheckProceed.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckProceed.sh; sourceTree = "<group>"; };
 		A354B632149514DE00D81AA5 /* CheckWindowsDiskSignature.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = CheckWindowsDiskSignature.sh; sourceTree = "<group>"; };
 		A354B634149514DE00D81AA5 /* MountESP.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = MountESP.sh; sourceTree = "<group>"; };
-		A354B635149514DE00D81AA5 /* patch */ = {isa = PBXFileReference; lastKnownFileType = file; path = patch; sourceTree = "<group>"; };
+		A354B635149514DE00D81AA5 /* patch */ = {isa = PBXFileReference; lastKnownFileType = text; path = patch; sourceTree = "<group>"; };
 		A354B636149514DE00D81AA5 /* SetActivePartition.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = SetActivePartition.sh; sourceTree = "<group>"; };
 		A354B637149514DE00D81AA5 /* UnMountEFIvolumes.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = UnMountEFIvolumes.sh; sourceTree = "<group>"; };
 		A354B638149514DE00D81AA5 /* WriteChameleonStage0.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = WriteChameleonStage0.sh; sourceTree = "<group>"; };
@@ -3344,6 +3345,7 @@
 				3696B23A1A1D2DD1004272A6 /* efi_tables.c */,
 				3696B23B1A1D2DD1004272A6 /* efi_tables.h */,
 				3696B23C1A1D2DD1004272A6 /* error.c */,
+				361EE41A1A96706600AE9455 /* interrupts.c */,
 				3696B23D1A1D2DD1004272A6 /* libsa.h */,
 				3696B23E1A1D2DD1004272A6 /* Makefile */,
 				3696B23F1A1D2DD1004272A6 /* memory.h */,
@@ -4100,7 +4102,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0440;
+				LastUpgradeCheck = 0620;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
 			compatibilityVersion = "Xcode 3.2";
@@ -4782,7 +4784,6 @@
 		1DEB919408733D9F0010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -4793,7 +4794,6 @@
 		1DEB919508733D9F0010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = macosx;

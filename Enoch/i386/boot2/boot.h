@@ -28,6 +28,17 @@
 #define __BOOT2_BOOT_H
 
 #include "libsaio.h"
+
+// OS X Versions
+//#define GALA            checkOSVersion("10.11") // Gala
+#define YOSEMITE        checkOSVersion("10.10") // Yosemite
+#define MAVERICKS       checkOSVersion("10.9")  // Mavericks
+#define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
+#define LION            checkOSVersion("10.7")  // Lion
+#define SNOW_LEOPARD    checkOSVersion("10.6")  // Snow Leopard
+#define LEOPARD         checkOSVersion("10.5")  // Leopard
+#define TIGER           checkOSVersion("10.4")  // Tiger
+
 /*
  * Paths used by chameleon
  */
@@ -117,8 +128,6 @@
 
 /* Slice: added these keys */
 #define kPS2RestartFix			"PS2RestartFix"		/* acpi_patcher.c */
-//#define kInjectEDID			"InjectEDID"		/* ati.c */
-//#define kCustomEDID			"CustomEDID"		/* ati.c */
 #define kUseIntelHDMI			"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 
 /* Signal64: added this key */
@@ -174,8 +183,6 @@
 #define kEnableHDMIAudio		"EnableHDMIAudio"		/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
-//#define kRebootOnPanic		"RebootOnPanic"
-//#define kEnableHiDPI			"EnableHiDPI"			/* enable High resolution display (aka Retina) */
 
 /* ErmaC: added these keys */
 #define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
@@ -183,9 +190,9 @@
 #define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
 #define kSkipAtiGfx			"SkipAtiGfx"			/* pci_setup.c */
-//#define kUsbInject			"USBInject"			/* usb.c */
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
+#define kIntelBdwFB			"IntelBDWFB"			/* gma.c */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */

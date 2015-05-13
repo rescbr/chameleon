@@ -52,17 +52,18 @@
 #include "pci.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "nvidia.h"
 #include "nvidia_helper.h"
 
 #ifndef DEBUG_NVIDIA
-#define DEBUG_NVIDIA 0
+	#define DEBUG_NVIDIA 0
 #endif
 
 #if DEBUG_NVIDIA
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 #define NVIDIA_ROM_SIZE				0x20000
@@ -93,8 +94,8 @@ const char *nvidia_name_1[]             =	{ "@1,name",		"NVDA,Display-B" };
 const char *nvidia_slot_name[]          =	{ "AAPL,slot-name", "Slot-1"		 };
 
 static uint8_t default_NVCAP[]= {
-	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0d, 0x00,
-	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x0a,
+	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
+	0x0C, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x07,
 	0x00, 0x00, 0x00, 0x00
 };
 
@@ -172,7 +173,8 @@ static nvidia_pci_info_t nvidia_card_vendors[] = {
 static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 0000 - 0040	
 	{ 0x10DE0000,	"Unknown" },
-	// 0040 - 004F	
+	// 0040 - 004F
+/*
 	{ 0x10DE0040,	"GeForce 6800 Ultra" },
 	{ 0x10DE0041,	"GeForce 6800" },
 	{ 0x10DE0042,	"GeForce 6800 LE" },
@@ -185,6 +187,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0049,	"NV40GL" },
 	{ 0x10DE004D,	"Quadro FX 3400" },
 	{ 0x10DE004E,	"Quadro FX 4000" },
+*/
 	// 0050 - 005F
 	// 0060 - 006F
 	// 0070 - 007F
@@ -199,9 +202,10 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0098,	"GeForce Go 7800" },
 	{ 0x10DE0099,	"GeForce Go 7800 GTX" },
 	{ 0x10DE009D,	"Quadro FX 4500" },
-	// 00A0 - 00AF	
-	// 00B0 - 00BF	
-	// 00C0 - 00CF	
+	// 00A0 - 00AF
+	// 00B0 - 00BF
+	// 00C0 - 00CF
+/*
 	{ 0x10DE00C0,	"GeForce 6800 GS" },
 	{ 0x10DE00C1,	"GeForce 6800" },
 	{ 0x10DE00C2,	"GeForce 6800 LE" },
@@ -222,11 +226,13 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE00F6,	"GeForce 6800 GS/XT" },
 	{ 0x10DE00F8,	"Quadro FX 3400/4400" },
 	{ 0x10DE00F9,	"GeForce 6800 Series GPU" },
+*/
 	// 0100 - 010F
 	// 0110 - 011F
 	// 0120 - 012F
 	// 0130 - 013F
 	// 0140 - 014F
+/*
 	{ 0x10DE0140,	"GeForce 6600 GT" },
 	{ 0x10DE0141,	"GeForce 6600" },
 	{ 0x10DE0142,	"GeForce 6600 LE" },
@@ -258,6 +264,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE016A,	"GeForce 7100 GS" },
 	{ 0x10DE016C,	"NVIDIA NV44GLM" },
 	{ 0x10DE016D,	"NVIDIA NV44GLM" },
+*/
 	// 0170 - 017F
 	// 0180 - 018F
 	// 0190 - 019F
@@ -289,6 +296,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE01DF,	"GeForce 7300 GS" },
 	// 01E0 - 01EF
 	// 01F0 - 01FF
+/*
 	{ 0x10DE01F0,	"GeForce4 MX" },
 	// 0200 - 020F
 	// 0210 - 021F
@@ -311,6 +319,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE0247,	"GeForce Go 6100" },
 	// 0250 - 025F
 	{ 0x10DE025B,	"Quadro4 700 XGL" },
+*/
 	// 0260 - 026F
 	// 0270 - 027F
 	// 0280 - 028F
@@ -343,6 +352,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE02E4,	"GeForce 7950 GT" },
 	// 02F0 - 02FF
 	// 0300 - 030F
+/*
 	{ 0x10DE0301,	"GeForce FX 5800 Ultra" },
 	{ 0x10DE0302,	"GeForce FX 5800" },
 	{ 0x10DE0308,	"Quadro FX 2000" },
@@ -390,6 +400,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE034C,	"Quadro FX Go1000" },
 	{ 0x10DE034E,	"Quadro FX 1100" },
 	{ 0x10DE034F,	"NV36GL" },
+*/
 	// 0350 - 035F
 	// 0360 - 036F
 	// 0370 - 037F
@@ -1082,8 +1093,12 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1020,	"Tesla K20X" },
 	{ 0x10DE1021,	"Tesla K20Xm" },
 	{ 0x10DE1022,	"Tesla K20c" },
+	{ 0x10DE1023,	"Tesla K40m" },  // GK110BGL
+	{ 0x10DE1024,	"Tesla K40c" },  // GK110BGL
 	{ 0x10DE1026,	"Tesla K20s" },
+	{ 0x10DE1027,	"Tesla K40st" }, // GK110BGL
 	{ 0x10DE1028,	"Tesla K20m" },
+	{ 0x10DE1029,	"Tesla K40s" }, // GK110BGL
 	{ 0x10DE102A,	"Tesla K40t" }, // GK110BGL
 //	{ 0x10DE102B,	"Graphics Device" }, // GK110BGL
 //	{ 0x10DE102C,	"Graphics Device" }, // GK110BGL
@@ -1092,6 +1107,8 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE102F,	"Tesla Stella Solo" }, // GK110BGL
 	// 1030 - 103F
 //	{ 0x10DE1030,	"" }, // GK110
+	{ 0x10DE103a,	"Quadro K6000" }, // GK110GL
+	{ 0x10DE103c,	"Quadro K5200" }, // GK110GL
 	{ 0x10DE103F,	"Tesla Stella SXM" }, // GK110
 	// 1040 - 104F
 	{ 0x10DE1040,	"GeForce GT 520" },
@@ -1182,6 +1199,8 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1189,	"GeForce GTX 670" },
 	{ 0x10DE118A,	"GRID K520" },
 	{ 0x10DE118B,	"GRID K200" }, // GRID K2 GeForce USM
+	{ 0x10DE118C,	"GRID K2 NVS USM" }, // GK104
+	{ 0x10DE118D,	"GRID K200 vGPU" }, // GK104GL
 	{ 0x10DE118E,	"GeForce GTX 760 (192-bit)" },
 	{ 0x10DE118F,	"Tesla K10" },
 	// 1190 - 119F
@@ -1215,7 +1234,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE11BC,	"Quadro K5000M" },
 	{ 0x10DE11BD,	"Quadro K4000M" },
 	{ 0x10DE11BE,	"Quadro K3000M" },
-	{ 0x10DE11BF,	"GRID K2" },
+	{ 0x10DE11BF,	"GRID K2" }, // GK104GL
 	// 11C0 - 11CF
 	{ 0x10DE11C0,	"GeForce GTX 660" },
 	{ 0x10DE11C2,	"GeForce GTX 650 Ti BOOST" },
@@ -1231,6 +1250,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE11E1,	"GeForce GTX 765M" },
 	{ 0x10DE11E2,	"GeForce GTX 765M" },
 	{ 0x10DE11E3,	"GeForce GTX 760M" },
+//	{ 0x10DE11E7,	"GeForce " }, // GK106M
 	// 11F0 - 11FF
 	{ 0x10DE11FA,	"Quadro K4000" },
 	{ 0x10DE11FC,	"Quadro 2100M" },
@@ -1271,6 +1291,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1284,	"GeForce GT 630" },
 	{ 0x10DE1286,	"GeForce GT 720" },
 	{ 0x10DE1287,	"GeForce GT 730" }, // GK208
+	{ 0x10DE1288,	"GeForce GT 720" }, // GK208
 	// 1290 - 129F
 	{ 0x10DE1290,	"GeForce GT 730M" },
 	{ 0x10DE1291,	"GeForce GT 735M" },
@@ -1280,6 +1301,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1295,	"GeForce GT 710M" },
 	{ 0x10DE1296,	"GeForce 825M" }, // GK208M
 	{ 0x10DE1298,	"GeForce GT 720M" },
+	{ 0x10DE1299,	"GeForce 920M" }, // GK208M
 	// 12A0 - 12AF
 	{ 0x10DE12A0,	"GK208" },
 	{ 0x10DE12AF,	"GK208-INT" },
@@ -1293,6 +1315,8 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	// 12F0 - 12FF
 	{ 0x10DE1340,	"GeForce 830M" },
 	{ 0x10DE1341,	"GeForce 840M" },
+	{ 0x10DE1346,	"GeForce 930M" }, // GM108M
+	{ 0x10DE1347,	"GeForce 940M" }, // GM108M
 	{ 0x10DE1380,	"GeForce GTX 750 Ti" },
 	{ 0x10DE1381,	"GeForce GTX 750" },
 	{ 0x10DE1382,	"GeForce GTX 745" },
@@ -1303,12 +1327,15 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE1392,	"GeForce GTX 860M" },
 	{ 0x10DE1393,	"GeForce 840M" },
 	{ 0x10DE1398,	"GeForce 845M" }, //
+	{ 0x10DE139A,	"GeForce GTX 950M" }, // GM107
+	{ 0x10DE139B,	"GeForce GTX 960M" }, // GM107
 	{ 0x10DE13AD,	"GM107 INT52" }, //
 	{ 0x10DE13AE,	"GM107 CS1" }, //
 //	{ 0x10DE13AF,	"Graphics Device" }, // GM107GLM
 	{ 0x10DE13B3,	"Quadro K2200M" }, //
 	{ 0x10DE13BA,	"Quadro K2200" },
 	{ 0x10DE13BB,	"Quadro K620" },
+	{ 0x10DE13BC,	"Quadro K1200" },
 	{ 0x10DE13BD,	"Tesla M40" }, // GM107GLM
 	{ 0x10DE13BE,	"GM107 CS1" }, //
 	{ 0x10DE13BF,	"GM107 INT52" }, //
@@ -1322,7 +1349,7 @@ static nvidia_pci_info_t nvidia_card_generic[] = {
 	{ 0x10DE13D9,	"GeForce GTX 965M" },
 //	{ 0x10DE13F0,	"Graphics Device" }, // GM107GLM
 //	{ 0x10DE13F1,	"Graphics Device" }, // GM107GLM
-//	{ 0x10DE1401,	"Graphics Device" }, //
+	{ 0x10DE1401,	"GeForce GTX 960" }, //
 //	{ 0x10DE1402,	"Graphics Device" }, //
 //	{ 0x10DE143F,	"Graphics Device" }, //
 //	{ 0x10DE1600,	"Graphics Device" }, //
@@ -1818,7 +1845,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	int i, j;
 
 	// First check in the plist, (for e.g this can override any hardcoded devices)
-	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
+	cardList_t *nvcard = FindCardWithIds(device_id, subsys_id);
 	if (nvcard)
 	{
 		if (nvcard->model)
@@ -1877,34 +1904,15 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	return nvidia_card_generic[0].name;
 }
 
-static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
-{
-	int fd;
-	int size;
-
-	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
-	{
-		return 0;
-	}
-
-	size = file_size(fd);
-
-	if (size)
-	{
-		*buf = malloc(size);
-		size = read(fd, (char *)buf, size);
-	}
-	close(fd);
-
-	return size > 0 ? size : 0;
-}
-
-static int devprop_add_nvidia_template(struct DevPropDevice *device)
+static int devprop_add_nvidia_template(DevPropDevice *device)
 {
 	char tmp[16];
+	DBG("devprop_add_nvidia_template\n");
 
 	if (!device)
+	{
 		return 0;
+	}
 
 	if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_0))
 	{
@@ -1954,18 +1962,40 @@ static int devprop_add_nvidia_template(struct DevPropDevice *device)
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
 	snprintf(tmp, sizeof(tmp), "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, strlen(tmp));
+	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, (uint32_t)strlen(tmp));
 	devices_number++;
 
 	return 1;
 }
 
-unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
+static uint32_t load_nvidia_bios_file(const char *filename, uint8_t **buf)
+{
+	int fd;
+	int size;
+
+	if ((fd = open_bvdev("bt(0,0)", filename, 0)) < 0)
+	{
+		return 0;
+	}
+
+	size = file_size(fd);
+
+	if (size)
+	{
+		*buf = malloc(size);
+		size = read(fd, (char *)buf, size);
+	}
+	close(fd);
+
+	return size > 0 ? size : 0;
+}
+
+uint64_t mem_detect(volatile uint8_t *regs, uint16_t nvCardType, pci_dt_t *nvda_dev, uint32_t device_id, uint32_t subsys_id)
 {
 	uint64_t vram_size = 0;
 
 	// First check if any value exist in the plist
-	cardList_t * nvcard = FindCardWithIds(device_id, subsys_id);
+	cardList_t *nvcard = FindCardWithIds(device_id, subsys_id);
 	if (nvcard) 
 	{
 		if (nvcard->videoRam > 0) 
@@ -1974,6 +2004,24 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 
 			return vram_size;
 		}
+	}
+
+	// Finally, if vram_size still not set do the calculation with our own method
+	if (nvCardType < NV_ARCH_50)
+	{
+		vram_size  = (uint64_t)(REG32( NV04_PFB_FIFO_DATA ));
+		vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
+	}
+	else if (nvCardType < NV_ARCH_C0)
+	{
+		vram_size = (uint64_t)(REG32( NV04_PFB_FIFO_DATA ));
+		vram_size |= (vram_size & 0xff) << 32;
+		vram_size &= 0xffffffff00ll;
+	}
+	else
+	{ // >= NV_ARCH_C0
+		vram_size = REG32( NVC0_MEM_CTRLR_RAM_AMOUNT ) << 20;
+		vram_size *= REG32( NVC0_MEM_CTRLR_COUNT );
 	}
 
 	// Then, Workaround for 9600M GT, GT 210/420/430/440/525M/540M & GTX 560M
@@ -2028,26 +2076,6 @@ unsigned long long mem_detect(volatile uint8_t *regs, uint8_t nvCardType, pci_dt
 			break;
 	}
 
-	if (!vram_size)
-	{
-		// Finally, if vram_size still not set do the calculation with our own method
-		if (nvCardType < NV_ARCH_50)
-		{
-			vram_size  = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
-			vram_size &= NV10_PFB_FIFO_DATA_RAM_AMOUNT_MB_MASK;
-		}
-		else if (nvCardType < NV_ARCH_C0)
-		{
-			vram_size = (uint64_t)(REG32(NV04_PFB_FIFO_DATA));
-			vram_size |= (vram_size & 0xff) << 32;
-			vram_size &= 0xffffffff00ll;
-		}
-		else
-		{ // >= NV_ARCH_C0
-			vram_size = REG32(NVC0_MEM_CTRLR_RAM_AMOUNT) << 20;
-			vram_size *= REG32(NVC0_MEM_CTRLR_COUNT);
-		}
-	}
 	DBG("mem_detected %ld\n", vram_size);
 	return vram_size;
 }
@@ -2061,22 +2089,22 @@ static bool checkNvRomSig(uint8_t * aRom)
 
 bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 {
-	struct DevPropDevice		*device		= NULL;
-	char				*devicepath	= NULL;
+	DevPropDevice	*device		= NULL;
+	char		*devicepath	= NULL;
+	uint8_t		*rom		= NULL;
+	uint16_t	nvCardType	= 0;
+	uint64_t	videoRam	= 0;
+	uint32_t	bar[7];
+	uint32_t	boot_display	= 0;
+	int		nvPatch		= 0;
+	char		*model		= NULL;
+	char		nvFilename[64];
 	option_rom_pci_header_t		*rom_pci_header;
 	volatile uint8_t		*regs;
-	uint8_t				*rom		= NULL;
-	uint8_t				nvCardType	= 0;
-	uint64_t			videoRam	= 0;
 	uint32_t			nvBiosOveride;
-	uint32_t			bar[7];
-	uint32_t			boot_display	= 0;
-	int				nvPatch = 0;
 	int				len;
 	char				biosVersion[64];
-	char				nvFilename[64];
 	char				kNVCAP[12];
-	char				*model		= NULL;
 	const char			*value;
 
 	fill_card_list();
@@ -2268,7 +2296,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 	}
 
-	snprintf(biosVersion, sizeof(biosVersion), "%s", (nvBiosOveride > 0) ? nvFilename : version_str);
+	strncpy(biosVersion, (nvBiosOveride > 0) ? nvFilename : version_str, sizeof(biosVersion) );
 	snprintf(kNVCAP, sizeof(kNVCAP), "NVCAP_%04x", nvda_dev->device_id);
 
 	if (getValueForKey(kNVCAP, &value, &len, &bootInfo->chameleonConfig) && len == NVCAP_LEN * 2)
@@ -2321,10 +2349,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	devprop_add_nvidia_template(device);
 	devprop_add_value(device, "NVCAP", default_NVCAP, NVCAP_LEN);
+
 	devprop_add_value(device, "NVPM", default_NVPM, NVPM_LEN);
 	devprop_add_value(device, "VRAM,totalsize", (uint8_t *)&videoRam, 4);
 	devprop_add_value(device, "model", (uint8_t *)model, strlen(model) + 1);
 	devprop_add_value(device, "rom-revision", (uint8_t *)biosVersion, strlen(biosVersion) + 1);
+
 	devprop_add_value(device, "@0,display-cfg", (uint8_t *)&default_dcfg_0, DCFG0_LEN);
 	devprop_add_value(device, "@1,display-cfg", (uint8_t *)&default_dcfg_1, DCFG1_LEN);
 

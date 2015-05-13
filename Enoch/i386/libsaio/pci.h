@@ -889,7 +889,7 @@ typedef struct {
 // values for the class_sub field for class_base = 0x0c (serial bus controller)
 #define PCI_BASE_CLASS_SERIAL					0x0c
 #define PCI_CLASS_SERIAL_FIREWIRE				0x0c00   /* FireWire (IEEE 1394) */
-#define PCI_CLASS_SERIAL_FIREWIRE_OHCI				0x0c10
+#define PCI_CLASS_SERIAL_FIREWIRE_OHCI				0x0c0010
 #define PCI_CLASS_SERIAL_ACCESS					0x0c01
 #define PCI_CLASS_SERIAL_SSA					0x0c02
 #define PCI_CLASS_SERIAL_USB					0x0c03  /* Universal Serial Bus */

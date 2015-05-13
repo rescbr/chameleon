@@ -143,7 +143,7 @@ again:
 			minwidth *= 10;
 			minwidth += c - '0';
 			goto again;
-        case 'X':
+		case 'X':
 			flag |= UCASE;
 			/* fall through */
 		case 'x':

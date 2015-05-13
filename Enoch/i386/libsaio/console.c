@@ -130,7 +130,7 @@ void initBooterLog(void)
 	cursor = msgbuf;
 	msglog("%s\n", "Enoch (r" I386BOOT_CHAMELEONREVISION ")" " [" I386BOOT_BUILDDATE "]");
 	getRTCdatetime();
-	verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
+	msglog("Logging started: %04d/%02d/%02d, %02d:%02d:%02d\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
 }
 
 int msglog(const char * fmt, ...)

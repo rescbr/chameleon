@@ -33,9 +33,63 @@
 #define DBG(x...)  msglog(x)
 #endif
 
-extern uint8_t acpi_cpu_count;
-extern uint32_t acpi_cpu_p_blk;
-extern char* acpi_cpu_name[32];
+uint8_t acpi_cpu_count	= 0;
+uint32_t acpi_cpu_p_blk	= 0;
+char *acpi_cpu_name[32];
+
+void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
+{
+	uint32_t i;
+
+	DBG("ACPIpatcher: start finding cpu names. Length %d\n", length);
+
+	for (i=0; i<length-7; i++)
+	{
+		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
+		{
+			DBG("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
+
+			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
+
+			bool add_name = true;
+
+			uint8_t j;
+
+			for (j=0; j<4; j++)
+			{
+				char c = dsdt[offset+j];
+
+				if (!aml_isvalidchar(c))
+				{
+					add_name = false;
+					DBG("ACPIpatcher: invalid character found in ProcessorOP '0x%X'!\n", c);
+					break;
+				}
+			}
+
+			if (add_name)
+			{
+				acpi_cpu_name[acpi_cpu_count] = malloc(4);
+				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
+				i = offset + 5;
+
+				if (acpi_cpu_count == 0)
+				{
+					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
+				}
+
+				DBG("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+
+				if (++acpi_cpu_count == 32)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	DBG("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
+}
 
 static char const pss_ssdt_header[] =
 {
@@ -227,8 +281,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 						break;
 					}
 					case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPUID_MODEL_DALES:			//
-					case CPUID_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+					case CPUID_MODEL_CLARKDALE:		//
+					case CPUID_MODEL_DALES:			// Intel Core i3, i5 LGA1156 (32nm)
 					case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPUID_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
 					case CPUID_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
@@ -241,7 +295,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 					//case CPUID_MODEL_HASWELL_H:		//
 					case CPUID_MODEL_HASWELL_SVR:		//
 					case CPUID_MODEL_HASWELL_ULT:		//
-					case CPUID_MODEL_CRYSTALWELL:		//
+					case CPUID_MODEL_HASWELL_ULX:		//
 
 					{
 					if ( (Platform.CPU.Model == CPUID_MODEL_SANDYBRIDGE) ||
@@ -251,7 +305,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 						(Platform.CPU.Model == CPUID_MODEL_IVYBRIDGE_XEON) ||
 						(Platform.CPU.Model == CPUID_MODEL_HASWELL_SVR) ||
 						(Platform.CPU.Model == CPUID_MODEL_HASWELL_ULT) ||
-						(Platform.CPU.Model == CPUID_MODEL_CRYSTALWELL) )
+						(Platform.CPU.Model == CPUID_MODEL_HASWELL_ULX) )
 					{
 						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
 					}

@@ -33,7 +33,7 @@ boolean_t tableSign(char *table, const char *sgn)
 	int i;
 	for (i = 0; i < 4; i++)
 	{
-		if ((table[i] &~0x20) != (sgn[i] &~0x20))
+		if ((table[i] & ~0x20) != (sgn[i] & ~0x20))
 		{
 			return false;
 		}
@@ -53,7 +53,7 @@ static struct acpi_2_rsdp *getAddressOfAcpiTable()
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
 		{
 			uint8_t csum = checksum8(acpi_addr, 20);
-			if(csum == 0)
+			if (csum == 0)
 			{
 			// Only return the table if it is a true version 1.0 table (Revision 0)
 				if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
@@ -104,7 +104,7 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	snprintf(dirSpec, sizeof(dirSpec), "%s", filename);
+	strncpy(dirSpec, filename, sizeof(dirSpec) );
 	fd = open(dirSpec, 0);
 	if (fd < 0)
 	{
@@ -135,12 +135,12 @@ void *loadACPITable (const char *filename)
 
 	if (fd >= 0)
 	{
-		void *tableAddr = (void*)AllocateKernelMemory(file_size(fd));
+		void *tableAddr = (void *)AllocateKernelMemory(file_size(fd));
 		if (tableAddr)
 		{
 			if (read(fd, tableAddr, file_size(fd)) != file_size(fd))
 			{
-				DBG("Couldn't read table %s\n",dirspec);
+				DBG("Couldn't read table %s\n", dirspec);
 				free(tableAddr);
 				close(fd);
 				return NULL;
@@ -151,68 +151,10 @@ void *loadACPITable (const char *filename)
 			return tableAddr;
 		}
 		close(fd);
-		DBG("Couldn't allocate memory for table \n", dirspec);
-	}  
+		DBG("Couldn't allocate memory for table: %s.\n", dirspec);
+	}
 	//printf("Couldn't find table %s\n", filename);
 	return NULL;
-}
-
-uint8_t acpi_cpu_count	= 0;
-uint32_t acpi_cpu_p_blk	= 0;
-char *acpi_cpu_name[32];
-
-void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
-{
-	uint32_t i;
-
-	DBG("ACPIpatcher: start finding cpu names. Length %d\n", length);
-
-	for (i=0; i<length-7; i++)
-	{
-		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
-		{
-			DBG("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
-
-			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
-
-			bool add_name = true;
-
-			uint8_t j;
-
-			for (j=0; j<4; j++)
-			{
-				char c = dsdt[offset+j];
-
-				if (!aml_isvalidchar(c))
-				{
-					add_name = false;
-					DBG("ACPIpatcher: invalid character found in ProcessorOP '0x%X'!\n", c);
-					break;
-				}
-			}
-
-			if (add_name)
-			{
-				acpi_cpu_name[acpi_cpu_count] = malloc(4);
-				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
-				i = offset + 5;
-
-				if (acpi_cpu_count == 0)
-				{
-					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
-				}
-
-				DBG("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
-
-				if (++acpi_cpu_count == 32)
-				{
-					return;
-				}
-			}
-		}
-	}
-
-	DBG("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
 }
 
 struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt)
@@ -241,7 +183,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	}
 	else
 	{
-		DBG("Not an Intel platform: Restart Fix not applied !!!\n");
+		DBG("\tNot an Intel platform, FACP Restart Fix will not be applied!\n");
 		fix_restart = false;
 	}
 
@@ -251,12 +193,12 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	}
 
 	// Allocate new fadt table
-	if (fadt->Length < 0x84 && fadt_rev2_needed)
+	if ((fadt->Length < 0x84) && fadt_rev2_needed)
 	{
 		fadt_mod = (struct acpi_2_fadt *)AllocateKernelMemory(0x84);
 		memcpy(fadt_mod, fadt, fadt->Length);
 		fadt_mod->Length   = 0x84;
-		fadt_mod->Revision = 0x02; // FADT rev 2 (ACPI 1.0B MS extensions)
+		fadt_mod->Revision = 0x02; // FACP rev 2 (ACPI 1.0B MS extensions)
 	}
 	else
 	{
@@ -302,7 +244,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// because we need to take care of FACP original content, if it is correct.
 	setupSystemType();
 
-	// Patch FADT to fix restart
+	// Patch FACP to fix restart
 	if (fix_restart)
 	{
 		if (fix_restart_ps2)
@@ -314,7 +256,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 			fadt_mod->Reset_Address		= 0x64;   // Address of the register
 			fadt_mod->Reset_Value		= 0xfe;   // Value to write to reset the system
-			DBG("FADT: PS2 Restart Fix applied!\n");
+			DBG("\tFACP PS2 Restart Fix applied!\n");
 		}
 		else
 		{
@@ -325,20 +267,32 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 			fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
 			fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
-			DBG("FADT: ACPI Restart Fix applied!\n");
+			DBG("\tFACP Restart Fix applied!\n");
 		}
 
 	}
 
-	// Patch DSDT Address if we have loaded DSDT.aml
-	if(new_dsdt)
+	// Bungo: Save Hardware Signature (machine-signature)
+	if ((fadt_mod->FACS > 0) && (fadt_mod->FACS < 0xFFFFFFFF) && (((struct acpi_2_facs *)fadt_mod->FACS)->Length >= 64))
+	{
+		Platform.HWSignature = ((struct acpi_2_facs *)fadt_mod->FACS)->HWSignature;
+		DBG("\tHardware Signature=0x%08X: using.\n", Platform.HWSignature);
+	}
+	else
+	{
+		Platform.HWSignature = 0;
+		DBG("\tFixing Hardware Signature=0x%08X.\n", Platform.HWSignature);
+	}
+
+	// Patch DSDT address if we have loaded DSDT.aml
+	if (new_dsdt)
 	{
 		DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
-		fadt_mod->DSDT=(uint32_t)new_dsdt;
-		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+		fadt_mod->DSDT = (uint32_t)new_dsdt;
+		if ((uint32_t)(&(fadt_mod->X_DSDT)) - (uint32_t)fadt_mod + 8<=fadt_mod->Length)
 		{
-			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+			fadt_mod->X_DSDT = (uint32_t)new_dsdt;
 		}
 
 		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
@@ -377,23 +331,8 @@ int setupAcpiNoMod()
 int setupAcpi(void)
 {
 	int version;
+	void *new_dsdt = NULL;
 
-	// ACPI Tables
-	bool drop_dmar = getBoolForKey(kDropDMAR, &drop_dmar, &bootInfo->chameleonConfig);
-	bool drop_hpet = getBoolForKey(kDropHPET, &drop_hpet, &bootInfo->chameleonConfig);
-	bool drop_slic = getBoolForKey(kDropSLIC, &drop_slic, &bootInfo->chameleonConfig);
-	bool drop_sbst = getBoolForKey(kDropSBST, &drop_sbst, &bootInfo->chameleonConfig);
-	bool drop_ecdt = getBoolForKey(kDropECDT, &drop_ecdt, &bootInfo->chameleonConfig);
-	bool drop_asft = getBoolForKey(kDropASFT, &drop_asft, &bootInfo->chameleonConfig);
-
-	void *new_dsdt = NULL; // DSDT.aml DSDT
-	void *new_hpet = NULL; // HPET.aml HPET
-	void *new_sbst = NULL; // SBST.aml SBST
-	void *new_ecdt = NULL; // ECDT.aml ECDT
-	void *new_asft = NULL; // ASFT.aml ASF!
-	void *new_dmar = NULL; // DMAR.aml DMAR
-	void *new_apic = NULL; // APIC.aml APIC
-	void *new_mcfg = NULL; // MCFG.aml MCFG
 
 	const char *filename;
 	char dirSpec[128];
@@ -405,100 +344,16 @@ int setupAcpi(void)
 	/* Try using the file specified with the DSDT option */
 	if (getValueForKey(kDSDT, &filename, &len, &bootInfo->chameleonConfig))
 	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
+		strncpy(dirSpec, filename, sizeof(dirSpec) );
 	}
 	else
 	{
-		sprintf(dirSpec, "DSDT.aml");
+		strcpy(dirSpec, "DSDT.aml");
 		//verbose("dirSpec, DSDT.aml");
 	}
 
 	// Load replacement DSDT
 	new_dsdt = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the HPET option */
-	if (getValueForKey(kHPET, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "HPET.aml");
-	}
-	// Load replacement HPET
-	new_hpet = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the SBST option */
-	if (getValueForKey(kSBST, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "SBST.aml");
-	}
-	// Load replacement SBST
-	new_sbst = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the ECDT option */
-	if (getValueForKey(kECDT, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "ECDT.aml");
-	}
-	// Load replacement ECDT
-	new_ecdt = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the ASF! option */
-	if (getValueForKey(kASFT, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "ASFT.aml");
-	}
-	// Load replacement ASF!
-	new_asft = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the DMAR option */
-	if (getValueForKey(kDMAR, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "DMAR.aml");
-	}
-	// Load replacement DMAR
-	new_dmar = loadACPITable(dirSpec);
-
-	/* Try using the file specified with the APIC option */
-	if (getValueForKey(kAPIC, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "APIC.aml");
-	}
-	// Load replacement APIC
-	new_apic = loadACPITable(dirSpec);
-
-	// Try using the file specified with the MCFG option */
-	if (getValueForKey(kMCFG, &filename, &len, &bootInfo->chameleonConfig))
-	{
-		snprintf(dirSpec, sizeof(dirSpec), filename);
-	}
-	else
-	{
-		sprintf(dirSpec, "MCFG.aml");
-	}
-	// Load replacement MCFG
-	new_mcfg = loadACPITable(dirSpec);
 
 	// Mozodojo: going to patch FACP and load SSDT's even if DSDT.aml is not present
 	/*if (!new_dsdt)
@@ -529,7 +384,14 @@ int setupAcpi(void)
 		{
 			char filename[512];
 
-			sprintf(filename, i > 0 ? "SSDT-%d.aml" : "SSDT.aml", i);
+			if (i > 0)
+			{
+				sprintf(filename, "SSDT-%d.aml", i);
+			}
+			else
+			{
+				strcpy(filename, "SSDT.aml");
+			}
 
 			if ( (new_ssdt[ssdt_count] = loadACPITable(filename)) )
 			{
@@ -584,7 +446,7 @@ int setupAcpi(void)
 		{
 			uint32_t *rsdt_entries;
 			int rsdt_entries_num;
-			int dropoffset=0, i;
+			int dropoffset = 0, i;
 
 			// mozo: using malloc cos I didn't found how to free already allocated kernel memory
 			rsdt_mod = (struct acpi_2_rsdt *)malloc(rsdt->Length);
@@ -592,7 +454,7 @@ int setupAcpi(void)
 			rsdp_mod->RsdtAddress = (uint32_t)rsdt_mod;
 			rsdt_entries_num = (rsdt_mod->Length - sizeof(struct acpi_2_rsdt)) / 4;
 			rsdt_entries = (uint32_t *)(rsdt_mod + 1);
-			for (i = 0;i < rsdt_entries_num;i++)
+			for (i = 0; i < rsdt_entries_num; i++)
 			{
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
@@ -611,132 +473,13 @@ int setupAcpi(void)
 					continue;
 				}
 
-				if (drop_hpet  && tableSign(table, "HPET"))
-				{
-					DBG("OEM HPET table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (drop_slic && tableSign(table, "SLIC"))
-				{
-					DBG("OEM SLIC table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (drop_sbst && tableSign(table, "SBST"))
-				{
-					DBG("OEM SBST table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (drop_ecdt && tableSign(table, "ECDT"))
-				{
-					DBG("OEM ECDT table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (drop_asft && tableSign(table, "ASF!"))
-				{
-					DBG("OEM ASF! table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (drop_dmar && tableSign(table, "DMAR"))
-				{
-					DBG("OEM DMAR table was dropped\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (tableSign(table, "HPET"))
-				{
-					DBG("HPET found\n");
-					DBG("Custom HPET table was found\n");
-					if(new_hpet)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_hpet;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "SBST"))
-				{
-					DBG("SBST found\n");
-					DBG("Custom SBST table was found\n");
-					if(new_sbst)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_sbst;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "ECDT"))
-				{
-					DBG("ECDT found\n");
-					DBG("Custom ECDT table was found\n");
-					if(new_ecdt)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_ecdt;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "ASF!"))
-				{
-					DBG("ASF! found\n");
-					DBG("Custom ASF! table was found\n");
-					if(new_asft)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_asft;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "DMAR"))
-				{
-					DBG("DMAR found\n");
-					DBG("Custom DMAR table was found\n");
-					if(new_dmar)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_dmar;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "APIC"))
-				{
-					DBG("APIC found\n");
-					DBG("Custom APIC table was found\n");
-					if(new_apic)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_apic;
-					}
-					continue;
-				}
-
-				if (tableSign(table, "MCFG"))
-				{
-					DBG("MCFG found\n");
-					DBG("Custom MCFG table was found\n");
-					if(new_mcfg)
-					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_mcfg;
-					}
-
-					continue;
-				}
 				if (tableSign(table, "DSDT"))
 				{
 					DBG("DSDT found\n");
 					DBG("Custom DSDT table was found\n");
 					if(new_dsdt)
 					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+						rsdt_entries[i-dropoffset] = (uint32_t)new_dsdt;
 					}
 
 					continue;
@@ -761,7 +504,7 @@ int setupAcpi(void)
 					// Generate _CST SSDT
 					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 					{
-						DBG("C-States generated\n");
+						DBG("\tC-States generated.\n");
 						generate_cstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -769,7 +512,7 @@ int setupAcpi(void)
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 					{
-						DBG("P-States generated\n");
+						DBG("\tP-States generated.\n");
 						generate_pstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -795,7 +538,7 @@ int setupAcpi(void)
 
 				for (j=0; j<ssdt_count; j++)
 				{
-					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
+					rsdt_entries[i-dropoffset+j] = (uint32_t)new_ssdt[j];
 				}
 
 				DBG("RSDT: Added %d SSDT table(s)\n", ssdt_count);
@@ -824,22 +567,22 @@ int setupAcpi(void)
 			// FIXME: handle 64-bit address correctly
 
 			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
-			DBG("XSDT @%x;%x, Length=%d Sign=%c%c%c%c\n", (uint32_t)(rsdp->XsdtAddress>>32),
-				(uint32_t)rsdp->XsdtAddress, xsdt->Length, xsdt[0], xsdt[1], xsdt[2], xsdt[3]);
+			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt->Length);
+
 			if (xsdt && (uint64_t)rsdp->XsdtAddress<0xffffffff && xsdt->Length<0x10000)
 			{
 				uint64_t *xsdt_entries;
 				int xsdt_entries_num, i;
-				int dropoffset=0;
+				int dropoffset = 0;
 
 				// mozo: using malloc cos I didn't found how to free already allocated kernel memory
-				xsdt_mod=(struct acpi_2_xsdt*)malloc(xsdt->Length);
+				xsdt_mod = (struct acpi_2_xsdt *)malloc(xsdt->Length);
 				memcpy(xsdt_mod, xsdt, xsdt->Length);
 
 				rsdp_mod->XsdtAddress = (uint32_t)xsdt_mod;
 				xsdt_entries_num = (xsdt_mod->Length - sizeof(struct acpi_2_xsdt)) / 8;
 				xsdt_entries = (uint64_t *)(xsdt_mod + 1);
-				for (i = 0;i < xsdt_entries_num;i++)
+				for (i = 0;i < xsdt_entries_num; i++)
 				{
 					char *table = (char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
@@ -850,165 +593,24 @@ int setupAcpi(void)
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
-						verbose("OEM SSDT tables was dropped\n");
+						DBG("OEM SSDT tables was dropped\n");
 						dropoffset++;
 						continue;
 					}
-
-					if (drop_hpet && tableSign(table, "HPET"))
-					{
-						verbose("OEM HPET table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
-					if (drop_slic && tableSign(table, "SLIC"))
-					{
-						verbose("OEM SLIC table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
-					if (drop_sbst && tableSign(table, "SBST"))
-					{
-						verbose("OEM SBST table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
-					if (drop_ecdt && tableSign(table, "ECDT"))
-					{
-						verbose("OEM ECDT table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
-					if (drop_asft && tableSign(table, "ASF!"))
-					{
-						verbose("OEM ASF! table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
-					if (drop_dmar && tableSign(table, "DMAR"))
-					{
-						verbose("OEM DMAR table was dropped\n");
-						dropoffset++;
-						continue;
-					}
-
 					if (tableSign(table, "DSDT"))
 					{
 						DBG("DSDT found\n");
 
 						if (new_dsdt)
 						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+							xsdt_entries[i-dropoffset] = (uint32_t)new_dsdt;
+							DBG("custom table added.\n");
 						}
 
 						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 
 						continue;
 					}
-
-					if (tableSign(table, "HPET"))
-					{
-						DBG("HPET found\n");
-
-						if (new_hpet)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_hpet;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "SBST"))
-					{
-						DBG("SBST found\n");
-
-						if (new_sbst)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_sbst;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "ECDT"))
-					{
-						DBG("ECDT found\n");
-
-						if (new_ecdt)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_ecdt;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "ASF!"))
-					{
-						DBG("ASF! found\n");
-
-						if (new_asft)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_asft;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "DMAR"))
-					{
-						DBG("DMAR found\n");
-
-						if (new_dmar)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_dmar;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "APIC"))
-					{
-						DBG("APIC found\n");
-
-						if (new_apic)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_apic;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
-					if (tableSign(table, "MCFG"))
-					{
-						DBG("MCFG found\n");
-
-						if (new_mcfg)
-						{
-							xsdt_entries[i-dropoffset]=(uint32_t)new_mcfg;
-						}
-
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
-						continue;
-					}
-
 					if (tableSign(table, "FACP"))
 					{
 						struct acpi_2_fadt *fadt, *fadt_mod;
@@ -1024,14 +626,14 @@ int setupAcpi(void)
 						}
 
 						fadt_mod = patch_fadt(fadt, new_dsdt);
-						xsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
+						xsdt_entries[i - dropoffset] = (uint32_t)fadt_mod;
 
 						// DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 
 						// Generate _CST SSDT
 						if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 						{
-							DBG("C-States generated\n");
+							DBG("\tC-States generated.\n");
 							generate_cstates = false; // Generate SSDT only once!
 							ssdt_count++;
 						}
@@ -1039,7 +641,7 @@ int setupAcpi(void)
 						// Generating _PSS SSDT
 						if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 						{
-							DBG("P-States generated\n");
+							DBG("\tP-States generated.\n");
 							generate_pstates = false; // Generate SSDT only once!
 							ssdt_count++;
 						}
@@ -1052,9 +654,8 @@ int setupAcpi(void)
 						}*/
 						continue;
 					}
-
-					DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
-
+					DBG("copied (OEM)\n");
+					// DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 				}
 
 				// Allocate xsdt in Kernel memory area
@@ -1074,7 +675,7 @@ int setupAcpi(void)
 
 					for (j=0; j<ssdt_count; j++)
 					{
-						xsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
+						xsdt_entries[i - dropoffset + j] = (uint32_t)new_ssdt[j];
 					}
 
 					verbose("Added %d SSDT table(s) into XSDT\n", ssdt_count);
@@ -1133,7 +734,7 @@ int setupAcpi(void)
 			acpi10_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 		}
-		DBG("ACPI version %d patching finished\n\n", version+1);
+		DBG("ACPI version %d patching finished\n\n", version + 1);
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");

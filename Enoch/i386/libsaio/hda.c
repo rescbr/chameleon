@@ -66,17 +66,18 @@
 #include "pci_root.h"
 #include "platform.h"
 #include "device_inject.h"
+#include "convert.h"
 #include "hda.h"
 //#include "aml_generator.h"
 
 #ifndef DEBUG_HDA
-#define DEBUG_HDA 0
+	#define DEBUG_HDA 0
 #endif
 
 #if DEBUG_HDA
-#define DBG(x...)  verbose(x)
+	#define DBG(x...)  verbose(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 extern uint32_t devices_number;
@@ -93,31 +94,38 @@ static uint8_t connector_type_value[]          =	{0x00, 0x08, 0x00, 0x00};
 
 static hda_controller_devices know_hda_controller[] = {
 	//8086  Intel Corporation
-	{ HDA_INTEL_OAK,	"Oaktrail"	/*, 0, 0 */ },
-	{ HDA_INTEL_BAY,	"BayTrail"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW1,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW2,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_HSW3,	"Haswell"	/*, 0, 0 */ },
-	{ HDA_INTEL_CPT,	"Cougar Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_PATSBURG,	"Patsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_PPT1,	"Panther Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPT1,	"Lynx Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPT2,	"Lynx Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_WCPT,	"Wildcat Point"	/*, 0, 0 */ },
-	{ HDA_INTEL_WELLS1,	"Wellsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_WELLS2,	"Wellsburg"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPTLP1,	"Lynx Point-LP"	/*, 0, 0 */ },
-	{ HDA_INTEL_LPTLP2,	"Lynx Point-LP"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801F,	"82801F"	/*, 0, 0 */ },
-	{ HDA_INTEL_63XXESB,	"631x/632xESB"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801G,	"82801G"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801H,	"82801H"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801I,	"82801I"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801JI,	"82801JI"	/*, 0, 0 */ },
-	{ HDA_INTEL_82801JD,	"82801JD"	/*, 0, 0 */ },
-	{ HDA_INTEL_PCH,	"5 Series/3400 Series" /*, 0, 0 */ },
-	{ HDA_INTEL_PCH2,	"5 Series/3400 Series" /*, 0, 0 */ },
-	{ HDA_INTEL_SCH,	"SCH"		/*, 0, 0 */ },
+	{ HDA_INTEL_OAK,	"Oaktrail"		/*, 0, 0 */ },
+	{ HDA_INTEL_BAY,	"BayTrail"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW1,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW2,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_HSW3,	"Haswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_BDW,	"Broadwell"		/*, 0, 0 */ },
+	{ HDA_INTEL_CPT,	"Cougar Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_PATSBURG,	"Patsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_PPT1,	"Panther Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_BRASWELL,	"Braswell"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801F,	"82801F"		/*, 0, 0 */ },
+	{ HDA_INTEL_63XXESB,	"631x/632xESB"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801G,	"82801G"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801H,	"82801H"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801I,	"82801I"		/*, 0, 0 */ },
+	{ HDA_INTEL_ICH9,	"ICH9"			/*, 0, 0 */ },
+	{ HDA_INTEL_82801JI,	"82801JI"		/*, 0, 0 */ },
+	{ HDA_INTEL_82801JD,	"82801JD"		/*, 0, 0 */ },
+	{ HDA_INTEL_PCH,	"5 Series/3400 Series"	/*, 0, 0 */ },
+	{ HDA_INTEL_PCH2,	"5 Series/3400 Series"	/*, 0, 0 */ },
+	{ HDA_INTEL_SCH,	"SCH"			/*, 0, 0 */ },
+	{ HDA_INTEL_LPT1,	"Lynx Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_LPT2,	"Lynx Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_WCPT,	"Wildcat Point"		/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS1,	"Wellsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_WELLS2,	"Wellsburg"		/*, 0, 0 */ },
+	{ HDA_INTEL_WCPTLP,	"Wildcat Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP1,	"Lynx Point-LP"		/*, 0, 0 */ },
+	{ HDA_INTEL_LPTLP2,	"Lynx Point-LP"		/*, 0, 0 */ },
+	{ HDA_INTEL_SRSPLP,	"Sunrise Point-LP"	/*, 0, 0 */ },
+	{ HDA_INTEL_SRSP,	"Sunrise Point"		/*, 0, 0 */ },
+
 	//10de  NVIDIA Corporation
 	{ HDA_NVIDIA_MCP51,	"MCP51" /*, 0, HDAC_QUIRK_MSI */ },
 	{ HDA_NVIDIA_MCP55,	"MCP55" /*, 0, HDAC_QUIRK_MSI */ },
@@ -160,6 +168,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
 	{ HDA_ATI_SB600,	"SB600" /*, 0, 0 */ },
 	{ HDA_ATI_RS600,	"RS600" /*, 0, 0 */ },
+	{ HDA_ATI_HUDSON,	"Hudson" /*, 0, 0 */ },
 	{ HDA_ATI_RS690,	"RS690" /*, 0, 0 */ },
 	{ HDA_ATI_RS780,	"RS780" /*, 0, 0 */ },
 	{ HDA_ATI_RS880,	"RS880" /*, 0, 0 */ },
@@ -182,6 +191,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_ATI_RV940,	"RV940" /*, 0, 0 */ },
 	{ HDA_ATI_RV970,	"RV970" /*, 0, 0 */ },
 	{ HDA_ATI_R1000,	"R1000" /*, 0, 0 */ }, // HDMi
+	{ HDA_ATI_SI,		"SI" /*, 0, 0 */ },
 	{ HDA_ATI_VERDE,	"Cape Verde" /*, 0, ? */ }, // HDMi
 	//17f3  RDC Semiconductor, Inc.
 	{ HDA_RDC_M3010,	"M3010" /*, 0, 0 */ },
@@ -209,7 +219,13 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_CS4206, 0,          "Cirrus Logic CS4206" },
 	{ HDA_CODEC_CS4207, 0,          "Cirrus Logic CS4207" },
 	{ HDA_CODEC_CS4210, 0,          "Cirrus Logic CS4210" },
+
 	{ HDA_CODEC_ALC221, 0,          "Realtek ALC221" },
+	{ HDA_CODEC_ALC231, 0,          "Realtek ALC231" },
+	{ HDA_CODEC_ALC233, 0,          "Realtek ALC233" },
+	{ HDA_CODEC_ALC235, 0,          "Realtek ALC235" },
+	{ HDA_CODEC_ALC255, 0,          "Realtek ALC255" },
+	{ HDA_CODEC_ALC256, 0,          "Realtek ALC256" },
 	{ HDA_CODEC_ALC260, 0,          "Realtek ALC260" },
 	{ HDA_CODEC_ALC262, 0,          "Realtek ALC262" },
 	{ HDA_CODEC_ALC267, 0,          "Realtek ALC267" },
@@ -220,24 +236,41 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC273, 0,          "Realtek ALC273" },
 	{ HDA_CODEC_ALC275, 0,          "Realtek ALC275" },
 	{ HDA_CODEC_ALC276, 0,          "Realtek ALC276" },
+	{ HDA_CODEC_ALC280, 0,          "Realtek ALC280" },
+	{ HDA_CODEC_ALC282, 0,          "Realtek ALC282" },
+	{ HDA_CODEC_ALC283, 0,          "Realtek ALC283" },
+	{ HDA_CODEC_ALC284, 0,          "Realtek ALC284" },
+	{ HDA_CODEC_ALC285, 0,          "Realtek ALC285" },
+	{ HDA_CODEC_ALC286, 0,          "Realtek ALC286" },
+	{ HDA_CODEC_ALC288, 0,          "Realtek ALC288" },
+	{ HDA_CODEC_ALC290, 0,          "Realtek ALC290" },
+	{ HDA_CODEC_ALC292, 0,          "Realtek ALC292" },
+	{ HDA_CODEC_ALC293, 0,          "Realtek ALC293" },
+	{ HDA_CODEC_ALC298, 0,          "Realtek ALC298" },
 	{ HDA_CODEC_ALC660, 0,          "Realtek ALC660-VD" },
-	{ HDA_CODEC_ALC662, 0x0002,     "Realtek ALC662 rev2" },
 	{ HDA_CODEC_ALC662, 0,          "Realtek ALC662" },
+	{ HDA_CODEC_ALC662, 0x100101,   "Realtek ALC662 rev1" },
+	{ HDA_CODEC_ALC662, 0x100002,   "Realtek ALC662 rev2" },
+	{ HDA_CODEC_ALC662, 0x100300,   "Realtek ALC662 rev3" },
 	{ HDA_CODEC_ALC663, 0,          "Realtek ALC663" },
 	{ HDA_CODEC_ALC665, 0,          "Realtek ALC665" },
+	{ HDA_CODEC_ALC667, 0,          "Realtek ALC667" },
+	{ HDA_CODEC_ALC668, 0,          "Realtek ALC668" },
 	{ HDA_CODEC_ALC670, 0,          "Realtek ALC670" },
+	{ HDA_CODEC_ALC671, 0,          "Realtek ALC671" },
 	{ HDA_CODEC_ALC680, 0,          "Realtek ALC680" },
-	{ HDA_CODEC_ALC861, 0x0340,     "Realtek ALC660" },
+	{ HDA_CODEC_ALC861, 0x100340,   "Realtek ALC660" },
 	{ HDA_CODEC_ALC861, 0,          "Realtek ALC861" },
 	{ HDA_CODEC_ALC861VD, 0,        "Realtek ALC861-VD" },
+	{ HDA_CODEC_ALC867, 0,          "Realtek ALC891" },
 	{ HDA_CODEC_ALC880, 0,          "Realtek ALC880" },
 	{ HDA_CODEC_ALC882, 0,          "Realtek ALC882" },
 	{ HDA_CODEC_ALC883, 0,          "Realtek ALC883" },
-	{ HDA_CODEC_ALC885, 0x0101,     "Realtek ALC889A" },
-	{ HDA_CODEC_ALC885, 0x0103,     "Realtek ALC889A" },
+	{ HDA_CODEC_ALC885, 0x100101,   "Realtek ALC889A" },
+	{ HDA_CODEC_ALC885, 0x100103,   "Realtek ALC889A" },
 	{ HDA_CODEC_ALC885, 0,          "Realtek ALC885" },
 	{ HDA_CODEC_ALC887, 0,          "Realtek ALC887" },
-	{ HDA_CODEC_ALC888, 0x0101,     "Realtek ALC1200" },
+	{ HDA_CODEC_ALC888, 0x100101,   "Realtek ALC1200" },
 	{ HDA_CODEC_ALC888, 0,          "Realtek ALC888" },
 	{ HDA_CODEC_ALC889, 0,          "Realtek ALC889" },
 	{ HDA_CODEC_ALC892, 0,          "Realtek ALC892" },
@@ -245,8 +278,8 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC899, 0,		"Realtek ALC899" },
 	{ HDA_CODEC_ALC900, 0,          "Realtek ALC1150" },
 
-	{ HDA_CODEC_AD1882, 0, "Analog Devices AD1882" },
-	{ HDA_CODEC_AD1882A, 0, "Analog Devices AD1882A" },
+	{ HDA_CODEC_AD1882, 0,          "Analog Devices AD1882" },
+	{ HDA_CODEC_AD1882A, 0,         "Analog Devices AD1882A" },
 	{ HDA_CODEC_AD1883, 0,          "Analog Devices AD1883" },
 	{ HDA_CODEC_AD1884, 0,          "Analog Devices AD1884" },
 	{ HDA_CODEC_AD1884A, 0,         "Analog Devices AD1884A" },
@@ -261,12 +294,14 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_AD1988B, 0,         "Analog Devices AD1988B" },
 	{ HDA_CODEC_AD1989A, 0,         "Analog Devices AD1989A" },
 	{ HDA_CODEC_AD1989B, 0,         "Analog Devices AD1989B" },
-	{ HDA_CODEC_CA0110, 0,          "Creative CA0110-IBG" },
-	{ HDA_CODEC_CA0110_2, 0,        "Creative CA0110-IBG" },
+
+	{ HDA_CODEC_XFIEA, 0,           "Creative X-Fi Extreme A" },
+	{ HDA_CODEC_XFIED, 0,           "Creative X-Fi Extreme D" },
 	{ HDA_CODEC_CA0132, 0,          "Creative CA0132" },
 	{ HDA_CODEC_SB0880, 0,          "Creative SB0880 X-Fi" },
 	{ HDA_CODEC_CMI9880, 0,         "CMedia CMI9880" },
 	{ HDA_CODEC_CMI98802, 0,        "CMedia CMI9880" },
+
 	{ HDA_CODEC_CXD9872RDK, 0,      "Sigmatel CXD9872RD/K" },
 	{ HDA_CODEC_CXD9872AKD, 0,      "Sigmatel CXD9872AKD" },
 	{ HDA_CODEC_STAC9200D, 0,       "Sigmatel STAC9200D" },
@@ -306,6 +341,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_STAC9274X5NH, 0,    "Sigmatel STAC9274X5NH" },
 	{ HDA_CODEC_STAC9274D5NH, 0,    "Sigmatel STAC9274D5NH" },
 	{ HDA_CODEC_STAC9872AK, 0,      "Sigmatel STAC9872AK" },
+
 	{ HDA_CODEC_IDT92HD005, 0,      "IDT 92HD005" },
 	{ HDA_CODEC_IDT92HD005D, 0,     "IDT 92HD005D" },
 	{ HDA_CODEC_IDT92HD206X, 0,     "IDT 92HD206X" },
@@ -363,6 +399,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_IDT92HD93BXX, 0,    "IDT 92HD93BXX" },
 	{ HDA_CODEC_IDT92HD98BXX, 0,    "IDT 92HD98BXX" },
 	{ HDA_CODEC_IDT92HD99BXX, 0,    "IDT 92HD99BXX" },
+
 	{ HDA_CODEC_CX20549, 0,         "Conexant CX20549 (Venice)" },
 	{ HDA_CODEC_CX20551, 0,         "Conexant CX20551 (Waikiki)" },
 	{ HDA_CODEC_CX20561, 0,         "Conexant CX20561 (Hermosa)" },
@@ -380,6 +417,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_CX20652, 0,         "Conexant CX20652" },
 	{ HDA_CODEC_CX20664, 0,         "Conexant CX20664" },
 	{ HDA_CODEC_CX20665, 0,         "Conexant CX20665" },
+
 	{ HDA_CODEC_VT1708_8, 0,        "VIA VT1708_8" },
 	{ HDA_CODEC_VT1708_9, 0,        "VIA VT1708_9" },
 	{ HDA_CODEC_VT1708_A, 0,        "VIA VT1708_A" },
@@ -428,10 +466,12 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_VT2002P_0, 0,       "VIA VT2002P_0" },
 	{ HDA_CODEC_VT2002P_1, 0,       "VIA VT2002P_1" },
 	{ HDA_CODEC_VT2020, 0,          "VIA VT2020" },
+
 	{ HDA_CODEC_ATIRS600_1, 0,      "ATI RS600" },
 	{ HDA_CODEC_ATIRS600_2, 0,      "ATI RS600" },
 	{ HDA_CODEC_ATIRS690, 0,        "ATI RS690/780" },
 	{ HDA_CODEC_ATIR6XX, 0,         "ATI R6xx" },
+
 	{ HDA_CODEC_NVIDIAMCP67, 0,     "NVIDIA MCP67" },
 	{ HDA_CODEC_NVIDIAMCP73, 0,     "NVIDIA MCP73" },
 	{ HDA_CODEC_NVIDIAMCP78, 0,     "NVIDIA MCP78" },
@@ -447,6 +487,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_NVIDIAGT440, 0,     "NVIDIA GT440" },
 	{ HDA_CODEC_NVIDIAGTX550, 0,    "NVIDIA GTX550" },
 	{ HDA_CODEC_NVIDIAGTX570, 0,    "NVIDIA GTX570" },
+
 	{ HDA_CODEC_INTELIP, 0,         "Intel Ibex Peak" },
 	{ HDA_CODEC_INTELBL, 0,         "Intel Bearlake" },
 	{ HDA_CODEC_INTELCA, 0,         "Intel Cantiga" },
@@ -454,10 +495,10 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_INTELIP2, 0,        "Intel Ibex Peak" },
 	{ HDA_CODEC_INTELCPT, 0,        "Intel Cougar Point" },
 	{ HDA_CODEC_INTELPPT, 0,        "Intel Panther Point" },
-	{ HDA_CODEC_INTELHSW, 0,	"Intel Haswell" },
+	{ HDA_CODEC_INTELLLP, 0,	"Intel Lynx Point" },
 	{ HDA_CODEC_INTELCL, 0,         "Intel Crestline" },
-	{ HDA_CODEC_SII1390, 0,         "Silicon Image SiI1390" },
-	{ HDA_CODEC_SII1392, 0,         "Silicon Image SiI1392" },
+	{ HDA_CODEC_SII1390, 0,         "Silicon Image SiI1390 HDMi" },
+	{ HDA_CODEC_SII1392, 0,         "Silicon Image SiI1392 HDMi" },
 	// Unknown CODECs
 	{ HDA_CODEC_ADXXXX, 0,          "Analog Devices" },
 	{ HDA_CODEC_AGEREXXXX, 0,       "Lucent/Agere Systems" },
@@ -599,26 +640,32 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_INTEL_HSW1:
 		case HDA_INTEL_HSW2:
 		case HDA_INTEL_HSW3:
+		case HDA_INTEL_BDW:
 		case HDA_INTEL_CPT:
 		case HDA_INTEL_PATSBURG:
 		case HDA_INTEL_PPT1:
-		case HDA_INTEL_LPT1:
-		case HDA_INTEL_LPT2:
-		case HDA_INTEL_WCPT:
-		case HDA_INTEL_WELLS1:
-		case HDA_INTEL_WELLS2:
-		case HDA_INTEL_LPTLP1:
-		case HDA_INTEL_LPTLP2:
+		case HDA_INTEL_BRASWELL:
 		case HDA_INTEL_82801F:
 		case HDA_INTEL_63XXESB:
 		case HDA_INTEL_82801G:
 		case HDA_INTEL_82801H:
 		case HDA_INTEL_82801I:
+		case HDA_INTEL_ICH9:
 		case HDA_INTEL_82801JI:
 		case HDA_INTEL_82801JD:
 		case HDA_INTEL_PCH:
 		case HDA_INTEL_PCH2:
 		case HDA_INTEL_SCH:
+		case HDA_INTEL_LPT1:
+		case HDA_INTEL_LPT2:
+		case HDA_INTEL_WCPT:
+		case HDA_INTEL_WELLS1:
+		case HDA_INTEL_WELLS2:
+		case HDA_INTEL_WCPTLP:
+		case HDA_INTEL_LPTLP1:
+		case HDA_INTEL_LPTLP2:
+		case HDA_INTEL_SRSPLP:
+		case HDA_INTEL_SRSP:
 
 	/* if the key value kHDEFLayoutID as a value set that value, if not will assign a default layout */
 	if (getValueForKey(kHDEFLayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDEF_LEN * 2)
@@ -692,6 +739,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	*************************************************************************************************************/
 	case HDA_ATI_SB450:
 	case HDA_ATI_SB600:
+	case HDA_ATI_HUDSON:
 	case HDA_ATI_RS600:
 	case HDA_ATI_RS690:
 	case HDA_ATI_RS780:
@@ -714,6 +762,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	case HDA_ATI_RV930:
 	case HDA_ATI_RV910:
 	case HDA_ATI_R1000:
+	case HDA_ATI_SI:
 	case HDA_ATI_VERDE:
 
             /* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
