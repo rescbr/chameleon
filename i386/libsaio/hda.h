@@ -91,7 +91,7 @@ typedef struct
 #define HDA_MODEL_CONSTRUCT(vendor, model) (((uint32_t)(model) << 16) | ((vendor##_VENDORID) & 0xffff))
 
 /* Intel */
-#define INTEL_VENDORID		0x8086
+#define INTEL_VENDORID		PCI_VENDOR_ID_INTEL
 #define HDA_INTEL_OAK		HDA_MODEL_CONSTRUCT(INTEL, 0x080a)
 #define HDA_INTEL_BAY		HDA_MODEL_CONSTRUCT(INTEL, 0x0f04)
 #define HDA_INTEL_HSW1		HDA_MODEL_CONSTRUCT(INTEL, 0x0a0c)
@@ -127,7 +127,7 @@ typedef struct
 #define HDA_INTEL_ALL		HDA_MODEL_CONSTRUCT(INTEL, 0xffff)
 
 /* Nvidia */
-#define NVIDIA_VENDORID		0x10de
+#define NVIDIA_VENDORID		PCI_VENDOR_ID_NVIDIA
 // AppleHDA binary contain 0a00de10 (10de000a)
 // AppleHDAController binary contain de10ea0b (10de0bea)
 #define HDA_NVIDIA_MCP51	HDA_MODEL_CONSTRUCT(NVIDIA, 0x026c)
@@ -170,7 +170,7 @@ typedef struct
 #define HDA_NVIDIA_ALL		HDA_MODEL_CONSTRUCT(NVIDIA, 0xffff)
 
 /* ATI */
-#define ATI_VENDORID		0x1002
+#define ATI_VENDORID		PCI_VENDOR_ID_ATI
 #define HDA_ATI_SB450		HDA_MODEL_CONSTRUCT(ATI, 0x437b)
 #define HDA_ATI_SB600		HDA_MODEL_CONSTRUCT(ATI, 0x4383)
 #define HDA_ATI_HUDSON		HDA_MODEL_CONSTRUCT(ATI, 0x780d)
@@ -321,7 +321,7 @@ typedef struct
 #define MEDION_ALL_SUBVENDOR		HDA_MODEL_CONSTRUCT(MEDION, 0xffff)
 
 /* Apple Computer Inc. */
-#define APPLE_VENDORID		0x106b
+#define APPLE_VENDORID		PCI_VENDOR_ID_APPLE
 #define APPLE_MB3_SUBVENDOR	HDA_MODEL_CONSTRUCT(APPLE, 0x00a1)
 
 /* Sony */
@@ -397,7 +397,7 @@ typedef struct
 #define HDA_CODEC_CSXXXX        HDA_CODEC_CONSTRUCT(CIRRUSLOGIC, 0xffff)
 
 /* Realtek */
-#define REALTEK_VENDORID        0x10ec
+#define REALTEK_VENDORID        PCI_VENDOR_ID_REALTEK
 #define HDA_CODEC_ALC221        HDA_CODEC_CONSTRUCT(REALTEK, 0x0221)
 #define HDA_CODEC_ALC231        HDA_CODEC_CONSTRUCT(REALTEK, 0x0231)
 #define HDA_CODEC_ALC233        HDA_CODEC_CONSTRUCT(REALTEK, 0x0233)
@@ -451,7 +451,7 @@ typedef struct
 #define HDA_CODEC_ALCXXXX       HDA_CODEC_CONSTRUCT(REALTEK, 0xffff)
 
 /* Motorola */
-#define MOTO_VENDORID           0x1057
+#define MOTO_VENDORID           PCI_VENDOR_ID_MOTOROLA
 #define HDA_CODEC_MOTOXXXX      HDA_CODEC_CONSTRUCT(MOTO, 0xffff)
 
 /* Creative */

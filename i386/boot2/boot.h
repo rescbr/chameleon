@@ -135,8 +135,9 @@
 
 /* Lebidou: added this key */
 
-/* Meklort: added this key */
+/* Meklort: added these keys */
 #define kMD0Image			"md0"			/* ramdisk.h */
+#define kEnableWifi			"EnableWifi"		/* pci_setup.c */
 
 /* Andyvand: added these keys */
 
