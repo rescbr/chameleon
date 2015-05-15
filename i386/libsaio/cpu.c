@@ -25,18 +25,11 @@
 
 clock_frequency_info_t gPEClockFrequencyInfo;
 
-static inline uint32_t __unused clockspeed_rdtsc(void)
+static __unused uint64_t rdtsc32(void)
 {
-	uint32_t out;
-	__asm__ volatile (
-                      "rdtsc\n"
-                      "shl $32,%%edx\n"
-                      "or %%edx,%%eax\n"
-                      : "=a" (out)
-                      :
-                      : "%edx"
-                      );
-	return out;
+	unsigned int lo,hi;
+	__asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+	return ((uint64_t)hi << 32) | lo;
 }
 
 /*
@@ -48,7 +41,7 @@ static inline uint32_t __unused clockspeed_rdtsc(void)
 static uint64_t timeRDTSC(void)
 {
 	int		attempts = 0;
-	uint64_t    	latchTime;
+	uint32_t    	latchTime;
 	uint64_t	saveTime,intermediate;
 	unsigned int	timerValue, lastValue;
 	//boolean_t	int_enabled;
@@ -82,10 +75,10 @@ restart:
 	attempts++;
 	enable_PIT2();		// turn on PIT2
 	set_PIT2(0);		// reset timer 2 to be zero
-	latchTime = rdtsc64();	// get the time stamp to time
+	latchTime = rdtsc32();	// get the time stamp to time
 	latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
 	set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
-	saveTime = rdtsc64();	// now time how long a 20th a second is...
+	saveTime = rdtsc32();	// now time how long a 20th a second is...
 	get_PIT2(&lastValue);
 	get_PIT2(&lastValue);	// read twice, first value may be unreliable
 	do {
@@ -214,7 +207,6 @@ uint32_t		rtc_quant_shift;	/* clock to nanos right shift */
 uint32_t		rtc_quant_scale;	/* clock to nanos multiplier */
 uint64_t		rtc_cyc_per_sec;	/* processor cycles per sec */
 uint64_t		rtc_cycle_count;	/* clocks in 1/20th second */
-//uint64_t cpuFreq;
 
 static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
 {
@@ -276,9 +268,108 @@ static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
 
 #define quad(hi,lo)	(((uint64_t)(hi)) << 32 | (lo))
 
+void get_cpuid(PlatformInfo_t *p)
+{
+
+	char		str[128];
+	uint32_t	reg[4];
+	char		*s			= 0;
+
+
+	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
+	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
+	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
+
+	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
+	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]); // Get the max extended cpuid
+
+	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+	{
+		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+	}
+	else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+	{
+		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
+	}
+
+// ==============================================================
+
+	/* get BrandString (if supported) */
+	/* Copyright: from Apple's XNU cpuid.c */
+	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
+	{
+		bzero(str, 128);
+		/*
+		 * The BrandString 48 bytes (max), guaranteed to
+		 * be NULL terminated.
+		 */
+		do_cpuid(0x80000002, reg);
+		memcpy(&str[0], (char *)reg, 16);
+		do_cpuid(0x80000003, reg);
+		memcpy(&str[16], (char *)reg, 16);
+		do_cpuid(0x80000004, reg);
+		memcpy(&str[32], (char *)reg, 16);
+		for (s = str; *s != '\0'; s++)
+		{
+			if (*s != ' ')
+			{
+				break;
+			}
+		}
+		strlcpy(p->CPU.BrandString, s, 48);
+
+		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), (unsigned)strlen(CPU_STRING_UNKNOWN) + 1)))
+		{
+			/*
+			 * This string means we have a firmware-programmable brand string,
+			 * and the firmware couldn't figure out what sort of CPU we have.
+			 */
+			p->CPU.BrandString[0] = '\0';
+		}
+		p->CPU.BrandString[47] = '\0';
+//		DBG("Brandstring = %s\n", p->CPU.BrandString);
+	}
+
+// ==============================================================
+
+	switch(p->CPU.BrandString[0])
+	{
+		case 'A':
+			/* AMD Processors */
+			// The cache information is only in ecx and edx so only save
+			// those registers
+
+			do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
+
+			do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+
+			break;
+
+		case 'G':
+			/* Intel Processors */
+			do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]); // Cache Index for Inte
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
+			{
+				do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
+			}
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
+			{
+				do_cpuid(6, p->CPU.CPUID[CPUID_6]);
+			}
+
+			break;
+	}
+}
 void scan_cpu(PlatformInfo_t *p)
 {
-//	scan();
+
+	get_cpuid(p);
+
 	uint64_t	busFCvtt2n;
 	uint64_t	tscFCvtt2n;
 	uint64_t	tscFreq			= 0;
@@ -305,8 +396,6 @@ void scan_cpu(PlatformInfo_t *p)
 	uint8_t		cpuMultN2		= 0;
 
 	const char	*newratio;
-	char		str[128];
-	char		*s			= 0;
 
 	int		len			= 0;
 	int		myfsb			= 0;
@@ -327,12 +416,9 @@ void scan_cpu(PlatformInfo_t *p)
     +--------+----------------+--------+----+----+--------+--------+--------+
 */
 	///////////////////-- MaxFn,Vendor --////////////////////////
-	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
 	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
-	/////////////////////////////////////////////////////////////
 
 	///////////////////-- Signature, stepping, features -- //////
-	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
 	cpuid_features = quad(p->CPU.CPUID[CPUID_1][ecx], p->CPU.CPUID[CPUID_1][edx]);
 	if (bit(28) & p->CPU.CPUID[CPUID_1][edx]) // HTT/Multicore
 	{
@@ -342,7 +428,6 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		logical_per_package = 1;
 	}
-//	printf("logical %d\n",logical_per_package);
 
 	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
 	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
@@ -366,11 +451,6 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		case CPUID_VENDOR_INTEL:
 		{
-
-			do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
-
-			do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
-
 			/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
 			if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
 			{
@@ -385,8 +465,6 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 			}
 
-			do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
-
 			if (i > 0)
 			{
 				cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
@@ -396,28 +474,6 @@ void scan_cpu(PlatformInfo_t *p)
 			if (cores_per_package == 0)
 			{
 				cores_per_package = 1;
-			}
-
-			if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
-			{
-				do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
-			}
-
-			if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
-			{
-				do_cpuid(6, p->CPU.CPUID[CPUID_6]);
-			}
-
-			do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-
-			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-			{
-				do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-			}
-			else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-			{
-				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 			}
 
 			switch (p->CPU.Model)
@@ -477,22 +533,6 @@ void scan_cpu(PlatformInfo_t *p)
 
 		case CPUID_VENDOR_AMD:
 		{
-			do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
-
-			do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
-			{
-				do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
-			}
-
-			if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
-			{
-				do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-			}
-
-			do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
-			do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
-			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
 
 			cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
 			threads_per_core = cores_per_package;
@@ -515,42 +555,6 @@ void scan_cpu(PlatformInfo_t *p)
 
 		default :
 			stop("Unsupported CPU detected! System halted.");
-	}
-
-	/* get BrandString (if supported) */
-	/* Copyright: from Apple's XNU cpuid.c */
-	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
-	{
-		bzero(str, 128);
-		/*
-		 * The BrandString 48 bytes (max), guaranteed to
-		 * be NULL terminated.
-		 */
-		do_cpuid(0x80000002, reg);
-		memcpy(&str[0], (char *)reg, 16);
-		do_cpuid(0x80000003, reg);
-		memcpy(&str[16], (char *)reg, 16);
-		do_cpuid(0x80000004, reg);
-		memcpy(&str[32], (char *)reg, 16);
-		for (s = str; *s != '\0'; s++)
-		{
-			if (*s != ' ')
-			{
-				break;
-			}
-		}
-		strlcpy(p->CPU.BrandString, s, 48);
-
-		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), (unsigned)strlen(CPU_STRING_UNKNOWN) + 1)))
-		{
-			/*
-			 * This string means we have a firmware-programmable brand string,
-			 * and the firmware couldn't figure out what sort of CPU we have.
-			 */
-			p->CPU.BrandString[0] = '\0';
-		}
-		p->CPU.BrandString[47] = '\0';
-//		DBG("Brandstring = %s\n", p->CPU.BrandString);
 	}
 
 	/* setup features */
