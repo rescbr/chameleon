@@ -216,9 +216,11 @@ static hda_controller_devices know_hda_controller[] = {
 // ErmaC: TODO build function to probe the codecID
 /*
 static hdacc_codecs know_codecs[] = {
-	{ HDA_CODEC_CS4206, 0,          "Cirrus Logic CS4206" },
-	{ HDA_CODEC_CS4207, 0,          "Cirrus Logic CS4207" },
-	{ HDA_CODEC_CS4210, 0,          "Cirrus Logic CS4210" },
+	{ HDA_CODEC_CS4206, 0,		"Cirrus Logic CS4206" },
+	{ HDA_CODEC_CS4207, 0,		"Cirrus Logic CS4207" },
+	{ HDA_CODEC_CS4208, 0,		"Cirrus Logic CS4208" },
+	{ HDA_CODEC_CS4210, 0,		"Cirrus Logic CS4210" },
+	{ HDA_CODEC_CS4213, 0,          "Cirrus Logic CS4213" },
 
 	{ HDA_CODEC_ALC221, 0,          "Realtek ALC221" },
 	{ HDA_CODEC_ALC231, 0,          "Realtek ALC231" },
@@ -325,7 +327,9 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_STAC9230X, 0,       "Sigmatel STAC9230X" },
 	{ HDA_CODEC_STAC9230D, 0,       "Sigmatel STAC9230D" },
 	{ HDA_CODEC_STAC9250, 0,        "Sigmatel STAC9250" },
+	{ HDA_CODEC_STAC9250D, 0,	"Sigmatel STAC9250D" },
 	{ HDA_CODEC_STAC9251, 0,        "Sigmatel STAC9251" },
+	{ HDA_CODEC_STAC9250D_1, 0,	"Sigmatel STAC9250D" },
 	{ HDA_CODEC_STAC9255, 0,        "Sigmatel STAC9255" },
 	{ HDA_CODEC_STAC9255D, 0,       "Sigmatel STAC9255D" },
 	{ HDA_CODEC_STAC9254, 0,        "Sigmatel STAC9254" },
@@ -340,6 +344,8 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_STAC9274D, 0,       "Sigmatel STAC9274D" },
 	{ HDA_CODEC_STAC9274X5NH, 0,    "Sigmatel STAC9274X5NH" },
 	{ HDA_CODEC_STAC9274D5NH, 0,    "Sigmatel STAC9274D5NH" },
+	{ HDA_CODEC_STAC9202, 0,	"Sigmatel STAC9202" },
+	{ HDA_CODEC_STAC9202D, 0,	"Sigmatel STAC9202D" },
 	{ HDA_CODEC_STAC9872AK, 0,      "Sigmatel STAC9872AK" },
 
 	{ HDA_CODEC_IDT92HD005, 0,      "IDT 92HD005" },
@@ -371,7 +377,12 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_IDT92HD73C1, 0,     "IDT 92HD73C1" },
 	{ HDA_CODEC_IDT92HD73D1, 0,     "IDT 92HD73D1" },
 	{ HDA_CODEC_IDT92HD73E1, 0,     "IDT 92HD73E1" },
+	{ HDA_CODEC_IDT92HD95, 0,	"IDT 92HD95" },
 	{ HDA_CODEC_IDT92HD75B3, 0,     "IDT 92HD75B3" },
+	{ HDA_CODEC_IDT92HD88B3, 0,     "IDT 92HD88B3" },
+	{ HDA_CODEC_IDT92HD88B1, 0,     "IDT 92HD88B1" },
+	{ HDA_CODEC_IDT92HD88B2, 0,     "IDT 92HD88B2" },
+	{ HDA_CODEC_IDT92HD88B4, 0,     "IDT 92HD88B4" },
 	{ HDA_CODEC_IDT92HD75BX, 0,     "IDT 92HD75BX" },
 	{ HDA_CODEC_IDT92HD81B1C, 0,    "IDT 92HD81B1C" },
 	{ HDA_CODEC_IDT92HD81B1X, 0,    "IDT 92HD81B1X" },
@@ -417,6 +428,13 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_CX20652, 0,         "Conexant CX20652" },
 	{ HDA_CODEC_CX20664, 0,         "Conexant CX20664" },
 	{ HDA_CODEC_CX20665, 0,         "Conexant CX20665" },
+	{ HDA_CODEC_CX20751, 0,		"Conexant CX20751/2" },
+	{ HDA_CODEC_CX20751_2, 0,	"Conexant CX20751/2" },
+	{ HDA_CODEC_CX20751_4, 0,	"Conexant CX20753/4" },
+	{ HDA_CODEC_CX20755, 0,         "Conexant CX20755" },
+	{ HDA_CODEC_CX20756, 0,         "Conexant CX20756" },
+	{ HDA_CODEC_CX20757, 0,         "Conexant CX20757" },
+	{ HDA_CODEC_CX20952, 0,         "Conexant CX20952" },
 
 	{ HDA_CODEC_VT1708_8, 0,        "VIA VT1708_8" },
 	{ HDA_CODEC_VT1708_9, 0,        "VIA VT1708_9" },
@@ -627,6 +645,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	{
 		return 0;
 	}
+
 	devprop_add_hda_template(device);
 
 	switch ((controller_device_id << 16) | controller_vendor_id)

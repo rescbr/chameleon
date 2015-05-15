@@ -982,6 +982,7 @@ typedef struct {
 #define PCI_VENDOR_ID_LENOVO					0x17aa
 #define PCI_VENDOR_ID_RALINK					0x1814
 #define PCI_VENDOR_ID_SITECOM					0x182d
+#define PCI_VENDOR_ID_QUALCOMM					0x1969
 #define PCI_VENDOR_ID_JMICRON					0x197B
 #define PCI_VENDOR_ID_OCZ					0x1b85
 #define PCI_VENDOR_ID_INTEL					0x8086
