@@ -10,6 +10,8 @@
 		019DFBAF11FB94090013E8CC /* MEMTEST86_LICENSE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = MEMTEST86_LICENSE; sourceTree = "<group>"; };
 		361BC70214BD977700236488 /* Changes.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Changes.txt; sourceTree = "<group>"; };
 		361BC70B14BD97C800236488 /* pkg.zip */ = {isa = PBXFileReference; lastKnownFileType = archive.zip; name = pkg.zip; path = Icons/pkg.zip; sourceTree = "<group>"; };
+		36414DD01B065F880064E39A /* networking.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = networking.c; sourceTree = "<group>"; };
+		36414DD11B065F880064E39A /* networking.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = networking.h; sourceTree = "<group>"; };
 		364B195E1A029963009A30BA /* background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = background.png; sourceTree = "<group>"; };
 		364B195F1A029963009A30BA /* boot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = boot.png; sourceTree = "<group>"; };
 		364B19601A029963009A30BA /* device_cdrom.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = device_cdrom.png; sourceTree = "<group>"; };
@@ -3298,6 +3300,8 @@
 				3685F4181A1D60CF0036A800 /* msdos.h */,
 				3685F4191A1D60CF0036A800 /* nbp_cmd.h */,
 				3685F41A1A1D60CF0036A800 /* nbp.c */,
+				36414DD01B065F880064E39A /* networking.c */,
+				36414DD11B065F880064E39A /* networking.h */,
 				3685F41B1A1D60CF0036A800 /* ntfs_private.h */,
 				3685F41C1A1D60CF0036A800 /* ntfs.c */,
 				3685F41D1A1D60CF0036A800 /* ntfs.h */,
