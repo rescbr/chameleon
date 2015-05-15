@@ -18,7 +18,7 @@ extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 extern bool setup_gma_devprop(pci_dt_t *gma_dev);
 extern bool setup_hda_devprop(pci_dt_t *hda_dev);
-extern void set_eth_builtin(pci_dt_t *eth_dev);
+extern void setup_eth_builtin(pci_dt_t *eth_dev);
 extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
 
@@ -55,7 +55,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				DBG("Setup ETHERNET %s enabled\n", do_eth_devprop? "is":"is not");
 				if (do_eth_devprop)
 				{
-					set_eth_builtin(current);
+					setup_eth_builtin(current);
 				}
 				break; // PCI_CLASS_NETWORK_ETHERNET
 

@@ -425,7 +425,7 @@ int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
 	return 1;
 }
 
-void set_eth_builtin(pci_dt_t *eth_dev)
+void setup_eth_builtin(pci_dt_t *eth_dev)
 {
 	char *devicepath = get_pci_dev_path(eth_dev);
 	DevPropDevice *device = NULL;
