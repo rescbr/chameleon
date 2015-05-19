@@ -13,13 +13,13 @@
 #include "pci.h"
 
 #ifndef DEBUG_USB
-#define DEBUG_USB 0
+	#define DEBUG_USB 0
 #endif
 
 #if DEBUG_USB
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 
@@ -39,7 +39,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev);
 // Add usb device to the list
 void notify_usb_dev(pci_dt_t *pci_dev)
 {
-	struct pciList* current = usbList;
+	struct pciList *current = usbList;
 	if(!usbList)
 	{
 		usbList = (struct pciList*)malloc(sizeof(struct pciList));
@@ -80,7 +80,7 @@ int usb_loop()
 		getBoolForKey(kLegacyOff, &fix_legacy, &bootInfo->chameleonConfig);
 	}
 	
-	struct pciList* current = usbList;
+	struct pciList *current = usbList;
 	
 	while(current)
 	{
@@ -124,7 +124,7 @@ static int legacy_off (pci_dt_t *pci_dev)
 	int isOSowned;
 	int isBIOSowned;
 	
-	verbose("Setting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
+	verbose("\tSetting Legacy USB Off on controller [%04x:%04x] at %02x:%2x.%x\n", 
 			pci_dev->vendor_id, pci_dev->device_id,
 			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
 	
@@ -138,13 +138,13 @@ static int legacy_off (pci_dt_t *pci_dev)
 	// eecp = EHCI Extended Capabilities offset = capaddr HCCPARAMS bits 15:8
 	eecp=*((unsigned char*)(capaddr + 9));
 	
-	DBG("capaddr=%x opaddr=%x eecp=%x\n", capaddr, opaddr, eecp);
+	DBG("\tcapaddr=%x opaddr=%x eecp=%x\n", capaddr, opaddr, eecp);
 	
 	usbcmd = *((unsigned int*)(opaddr));			// Command Register
 	usbsts = *((unsigned int*)(opaddr + 4));		// Status Register
 	usbintr = *((unsigned int*)(opaddr + 8));		// Interrupt Enable Register
 	
-	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
+	DBG("\tusbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
 	
 	// read PCI Config 32bit USBLEGSUP (eecp+0) 
 	usblegsup = pci_config_read32(pci_dev->dev.addr, eecp);
@@ -156,10 +156,10 @@ static int legacy_off (pci_dt_t *pci_dev)
 	// read PCI Config 32bit USBLEGCTLSTS (eecp+4) 
 	usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
 	
-	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+	DBG("\tusblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
 	
 	// Reset registers to Legacy OFF
-	DBG("Clearing USBLEGCTLSTS\n");
+	DBG("\tClearing USBLEGCTLSTS\n");
 	pci_config_write32(pci_dev->dev.addr, eecp + 4, 0);	//usblegctlsts
 	
 	delay(100000);
@@ -168,9 +168,9 @@ static int legacy_off (pci_dt_t *pci_dev)
 	usbsts = *((unsigned int*)(opaddr + 4));
 	usbintr = *((unsigned int*)(opaddr + 8));
 	
-	DBG("usbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
+	DBG("\tusbcmd=%08x usbsts=%08x usbintr=%08x\n", usbcmd, usbsts, usbintr);
 	
-	DBG("Clearing Registers\n");
+	DBG("\tClearing Registers\n");
 	
 	// clear registers to default
 	usbcmd = (usbcmd & 0xffffff00);
@@ -196,9 +196,9 @@ static int legacy_off (pci_dt_t *pci_dev)
 	// read 32bit USBLEGCTLSTS (eecp+4) 
 	usblegctlsts = pci_config_read32(pci_dev->dev.addr, eecp + 4);
 	
-	DBG("usblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
+	DBG("\tusblegsup=%08x isOSowned=%d isBIOSowned=%d usblegctlsts=%08x\n", usblegsup, isOSowned, isBIOSowned, usblegctlsts);
 	
-	verbose("Legacy USB Off Done\n");	
+	verbose("\tLegacy USB Off Done\n");	
 	return 1;
 }
 
@@ -219,7 +219,7 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 	pci_config_write16(pci_dev->dev.addr, 0x04, 0x0002);
 	base = pci_config_read32(pci_dev->dev.addr, 0x10);
 
-	verbose("EHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
+	verbose("\tEHCI controller [%04x:%04x] at %02x:%2x.%x DMA @%x\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		base);
@@ -235,13 +235,13 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 		return 1;
 	}
 
-	DBG("eecp=%x\n",eecp);
+	DBG("\teecp=%x\n",eecp);
 
 	// bad way to do it
 	// pci_conf_write(pci_dev->dev.addr, eecp, 4, 0x01000001);
 	for (j = 0; j < 8; j++) {
 		legacy[j] = pci_config_read8(pci_dev->dev.addr, eecp + j);
-		DBG("%02x ", legacy[j]);
+		DBG("\t%02x ", legacy[j]);
 	}
 	DBG("\n");
 
@@ -251,8 +251,8 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 
 	isOwnershipConflict = (((legacy[3] & 1) !=  0) && ((legacy[2] & 1) !=  0));
 	if (!alwaysHardBIOSReset && isOwnershipConflict) {
-		DBG("EHCI - Ownership conflict - attempting soft reset ...\n");
-		DBG("EHCI - toggle OS Ownership to 0\n");
+		DBG("\tEHCI - Ownership conflict - attempting soft reset ...\n");
+		DBG("\tEHCI - toggle OS Ownership to 0\n");
 		pci_config_write8(pci_dev->dev.addr, eecp + 3, 0);
 		for (k = 0; k < 25; k++) {
 			for (j = 0; j < 8; j++) {
@@ -265,7 +265,7 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 		}
 	}	
 
-	DBG("Found USBLEGSUP_ID - value %x:%x - writing OSOwned\n", legacy[3],legacy[2]);
+	DBG("\tFound USBLEGSUP_ID - value %x:%x - writing OSOwned\n", legacy[3],legacy[2]);
 	pci_config_write8(pci_dev->dev.addr, eecp + 3, 1);
 
 	// wait for kEHCI_USBLEGSUP_BIOSOwned bit to clear
@@ -273,7 +273,7 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 		for (j = 0;j < 8; j++) {
 			legacy[j] = pci_config_read8(pci_dev->dev.addr, eecp + j);
 		}
-		DBG ("%x:%x,",legacy[3],legacy[2]);
+		DBG ("\t%x:%x,",legacy[3],legacy[2]);
 		if (legacy[2] == 0) {
 			break;
 		}
@@ -288,16 +288,16 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 		// Soft reset has failed. Assume SMI being ignored
 		// Hard reset
 		// Force Clear BIOS BIT
-		DBG("EHCI - Ownership conflict - attempting hard reset ...\n");			
-		DBG ("%x:%x\n",legacy[3],legacy[2]);
-		DBG("EHCI - Force BIOS Ownership to 0\n");
+		DBG("\tEHCI - Ownership conflict - attempting hard reset ...\n");			
+		DBG ("\t%x:%x\n",legacy[3],legacy[2]);
+		DBG("\tEHCI - Force BIOS Ownership to 0\n");
 
 		pci_config_write8(pci_dev->dev.addr, eecp + 2, 0);
 		for (k = 0; k < 25; k++) {
 			for (j = 0; j < 8; j++) {
 				legacy[j] = pci_config_read8(pci_dev->dev.addr, eecp + j);
 			}
-			DBG ("%x:%x,",legacy[3],legacy[2]);
+			DBG ("\t%x:%x,",legacy[3],legacy[2]);
 
 			if ((legacy[2]) == 0) {
 				break;
@@ -314,15 +314,15 @@ static int ehci_acquire (pci_dt_t *pci_dev)
 		legacy[j] = pci_config_read8(pci_dev->dev.addr, eecp + j);
 	}
 
-	DBG ("%x:%x\n",legacy[3],legacy[2]);
+	DBG ("\t%x:%x\n",legacy[3],legacy[2]);
 
 	// Final Ownership Resolution Check...
 	if (legacy[2] & 1) {					
-		DBG("EHCI controller unable to take control from BIOS\n");
+		DBG("\tEHCI controller unable to take control from BIOS\n");
 		return 0;
 	}
 
-	DBG("EHCI Acquire OS Ownership done\n");	
+	DBG("\tEHCI Acquire OS Ownership done\n");	
 	return 1;
 }
 
@@ -333,7 +333,7 @@ static int uhci_reset (pci_dt_t *pci_dev)
 	base = pci_config_read32(pci_dev->dev.addr, 0x20);
 	port_base = (base >> 5) & 0x07ff;
 
-	verbose("UHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
+	verbose("\tUHCI controller [%04x:%04x] at %02x:%2x.%x base %x(%x)\n", 
 		pci_dev->vendor_id, pci_dev->device_id,
 		pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func, 
 		port_base, base);
@@ -353,7 +353,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 	uint32_t bar0, hccparams1, extendCap, value;
 	int32_t timeOut;
 
-	verbose("Setting Legacy USB Off on xHC [%04x:%04x] at %02x:%2x.%x\n",
+	verbose("\tSetting Legacy USB Off on xHC [%04x:%04x] at %02x:%2x.%x\n",
 			pci_dev->vendor_id, pci_dev->device_id,
 			pci_dev->dev.bits.bus, pci_dev->dev.bits.dev, pci_dev->dev.bits.func);
 
@@ -363,7 +363,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 	 */
 	if (bar0 & 1)
 	{
-		DBG("%s: BAR0 not a memory range\n", __FUNCTION__);
+		DBG("\t%s: BAR0 not a memory range\n", __FUNCTION__);
 		return 0;
 	}
 	/*
@@ -372,7 +372,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 	if (((bar0 & 6) == 4) &&
 		pci_config_read32(pci_dev->dev.addr, 20))
 	{
-		DBG("%s: BAR0 outside 32-bit physical address space\n", __FUNCTION__);
+		DBG("\t%s: BAR0 outside 32-bit physical address space\n", __FUNCTION__);
 		return 0;
 	}
 	bar0 &= ~15;
@@ -380,7 +380,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 	hccparams1 = *(uint32_t const volatile*) (bar0 + 16);
 	if (hccparams1 == ~0)
 	{
-		DBG("%s: hccparams1 invalid 0x%x\n", __FUNCTION__, hccparams1);
+		DBG("\t%s: hccparams1 invalid 0x%x\n", __FUNCTION__, hccparams1);
 		return 0;
 	}
 	extendCap = (hccparams1 >> 14) & 0x3fffc;
@@ -392,7 +392,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 		}
 		if ((value & 0xff) == 1) {
 #if DEBUG_USB
-			verbose("%s: Found USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
+			verbose("\t%s: Found USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
 					value, *(uint32_t const volatile*) (bar0 + extendCap + 4));
 #endif
 			value |= (1 << 24);
@@ -414,7 +414,7 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 				}
 			}
 #if DEBUG_USB
-			verbose("%s: USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
+			verbose("\t%s: USBLEGSUP 0x%x, USBLEGCTLSTS 0x%x\n", __FUNCTION__,
 					value, *(uint32_t const volatile*) (bar0 + extendCap + 4));
 #endif
 			if (timeOut >= 0)
@@ -438,6 +438,6 @@ static int xhci_legacy_off(pci_dt_t *pci_dev)
 			break;
 		extendCap += ((value >> 6) & 0x3fc);
 	}
-	verbose("XHCI Legacy Off Done\n");
+	verbose("\tXHCI Legacy Off Done\n");
 	return 1;
 }

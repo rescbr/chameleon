@@ -1646,6 +1646,8 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 //	static char compatible[64];
 	char *devicepath;
 
+	verbose("\tClass code: [%04x]\n", ati_dev->class_id );
+
 	if (!init_card(ati_dev))
 	{
 		return false;
@@ -1693,14 +1695,12 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	stringlength = string->length;
 	// -------------------------------------------------
 
-	DBG("ATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
+	DBG("\tATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x])\n\t%s\n",
 			chip_family_name[card->info->chip_family], card->info->model_name,
 			(uint32_t)(card->vram_size / (1024 * 1024)), card->cfg_name,
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
 			devicepath);
-
-	verbose("---------------------------------------------\n");
 
 	free(card);
 

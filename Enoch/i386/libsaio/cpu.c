@@ -367,7 +367,7 @@ void get_cpuid(PlatformInfo_t *p)
 }
 void scan_cpu(PlatformInfo_t *p)
 {
-
+	verbose("[ CPU INFO ]\n");
 	get_cpuid(p);
 
 	uint64_t	busFCvtt2n;
@@ -705,7 +705,7 @@ void scan_cpu(PlatformInfo_t *p)
 							max_ratio = (max_ratio + 5);
 						}
 
-						verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
+						verbose("\tBus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 						// extreme overclockers may love 320 ;)
 						if ((max_ratio >= min_ratio) && (max_ratio <= 320))
@@ -731,7 +731,7 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.MinRatio = min_ratio;
 
 				myfsb = busFrequency / 1000000;
-				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);  // Bungo: fixed wrong Bus-Ratio readout
+				verbose("\tSticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);  // Bungo: fixed wrong Bus-Ratio readout
 				currcoef = bus_ratio_max;
 
 				break;
@@ -1023,11 +1023,11 @@ void scan_cpu(PlatformInfo_t *p)
 	if (!busFrequency)
 	{
 		busFrequency = (DEFAULT_FSB * 1000);
-		DBG("CPU: busFrequency = 0! using the default value for FSB!\n");
+		DBG("\tCPU: busFrequency = 0! using the default value for FSB!\n");
 		cpuFrequency = tscFreq;
 	}
 
-	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
+	DBG("\tcpu freq = 0x%016llxn", timeRDTSC() * 20);
 
 #endif
 
@@ -1042,52 +1042,50 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.CPUFrequency = cpuFrequency;
 
 	// keep formatted with spaces instead of tabs
-	DBG("\n------------------------------\n");
-   	DBG("\tCPU INFO\n");
-	DBG("------------------------------\n");
 
-	DBG("CPUID Raw Values:\n");
+	DBG("\tCPUID Raw Values:\n");
 	for (i = 0; i < CPUID_MAX; i++)
 	{
-		DBG("%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
+		DBG("\t%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
 	}
 	DBG("\n");
-	DBG("Brand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
-	DBG("Vendor:                  0x%X\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
-	DBG("Family:                  0x%X\n",		p->CPU.Family);			// Family ex: 6 (06h)
-	DBG("ExtFamily:               0x%X\n",		p->CPU.ExtFamily);
-	DBG("Signature:               0x%08X\n",	p->CPU.Signature);		// CPUID signature
+	DBG("\tBrand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
+	DBG("\tVendor:                  0x%X\n",	p->CPU.Vendor);			// Vendor ex: GenuineIntel
+	DBG("\tFamily:                  0x%X\n",	p->CPU.Family);			// Family ex: 6 (06h)
+	DBG("\tExtFamily:               0x%X\n",	p->CPU.ExtFamily);
+	DBG("\tSignature:               0x%08X\n",	p->CPU.Signature);		// CPUID signature
 	/*switch (p->CPU.Type) {
 		case PT_OEM:
-			DBG("Processor type:          Intel Original OEM Processor\n");
+			DBG("\tProcessor type:          Intel Original OEM Processor\n");
 			break;
 		case PT_OD:
-			DBG("Processor type:          Intel Over Drive Processor\n");
+			DBG("\tProcessor type:          Intel Over Drive Processor\n");
 			break;
 		case PT_DUAL:
-			DBG("Processor type:          Intel Dual Processor\n");
+			DBG("\tProcessor type:          Intel Dual Processor\n");
 			break;
 		case PT_RES:
-			DBG("Processor type:          Intel Reserved\n");
+			DBG("\tProcessor type:          Intel Reserved\n");
 			break;
 		default:
 			break;
 	}*/
-	DBG("Model:                   0x%X\n",		p->CPU.Model);			// Model ex: 37 (025h)
-	DBG("ExtModel:                0x%X\n",		p->CPU.ExtModel);
-	DBG("Stepping:                0x%X\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
-	DBG("MaxCoef:                 %d\n",		p->CPU.MaxCoef);
-	DBG("CurrCoef:                %d\n",		p->CPU.CurrCoef);
-	DBG("MaxDiv:                  %d\n",		p->CPU.MaxDiv);
-	DBG("CurrDiv:                 %d\n",		p->CPU.CurrDiv);
-	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
-	DBG("FSBFreq:                 %dMHz\n",		(p->CPU.FSBFrequency + 500000) / 1000000);
-	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",		p->CPU.NoCores);		// Cores
-	DBG("Logical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
-	DBG("Features:                0x%08x\n",	p->CPU.Features);
-//	DBG("Microcode version:       %d\n",		p->CPU.MCodeVersion);		// CPU microcode version
-	DBG("\n---------------------------------------------\n");
+	DBG("\tModel:                   0x%X\n",	p->CPU.Model);			// Model ex: 37 (025h)
+	DBG("\tExtModel:                0x%X\n",	p->CPU.ExtModel);
+	DBG("\tStepping:                0x%X\n",	p->CPU.Stepping);		// Stepping ex: 5 (05h)
+	DBG("\tMaxCoef:                 %d\n",		p->CPU.MaxCoef);
+	DBG("\tCurrCoef:                %d\n",		p->CPU.CurrCoef);
+	DBG("\tMaxDiv:                  %d\n",		p->CPU.MaxDiv);
+	DBG("\tCurrDiv:                 %d\n",		p->CPU.CurrDiv);
+	DBG("\tTSCFreq:                 %dMHz\n",	p->CPU.TSCFrequency / 1000000);
+	DBG("\tFSBFreq:                 %dMHz\n",	(p->CPU.FSBFrequency + 500000) / 1000000);
+	DBG("\tCPUFreq:                 %dMHz\n",	p->CPU.CPUFrequency / 1000000);
+	DBG("\tCores:                   %d\n",		p->CPU.NoCores);		// Cores
+	DBG("\tLogical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
+	DBG("\tFeatures:                0x%08x\n",	p->CPU.Features);
+//	DBG("\tMicrocode version:       %d\n",		p->CPU.MCodeVersion);		// CPU microcode version
+
+	verbose("\n");
 #if DEBUG_CPU
 	pause();
 #endif

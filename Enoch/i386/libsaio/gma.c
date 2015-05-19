@@ -462,11 +462,10 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 	model = get_gma_controller_name(device_id, vendor_id);
 
-	verbose("---------------------------------------------\n");
-   	verbose("------------ INTEL DEVICE INFO --------------\n");
-	verbose("---------------------------------------------\n");
-	verbose("Class code: [%04x]\n%s [%04x:%04x] (rev %02x)\nSubsystem: [%04x:%04x] :: %s\n",
-			gma_dev->class_id, model, gma_dev->vendor_id, gma_dev->device_id, gma_dev->revision_id, gma_dev->subsys_id.subsys.vendor_id, gma_dev->subsys_id.subsys.device_id, devicepath);
+	verbose("\tClass code: [%04x]\n", gma_dev->class_id);
+
+	verbose("\t%s [%04x:%04x] (rev %02x)\nSubsystem: [%04x:%04x] :: %s\n",
+			model, gma_dev->vendor_id, gma_dev->device_id, gma_dev->revision_id, gma_dev->subsys_id.subsys.vendor_id, gma_dev->subsys_id.subsys.device_id, devicepath);
 
 	if (!string)
 	{
@@ -476,7 +475,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	struct DevPropDevice *device = devprop_add_device(string, devicepath);
 	if (!device)
 	{
-		printf("[setup_gma_devprop] Failed initializing dev-prop string dev-entry!\n");
+		printf("\t[setup_gma_devprop] Failed initializing dev-prop string dev-entry!\n");
 		pause();
 		return false;
 	}
@@ -581,8 +580,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
 
-					verbose("Using user supplied AAPL,snb-platform-id\n");
-					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,snb-platform-id\n");
+					verbose("\tAAPL,snb-platform-id: %02x%02x%02x%02x\n",
 					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
 				}
 				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
@@ -623,8 +622,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
 
-					verbose("Using user supplied AAPL,snb-platform-id\n");
-					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,snb-platform-id\n");
+					verbose("\tAAPL,snb-platform-id: %02x%02x%02x%02x\n",
 					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
 				}
 				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
@@ -655,8 +654,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
 
-					verbose("Using user supplied AAPL,snb-platform-id\n");
-					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,snb-platform-id\n");
+					verbose("\tAAPL,snb-platform-id: %02x%02x%02x%02x\n",
 					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
 				}
 				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
@@ -690,8 +689,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_snb, new_aapl0, AAPL_LEN_SNB);
 
-					verbose("Using user supplied AAPL,snb-platform-id\n");
-					verbose("AAPL,snb-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,snb-platform-id\n");
+					verbose("\tAAPL,snb-platform-id: %02x%02x%02x%02x\n",
 					default_aapl_snb[0], default_aapl_snb[1], default_aapl_snb[2], default_aapl_snb[3]);
 				}
 				devprop_add_value(device, "AAPL,snb-platform-id", default_aapl_snb, AAPL_LEN_SNB);
@@ -724,8 +723,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_ivy, new_aapl0, AAPL_LEN_IVY);
 
-					verbose("Using user supplied AAPL,ig-platform-id\n");
-					verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,ig-platform-id\n");
+					verbose("\tAAPL,ig-platform-id: %02x%02x%02x%02x\n",
 					default_aapl_ivy[0], default_aapl_ivy[1], default_aapl_ivy[2], default_aapl_ivy[3]);
 				}
 				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_ivy, AAPL_LEN_IVY);
@@ -734,12 +733,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			{
 				if ((n_igs >= 0) || (n_igs <= 11))
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", ivy_bridge_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 11.\n");
 				}
 			}
 			else
@@ -761,8 +760,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 						break;
 
 					default:
-						printf("Please specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
-							"The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
+						printf("\tPlease specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
+							"\tThe selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
 						pause();
 						return false;	// Exit early before the AAPL,ig-platform-id property is set.
 						break;
@@ -786,11 +785,11 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_ULT_M_GT2: // 0a16
 		case GMA_HASWELL_ULT_E_GT2: // 0a1e
 
-			verbose("Injecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
+			verbose("\tInjecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
 			device_id = 0x00000412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
-			verbose("Injeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
+			verbose("\tInjeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
 
 		case GMA_HASWELL_D_GT1: // 0402
 		case GMA_HASWELL_M_GT1: // 0406
@@ -840,8 +839,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_haswell, new_aapl0, AAPL_LEN_HSW);
 
-					verbose("Using user supplied AAPL,ig-platform-id\n");
-					verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,ig-platform-id\n");
+					verbose("\tAAPL,ig-platform-id: %02x%02x%02x%02x\n",
 						default_aapl_haswell[0], default_aapl_haswell[1], default_aapl_haswell[2], default_aapl_haswell[3]);
 				}
 				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_haswell, AAPL_LEN_HSW);
@@ -850,12 +849,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			{
 				if ((n_igs >= 0) || (n_igs <= 16))
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", haswell_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 16.\n");
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 16.\n");
 				}
 			}
 			else
@@ -911,8 +910,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 				{
 					memcpy(default_aapl_broadwell, new_aapl0, AAPL_LEN_BDW);
 
-					verbose("Using user supplied AAPL,ig-platform-id\n");
-					verbose("AAPL,ig-platform-id: %02x%02x%02x%02x\n",
+					verbose("\tUsing user supplied AAPL,ig-platform-id\n");
+					verbose("\tAAPL,ig-platform-id: %02x%02x%02x%02x\n",
 						default_aapl_broadwell[0], default_aapl_broadwell[1], default_aapl_broadwell[2], default_aapl_broadwell[3]);
 				}
 				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_broadwell, AAPL_LEN_BDW);
@@ -921,12 +920,12 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			{
 				if ((n_igs >= 0) || (n_igs <= 19))
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", broadwell_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("AAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 18.\n");
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 18.\n");
 				}
 			}
 			else
@@ -948,12 +947,11 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	stringdata = malloc(sizeof(uint8_t) * string->length);
 	if (!stringdata)
 	{
-		printf("[setup_gma_devprop] No stringdata!\n");
+		printf("\t[setup_gma_devprop] No stringdata!\n");
 		pause();
 		return false;
 	}
 
-	verbose("---------------------------------------------\n");
 	memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 

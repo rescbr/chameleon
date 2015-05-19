@@ -12,11 +12,26 @@
 #include "device_inject.h"
 #include "networking.h"
 
-#ifndef DEBUG_NETWORKING
-	#define DEBUG_NETWORKING 0
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+#define HEADER      __FILE__ " [" TOSTRING(__LINE__) "]: "
+
+#ifndef DEBUG_ETHERNET
+	#define DEBUG_ETHERNET 0
 #endif
 
-#if DEBUG_NETWORKING
+#if DEBUG_ETHERNET
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)
+#endif
+
+#ifndef DEBUG_WLAN
+	#define DEBUG_WLAN 0
+#endif
+
+#if DEBUG_WLAN
 	#define DBG(x...)	printf(x)
 #else
 	#define DBG(x...)
@@ -359,7 +374,7 @@ int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
 	}
 }
 
-void setup_eth_builtin(pci_dt_t *eth_dev)
+void setup_eth_devdrop(pci_dt_t *eth_dev)
 {
 	char *devicepath	= get_pci_dev_path(eth_dev);
 	char *name_model	= NULL;
@@ -376,7 +391,7 @@ void setup_eth_builtin(pci_dt_t *eth_dev)
 			return;
 		}
 	}
-    
+
 	device = devprop_add_device(string, devicepath);
 	if(device)
 	{
@@ -396,7 +411,7 @@ void setup_eth_builtin(pci_dt_t *eth_dev)
 	}
 }
 
-void setup_wifi_airport(pci_dt_t *wlan_dev) // ARPT
+void setup_wifi_devdrop(pci_dt_t *wlan_dev) // ARPT
 {
 	char tmp[16];
 	builtin = 0;

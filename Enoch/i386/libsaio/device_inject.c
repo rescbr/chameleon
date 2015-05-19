@@ -400,3 +400,5 @@ void devprop_free_string(DevPropString *string)
 /* ======================================================= */
 
 /* a fine place for this code */
+
+// (devprop_add_network_template) and (setup_eth_builtin) moved to i386/libsaio/networking.c

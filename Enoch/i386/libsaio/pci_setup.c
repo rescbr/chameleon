@@ -18,24 +18,42 @@ extern bool setup_ati_devprop(pci_dt_t *ati_dev);
 extern bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 extern bool setup_gma_devprop(pci_dt_t *gma_dev);
 extern bool setup_hda_devprop(pci_dt_t *hda_dev);
-extern void setup_eth_builtin(pci_dt_t *eth_dev);
-extern void setup_wifi_airport(pci_dt_t *wifi_dev);
-extern bool set_usb_devprop(pci_dt_t *usb_dev);
+extern void setup_eth_devdrop(pci_dt_t *eth_dev);
+extern void setup_wifi_devdrop(pci_dt_t *wifi_dev);
+
 extern void notify_usb_dev(pci_dt_t *pci_dev);
 extern void force_enable_hpet(pci_dt_t *lpc_dev);
+
 extern pci_dt_t *dram_controller_dev;
 
 void setup_pci_devs(pci_dt_t *pci_dt)
 {
 	char *devicepath;
-	bool doit, do_eth_devprop, do_wifi_devprop, /*do_usb_devprop,*/ do_gfx_devprop, do_enable_hpet, do_hda_devprop = false;
+
+	bool do_gfx_devprop = false;
+	bool do_skip_n_devprop = false;
+	bool do_skip_a_devprop = false;
+	bool do_skip_i_devprop = false;
+
+	bool do_enable_hpet = false;
+	bool do_hda_devprop = false;
+
 	pci_dt_t *current = pci_dt;
 
-	getBoolForKey(kEthernetBuiltIn, &do_eth_devprop, &bootInfo->chameleonConfig);
-	getBoolForKey(kEnableWifi, &do_wifi_devprop, &bootInfo->chameleonConfig);
+	// GraphicsEnabler
 	getBoolForKey(kGraphicsEnabler, &do_gfx_devprop, &bootInfo->chameleonConfig);
+
+	// Skip keys
+	getBoolForKey(kSkipNvidiaGfx, &do_skip_n_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kSkipAtiGfx, &do_skip_a_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kSkipIntelGfx, &do_skip_i_devprop, &bootInfo->chameleonConfig);
+
 //	getBoolForKey(kUsbInject, &do_usb_devprop, &bootInfo->chameleonConfig);
+
+	// HDAEnable
 	getBoolForKey(kHDAEnabler, &do_hda_devprop, &bootInfo->chameleonConfig);
+
+	// ForceHPET
 	getBoolForKey(kForceHPET, &do_enable_hpet, &bootInfo->chameleonConfig);
 
 	while (current)
@@ -54,18 +72,14 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 
 			case PCI_CLASS_NETWORK_ETHERNET:
 				DBG("Setup ETHERNET %s enabled\n", do_eth_devprop? "is":"is not");
-				if (do_eth_devprop)
-				{
-					setup_eth_builtin(current);
-				}
+				verbose("[ ETHERNET DEVICE INFO ]\n");
+				setup_eth_devdrop(current);
 				break; // PCI_CLASS_NETWORK_ETHERNET
 
 			case PCI_CLASS_NETWORK_OTHER:
 				DBG("Setup WIRELESS %s enabled\n", do_wifi_devprop? "is":"is not");
-				if (do_wifi_devprop)
-				{
-					setup_wifi_airport(current);
-				}
+				verbose("[ WIRELESS DEVICE INFO ]\n");
+				setup_wifi_devdrop(current);
 				break; // PCI_CLASS_NETWORK_OTHER
 
 			case PCI_CLASS_DISPLAY_VGA:
@@ -75,35 +89,41 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 					switch (current->vendor_id)
 					{
 						case PCI_VENDOR_ID_ATI:
-							if (getBoolForKey(kSkipAtiGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							if ( do_skip_a_devprop )
 							{
 								verbose("Skip ATi/AMD gfx device!\n");
 							}
 							else
 							{
+								verbose("[ ATi GFX DEVICE INFO ]\n");
 								setup_ati_devprop(current);
+								verbose("\n");
 							}
 							break; // PCI_VENDOR_ID_ATI
 
 						case PCI_VENDOR_ID_INTEL:
-							if (getBoolForKey(kSkipIntelGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							if ( do_skip_i_devprop )
 							{
 								verbose("Skip Intel gfx device!\n");
 							}
 							else
 							{
+								verbose("[ INTEL GMA DEVICE INFO ]\n");
 								setup_gma_devprop(current);
+								verbose("\n");
 							}
 							break; // PCI_VENDOR_ID_INTEL
 
 						case PCI_VENDOR_ID_NVIDIA:
-							if (getBoolForKey(kSkipNvidiaGfx, &doit, &bootInfo->chameleonConfig) && doit)
+							if ( do_skip_n_devprop )
 							{
 								verbose("Skip Nvidia gfx device!\n");
 							}
 							else
 							{
+								verbose("[ NVIDIA GFX DEVICE INFO ]\n");
 								setup_nvidia_devprop(current);
+								verbose("\n");
 							}
 							break; // PCI_VENDOR_ID_NVIDIA
 
@@ -114,27 +134,42 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				break; // PCI_CLASS_DISPLAY_VGA
 
 			case PCI_CLASS_MULTIMEDIA_AUDIO_DEV:
-				DBG("Setup HDEF %s enabled\n", do_hda_devprop? "is":"is not");
+				DBG("Setup HDEF %s enabled\n", do_hda_devprop ? "is":"is not");
 				if (do_hda_devprop)
 				{
+					verbose("[ AUDIO DEVICE INFO ]\n");
 					setup_hda_devprop(current);
+					verbose("\n");
 				}
 				break; // PCI_CLASS_MULTIMEDIA_AUDIO_DEV
 
 			case PCI_CLASS_SERIAL_USB:
 				DBG("USB\n");
 				notify_usb_dev(current);
-				/*if (do_usb_devprop)
-				{
-					set_usb_devprop(current);
-				}*/
+//				if (do_usb_devprop)
+//				{
+//					set_usb_devprop(current);
+//				}
 				break; // PCI_CLASS_SERIAL_USB
 
+			case PCI_CLASS_SERIAL_FIREWIRE:
+				DBG("FireWire\n");
+				verbose("[ FIREWIRE DEVICE INFO ]\n");
+				verbose("\tClass code: [%04x]\n\tFireWire device [%04x:%04x]-[%04x:%04x]\n\t%s\n",
+					current->class_id,current->vendor_id, current->device_id,
+					current->subsys_id.subsys.vendor_id,
+					current->subsys_id.subsys.device_id, devicepath);
+//				set_fwr_devdrop(current);
+				verbose("\n");
+				break; // PCI_CLASS_SERIAL_FIREWIRE
+
 			case PCI_CLASS_BRIDGE_ISA:
-				DBG("Force HPET %s enabled\n", do_enable_hpet? "is":"is not");
+				DBG("Force HPET %s enabled\n", do_enable_hpet ? "is":"is not");
 				if (do_enable_hpet)
 				{
+					verbose("[ HPET ]\n");
 					force_enable_hpet(current);
+					verbose("\n");
 				}
 				break; // PCI_CLASS_BRIDGE_ISA
 

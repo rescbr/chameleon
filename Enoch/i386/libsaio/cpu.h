@@ -243,7 +243,6 @@ set_PIT2(int value)
         : : "d"(value) : "%al");
 }
 
-
 inline static uint64_t
 get_PIT2(unsigned int *value)
 {

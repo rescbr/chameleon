@@ -91,7 +91,7 @@ const char *nvidia_device_type_parent[] =	{ "device_type",	"NVDA,Parent"	 };
 const char *nvidia_device_type_child[]	=	{ "device_type",	"NVDA,Child"	 };
 const char *nvidia_name_0[]             =	{ "@0,name",		"NVDA,Display-A" };
 const char *nvidia_name_1[]             =	{ "@1,name",		"NVDA,Display-B" };
-const char *nvidia_slot_name[]          =	{ "AAPL,slot-name", "Slot-1"		 };
+//const char *nvidia_slot_name[]          =	{ "AAPL,slot-name", "Slot-1"		 };
 
 static uint8_t default_NVCAP[]= {
 	0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x03, 0x00,
@@ -1591,7 +1591,7 @@ static nvidia_card_info_t nvidia_card_exceptions[] = {
 
 	{ 0x10DE1248,	0x152D0930,	"Quanta GeForce GT 635M" },
 
-	{ 0x10DE124D,	0x146210CC,	"MSi GeForce GT 635M" },
+	{ 0x10DE124D,	0x146210CC,	"MSi GeForce GT 635M" }
 };
 
 static int patch_nvidia_rom(uint8_t *rom)
@@ -1857,7 +1857,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 	//ErmaC added selector for Chameleon "old" style in System Profiler
 	if (getBoolForKey(kNvidiaGeneric, &showGeneric, &bootInfo->chameleonConfig))
 	{
-		verbose("NvidiaGeneric = Yes\n");
+
 
 		for (i = 1; i < (sizeof(nvidia_card_generic) / sizeof(nvidia_card_generic[0])); i++)
 		{
@@ -1907,7 +1907,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 static int devprop_add_nvidia_template(DevPropDevice *device)
 {
 	char tmp[16];
-	DBG("devprop_add_nvidia_template\n");
+	DBG("\tdevprop_add_nvidia_template\n");
 
 	if (!device)
 	{
@@ -1951,12 +1951,9 @@ static int devprop_add_nvidia_template(DevPropDevice *device)
 			return 0;
 		}
 	}
-	else
+	else if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_child))
 	{
-		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_child))
-		{
 			return 0;
-		}
 	}
 
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
@@ -2116,6 +2113,8 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
 
+	verbose("\tClass code: [%04x]\n", nvda_dev->class_id);
+
 	model = get_nvidia_model(((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id));
 
 	// Amount of VRAM in kilobytes
@@ -2125,17 +2124,17 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	if (getBoolForKey(kUseNvidiaROM, &doit, &bootInfo->chameleonConfig) && doit)
 	{
-		verbose("Looking for nvidia video bios file %s\n", nvFilename);
+		verbose("\tLooking for nvidia video bios file %s\n", nvFilename);
 		nvBiosOveride = load_nvidia_bios_file(nvFilename, &rom);
 
 		if (nvBiosOveride > 0)
 		{
-			verbose("Using nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
+			verbose("\tUsing nVidia Video BIOS File %s (%d Bytes)\n", nvFilename, nvBiosOveride);
 			DBG("%s Signature 0x%02x%02x %d bytes\n", nvFilename, rom[0], rom[1], nvBiosOveride);
 		}
 		else
 		{
-			printf("ERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
+			printf("\tERROR: unable to open nVidia Video BIOS File %s\n", nvFilename);
 			free(rom);
 			return false;
 		}
@@ -2157,7 +2156,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		if (checkNvRomSig(nvRom))
 		{
 			bcopy((uint8_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-			DBG("PROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+			DBG("\tPROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
 		}
 		else
 		{
@@ -2171,7 +2170,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			if(checkNvRomSig(nvRom))
 			{
 				bcopy((uint32_t *)nvRom, rom, NVIDIA_ROM_SIZE);
-				DBG("PRAM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+				DBG("\tPRAM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
 			}
 			else
 			{
@@ -2181,12 +2180,12 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 				// Valid Signature ?
 				if (!checkNvRomSig(rom))
 				{
-					printf("ERROR: Unable to locate nVidia Video BIOS\n");
+					printf("\tERROR: Unable to locate nVidia Video BIOS\n");
 					return false;
 				}
 				else
 				{
-                			    DBG("ROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
+                			    DBG("\tROM Address 0x%x Signature 0x%02x%02x\n", nvRom, rom[0], rom[1]);
                 		}
             		}//end PRAM check
                 }//end PROM check
@@ -2194,7 +2193,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	if ((nvPatch = patch_nvidia_rom(rom)) == PATCH_ROM_FAILED)
 	{
-		printf("ERROR: nVidia ROM Patching Failed!\n");
+		printf("\tERROR: nVidia ROM Patching Failed!\n");
 		free(rom);
 		return false;
 	}
@@ -2215,15 +2214,17 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		}
 		else
 		{
-			printf("nVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
+			printf("\tnVidia incorrect PCI ROM signature: 0x%x\n", rom_pci_header->signature);
 		}
 	}
 
-	verbose("%s %dMB NV%02x [%04x:%04x]-[%04x:%04x] :: %s device number: %d\n",
+	verbose("\tdevice number: %d\n\t%s %dMB NV%02x [%04x:%04x]-[%04x:%04x]\n\t%s\n",
+			devices_number,
 			model, (uint32_t)(videoRam / 1024 / 1024),
 			(REG32(0) >> 20) & 0x1ff, nvda_dev->vendor_id, nvda_dev->device_id,
 			nvda_dev->subsys_id.subsys.vendor_id, nvda_dev->subsys_id.subsys.device_id,
-			devicepath, devices_number);
+			devicepath);
+	verbose("\tNvidiaGeneric = %s\n", showGeneric ? "Yes" : "No");
 
 	if (!string)
 	{
@@ -2256,7 +2257,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	// get bios version
 	const int MAX_BIOS_VERSION_LENGTH = 32;
-	char* version_str = (char*)malloc(MAX_BIOS_VERSION_LENGTH);
+	char *version_str = (char *)malloc(MAX_BIOS_VERSION_LENGTH);
 
 	memset(version_str, 0, MAX_BIOS_VERSION_LENGTH);
 
@@ -2305,7 +2306,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 		if (hex2bin(value, new_NVCAP, NVCAP_LEN) == 0)
 		{
-			verbose("Using user supplied NVCAP for %s :: %s\n", model, devicepath);
+			verbose("\tUsing user supplied NVCAP for %s :: %s\n", model, devicepath);
 			memcpy(default_NVCAP, new_NVCAP, NVCAP_LEN);
 		}
 	}
@@ -2318,7 +2319,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 		{
 			memcpy(default_dcfg_0, new_dcfg0, DCFG0_LEN);
 
-			verbose("Using user supplied @0,display-cfg\n");
+			verbose("\tUsing user supplied @0,display-cfg\n");
 			printf("@0,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_0[0], default_dcfg_0[1], default_dcfg_0[2], default_dcfg_0[3]);
 		}
@@ -2333,7 +2334,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			memcpy(default_dcfg_1, new_dcfg1, DCFG1_LEN);
 
 			verbose("Using user supplied @1,display-cfg\n");
-			printf("@1,display-cfg: %02x%02x%02x%02x\n",
+			printf("\t@1,display-cfg: %02x%02x%02x%02x\n",
 				   default_dcfg_1[0], default_dcfg_1[1], default_dcfg_1[2], default_dcfg_1[3]);
 		}
 	}
