@@ -66,7 +66,7 @@ void setupDeviceProperties(Node *node)
 		if (cnt2 > 0)
 		{
 			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
-			DBG("Adding device-properties string to DT");
+			DBG("Adding device-properties string to DT\n");
 		}
 	}
 }

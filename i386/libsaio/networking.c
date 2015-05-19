@@ -12,11 +12,26 @@
 #include "device_inject.h"
 #include "networking.h"
 
-#ifndef DEBUG_NETWORKING
-	#define DEBUG_NETWORKING 0
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+
+#define HEADER      __FILE__ " [" TOSTRING(__LINE__) "]: "
+
+#ifndef DEBUG_ETHERNET
+	#define DEBUG_ETHERNET 0
 #endif
 
-#if DEBUG_NETWORKING
+#if DEBUG_ETHERNET
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)
+#endif
+
+#ifndef DEBUG_WLAN
+	#define DEBUG_WLAN 0
+#endif
+
+#if DEBUG_WLAN
 	#define DBG(x...)	printf(x)
 #else
 	#define DBG(x...)
@@ -26,37 +41,6 @@ uint32_t builtin_set	= 0;
 uint8_t builtin		= 0;
 extern uint32_t devices_number;
 //extern uint32_t onboard_number;
-
-int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
-{
-	builtin = 0;
-	if(device)
-	{
-
-		if((vendor_id != PCI_VENDOR_ID_ATHEROS) && (builtin_set == 0))
-		{
-			builtin_set = 1;
-			builtin = 0x01;
-		}
-
-		if(!devprop_add_value(device, "built-in", (uint8_t *)&builtin, 1))
-		{
-			return 0;
-		}
-
-		if(!devprop_add_value(device, "device_type", (uint8_t *)"ethernet", sizeof("ethernet")))
-		{
-			return 0;
-		}
-
-		devices_number++;
-		return 1;
-	}
-	else
-	{
-		return 0;
-	}
-}
 
 static network_device known_ethernet_cards[] =
 {
@@ -296,64 +280,6 @@ static network_device generic_ethernet_cards[] =
 	{ PCI_VENDOR_ID_INTEL, 0x0000, "Intel(R) Ethernet Controller" },
 };
 
-char *get_ethernet_model(uint32_t vendor_id, uint32_t device_id)
-{
-	int i = 0;
-	for( ; i < sizeof(known_ethernet_cards) / sizeof(known_ethernet_cards[0]); i++)
-	{
-		if(vendor_id == known_ethernet_cards[i].vendor_id && device_id == known_ethernet_cards[i].device_id)
-		{
-			return known_ethernet_cards[i].model;
-		}
-	}
-	i = 0;
-	for ( ; i < sizeof(generic_ethernet_cards) / sizeof(generic_ethernet_cards[0]); i++)
-	{
-		if (vendor_id == generic_ethernet_cards[i].vendor_id)
-		{
-			return generic_ethernet_cards[i].model;
-		}
-	}
-	return generic_ethernet_cards[0].model;
-}
-
-void setup_eth_builtin(pci_dt_t *eth_dev)
-{
-	char *devicepath	= get_pci_dev_path(eth_dev);
-	char *name_model	= NULL;
-
-	DevPropDevice *device = (DevPropDevice *)malloc(sizeof(DevPropDevice));
-
-	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
-
-	if (!string)
-	{
-		string = devprop_create_string();
-		if (!string)
-		{
-			return;
-		}
-	}
-    
-	device = devprop_add_device(string, devicepath);
-	if(device)
-	{
-		verbose("Setting up lan keys\n");
-		name_model = get_ethernet_model(eth_dev->vendor_id, eth_dev->device_id);
-
-		devprop_add_network_template(device, eth_dev->vendor_id);
-		devprop_add_value(device, "model", (uint8_t *)name_model, (strlen(name_model) + 1));
-		devprop_add_value(device, "device_type", (uint8_t *)"ethernet", sizeof("ethernet"));
-
-		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
-		if(stringdata)
-		{
-			memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
-			stringlength = string->length;
-		}
-	}
-}
-
 static network_device known_wifi_cards[] =
 {
 	// Broadcom
@@ -416,7 +342,76 @@ static network_device known_wifi_cards[] =
 //	{PCI_VENDOR_ID_ATHEROS, 0x0037, "Atheros AR9485 Wireless Network Adapter"},
 };
 
-void setup_wifi_airport(pci_dt_t *wlan_dev) // ARPT
+
+int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
+{
+	builtin = 0;
+	if(device)
+	{
+
+		if((vendor_id != PCI_VENDOR_ID_ATHEROS ) && ( builtin_set == 0 ))
+		{
+			builtin_set = 1;
+			builtin = 0x01;
+		}
+
+		if(!devprop_add_value(device, "built-in", (uint8_t *)&builtin, 1))
+		{
+			return 0;
+		}
+
+		if(!devprop_add_value(device, "device_type", (uint8_t *)"ethernet", sizeof("ethernet")))
+		{
+			return 0;
+		}
+
+		devices_number++;
+		return 1;
+	}
+	else
+	{
+		return 0;
+	}
+}
+
+void setup_eth_devdrop(pci_dt_t *eth_dev)
+{
+	char *devicepath	= get_pci_dev_path(eth_dev);
+	char *name_model	= NULL;
+
+	DevPropDevice *device = (DevPropDevice *)malloc(sizeof(DevPropDevice));
+
+	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
+
+	if (!string)
+	{
+		string = devprop_create_string();
+		if (!string)
+		{
+			return;
+		}
+	}
+
+	device = devprop_add_device(string, devicepath);
+	if(device)
+	{
+		verbose("Setting up lan keys\n");
+		name_model = get_ethernet_model(eth_dev->vendor_id, eth_dev->device_id);
+
+		devprop_add_network_template(device, eth_dev->vendor_id);
+		devprop_add_value(device, "model", (uint8_t *)name_model, (strlen(name_model) + 1));
+		devprop_add_value(device, "device_type", (uint8_t *)"ethernet", sizeof("ethernet"));
+
+		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
+		if(stringdata)
+		{
+			memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
+			stringlength = string->length;
+		}
+	}
+}
+
+void setup_wifi_devdrop(pci_dt_t *wlan_dev) // ARPT
 {
 	char tmp[16];
 	builtin = 0;
@@ -465,4 +460,25 @@ void setup_wifi_airport(pci_dt_t *wlan_dev) // ARPT
 			}
 		}
 	}
+}
+
+char *get_ethernet_model(uint32_t vendor_id, uint32_t device_id)
+{
+	int i = 0;
+	for( ; i < sizeof(known_ethernet_cards) / sizeof(known_ethernet_cards[0]); i++)
+	{
+		if(vendor_id == known_ethernet_cards[i].vendor_id && device_id == known_ethernet_cards[i].device_id)
+		{
+			return known_ethernet_cards[i].model;
+		}
+	}
+	i = 0;
+	for ( ; i < sizeof(generic_ethernet_cards) / sizeof(generic_ethernet_cards[0]); i++)
+	{
+		if (vendor_id == generic_ethernet_cards[i].vendor_id)
+		{
+			return generic_ethernet_cards[i].model;
+		}
+	}
+	return generic_ethernet_cards[0].model;
 }

@@ -437,7 +437,7 @@ static const char CPU_Frequency_prop[] = "CPUFrequency";
  */
 
 /* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const	gEfiSmbiosTableGuid = SMBIOS_TABLE_GUID;
+EFI_GUID const  gEfiSmbiosTableGuid = SMBIOS_TABLE_GUID;
 
 #define SMBIOS_RANGE_START		0x000F0000
 #define SMBIOS_RANGE_END		0x000FFFFF
@@ -478,7 +478,7 @@ static EFI_UINT8 const COMPAT_MODE[] = { 0x01, 0x00, 0x00, 0x00 };
 static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 {
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
-	EFI_CHAR16*	 dst = 0;
+	EFI_CHAR16	*dst = 0;
 	size_t		 i = 0;
 
 	if (!key || !(*key) || !len || !src)
@@ -649,7 +649,7 @@ static void setupEfiDeviceTree(void)
 	}
 
 	// Now fill in the /efi/platform Node
-	Node *efiPlatformNode = DT__AddChild(node, "platform");
+	Node *efiPlatformNode = DT__AddChild(node, "platform"); // "/efi/platform"
 
 	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 	// the value in the fsbFrequency global and not an malloc'd pointer

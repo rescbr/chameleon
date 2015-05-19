@@ -941,13 +941,15 @@ typedef struct {
 
 /* Several ID's we need in the library */
 #define PCI_VENDOR_ID_TEXAS_INSTRUMENTS				0x104c
+#define PCI_VENDOR_ID_ATI					0x1002
+#define PCI_VENDOR_ID_MOTOROLA					0x1057
 #define PCI_VENDOR_ID_APPLE					0x106b
 #define PCI_VENDOR_ID_AMD					0x1022
-#define PCI_VENDOR_ID_ATI					0x1002
 #define PCI_VENDOR_ID_NVIDIA					0x10de
 #define PCI_VENDOR_ID_REALTEK					0x10ec
 #define PCI_VENDOR_ID_VIA					0x1106
 #define PCI_VENDOR_ID_MARVELL					0x11ab
+
 #define PCI_VENDOR_ID_BROADCOM					0x14e4
 #define PCI_VENDOR_ID_ATHEROS					0x168c
 #define PCI_VENDOR_ID_QUALCOMM					0x1969

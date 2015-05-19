@@ -16,13 +16,13 @@
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD
-#define DEBUG_SPD 0
+	#define DEBUG_SPD 0
 #endif
 
 #if DEBUG_SPD
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 static const char *spd_memory_types[] =
@@ -401,9 +401,10 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 					case 99:	freq++; break;
 				}
 				slot->Frequency = freq;
+				DBG("RAM speed %dMHz \n", freq);
 			}
 
-			verbose("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n",
+			verbose("\tSlot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n\t\tPartNo=%s SerialNo=%s\n",
 				i,
 				(int)slot->Type,
 				slot->ModuleSize, 

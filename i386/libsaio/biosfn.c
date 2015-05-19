@@ -44,6 +44,16 @@
 #include "libsaio.h"
 
 
+#ifndef DEBUG_MEMRANGE
+	#define DEBUG_MEMRANGE 0
+#endif
+
+#if DEBUG_MEMRANGE
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)	msglog(x)
+#endif
+
 #define MAX_DRIVES 8
 
 static biosBuf_t bb;
@@ -126,7 +136,7 @@ unsigned int time18(void)
 #endif
 }
 
-#if 0
+#if DEBUG_MEMRANGE
 
 static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
@@ -197,7 +207,9 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 	MemoryRange *	range = (MemoryRange *)BIOS_ADDR;
 	unsigned long	count = 0;
-	//    unsigned long	rerangedCount;
+#if DEBUG_MEMRANGE
+	unsigned long	rerangedCount;
+#endif
 	unsigned long long	conMemSize = 0;
 	unsigned long long	extMemSize = 0;
 
@@ -267,7 +279,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 	*conMemSizePtr = conMemSize / 1024;  // size in KB
 	*extMemSizePtr = extMemSize / 1024;  // size in KB
 
-#if 0
+#if DEBUG_MEMRANGE
 	rerangedCount = rerangeMemoryMap(count);
 	range += rerangedCount - count;
 #endif

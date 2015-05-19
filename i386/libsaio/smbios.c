@@ -1096,9 +1096,10 @@ void addSMBOemPlatformFeature(SMBStructPtrs *structPtr)
  }
 */
 
-//-------------------------------------------------------------------------------------------------------------------------
-// EndOfTable
-//-------------------------------------------------------------------------------------------------------------------------
+
+/* ==============================================
+ EndOfTable
+ ================================================ */
 void addSMBEndOfTable(SMBStructPtrs *structPtr)
 {
 	structPtr->new->type	= kSMBTypeEndOfTable;
@@ -1238,6 +1239,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 			case kSMBTypeMemorySPD:
 			case kSMBTypeOemProcessorType:
 			case kSMBTypeOemProcessorBusSpeed:
+//			case kSMBTypeOemPlatformFeature:
 				/* And this one too, to be added at the end */
 			case kSMBTypeEndOfTable:
 				break;
@@ -1265,7 +1267,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 	addSMBMemorySPD(structPtr);
 	addSMBOemProcessorType(structPtr);
 	addSMBOemProcessorBusSpeed(structPtr);
-
+//	addSMBOemPlatformFeature(structPtr);
 	addSMBEndOfTable(structPtr);
 }
 

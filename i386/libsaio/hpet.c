@@ -319,12 +319,12 @@ void force_enable_hpet_nvidia(pci_dt_t *lpc_dev)
 
 			rcba = (void *)(pci_config_read32(lpc_dev->dev.addr, 0xF0) & 0xFFFFC000);
 
-			DBG("nVidia(R) %s LPC Interface [%04x:%04x], MMIO @ 0x%lx\n", 
+			DBG("\tnVidia(R) %s LPC Interface [%04x:%04x], MMIO @ 0x%lx\n", 
 				lpc_controllers_nvidia[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
 
 			if (rcba == 0)
 			{
-				printf(" RCBA disabled; cannot force enable HPET\n");
+				printf("\tRCBA disabled; cannot force enable HPET\n");
 			}
 			else
 			{
@@ -332,24 +332,24 @@ void force_enable_hpet_nvidia(pci_dt_t *lpc_dev)
 				if (val & 0x80)
 				{
 					// HPET is enabled in HPTC. Just not reported by BIOS
-					DBG(" HPET is enabled in HPTC, just not reported by BIOS\n");
+					DBG("\tHPET is enabled in HPTC, just not reported by BIOS\n");
 					hpet_address |= (val & 3) << 12 ;
-					DBG(" HPET MMIO @ 0x%lx\n", hpet_address);
+					DBG("\tHPET MMIO @ 0x%lx\n", hpet_address);
 				}
 				else
 				{
 					// HPET disabled in HPTC. Trying to enable
-					DBG(" HPET is disabled in HPTC, trying to enable\n");									
+					DBG("\tHPET is disabled in HPTC, trying to enable\n");									
 					REG32(rcba, 0x3404) = val | 0x80;
 					hpet_address |= (val & 3) << 12 ;
-					DBG(" Force enabled HPET, MMIO @ 0x%lx\n", hpet_address);
+					DBG("\tForce enabled HPET, MMIO @ 0x%lx\n", hpet_address);
 				}
 
 				// verify if the job is done
 				val = REG32(rcba, 0x3404);
 				if (!(val & 0x80))
 				{
-					printf(" Failed to force enable HPET\n");
+					printf("\tFailed to force enable HPET\n");
 				}
 			}
 			break;
@@ -368,7 +368,7 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 		{
 			val = pci_config_read32(lpc_dev->dev.addr, 0x68);
 
-			DBG("VIA %s LPC Interface [%04x:%04x], MMIO\n", 
+			DBG("\tVIA %s LPC Interface [%04x:%04x], MMIO\n", 
 				lpc_controllers_via[i].name, lpc_dev->vendor_id, lpc_dev->device_id);
 
 			if (val & 0x80)
@@ -384,11 +384,11 @@ void force_enable_hpet_via(pci_dt_t *lpc_dev)
 				if (val & 0x80)
 				{
 					hpet_address = (val & ~0x3ff);
-					DBG("Force enabled HPET at 0x%lx\n", hpet_address);
+					DBG("\tForce enabled HPET at 0x%lx\n", hpet_address);
 				}
 				else
 				{
-					DBG("Unable to enable HPET");
+					DBG("\tUnable to enable HPET");
 				}
 			}
 		}
@@ -409,12 +409,12 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 
 			rcba = (void *)(pci_config_read32(lpc_dev->dev.addr, 0xF0) & 0xFFFFC000);
 
-			DBG("Intel(R) %s LPC Interface [%04x:%04x], MMIO @ 0x%lx\n", 
+			DBG("\tIntel(R) %s LPC Interface [%04x:%04x], MMIO @ 0x%lx\n", 
 				lpc_controllers_intel[i].name, lpc_dev->vendor_id, lpc_dev->device_id, rcba);
 
 			if (rcba == 0)
 			{
-				printf(" RCBA disabled; cannot force enable HPET\n");
+				printf("\tRCBA disabled; cannot force enable HPET\n");
 			}
 			else
 			{
@@ -422,24 +422,24 @@ void force_enable_hpet_intel(pci_dt_t *lpc_dev)
 				if (val & 0x80)
 				{
 					// HPET is enabled in HPTC. Just not reported by BIOS
-					DBG(" HPET is enabled in HPTC, just not reported by BIOS\n");
+					DBG("\tHPET is enabled in HPTC, just not reported by BIOS\n");
 					hpet_address |= (val & 3) << 12 ;
-					DBG(" HPET MMIO @ 0x%lx\n", hpet_address);
+					DBG("\tHPET MMIO @ 0x%lx\n", hpet_address);
 				}
 				else
 				{
 					// HPET disabled in HPTC. Trying to enable
-					DBG(" HPET is disabled in HPTC, trying to enable\n");									
+					DBG("\tHPET is disabled in HPTC, trying to enable\n");									
 					REG32(rcba, 0x3404) = val | 0x80;
 					hpet_address |= (val & 3) << 12 ;
-					DBG(" Force enabled HPET, MMIO @ 0x%lx\n", hpet_address);
+					DBG("\tForce enabled HPET, MMIO @ 0x%lx\n", hpet_address);
 				}
 
 				// verify if the job is done
 				val = REG32(rcba, 0x3404);
 				if (!(val & 0x80))
 				{
-					printf(" Failed to force enable HPET\n");
+					printf("\tFailed to force enable HPET\n");
 				}
 			}
 			break;

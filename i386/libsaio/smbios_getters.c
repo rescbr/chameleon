@@ -23,7 +23,6 @@
 #define CORE_I5 "Core(TM) i5"
 #define CORE_I7 "Core(TM) i7"
 
-
 bool getProcessorInformationExternalClock(returnType *value)
 {
 	if (Platform.CPU.Vendor == CPUID_VENDOR_INTEL) // Intel
@@ -153,11 +152,17 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 	return false; //Unsupported CPU type
 }
 
+//bool getSMBOemPlatformFeature(returnType *value)
+//{
+//    value->word = (uint64_t)(0x0000000000000001);
+//    return true;
+//}
+
 uint16_t simpleGetSMBOemProcessorType(void)
 {
 	if (Platform.CPU.NoCores >= 4)
 	{
-		return 0x501;	// 1281 - Quad-Core Xeon
+		return 0x402;	// 1026 - Quad-Core Xeon
 	}
 	else if (Platform.CPU.NoCores == 1)
 	{

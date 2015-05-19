@@ -109,7 +109,7 @@
 #define kUseNvidiaROM			"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"			/* nvidia.c && ati.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn		"EthernetBuiltIn"	/* pci_setup.c */
+#define kEthernetBuiltIn		"EthernetBuiltIn"	/* networking.c */
 #define kGraphicsEnabler		"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"		/* pci_setup.c */
 #define kUseMemDetect			"UseMemDetect"		/* platform.c */
@@ -137,7 +137,7 @@
 
 /* Meklort: added these keys */
 #define kMD0Image			"md0"			/* ramdisk.h */
-#define kEnableWifi			"EnableWifi"		/* pci_setup.c */
+#define kEnableWifi			"EnableWifi"		/* networking.c */
 
 /* Andyvand: added these keys */
 
@@ -170,7 +170,7 @@
 /* cparm: added these keys */
 
 /* ErmaC: added these keys */
-#define kEnableDualLink			"EnableDualLink"		/* nvidia.c && gma.c*/
+#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
 #define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
