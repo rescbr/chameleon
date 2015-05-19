@@ -328,7 +328,7 @@ void get_cpuid(PlatformInfo_t *p)
 			p->CPU.BrandString[0] = '\0';
 		}
 		p->CPU.BrandString[47] = '\0';
-//		DBG("Brandstring = %s\n", p->CPU.BrandString);
+//		DBG("\tBrandstring = %s\n", p->CPU.BrandString);
 	}
 
 // ==============================================================

@@ -23,7 +23,9 @@
 	#define DBG(x...)	msglog(x)
 #endif
 
-uint32_t	devices_number	= 1;
+uint32_t	devices_number	= 1; // nvidia.c
+uint32_t	location_number	= 1; // networking.c
+
 DevPropString	*string		= NULL;
 uint8_t		*stringdata	= NULL;
 uint32_t	stringlength	= 0;
@@ -66,7 +68,7 @@ void setupDeviceProperties(Node *node)
 		if (cnt2 > 0)
 		{
 			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
-			DBG("Adding device-properties string to DT");
+			DBG("Adding device-properties string to DT\n");
 		}
 	}
 }
