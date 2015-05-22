@@ -2501,7 +2501,7 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	char *devicepath;
 
-	verbose("\tClass code: [%04x]\n", ati_dev->class_id );
+	verbose("\tClass code: [%04X]\n", ati_dev->class_id );
 
 	if (!init_card(ati_dev))
 	{

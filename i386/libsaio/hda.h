@@ -77,9 +77,9 @@ typedef struct
 struct hdacc_codecs;
 typedef struct
 {
-	uint32_t cid;
-	uint16_t revid;
-	char *name;
+	uint32_t id;
+	uint32_t rev;
+	const char *name;
 } hdacc_codecs;
 */
 
@@ -441,6 +441,7 @@ typedef struct
 #define HDA_CODEC_ALC882        HDA_CODEC_CONSTRUCT(REALTEK, 0x0882)
 #define HDA_CODEC_ALC883        HDA_CODEC_CONSTRUCT(REALTEK, 0x0883)
 #define HDA_CODEC_ALC885        HDA_CODEC_CONSTRUCT(REALTEK, 0x0885)
+#define HDA_CODEC_ALC886        HDA_CODEC_CONSTRUCT(REALTEK, 0x0886)
 #define HDA_CODEC_ALC887        HDA_CODEC_CONSTRUCT(REALTEK, 0x0887)
 #define HDA_CODEC_ALC888        HDA_CODEC_CONSTRUCT(REALTEK, 0x0888)
 #define HDA_CODEC_ALC889        HDA_CODEC_CONSTRUCT(REALTEK, 0x0889)

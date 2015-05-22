@@ -462,7 +462,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 	model = get_gma_controller_name(device_id, vendor_id);
 
-	verbose("\tClass code: [%04x]\n", gma_dev->class_id);
+	verbose("\tClass code: [%04X]\n", gma_dev->class_id);
 
 	verbose("\t%s [%04x:%04x] (rev %02x)\nSubsystem: [%04x:%04x] :: %s\n",
 			model, gma_dev->vendor_id, gma_dev->device_id, gma_dev->revision_id, gma_dev->subsys_id.subsys.vendor_id, gma_dev->subsys_id.subsys.device_id, devicepath);

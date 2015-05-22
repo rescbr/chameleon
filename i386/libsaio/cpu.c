@@ -486,7 +486,6 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_SANDYBRIDGE:
 				case CPUID_MODEL_IVYBRIDGE:
 				case CPUID_MODEL_HASWELL_U5:
-				case CPUID_MODEL_ATOM_3700:
 				case CPUID_MODEL_HASWELL:
 				case CPUID_MODEL_HASWELL_SVR:
 				//case CPUID_MODEL_HASWELL_H:
@@ -504,6 +503,10 @@ void scan_cpu(PlatformInfo_t *p)
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+				case CPUID_MODEL_ATOM_3700:
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
 					break;
 			}
 

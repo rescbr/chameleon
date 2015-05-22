@@ -45,10 +45,10 @@
 
 
 #ifndef DEBUG_MEMRANGE
-	#define DEBUG_MEMRANGE 0
+	#define MEMRANGE 0
 #endif
 
-#if DEBUG_MEMRANGE
+#if MEMRANGE
 	#define DBG(x...)	printf(x)
 #else
 	#define DBG(x...)	msglog(x)
@@ -136,7 +136,7 @@ unsigned int time18(void)
 #endif
 }
 
-#if DEBUG_MEMRANGE
+#if MEMRANGE
 
 static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
@@ -207,7 +207,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 	MemoryRange *	range = (MemoryRange *)BIOS_ADDR;
 	unsigned long	count = 0;
-#if DEBUG_MEMRANGE
+#if MEMRANGE
 	unsigned long	rerangedCount;
 #endif
 	unsigned long long	conMemSize = 0;
@@ -279,7 +279,7 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 	*conMemSizePtr = conMemSize / 1024;  // size in KB
 	*extMemSizePtr = extMemSize / 1024;  // size in KB
 
-#if DEBUG_MEMRANGE
+#if MEMRANGE
 	rerangedCount = rerangeMemoryMap(count);
 	range += rerangedCount - count;
 #endif

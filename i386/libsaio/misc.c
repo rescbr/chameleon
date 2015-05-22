@@ -46,7 +46,6 @@
 
 #include "libsaio.h"
 
-//#if UNUSED
 /*
  * keyboard controller (8042) I/O port addresses
  */
@@ -108,7 +107,6 @@ void enableA20()
     /* wait until done */
     flushKeyboardInputBuffer();
 }
-//#endif /* UNUSED */
 
 //==========================================================================
 // Return the platform name for this hardware.

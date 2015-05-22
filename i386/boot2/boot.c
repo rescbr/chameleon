@@ -644,7 +644,8 @@ void common_boot(int biosdev)
 			}
 		}
 
-		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
+		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig))
+		{
 			if (strncmp(val, "i386", sizeof("i386") ) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;

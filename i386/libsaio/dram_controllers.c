@@ -490,27 +490,6 @@ static struct mem_controller_t dram_controllers[] = {
 	{ 0, 0, "",					NULL, NULL, NULL },
 
 	// Intel
-//	{ 0x8086, 0x0100, "2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0104, "2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x010C, "Xeon E3-1200/2rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0150, "Xeon E3-1200 v2/3rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0154, "3rd Gen Core processor",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0158, "Xeon E3-1200 v2/Ivy Bridge",	NULL, NULL, NULL },
-//	{ 0x8086, 0x015C, "Xeon E3-1200 v2/3rd Gen Core processor",	NULL, NULL, NULL },
-
-//	{ 0x8086, 0x0BF0, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF1, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF2, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF3, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF4, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF5, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF6, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-//	{ 0x8086, 0x0BF7, "Atom Processor D2xxx/N2xxx",	NULL, NULL, NULL },
-
-//	{ 0x8086, 0x0C00, "Haswell",			NULL, NULL, NULL },
-//	{ 0x8086, 0x0C04, "Haswell",			NULL, NULL, NULL },
-//	{ 0x8086, 0x0C08, "Haswell",			NULL, NULL, NULL },
-
 	{ 0x8086, 0x7190, "VMWare",			NULL, NULL, NULL },
 
 	{ 0x8086, 0x1A30, "82845 845 [Brookdale]",	NULL, NULL, NULL },

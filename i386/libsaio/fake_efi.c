@@ -22,6 +22,10 @@
 	#define DEBUG_EFI 0
 #endif
 
+#ifndef RANDOMSEED
+	#define RANDOMSEED 0
+#endif
+
 #if DEBUG_EFI
 	#define DBG(x...)	printf(x)
 #else
@@ -732,17 +736,16 @@ void setupChosenNode()
 		stop("setupChosenNode: Couldn't get '/chosen' node");
 	}
 
-	int length = strlen(gBootUUIDString);
-	if (length)
+	// Only accept a UUID with the correct length.
+	if (strlen(gBootUUIDString) == 36)
 	{
-		DT__AddProperty(chosenNode, "boot-uuid", length + 1, gBootUUIDString);
+		DT__AddProperty(chosenNode, "boot-uuid", 37, gBootUUIDString);
 	}
 
-	length = strlen(bootArgs->CommandLine);
-	DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+	DT__AddProperty(chosenNode, "boot-args", sizeof(bootArgs->CommandLine), (EFI_UINT8 *)bootArgs->CommandLine);
 
-	length = strlen(bootInfo->bootFile);
-	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+	// Adding the default kernel name (mach_kernel) for kextcache.
+	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);
 
 //	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
 
@@ -759,9 +762,17 @@ void setupChosenNode()
 		//
 		UInt8 index = 0;
 		EFI_UINT16 PMTimerValue = 0;
+#if RANDOMSEED
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi = 0;
+		EFI_UINT32 rcx, rdx, rsi, rdi;
+
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		cpuTick = rcx = rdx = rsi = rdi = 0;
+#else
 		EFI_UINT32 randomValue = 0, cpuTick = 0;
 		EFI_UINT32 ecx = 0, edx = 0, esi = 0, edi = 0;
-
+#endif
 		// LEAF_1 - Feature Information (Function 01h).
 		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
 		{
@@ -806,8 +817,21 @@ void setupChosenNode()
 					continue;						// jb		0x17e55		(retry)
 				}
 
-				cpuTick = (EFI_UINT32) getCPUTick();		// callq	0x121a7
+				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 //				printf("value: 0x%x\n", getCPUTick());
+#if RANDOMSEED
+
+				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				rdx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				rdi = rsi;							// mov		%rsi,	%rdi
+				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
+				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
+				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+
+				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
+#else
 				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
 				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
@@ -818,7 +842,7 @@ void setupChosenNode()
 				edi = (edi ^ edx);						// xor		%rdx,	%rdi
 
 				seedBuffer[index] = (edi & 0xff);				// mov		%dil,	(%r15,%r12,1)
-
+#endif
 				edi = (edi & 0x2f);						// and		$0x2f,	%edi
 				edi = (edi + esi);						// add		%esi,	%edi
 				index++;							// inc		r12

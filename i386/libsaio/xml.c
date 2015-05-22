@@ -27,6 +27,16 @@
 #include "sl.h"
 #include "xml.h"
 
+#ifndef DEBUG_XML
+	#define DEBUG_XML 0
+#endif
+
+#if DEBUG_XML
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)
+#endif
+
 string_ref *ref_strings = NULL;
 
 /// TODO: remove below

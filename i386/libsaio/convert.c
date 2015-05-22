@@ -11,7 +11,7 @@
 /* ======================================================= */
 
 /** Transform a 16 bytes hexadecimal value UUID to a string */
-const char *getStringFromUUID(const EFI_CHAR8 *eUUID)
+const char *getStringFromUUID(const uint8_t *eUUID)
 {
 	static char msg[UUID_LEN*2 + 8] = "";
 	if (!eUUID) return "";
@@ -197,26 +197,3 @@ int hex2bin( const char *hex, uint8_t *bin, int len )
 }
 
 /* ======================================================= */
-
-// FIXME: can't use my original code here,
-// Ironically, trying to reuse convertHexStr2Binary() would RESET the system!
-/*
-static EFI_CHAR8 *getUUIDFromString2(const char * szInUUID)
-{
-  char szUUID[UUID_LEN+1], *p=szUUID;
-  int size=0;
-  void* ret;
-
-  if (!szInUUID || strlen(szInUUID)<UUID_LEN) return (EFI_CHAR8*) 0;
-
-  while(*szInUUID) if (*szInUUID!='-') *p++=*szInUUID++; else szInUUID++;
-  *p='\0';
-  ret = convertHexStr2Binary(szUUID, &size);
-  if (!ret || size!=UUID_LEN) 
-  {
-      verbose("UUID: cannot convert string <%s> to valid UUID.\n", szUUID);
-      return (EFI_CHAR8*) 0;
-  }
-  return (EFI_CHAR8 *) ret; // new allocated buffer containing the converted string to bin
-}
-*/
