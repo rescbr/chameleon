@@ -459,7 +459,7 @@ void setup_eth_devdrop(pci_dt_t *eth_dev)
 			devprop_add_value(device, "location", (uint8_t *)&location_number, 1);
 
 //			devprop_add_value(device, "AAPL,slot-name", "Slot-x"
-//			devprop_add_value(device, "device-id" 0xF6,,
+//			devprop_add_value(device, "device-id",
 //			devprop_add_value(device, "revision-id",
 //			devprop_add_value(device, "subsystem-id",
 //			devprop_add_value(device, "subsystem-vendor-id",
