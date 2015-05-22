@@ -283,4 +283,27 @@ get_PIT2(unsigned int *value)
     return result;
 }
 
+/*
+ * Timing Functions
+ */
+
+/* REP NOP (PAUSE) is a good thing to insert into busy-wait loops. */
+static inline void CpuPause(void)
+{
+	__asm__ volatile ("rep; nop");
+}
+
+static inline uint32_t DivU64x32(uint64_t dividend, uint32_t divisor)
+{
+	__asm__ volatile ("divl %1" : "+A"(dividend) : "r"(divisor));
+	return (uint32_t) dividend;
+}
+
+static inline uint64_t MultU32x32(uint32_t multiplicand, uint32_t multiplier)
+{
+	uint64_t result;
+	__asm__ volatile ("mull %2" : "=A"(result) : "a"(multiplicand), "r"(multiplier));
+	return result;
+}
+
 #endif /* !__LIBSAIO_CPU_H */
