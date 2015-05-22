@@ -2113,7 +2113,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	// get card type
 	nvCardType = (REG32(0) >> 20) & 0x1ff;
 
-	verbose("\tClass code: [%04x]\n", nvda_dev->class_id);
+	verbose("\tClass code: [%04X]\n", nvda_dev->class_id);
 
 	model = get_nvidia_model(((nvda_dev->vendor_id << 16) | nvda_dev->device_id),((nvda_dev->subsys_id.subsys.vendor_id << 16) | nvda_dev->subsys_id.subsys.device_id));
 

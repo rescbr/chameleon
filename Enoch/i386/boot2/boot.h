@@ -85,7 +85,7 @@
 #define kScanSingleDriveKey		"Scan Single Drive"
 #define kInstantMenuKey			"Instant Menu"
 #define kDefaultKernel			"mach_kernel"
-#define kOSXKernel			"kernel"		// Yosemite
+#define kOSXKernel			"kernel"		// Yosemite+
 #define kGUIKey				"GUI"
 #define kBootBannerKey			"Boot Banner"
 #define kShowInfoKey			"ShowInfo"		// gui.c

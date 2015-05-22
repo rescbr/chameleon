@@ -178,6 +178,7 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_NVIDIA_GK106,	"GK106" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK107,	"GK107" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK104,	"GK104" /*, 0, ? */ },
+
 	//1002  Advanced Micro Devices [AMD] nee ATI Technologies Inc
 	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
 	{ HDA_ATI_SB600,	"SB600" /*, 0, 0 */ },
@@ -659,7 +660,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	uint16_t	controller_device_id = hda_dev->device_id;
 	const char	*value;
 
-	verbose("\tClass code: [%04x]\n", hda_dev->class_id);
+	verbose("\tClass code: [%04X]\n", hda_dev->class_id);
 
 	devicepath = get_pci_dev_path(hda_dev);
 	controller_name = get_hda_controller_name(controller_device_id, controller_vendor_id);
