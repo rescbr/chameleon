@@ -396,8 +396,8 @@ typedef struct _PlatformInfo_t
 		uint32_t		LogicalPerPackage;
 		uint32_t		Signature;		// Processor Signature
 		uint32_t		Stepping;		// Stepping
-		//uint16_t		Type;			// Type
 		uint32_t		Model;			// Model
+		//uint32_t		Type;			// Processor Type
 		uint32_t		ExtModel;		// Extended Model
 		uint32_t		Family;			// Family
 		uint32_t		ExtFamily;		// Extended Family

@@ -9,6 +9,7 @@
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
+//#include "convert.h"
 #include "device_inject.h"
 #include "networking.h"
 
@@ -70,42 +71,42 @@ static network_device known_ethernet_cards[] =
 	{ 0x021b, 0x8139, "Realtek RTL8139 Family Fast Ethernet" },
 
 	// Marvell
-	{ PCI_VENDOR_ID_MARVELL, 0x4320, "88E8001 Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4340, "88E8021 PCI-X IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4341, "88E8022 PCI-X IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4342, "88E8061 PCI-E IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4343, "88E8062 PCI-E IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4344, "88E8021 PCI-X IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4345, "88E8022 PCI-X IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4346, "88E8061 PCI-E IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4347, "88E8062 PCI-E IPMI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4350, "88E8035 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4351, "88E8036 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4352, "88E8038 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4353, "88E8039 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4354, "88E8040 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4355, "88E8040T PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4356, "88EC033 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4357, "88E8042 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x435A, "88E8048 PCI-E Fast Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4360, "88E8052 PCI-E ASF Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4361, "88E8050 PCI-E ASF Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4362, "88E8053 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4363, "88E8055 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4364, "88E8056 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4365, "8E8070 based Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4366, "88EC036 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4367, "88EC032 Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4368, "88EC034 Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4369, "88EC042 Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x436A, "88E8058 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x436B, "88E8071 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x436C, "88E8072 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x436D, "88E8055 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4370, "88E8075 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4380, "88E8057 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4381, "88E8059 PCI-E Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_MARVELL, 0x4382, "88E8079 PCI-E Gigabit Ethernet Controller" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4320, "Yukon Gigabit Adapter 88E8001 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4340, "Yukon Gigabit Adapter 88E8021 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4341, "Yukon Gigabit Adapter 88E8022 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4342, "Yukon Gigabit Adapter 88E8061 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4343, "Yukon Gigabit Adapter 88E8062 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4344, "Yukon Gigabit Adapter 88E8021 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4345, "Yukon Gigabit Adapter 88E8022 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4346, "Yukon Gigabit Adapter 88E8061 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4347, "Yukon Gigabit Adapter 88E8062 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4350, "Yukon Gigabit Adapter 88E8035 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4351, "Yukon Gigabit Adapter 88E8036 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4352, "Yukon Gigabit Adapter 88E8038 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4353, "Yukon Gigabit Adapter 88E8039 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4354, "Yukon Gigabit Adapter 88E8040 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4355, "Yukon Gigabit Adapter 88E8040T Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4356, "Yukon Gigabit Adapter 88EC033 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4357, "Yukon Gigabit Adapter 88E8042 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x435A, "Yukon Gigabit Adapter 88E8048 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4360, "Yukon Gigabit Adapter 88E8052 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4361, "Yukon Gigabit Adapter 88E8050 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4362, "Yukon Gigabit Adapter 88E8053 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4363, "Yukon Gigabit Adapter 88E8055 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4364, "Yukon Gigabit Adapter 88E8056 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4365, "Yukon Gigabit Adapter 8E8070 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4366, "Yukon Gigabit Adapter 88EC036 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4367, "Yukon Gigabit Adapter 88EC032 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4368, "Yukon Gigabit Adapter 88EC034 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4369, "Yukon Gigabit Adapter 88EC042 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x436A, "Yukon Gigabit Adapter 88E8058 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x436B, "Yukon Gigabit Adapter 88E8071 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x436C, "Yukon Gigabit Adapter 88E8072 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x436D, "Yukon Gigabit Adapter 88E8055 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4370, "Yukon Gigabit Adapter 88E8075 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4380, "Yukon Gigabit Adapter 88E8057 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4381, "Yukon Gigabit Adapter 88E8059 Singleport Copper SA" },
+	{ PCI_VENDOR_ID_MARVELL, 0x4382, "Yukon Gigabit Adapter 88E8079 Singleport Copper SA" },
 //	{ PCI_VENDOR_ID_MARVELL, 0x5005, "Belkin F5D5005 Gigabit Desktop Network PCI Card" },
 
 	// Broadcom
@@ -134,56 +135,56 @@ static network_device known_ethernet_cards[] =
 	{ PCI_VENDOR_ID_JMICRON, 0x0260, "JMC260 PCI Express Gigabit Ethernet Controller" },
 
 	// Intel
-//	{ PCI_VENDOR_ID_INTEL, 0x1000, "82542 Gigabit Ethernet Controller (Fiber)" },
-	{ PCI_VENDOR_ID_INTEL, 0x1029, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1030, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1031, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1032, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1033, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1034, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1038, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x1039, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x103A, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x103B, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x103C, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x103D, "8255x Ethernet" },
-	{ PCI_VENDOR_ID_INTEL, 0x103E, "8255x Ethernet" },
-//	{ PCI_VENDOR_ID_INTEL, 0x1049, "82566MM Gigabit Network Connection" },
-//	{ PCI_VENDOR_ID_INTEL, 0x104A, "82566DM Gigabit Network Connection" },
-//	{ PCI_VENDOR_ID_INTEL, 0x104B, "82566DC Gigabit Network Connection" },
-//	{ PCI_VENDOR_ID_INTEL, 0x104C, "82562V 10/100 Network Connection" },
-//	{ PCI_VENDOR_ID_INTEL, 0x104D, "82566MC Gigabit Network Connection" },
-	{ PCI_VENDOR_ID_INTEL, 0x1050, "82562EZ 10/100 Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1051, "82801EB/ER (ICH5/ICH5R) integrated LAN Controller" },
+	{ PCI_VENDOR_ID_INTEL, 0x1000, "82542" },
+	{ PCI_VENDOR_ID_INTEL, 0x1029, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1030, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1031, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1032, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1033, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1034, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1038, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1039, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x103A, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x103B, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x103C, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x103D, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x103E, "8255x" },
+	{ PCI_VENDOR_ID_INTEL, 0x1049, "82566MM" },
+	{ PCI_VENDOR_ID_INTEL, 0x104A, "82566DM" },
+	{ PCI_VENDOR_ID_INTEL, 0x104B, "82574L" },
+	{ PCI_VENDOR_ID_INTEL, 0x104C, "82562V" },
+	{ PCI_VENDOR_ID_INTEL, 0x104D, "82566MC" },
+	{ PCI_VENDOR_ID_INTEL, 0x1050, "82562EZ" },
+	{ PCI_VENDOR_ID_INTEL, 0x1051, "82801EB/ER" },
 	{ PCI_VENDOR_ID_INTEL, 0x1052, "PRO/100 VE Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1053, "PRO/100 VE Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1054, "PRO/100 VE Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1055, "PRO/100 VE Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1056, "PRO/100 VE Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1057, "PRO/100 VE Network Connection" },
-	{ PCI_VENDOR_ID_INTEL, 0x1059, "82551QM Ethernet Controller" },
-//	{ PCI_VENDOR_ID_INTEL, 0x105b  "82546GB Gigabit Ethernet Controller (Copper)" },
-//	{ PCI_VENDOR_ID_INTEL, 0x105E, "82546GB Gigabit Ethernet Controller" },
-//	{ PCI_VENDOR_ID_INTEL, 0x105F, "82571EB Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1060, "82571EB Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1064, "82562ET/EZ/GT/GZ - PRO/100 VE (LOM) Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1065, "82562ET/EZ/GT/GZ - PRO/100 VE Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1066, "82562 EM/EX/GX - PRO/100 VM (LOM) Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1067, "82562 EM/EX/GX - PRO/100 VM Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1068, "82562ET/EZ/GT/GZ - PRO/100 VE (LOM) Ethernet Controller Mobile" },
-	{ PCI_VENDOR_ID_INTEL, 0x1069, "82562EM/EX/GX - PRO/100 VM (LOM) Ethernet Controller Mobile" },
-	{ PCI_VENDOR_ID_INTEL, 0x106A, "82562G - PRO/100 VE (LOM) Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x106B, "82562G - PRO/100 VE Ethernet Controller Mobile" },
-	{ PCI_VENDOR_ID_INTEL, 0x1075, "82547GI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1076, "82541GI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1077, "82541GI Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1078, "82541ER Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x1079, "82546GB Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x107a, "82546GB Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x107b, "82546GB Gigabit Ethernet Controller" },
-	{ PCI_VENDOR_ID_INTEL, 0x107c, "82541PI Gigabit Ethernet Controller" },
-//	{ PCI_VENDOR_ID_INTEL, 0x107D, "82572EI Gigabit Ethernet Controller (Copper)" },
-//	{ PCI_VENDOR_ID_INTEL, 0x107E, "82572EI Gigabit Ethernet Controller (Fiber)" },
+	{ PCI_VENDOR_ID_INTEL, 0x1059, "82551QM" },
+//	{ PCI_VENDOR_ID_INTEL, 0x105b  "82546GB" },
+//	{ PCI_VENDOR_ID_INTEL, 0x105E, "82546GB" },
+//	{ PCI_VENDOR_ID_INTEL, 0x105F, "82571EB" },
+	{ PCI_VENDOR_ID_INTEL, 0x1060, "82571EB" },
+	{ PCI_VENDOR_ID_INTEL, 0x1064, "82562ET/EZ/GT/GZ" },
+	{ PCI_VENDOR_ID_INTEL, 0x1065, "82562ET/EZ/GT/GZ" },
+	{ PCI_VENDOR_ID_INTEL, 0x1066, "82562 EM/EX/GX" },
+	{ PCI_VENDOR_ID_INTEL, 0x1067, "82562 EM/EX/GX" },
+	{ PCI_VENDOR_ID_INTEL, 0x1068, "82562ET/EZ/GT/GZ" },
+	{ PCI_VENDOR_ID_INTEL, 0x1069, "82562EM/EX/GX" },
+	{ PCI_VENDOR_ID_INTEL, 0x106A, "82562G" },
+	{ PCI_VENDOR_ID_INTEL, 0x106B, "82562G" },
+	{ PCI_VENDOR_ID_INTEL, 0x1075, "82547GI" },
+	{ PCI_VENDOR_ID_INTEL, 0x1076, "82541GI" },
+	{ PCI_VENDOR_ID_INTEL, 0x1077, "82541GI" },
+	{ PCI_VENDOR_ID_INTEL, 0x1078, "82541ER" },
+	{ PCI_VENDOR_ID_INTEL, 0x1079, "82546GB" },
+	{ PCI_VENDOR_ID_INTEL, 0x107a, "82546GB" },
+	{ PCI_VENDOR_ID_INTEL, 0x107b, "82546GB" },
+	{ PCI_VENDOR_ID_INTEL, 0x107c, "82541PI" },
+//	{ PCI_VENDOR_ID_INTEL, 0x107D, "82572EI" },
+//	{ PCI_VENDOR_ID_INTEL, 0x107E, "82572EI" },
 //	{ PCI_VENDOR_ID_INTEL, 0x107F, "82572EI Gigabit Ethernet Controller" },
 //	{ PCI_VENDOR_ID_INTEL, 0x108a, "82546GB Gigabit Ethernet Controller" },
 //	{ PCI_VENDOR_ID_INTEL, 0x108B, "82573V Gigabit Ethernet Controller (Copper)" },
@@ -225,7 +226,7 @@ static network_device known_ethernet_cards[] =
 //	{ PCI_VENDOR_ID_INTEL, 0x10EB, "Intel " },
 //	{ PCI_VENDOR_ID_INTEL, 0x10EF, "Intel " },
 //	{ PCI_VENDOR_ID_INTEL, 0x10F5, "Intel " },
-//	{ PCI_VENDOR_ID_INTEL, 0x10F6, "" },
+	{ PCI_VENDOR_ID_INTEL, 0x10F6, "82574L" },
 	{ PCI_VENDOR_ID_INTEL, 0x10F0, "82578DC Gigabit Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x10FE, "82552 10/100 Network Connection" },
 	{ PCI_VENDOR_ID_INTEL, 0x1209, "8255xER/82551IT Fast Ethernet Controller" },
@@ -428,7 +429,7 @@ void setup_eth_devdrop(pci_dt_t *eth_dev)
 
 	DevPropDevice *device = (DevPropDevice *)malloc(sizeof(DevPropDevice));
 
-	verbose("\tClass code: [%04x]\n", eth_dev->class_id);
+	verbose("\tClass code: [%04X]\n", eth_dev->class_id);
 	verbose("\tEthernetBuiltIn = %s\n", do_eth_devprop ? "Yes" : "No");
 
 	if (!string)
@@ -481,8 +482,6 @@ void setup_eth_devdrop(pci_dt_t *eth_dev)
 
 	// location number
 	location_number++;
-
-	verbose("\n");
 }
 
 void setup_wifi_devdrop(pci_dt_t *wlan_dev) // ARPT
@@ -496,7 +495,7 @@ void setup_wifi_devdrop(pci_dt_t *wlan_dev) // ARPT
 
 	DevPropDevice *device = (DevPropDevice *)malloc(sizeof(DevPropDevice));
 
-	verbose("\tClass code: [%04x]\n", wlan_dev->class_id);
+	verbose("\tClass code: [%04X]\n", wlan_dev->class_id);
 	verbose("\tEnableWifi = %s\n", do_wifi_devprop ? "Yes" : "No");
 
 	if (!string)
@@ -542,5 +541,4 @@ void setup_wifi_devdrop(pci_dt_t *wlan_dev) // ARPT
 	}
 
 	verbose("\t%s [%04x:%04x]\n\t%s\n", name_model, wlan_dev->vendor_id, wlan_dev->device_id, devicepath);
-	verbose("\n");
 }

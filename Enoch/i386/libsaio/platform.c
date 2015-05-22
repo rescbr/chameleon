@@ -40,14 +40,17 @@ bool platformCPUFeature(uint32_t feature)
 void scan_mem()
 {
 	static bool done = false;
-	if (done) {
+	if (done)
+	{
 		return;
 	}
 
 	/* our code only works on Intel chipsets so make sure here */
 	if (pci_config_read16(PCIADDR(0, 0x00, 0), 0x00) != 0x8086) {
 		bootInfo->memDetect = false;
-	} else {
+	}
+	else
+	{
 		bootInfo->memDetect = true;
 	}
 	/* manually */

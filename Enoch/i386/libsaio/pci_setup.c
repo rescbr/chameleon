@@ -74,12 +74,14 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 				DBG("Setup ETHERNET %s enabled\n", do_eth_devprop? "is":"is not");
 				verbose("[ ETHERNET DEVICE INFO ]\n");
 				setup_eth_devdrop(current);
+				verbose("\n");
 				break; // PCI_CLASS_NETWORK_ETHERNET
 
 			case PCI_CLASS_NETWORK_OTHER:
 				DBG("Setup WIRELESS %s enabled\n", do_wifi_devprop? "is":"is not");
 				verbose("[ WIRELESS DEVICE INFO ]\n");
 				setup_wifi_devdrop(current);
+				verbose("\n");
 				break; // PCI_CLASS_NETWORK_OTHER
 
 			case PCI_CLASS_DISPLAY_VGA:
@@ -155,7 +157,7 @@ void setup_pci_devs(pci_dt_t *pci_dt)
 			case PCI_CLASS_SERIAL_FIREWIRE:
 				DBG("FireWire\n");
 				verbose("[ FIREWIRE DEVICE INFO ]\n");
-				verbose("\tClass code: [%04x]\n\tFireWire device [%04x:%04x]-[%04x:%04x]\n\t%s\n",
+				verbose("\tClass code: [%04X]\n\tFireWire device [%04x:%04x]-[%04x:%04x]\n\t%s\n",
 					current->class_id,current->vendor_id, current->device_id,
 					current->subsys_id.subsys.vendor_id,
 					current->subsys_id.subsys.device_id, devicepath);
