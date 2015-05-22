@@ -1276,10 +1276,11 @@ uint8_t *fixSystemUUID()
 {
 	uint8_t *ptr = (uint8_t *)neweps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)ptr;
+	uint8_t *ret = NULL;
 	int i, isZero, isOnes;
 	uint8_t fixedUUID[UUID_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 	const char *sysId = getStringForKey(kSMBSystemInformationUUIDKey, SMBPlist); // try to get user's uuid from smbios.plist
-	uint8_t *ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
+	ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
 
 	for (;(structHeader->type != kSMBTypeSystemInformation);) // find System Information Table (Type 1) in patched SMBIOS
 	{
