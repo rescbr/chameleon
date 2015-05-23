@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:37-0000\n"
+"PO-Revision-Date: 2015-05-23 15:50+0000\n"
 "Last-Translator: crazybirdy <>\n"
 "Language-Team: zh_CN <zh_CN@li.org>\n"
 "Language: zh_CN\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1416324540.0\n"
+"X-POOTLE-MTIME: 1432396259.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -273,10 +273,10 @@ msgstr "不安装变色龙引导器 (适用于仅安装 Extra 组件)。"
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
-msgstr "Chameleon"
+msgstr "引导器选择安装"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -287,12 +287,15 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"在這裡，您可以選擇跳過引導器安裝，或安裝全部引導器，或安裝部分引導器。如果你想要寫入 Extra 的文件，或跳過某些 stage（0,1 "
+"和設置激活動的目標分區），這會是很有用的選擇方式。跳過所有 stages，允許您跳過使用中的的引導扇區，尤其是 4K 硬碟 "
+"特別有用。即使你跳過一個或多個 stages，變色龍的 boot 文件仍會複製到目標分區。"
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "跳过 Stage 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -300,13 +303,13 @@ msgstr ""
 msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
-msgstr ""
+msgstr "避免写入 stage 0 之 boot0 到目标磁盘。Stage 2 仍会复制/替换 /boot 文件。"
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "跳过 Stage 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -314,13 +317,13 @@ msgstr ""
 msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
-msgstr ""
+msgstr "避免写入 stage 1 之 boot1 到选择分区的引导扇区。Stage 2 仍会复制/替换 /boot 文件。"
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "跳过 设置激活分区"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -330,33 +333,39 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"防止设置激活目标分区。一些旧版的主板的BIOS无法正确使用GPT，在GUID分区表中，无法找到标记为激活的分区。Stage 2 仍会复制/替换 "
+"/boot 文件。"
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;纪录文件。"
+msgstr "安装变色龙到 选择的分区"
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "此选项会安装三个必要文件，并依照您的系统需求将 boot0 或 boot0md 写入 MBR 的前 440 位元，以避免损坏任何已经存在的 Windows 机码。然后 boot0 会在第一个启动分区搜寻 boot1h，而 boot0md 可以在第二个硬盘的第一个启动分区搜寻 boot1h。"
+msgstr ""
+"以不破坏现存已安装 Windows 系统的方式，依据你的系统，自动选择 boot0, boot0md 或 "
+"boot0hfs，并将变色龙的文件安装到选择分区的根目录。"
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "安装变色龙到 ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "此选项会安装三个必要文件到正常隐藏的 EFI 分区，并依照您的系统需求将 boot0 或 boot0md 写入 MBR 的前 440 位元，以避免损坏任何已经存在的 Windows 机码。然后 boot0 会在第一个启动分区搜寻 boot1h，而 boot0md 可以在第二个硬盘的第一个启动分区搜寻 boot1h。"
+msgstr ""
+"依据你的系统，自动选择 boot0, boot0md 或 boot0hfs，并将变色龙的文件安装到目标磁盘的 ESP 分区 (EFI System "
+"Partition)。"
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -713,7 +722,7 @@ msgstr "PrivateData=No"
 #: Resources/templates/Localizable.strings:150
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
-msgstr ""
+msgstr "(默认是 Yes) 在 bdmesg 记录中显示 serial number 等隐藏资料。"
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:154
@@ -725,7 +734,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:155
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "(默认是 No) 启用 XHCI, EHCI 及 UHCI 修复功能。"
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:157
@@ -737,7 +746,7 @@ msgstr "USBLegacyOff=Yes"
 #: Resources/templates/Localizable.strings:158
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
-msgstr ""
+msgstr "(默认是 No) 选用 Yes 将强制停用 XHCI 及 EHCI USB Legacy。"
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:160
@@ -749,7 +758,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:161
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "(默认是 No) 选用 Yes 将强制停用 XHCI USB Legacy。"
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:163
@@ -2273,277 +2282,277 @@ msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 08002e0a
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:588
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 04001204。"
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:592
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00000604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 00000616。"
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00000604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 00000e16。"
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 00001616。"
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001e16。"
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:605
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002616。"
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002b16。"
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:611
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 00002216。"
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:613
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:614
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 01000e16。"
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 01001e16。"
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 02001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 02000616。"
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 02001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 02001616。"
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:625
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:626
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 02001604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 02002616。"
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:629
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 02001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 02002216。"
 
 #. type: "IntelBroadwellx13_title"
 #: Resources/templates/Localizable.strings:631
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002b16"
-msgstr "02001604"
+msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:632
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 02001604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 02002b16。"
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:634
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0300220d"
 msgid "03001216"
-msgstr "0300220d"
+msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:635
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell 显卡的 AAPL,ig-platform-id 为 03001216。"
 
 #. type: "IntelBroadwellx15_title"
 #: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:638
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00001604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 04002b16。"
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:641
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 00002604。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 04002616。"
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:644
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 0500260a。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 05002616。"
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "设置 Intel Haswell (Mobile) 显卡的 AAPL,ig-platform-id 为 0600260c。"
+msgstr "设置 Intel Broadwell (Mobile) 显卡的 AAPL,ig-platform-id 为 06002616。"
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:651
@@ -2652,6 +2661,9 @@ msgstr "UseIntelHDMI=Yes"
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
 msgstr ""
+"(默认是 No) 如设置 Yes，将 hda-gfx=onboard-1 注入 GFX0 及 HDEF 装置。另外，如果存在 ATI 或 Nvidia "
+"的 HDMI 装置，将会被指定为 onboard-2。如设置 No，ATI 或 Nvidia 的装置，将会如同 HDAU 装置一样被指定为 "
+"onboard-1。"
 
 #. type: "UseAtiROM_title"
 #: Resources/templates/Localizable.strings:680
@@ -3129,24 +3141,24 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:830
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
-msgstr "设置一个 Intel HD4000 显卡的 AAPL,ig-platform-id。"
+msgstr "设置一个 Intel Haswell 显卡的 AAPL,ig-platform-id。"
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
-msgstr "设置一个 Intel HD4000 显卡的 AAPL,ig-platform-id。"
+msgstr "设置一个 Intel Broadwell 显卡的 AAPL,ig-platform-id。"
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:837
