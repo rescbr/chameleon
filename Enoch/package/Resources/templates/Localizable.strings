@@ -584,6 +584,68 @@ Dependencies: none";
 "IntelAzulx15_title" = "08002e0a";
 "IntelAzulx15_description" = "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id.";
 
+"IntelAzulx16_title" = "04001204";
+"IntelAzulx16_description" = "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id.";
+
+// ----------------------------------------------------------------------------
+
+"IntelBroadwellx00_title" = "00000616";
+"IntelBroadwellx00_description" = "Set 00000616 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx01_title" = "00000e16";
+"IntelBroadwellx01_description" = "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx02_title" = "00001616";
+"IntelBroadwellx02_description" = "Set 00001616 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx03_title" = "00001e16";
+"IntelBroadwellx03_description" = "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx04_title" = "00002616";
+"IntelBroadwellx04_description" = "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx05_title" = "00002b16";
+"IntelBroadwellx05_description" = "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx06_title" = "00002216";
+"IntelBroadwellx06_description" = "Set 00002216 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx07_title" = "01000e16";
+"IntelBroadwellx07_description" = "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx08_title" = "01001e16";
+"IntelBroadwellx08_description" = "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx09_title" = "02000616";
+"IntelBroadwellx09_description" = "Set 02000616 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx10_title" = "02001616";
+"IntelBroadwellx10_description" = "Set 02001616 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx11_title" = "02002616";
+"IntelBroadwellx11_description" = "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx12_title" = "02002216";
+"IntelBroadwellx12_description" = "Set 02002216 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx13_title" = "02002b16";
+"IntelBroadwellx13_description" = "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx14_title" = "03001216";
+"IntelBroadwellx14_description" = "Set 03001216 for Intel Broadwell AAPL,ig-platform-id.";
+
+"IntelBroadwellx15_title" = "04002b16";
+"IntelBroadwellx15_description" = "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx16_title" = "04002616";
+"IntelBroadwellx16_description" = "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx17_title" = "05002616";
+"IntelBroadwellx17_description" = "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
+"IntelBroadwellx18_title" = "06002616";
+"IntelBroadwellx18_description" = "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id.";
+
 // ----------------------------------------------------------------------------
 
 "AD2000B_PinConf_title" = "AD2000b";
@@ -765,7 +827,11 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 
 // HD5000 Layout
 "IntelAzul_title" = "Intel Azul AAPL,ig-platform-id";
-"IntelAzul_description" = "Set one AAPL,ig-platform-id to use for your Intel HD5000.";
+"IntelAzul_description" = "Set one AAPL,ig-platform-id to use for your Intel Haswell.";
+
+// HD6000 Layout
+"IntelBdw_title" = "Intel Bdw AAPL,ig-platform-id";
+"IntelBdw_description" = "Set one AAPL,ig-platform-id to use for your Intel Broadwell.";
 
 // PinConfiguration
 "HDEFPinConfiguration_title" = "HDEF PinConfiguration";

@@ -41,3 +41,4 @@ Text@IntelAzulx12:IntelAzulFB=12
 Text@IntelAzulx13:IntelAzulFB=13
 Text@IntelAzulx14:IntelAzulFB=14
 Text@IntelAzulx15:IntelAzulFB=15
+Text@IntelAzulx16:IntelAzulFB=16
