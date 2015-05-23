@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-14 16:40+0200\n"
-"PO-Revision-Date: 2015-02-13 18:15-0000\n"
+"POT-Creation-Date: 2015-05-23 13:17+0200\n"
+"PO-Revision-Date: 2015-05-23 14:01-0000\n"
 "Last-Translator: Gianfranco <gianfrancominischetti@gmail.com>\n"
 "Language-Team: it <it@li.org>\n"
 "Language: it\n"
@@ -289,10 +289,9 @@ msgstr "Utile se vuoi solo installare i componenti aggiuntivi."
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
-#| msgid "Chameleon Bootloader Package"
+#, no-wrap
 msgid "Bootloader Stages"
-msgstr "Chameleon"
+msgstr "Stadi del gestore di avvio"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -308,7 +307,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "Salta Stage 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -322,7 +321,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "Salta Stage 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -336,7 +335,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "Salta Attivazione"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -349,17 +348,15 @@ msgstr ""
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
-#| msgid "Install Chameleon in the ESP"
+#, no-wrap
 msgid "Install Chameleon in the chosen partition."
-msgstr "Installa Chameleon nella ESP"
+msgstr "Installa Chameleon nella partizione selezionata."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
-#| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
+#, no-wrap
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Installare Chameleon."
+msgstr "Installa Chameleon nella radice (root) della partizione selezionata usando boot0, boot0md o boot0hfs in base al tuo sistema senza danneggiare una installazione di Windows (se si possiede)."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
@@ -369,10 +366,9 @@ msgstr "Installa Chameleon nella ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
-#| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
+#, no-wrap
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "Installare Chameleon nella partizione ESP (EFI System Partition)."
+msgstr "Installare i boot stages (stadi) di Chameleon nella partizione ESP (EFI System Partition) del volume selezionato."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -473,7 +469,7 @@ msgstr ""
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:81
-#: Resources/templates/Localizable.strings:751
+#: Resources/templates/Localizable.strings:813
 #, no-wrap
 msgid "Resolution"
 msgstr "Risoluzioni"
@@ -2277,290 +2273,530 @@ msgstr "08002e0a"
 msgid "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgstr "Imposta l'AAPL,ig-platform-id a 08002e0a per schede grafiche Intel Haswell (Mobile)."
 
+#. type: "IntelAzulx16_title"
+#: Resources/templates/Localizable.strings:587
+#, no-wrap
+msgid "04001204"
+msgstr "04001204"
+
+#. type: "IntelAzulx16_description"
+#: Resources/templates/Localizable.strings:588
+#, no-wrap
+msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 04001204 per schede grafiche Intel Haswell (Mobile)."
+
+#. type: "IntelBroadwellx00_title"
+#: Resources/templates/Localizable.strings:592
+#, no-wrap
+msgid "00000616"
+msgstr "00000616"
+
+#. type: "IntelBroadwellx00_description"
+#: Resources/templates/Localizable.strings:593
+#, no-wrap
+msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00000616 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx01_title"
+#: Resources/templates/Localizable.strings:595
+#, no-wrap
+msgid "00000e16"
+msgstr "00000e16"
+
+#. type: "IntelBroadwellx01_description"
+#: Resources/templates/Localizable.strings:596
+#, no-wrap
+msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00000e16 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx02_title"
+#: Resources/templates/Localizable.strings:598
+#, no-wrap
+msgid "00001616"
+msgstr "00001616"
+
+#. type: "IntelBroadwellx02_description"
+#: Resources/templates/Localizable.strings:599
+#, no-wrap
+msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00001616 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx03_title"
+#: Resources/templates/Localizable.strings:601
+#, no-wrap
+msgid "00001e16"
+msgstr "00001e16"
+
+#. type: "IntelBroadwellx03_description"
+#: Resources/templates/Localizable.strings:602
+#, no-wrap
+msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00001e16 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx04_title"
+#: Resources/templates/Localizable.strings:604
+#, no-wrap
+msgid "00002616"
+msgstr "00002616"
+
+#. type: "IntelBroadwellx04_description"
+#: Resources/templates/Localizable.strings:605
+#, no-wrap
+msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00002616 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx05_title"
+#: Resources/templates/Localizable.strings:607
+#, no-wrap
+msgid "00002b16"
+msgstr "00002b16"
+
+#. type: "IntelBroadwellx05_description"
+#: Resources/templates/Localizable.strings:608
+#, no-wrap
+msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00002b16 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx06_title"
+#: Resources/templates/Localizable.strings:610
+#, no-wrap
+msgid "00002216"
+msgstr "00002216"
+
+#. type: "IntelBroadwellx06_description"
+#: Resources/templates/Localizable.strings:611
+#, no-wrap
+msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 00002216 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx07_title"
+#: Resources/templates/Localizable.strings:613
+#, no-wrap
+msgid "01000e16"
+msgstr "01000e16"
+
+#. type: "IntelBroadwellx07_description"
+#: Resources/templates/Localizable.strings:614
+#, no-wrap
+msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 01000e16 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx08_title"
+#: Resources/templates/Localizable.strings:616
+#, no-wrap
+msgid "01001e16"
+msgstr "01001e16"
+
+#. type: "IntelBroadwellx08_description"
+#: Resources/templates/Localizable.strings:617
+#, no-wrap
+msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 01001e16 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx09_title"
+#: Resources/templates/Localizable.strings:619
+#, no-wrap
+msgid "02000616"
+msgstr "02000616"
+
+#. type: "IntelBroadwellx09_description"
+#: Resources/templates/Localizable.strings:620
+#, no-wrap
+msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 02000616 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx10_title"
+#: Resources/templates/Localizable.strings:622
+#, no-wrap
+msgid "02001616"
+msgstr "02001616"
+
+#. type: "IntelBroadwellx10_description"
+#: Resources/templates/Localizable.strings:623
+#, no-wrap
+msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 02001616 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx11_title"
+#: Resources/templates/Localizable.strings:625
+#, no-wrap
+msgid "02002616"
+msgstr "02002616"
+
+#. type: "IntelBroadwellx11_description"
+#: Resources/templates/Localizable.strings:626
+#, no-wrap
+msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 02002616 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx12_title"
+#: Resources/templates/Localizable.strings:628
+#, no-wrap
+msgid "02002216"
+msgstr "02002216"
+
+#. type: "IntelBroadwellx12_description"
+#: Resources/templates/Localizable.strings:629
+#, no-wrap
+msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 02002216 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx13_title"
+#: Resources/templates/Localizable.strings:631
+#, no-wrap
+msgid "02002b16"
+msgstr "02002b16"
+
+#. type: "IntelBroadwellx13_description"
+#: Resources/templates/Localizable.strings:632
+#, no-wrap
+msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 02002b16 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx14_title"
+#: Resources/templates/Localizable.strings:634
+#, no-wrap
+msgid "03001216"
+msgstr "03001216"
+
+#. type: "IntelBroadwellx14_description"
+#: Resources/templates/Localizable.strings:635
+#, no-wrap
+msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 03001216 per schede grafiche Intel Broadwell."
+
+#. type: "IntelBroadwellx15_title"
+#: Resources/templates/Localizable.strings:637
+#, no-wrap
+msgid "04002b16"
+msgstr "04002b16"
+
+#. type: "IntelBroadwellx15_description"
+#: Resources/templates/Localizable.strings:638
+#, no-wrap
+msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 04002b16 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx16_title"
+#: Resources/templates/Localizable.strings:640
+#, no-wrap
+msgid "04002616"
+msgstr "04002616"
+
+#. type: "IntelBroadwellx16_description"
+#: Resources/templates/Localizable.strings:641
+#, no-wrap
+msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 04002616 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx17_title"
+#: Resources/templates/Localizable.strings:643
+#, no-wrap
+msgid "05002616"
+msgstr "05002616"
+
+#. type: "IntelBroadwellx17_description"
+#: Resources/templates/Localizable.strings:644
+#, no-wrap
+msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 05002616 per schede grafiche Intel Broadwell (Mobile)."
+
+#. type: "IntelBroadwellx18_title"
+#: Resources/templates/Localizable.strings:646
+#, no-wrap
+msgid "06002616"
+msgstr "06002616"
+
+#. type: "IntelBroadwellx18_description"
+#: Resources/templates/Localizable.strings:647
+#, no-wrap
+msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Imposta l'AAPL,ig-platform-id a 06002616 per schede grafiche Intel Broadwell (Mobile)."
+
 #. type: "AD2000B_PinConf_title"
-#: Resources/templates/Localizable.strings:589
+#: Resources/templates/Localizable.strings:651
 #, no-wrap
 msgid "AD2000b"
 msgstr "AD2000b"
 
 #. type: "AD2000B_PinConf_description"
-#: Resources/templates/Localizable.strings:590
+#: Resources/templates/Localizable.strings:652
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD2000b."
 msgstr "Imposta il PinConfiguration (HDEF) per l'Analog Devices AD2000b."
 
 #. type: "AD1981HD_PinConf_title"
-#: Resources/templates/Localizable.strings:592
+#: Resources/templates/Localizable.strings:654
 #, no-wrap
 msgid "AD1981HD"
 msgstr "AD1981HD"
 
 #. type: "AD1981HD_PinConf_description"
-#: Resources/templates/Localizable.strings:593
+#: Resources/templates/Localizable.strings:655
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1981HD."
 msgstr "Imposta il PinConfiguration (HDEF) per l'Analog Devices AD1981HD."
 
 #. type: "AD1988B_PinConf_title"
-#: Resources/templates/Localizable.strings:595
+#: Resources/templates/Localizable.strings:657
 #, no-wrap
 msgid "AD1988b"
 msgstr "AD1988b"
 
 #. type: "AD1988B_PinConf_description"
-#: Resources/templates/Localizable.strings:596
+#: Resources/templates/Localizable.strings:658
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1988b."
 msgstr "Imposta il PinConfiguration (HDEF) per l'Analog Devices AD1988b."
 
 #. type: "ALC888_PinConf_title"
-#: Resources/templates/Localizable.strings:598
+#: Resources/templates/Localizable.strings:660
 #, no-wrap
 msgid "ALC888"
 msgstr "ALC888"
 
 #. type: "ALC888_PinConf_description"
-#: Resources/templates/Localizable.strings:599
+#: Resources/templates/Localizable.strings:661
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC888."
 msgstr "Imposta il PinConfiguration (HDEF) per Realtek ALC888."
 
 #. type: "ALC1200_PinConf_title"
-#: Resources/templates/Localizable.strings:601
+#: Resources/templates/Localizable.strings:663
 #, no-wrap
 msgid "ALC1200"
 msgstr "ALC1200"
 
 #. type: "ALC1200_PinConf_description"
-#: Resources/templates/Localizable.strings:602
+#: Resources/templates/Localizable.strings:664
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC1200."
 msgstr "Imposta il PinConfiguration (HDEF) per Realtek ALC1200."
 
 #. type: "00_PinConf_title"
-#: Resources/templates/Localizable.strings:604
+#: Resources/templates/Localizable.strings:666
 #, no-wrap
 msgid "00"
 msgstr "00"
 
 #. type: "00_PinConf_description"
-#: Resources/templates/Localizable.strings:605
+#: Resources/templates/Localizable.strings:667
 #, no-wrap
 msgid "Set HDEF PinConfiguration for ???."
 msgstr "Imposta il PinConfiguration HDEF per ???."
 
 #. type: "GraphicsEnabler_title"
-#: Resources/templates/Localizable.strings:609
+#: Resources/templates/Localizable.strings:671
 #, no-wrap
 msgid "GraphicsEnabler=Yes"
 msgstr "GraphicsEnabler=Yes"
 
 #. type: "GraphicsEnabler_description"
-#: Resources/templates/Localizable.strings:610
+#: Resources/templates/Localizable.strings:672
 #, no-wrap
 msgid "Enables the option to autodetect NVIDIA, AMD/ATI or Intel based GPUs and inject the correct info."
 msgstr "Aggiunge GraphicsEnabler=Yes al org.chameleon.Boot.plist, Questa opzione abilita il riconoscimento automatico delle schede grafiche Nvidia, AMD/ATI o Intel, iniettando le informazioni corrette."
 
 #. type: "EnableHDMIAudio_title"
-#: Resources/templates/Localizable.strings:612
+#: Resources/templates/Localizable.strings:674
 #, no-wrap
 msgid "EnableHDMIAudio=Yes"
 msgstr "EnableHDMIAudio=Yes"
 
 #. type: "EnableHDMIAudio_description"
-#: Resources/templates/Localizable.strings:613
+#: Resources/templates/Localizable.strings:675
 #, no-wrap
 msgid "Inject HDMi audio for NVIDIA or AMD/ATI."
 msgstr "Aggiunge EnableHDMIAudio=Yes al org.chameleon.Boot.plist, Questa opzione abilita l'audio HDMi delle schede grafiche iniettando le informazioni corrette."
 
 #. type: "UseIntelHDMI_title"
-#: Resources/templates/Localizable.strings:615
+#: Resources/templates/Localizable.strings:677
 #, no-wrap
 msgid "UseIntelHDMI=Yes"
 msgstr "UseIntelHDMI=Yes"
 
 #. type: "UseIntelHDMI_description"
-#: Resources/templates/Localizable.strings:616
+#: Resources/templates/Localizable.strings:678
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
 msgstr "Attivando questa chiave, verrà iniettato hda-gfx=onboard-1 nei dispositivi GFX0 e HDEF. Allo stesso tempo, se possiedi un dispositivo HDMI ATI o Nvidia, questi saranno iniettati come hda-gfx=onboard-2. Se si mantiene la chiave  disattivata, allora i dispositivi HDMI ATI o Nvidia allo stesso modo che HDAU (se è presente) saranno iniettati come hda-gfx=onboard-1."
 
 #. type: "UseAtiROM_title"
-#: Resources/templates/Localizable.strings:618
+#: Resources/templates/Localizable.strings:680
 #, no-wrap
 msgid "UseAtiROM=Yes"
 msgstr "UseAtiROM=Yes"
 
 #. type: "UseAtiROM_description"
-#: Resources/templates/Localizable.strings:619
+#: Resources/templates/Localizable.strings:681
 #, no-wrap
 msgid "Enables UseAtiROM options."
 msgstr "Attiva opzione UseAtiROM."
 
 #. type: "UseNvidiaROM_title"
-#: Resources/templates/Localizable.strings:621
+#: Resources/templates/Localizable.strings:683
 #, no-wrap
 msgid "UseNvidiaROM=Yes"
 msgstr "UseNvidiaROM=Yes"
 
 #. type: "UseNvidiaROM_description"
-#: Resources/templates/Localizable.strings:622
+#: Resources/templates/Localizable.strings:684
 #, no-wrap
 msgid "Enables UseNvidiaROM options."
 msgstr "Attiva opzione UseNvidiaROM."
 
 #. type: "VBIOS_title"
-#: Resources/templates/Localizable.strings:624
+#: Resources/templates/Localizable.strings:686
 #, no-wrap
 msgid "VBIOS=Yes"
 msgstr "VBIOS=Yes"
 
 #. type: "VBIOS_description"
-#: Resources/templates/Localizable.strings:625
+#: Resources/templates/Localizable.strings:687
 #, no-wrap
 msgid "Enables VBIOS option"
 msgstr "Attiva opzione VBIOS"
 
 #. type: "SkipIntelGfx_title"
-#: Resources/templates/Localizable.strings:627
+#: Resources/templates/Localizable.strings:689
 #, no-wrap
 msgid "SkipIntelGfx=Yes"
 msgstr "SkipIntelGfx=Yes"
 
 #. type: "SkipIntelGfx_description"
-#: Resources/templates/Localizable.strings:628
+#: Resources/templates/Localizable.strings:690
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for Intel based GPUs."
 msgstr "Salta il riconoscimento da perte del GraphicsEnabler per le schede Intel."
 
 #. type: "SkipNvidiaGfx_title"
-#: Resources/templates/Localizable.strings:630
+#: Resources/templates/Localizable.strings:692
 #, no-wrap
 msgid "SkipNvidiaGfx=Yes"
 msgstr "SkipNvidiaGfx=Yes"
 
 #. type: "SkipNvidiaGfx_description"
-#: Resources/templates/Localizable.strings:631
+#: Resources/templates/Localizable.strings:693
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for NVIDIA based GPUs."
 msgstr "Salta il riconoscimento da parte del GraphicsEnabler per le schede nVidia."
 
 #. type: "SkipAtiGfx_title"
-#: Resources/templates/Localizable.strings:633
+#: Resources/templates/Localizable.strings:695
 #, no-wrap
 msgid "SkipAtiGfx=Yes"
 msgstr "SkipAtiGfx=Yes"
 
 #. type: "SkipAtiGfx_description"
-#: Resources/templates/Localizable.strings:634
+#: Resources/templates/Localizable.strings:696
 #, no-wrap
 msgid "Skip the GraphicsEnbaler autodetect for AMD/ATI based GPUs."
 msgstr "Salta il riconoscimento da perte del GraphicsEnabler per le schede AMD/ATi."
 
 #. type: "EnableBacklight_title"
-#: Resources/templates/Localizable.strings:636
+#: Resources/templates/Localizable.strings:698
 #, no-wrap
 msgid "EnableBacklight=Yes"
 msgstr "EnableBacklight=Yes"
 
 #. type: "EnableBacklight_description"
-#: Resources/templates/Localizable.strings:637
+#: Resources/templates/Localizable.strings:699
 #, no-wrap
 msgid "Enables Backlight options for laptop with nVidia cards."
 msgstr "Abilita l'opzione Backlight per i laptop con schede nVidia."
 
 #. type: "EnableDualLink_title"
-#: Resources/templates/Localizable.strings:639
+#: Resources/templates/Localizable.strings:701
 #, no-wrap
 msgid "EnableDualLink=Yes"
 msgstr "EnableDualLink=Yes"
 
 #. type: "EnableDualLink_description"
-#: Resources/templates/Localizable.strings:640
+#: Resources/templates/Localizable.strings:702
 #, no-wrap
 msgid "Enables DualLink options for nVidia and ATi cards."
 msgstr "Abilita l'opzione DualLink per schede nVidia e ATi."
 
 #. type: "NvidiaGeneric_title"
-#: Resources/templates/Localizable.strings:642
+#: Resources/templates/Localizable.strings:704
 #, no-wrap
 msgid "NvidiaGeneric=Yes"
 msgstr "NvidiaGeneric=Yes"
 
 #. type: "NvidiaGeneric_description"
-#: Resources/templates/Localizable.strings:643
+#: Resources/templates/Localizable.strings:705
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
 msgstr "Utilizza il nome classico per le schede nVidia che verrà visualizzato nel SystemProfiler (disabilitato di default)."
 
 #. type: "Verbose_title"
-#: Resources/templates/Localizable.strings:649
+#: Resources/templates/Localizable.strings:711
 #, no-wrap
 msgid "Verbose Mode"
 msgstr "Modalità Verbose (-v)"
 
 #. type: "Verbose_description"
-#: Resources/templates/Localizable.strings:650
+#: Resources/templates/Localizable.strings:712
 #, no-wrap
 msgid "Turns on verbose logging and allows you to see messages from both Chameleon and the OS X kernel at boot time. Essential for troubleshooting."
 msgstr "Attiva il registro dettagliato e permette di vedere i messaggi sia di Chameleon che del Kernel, durante l'avvio. Essenziale per la soluzione di problemi."
 
 #. type: "Singleusermode_title"
-#: Resources/templates/Localizable.strings:652
+#: Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "Single User Mode"
 msgstr "Modalitá Single User (-s)"
 
 #. type: "Singleusermode_description"
-#: Resources/templates/Localizable.strings:653
+#: Resources/templates/Localizable.strings:715
 #, no-wrap
 msgid "A troubleshooting option used for booting into OS X's BSD/Unix command line."
 msgstr "È una opzione utilizzata per risolvere problemi utilizzata per avviare in command-line BSD/Unix di OS X."
 
 #. type: "Ignorecaches_title"
-#: Resources/templates/Localizable.strings:655
+#: Resources/templates/Localizable.strings:717
 #, no-wrap
 msgid "Ignore Caches"
 msgstr "Ignora Caches (-f)"
 
 #. type: "Ignorecaches_description"
-#: Resources/templates/Localizable.strings:656
+#: Resources/templates/Localizable.strings:718
 #, no-wrap
 msgid "Not an option that's needed for everyday booting, but it can be useful if you want OS X to load all files from it's system folders, rather than relying on it's pre-built caches."
 msgstr "Non è una opzione necessaria per avviare, ma può essere utile se si desidera che  OS X carichi tutti i file della cartella di sistema, al posto di andare in conflitto con la cache precostruita."
 
 #. type: "Npci_title"
-#: Resources/templates/Localizable.strings:658
+#: Resources/templates/Localizable.strings:720
 #, no-wrap
 msgid "npci=0x2000"
 msgstr "npci=0x2000"
 
 #. type: "Npci_description"
-#: Resources/templates/Localizable.strings:659
+#: Resources/templates/Localizable.strings:721
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x2000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "Imposta la flag npci=0x2000 per la key Kernel Flags. Risolve il blocco su 'PCI configuration begin' su alcuni sistemi."
 
 #. type: "Npci3_title"
-#: Resources/templates/Localizable.strings:661
+#: Resources/templates/Localizable.strings:723
 #, no-wrap
 msgid "npci=0x3000"
 msgstr "npci=0x3000"
 
 #. type: "Npci3_description"
-#: Resources/templates/Localizable.strings:662
+#: Resources/templates/Localizable.strings:724
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "Imposta la flag npci=0x3000 per la key Kernel Flags. Risolve il blocco su 'PCI configuration begin' su alcuni sistemi."
 
 #. type: "WaitingRootDevice_title"
-#: Resources/templates/Localizable.strings:664
+#: Resources/templates/Localizable.strings:726
 #, no-wrap
 msgid "ahcidisk=1 debug=8"
 msgstr "ahcidisk=1 debug=8"
 
 #. type: "WaitingRootDevice_description"
-#: Resources/templates/Localizable.strings:665
+#: Resources/templates/Localizable.strings:727
 #, no-wrap
 msgid ""
 "Info here: Waiting for root device when kernel cache used only with some disks +FIX\n"
@@ -2572,25 +2808,25 @@ msgstr ""
 "Ringraziamenti a bcc9."
 
 #. type: "Darkwake_title"
-#: Resources/templates/Localizable.strings:669
+#: Resources/templates/Localizable.strings:731
 #, no-wrap
 msgid "darkwake=0"
 msgstr "darkwake=0"
 
 #. type: "Darkwake_description"
-#: Resources/templates/Localizable.strings:670
+#: Resources/templates/Localizable.strings:732
 #, no-wrap
 msgid "Lion only. Disables the 'low power wake' feature which can sometimes leave the screen black after wake from sleep."
 msgstr "Solo per Lion e superiori. Disabilita il 'low power wake' che a volte lascia lo schermo nero dopo il risveglio dallo Sleep/Stop."
 
 #. type: "NvdaDrv1_title"
-#: Resources/templates/Localizable.strings:672
+#: Resources/templates/Localizable.strings:734
 #, no-wrap
 msgid "nvda_drv=1"
 msgstr "nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
-#: Resources/templates/Localizable.strings:673
+#: Resources/templates/Localizable.strings:735
 #, no-wrap
 msgid ""
 "It introduces a new Preference Pane under System Preferences that allows you to enable the Nvidia Web Driver.\n"
@@ -2604,25 +2840,25 @@ msgstr ""
 "Crediti a meklort e Rampage Dev."
 
 #. type: "kext-dev-mode1_title"
-#: Resources/templates/Localizable.strings:678
+#: Resources/templates/Localizable.strings:740
 #, no-wrap
 msgid "kext-dev-mode=1"
 msgstr "kext-dev-mode=1"
 
 #. type: "kext-dev-mode1_description"
-#: Resources/templates/Localizable.strings:679
+#: Resources/templates/Localizable.strings:741
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr "Nella versione di anteprima per sviluppatori di Yosemite, i kext non opportunamente firmati non verranno caricati. Per poter usare tali kext durante lo sviluppo, questo controllo può essere disabilitato aggiungendo 'kext-dev-mode=1' come argomento per il boot."
 
 #. type: "Dart0_title"
-#: Resources/templates/Localizable.strings:681
+#: Resources/templates/Localizable.strings:743
 #, no-wrap
 msgid "dart=0"
 msgstr "dart=0"
 
 #. type: "Dart0_description"
-#: Resources/templates/Localizable.strings:682
+#: Resources/templates/Localizable.strings:744
 #, no-wrap
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
@@ -2632,283 +2868,295 @@ msgstr ""
 "Maggiori informaazioni (credit a bcc9) qui: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
-#: Resources/templates/Localizable.strings:689
+#: Resources/templates/Localizable.strings:751
 #, no-wrap
 msgid "German Mac Keyboard"
 msgstr "Mappatura tastiera Tedesca Mac"
 
 #. type: "mac-de_description"
-#: Resources/templates/Localizable.strings:690
+#: Resources/templates/Localizable.strings:752
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
 msgstr "Usa la mappatura della tastiera Tedesca per Mac"
 
 #. type: "mac-es_title"
-#: Resources/templates/Localizable.strings:692
+#: Resources/templates/Localizable.strings:754
 #, no-wrap
 msgid "Spanish Mac Keyboard"
 msgstr "Mappatura tastiera Spagnola Mac"
 
 #. type: "mac-es_description"
-#: Resources/templates/Localizable.strings:693
+#: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
 msgstr "Usa la mappatura della tastiera Spagnola per Mac"
 
 #. type: "mac-fr_title"
-#: Resources/templates/Localizable.strings:695
+#: Resources/templates/Localizable.strings:757
 #, no-wrap
 msgid "French Mac Keyboard"
 msgstr "Mappatura tastiera Francese Mac"
 
 #. type: "mac-fr_description"
-#: Resources/templates/Localizable.strings:696
+#: Resources/templates/Localizable.strings:758
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
 msgstr "Usa la mappatura della tastiera Francese per Mac"
 
 #. type: "mac-it_title"
-#: Resources/templates/Localizable.strings:698
+#: Resources/templates/Localizable.strings:760
 #, no-wrap
 msgid "Italian Mac Keyboard"
 msgstr "Mappatura tastiera Italiana Mac"
 
 #. type: "mac-it_description"
-#: Resources/templates/Localizable.strings:699
+#: Resources/templates/Localizable.strings:761
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
 msgstr "Usa la mappatura della tastiera Italiana per Mac"
 
 #. type: "mac-se_title"
-#: Resources/templates/Localizable.strings:701
+#: Resources/templates/Localizable.strings:763
 #, no-wrap
 msgid "Swedish Mac Keyboard"
 msgstr "Mappatura tastiera Svedese Mac"
 
 #. type: "mac-se_description"
-#: Resources/templates/Localizable.strings:702
+#: Resources/templates/Localizable.strings:764
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
 msgstr "Usa la mappatura della tastiera Svedese per Mac"
 
 #. type: "pc-fr_title"
-#: Resources/templates/Localizable.strings:704
+#: Resources/templates/Localizable.strings:766
 #, no-wrap
 msgid "French PC Keyboard"
 msgstr "Mappatura tastiera Francese PC"
 
 #. type: "pc-fr_description"
-#: Resources/templates/Localizable.strings:705
+#: Resources/templates/Localizable.strings:767
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
 msgstr "Usa la mappatura della tastiera Francese per PC"
 
 #. type: "Embed_title"
-#: Resources/templates/Localizable.strings:712
+#: Resources/templates/Localizable.strings:774
 #, no-wrap
 msgid "Embed"
 msgstr "Embed"
 
 #. type: "Embed_description"
-#: Resources/templates/Localizable.strings:713
+#: Resources/templates/Localizable.strings:775
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
 msgstr "Tema integrato in chameleon (Standard ridotto)."
 
 #. type: "Legacy_title"
-#: Resources/templates/Localizable.strings:715
+#: Resources/templates/Localizable.strings:777
 #, no-wrap
 msgid "Legacy"
 msgstr "Legacy"
 
 #. type: "Legacy_description"
-#: Resources/templates/Localizable.strings:716
+#: Resources/templates/Localizable.strings:778
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr "Il vecchio tema Standard di chameleon"
 
 #. type: "Default_title"
-#: Resources/templates/Localizable.strings:718
+#: Resources/templates/Localizable.strings:780
 #, no-wrap
 msgid "Standard"
 msgstr "Standard"
 
 #. type: "Default_description"
-#: Resources/templates/Localizable.strings:719
+#: Resources/templates/Localizable.strings:781
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
 msgstr "Il tema standard usato dal bootloader, aggiunto qui per essere personalizzato."
 
 #. type: "Bullet_title"
-#: Resources/templates/Localizable.strings:721
+#: Resources/templates/Localizable.strings:783
 #, no-wrap
 msgid "Bullet"
 msgstr "Bullet"
 
 #. type: "Bullet_description"
-#: Resources/templates/Localizable.strings:722
+#: Resources/templates/Localizable.strings:784
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
 msgstr "Un tema The Bullet by NoSmokingBandit."
 
 #. type: "Audio_title"
-#: Resources/templates/Localizable.strings:731
+#: Resources/templates/Localizable.strings:793
 #, no-wrap
 msgid "Audio"
 msgstr "Audio"
 
 #. type: "Audio_description"
-#: Resources/templates/Localizable.strings:732
+#: Resources/templates/Localizable.strings:794
 #, no-wrap
 msgid "A selection of options that deal with audio."
 msgstr "Selezione di opzioni per l'audio."
 
 #. type: "Control_title"
-#: Resources/templates/Localizable.strings:735
+#: Resources/templates/Localizable.strings:797
 #, no-wrap
 msgid "Control Options"
 msgstr "Opzioni di Controllo"
 
 #. type: "Control_description"
-#: Resources/templates/Localizable.strings:736
+#: Resources/templates/Localizable.strings:798
 #, no-wrap
 msgid "Settings to control how Chameleon works."
 msgstr "Settaggi per controllare come Chameleon lavora."
 
 #. type: "General_title"
-#: Resources/templates/Localizable.strings:739
+#: Resources/templates/Localizable.strings:801
 #, no-wrap
 msgid "General Options"
 msgstr "Opzioni Generali"
 
 #. type: "General_description"
-#: Resources/templates/Localizable.strings:740
+#: Resources/templates/Localizable.strings:802
 #, no-wrap
 msgid "Choose from a selection of base options."
 msgstr "Seleziona una opzione base."
 
 #. type: "KernelFlags_title"
-#: Resources/templates/Localizable.strings:743
+#: Resources/templates/Localizable.strings:805
 #, no-wrap
 msgid "Kernel Flags"
 msgstr "Flags del Kernel"
 
 #. type: "KernelFlags_description"
-#: Resources/templates/Localizable.strings:744
+#: Resources/templates/Localizable.strings:806
 #, no-wrap
 msgid "Choose from a selection of kernel flags."
 msgstr "Scegli le possibili flag del kernel."
 
 #. type: "PowerManagement_title"
-#: Resources/templates/Localizable.strings:747
+#: Resources/templates/Localizable.strings:809
 #, no-wrap
 msgid "Power Management"
 msgstr "Gestione Energetica"
 
 #. type: "PowerManagement_description"
-#: Resources/templates/Localizable.strings:748
+#: Resources/templates/Localizable.strings:810
 #, no-wrap
 msgid "A selection of options that deal with power management and speedstep."
 msgstr "Selezione di opzioni pre la gestione energetica e speedstep."
 
 #. type: "Resolution_description"
-#: Resources/templates/Localizable.strings:752
+#: Resources/templates/Localizable.strings:814
 #, no-wrap
 msgid "Set one resolution to use."
 msgstr "Imposta la risoluzione del tuo monitor."
 
 #. type: "HDEFLayout_title"
-#: Resources/templates/Localizable.strings:755
+#: Resources/templates/Localizable.strings:817
 #, no-wrap
 msgid "HDEF Layout"
 msgstr "HDEF Layout"
 
 #. type: "HDEFLayout_description"
-#: Resources/templates/Localizable.strings:756
+#: Resources/templates/Localizable.strings:818
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
 msgstr "Scegli un layout-id dell'HDEF da usare per il controller HDA."
 
 #. type: "HDAULayout_title"
-#: Resources/templates/Localizable.strings:759
+#: Resources/templates/Localizable.strings:821
 #, no-wrap
 msgid "HDAU Layout"
 msgstr "HDAU Layout"
 
 #. type: "HDAULayout_description"
-#: Resources/templates/Localizable.strings:760
+#: Resources/templates/Localizable.strings:822
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
 msgstr "Scegli un layout-id dell'HDAU da usare per il controller HDMi."
 
 #. type: "IntelCapri_title"
-#: Resources/templates/Localizable.strings:763
+#: Resources/templates/Localizable.strings:825
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
 msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
-#: Resources/templates/Localizable.strings:764
+#: Resources/templates/Localizable.strings:826
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 4000."
 
 #. type: "IntelAzul_title"
-#: Resources/templates/Localizable.strings:767
+#: Resources/templates/Localizable.strings:829
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
-#: Resources/templates/Localizable.strings:768
+#: Resources/templates/Localizable.strings:830
 #, no-wrap
-msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 5000."
+msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
+msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel Haswell."
+
+#. type: "IntelBdw_title"
+#: Resources/templates/Localizable.strings:833
+#, no-wrap
+msgid "Intel Bdw AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
+
+#. type: "IntelBdw_description"
+#: Resources/templates/Localizable.strings:834
+#, no-wrap
+msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
+msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel Broadwell."
 
 #. type: "HDEFPinConfiguration_title"
-#: Resources/templates/Localizable.strings:771
+#: Resources/templates/Localizable.strings:837
 #, no-wrap
 msgid "HDEF PinConfiguration"
 msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
-#: Resources/templates/Localizable.strings:772
+#: Resources/templates/Localizable.strings:838
 #, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
 msgstr "Setta il PinConfiguration per l'HDEF."
 
 #. type: "Video_title"
-#: Resources/templates/Localizable.strings:775
+#: Resources/templates/Localizable.strings:841
 #, no-wrap
 msgid "Video"
 msgstr "Video"
 
 #. type: "Video_description"
-#: Resources/templates/Localizable.strings:776
+#: Resources/templates/Localizable.strings:842
 #, no-wrap
 msgid "A selection of options that deal with video."
 msgstr "Selezione di opzioni per il video."
 
 #. type: "Keymaps_title"
-#: Resources/templates/Localizable.strings:779
+#: Resources/templates/Localizable.strings:845
 #, no-wrap
 msgid "KeyLayout"
 msgstr "Mappatura tastiera"
 
 #. type: "Keymaps_description"
-#: Resources/templates/Localizable.strings:780
+#: Resources/templates/Localizable.strings:846
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Seleziona la mappatura da utilizzare, Verrá anche installato il modulo Keylayout e le mappature tastiera."
 
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:786
+#: Resources/templates/Localizable.strings:852
 #, no-wrap
 msgid "Themes"
 msgstr "Temi"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:787
+#: Resources/templates/Localizable.strings:853
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -2916,6 +3164,14 @@ msgid ""
 msgstr ""
 "Una raccolta di temi campione.\n"
 "Molti altri temi sono reperibili su http://forum.voodooprojects.org/index.php/board,7.0.html"
+
+#, fuzzy
+#~| msgid "Intel Azul AAPL,ig-platform-id"
+#~ msgid "Intel Bdw (Broadwell) AAPL,ig-platform-id"
+#~ msgstr "Intel Azul AAPL,ig-platform-id"
+
+#~ msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
+#~ msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 5000."
 
 #~ msgid "Set 0000260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
 #~ msgstr ""

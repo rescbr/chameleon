@@ -21,10 +21,26 @@
 # B) User can select only one of the options from the list.
 # Set Exclusive=False for A, or Exclusive=True for B.
 #
-Exclusive=False
+Exclusive=True
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
-Bool@HDAEnabler:HDAEnabler=Yes
-Bool@UseIntelHDMI:UseIntelHDMI=Yes
-Bool@EnableHDMIAudio:EnableHDMIAudio=Yes
+Text@IntelBroadwellx00:IntelBdwFB=0
+Text@IntelBroadwellx01:IntelBdwFB=1
+Text@IntelBroadwellx02:IntelBdwFB=2
+Text@IntelBroadwellx03:IntelBdwFB=3
+Text@IntelBroadwellx04:IntelBdwFB=4
+Text@IntelBroadwellx05:IntelBdwFB=5
+Text@IntelBroadwellx06:IntelBdwFB=6
+Text@IntelBroadwellx07:IntelBdwFB=7
+Text@IntelBroadwellx08:IntelBdwFB=8
+Text@IntelBroadwellx09:IntelBdwFB=9
+Text@IntelBroadwellx10:IntelBdwFB=10
+Text@IntelBroadwellx11:IntelBdwFB=11
+Text@IntelBroadwellx12:IntelBdwFB=12
+Text@IntelBroadwellx13:IntelBdwFB=13
+Text@IntelBroadwellx14:IntelBdwFB=14
+Text@IntelBroadwellx15:IntelBdwFB=15
+Text@IntelBroadwellx16:IntelBdwFB=16
+Text@IntelBroadwellx17:IntelBdwFB=17
+Text@IntelBroadwellx18:IntelBdwFB=18
