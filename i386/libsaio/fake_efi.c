@@ -762,16 +762,17 @@ void setupChosenNode()
 		//
 		UInt8 index = 0;
 		EFI_UINT16 PMTimerValue = 0;
+
 #if RANDOMSEED
+		EFI_UINT32 randomValue = 0, cpuTick = 0;
+		EFI_UINT32 ecx = 0, edx = 0, esi = 0, edi = 0;
+#else
 		EFI_UINT32 randomValue, tempValue, cpuTick;
 		EFI_UINT32 ecx, esi, edi = 0;
 		EFI_UINT32 rcx, rdx, rsi, rdi;
 
 		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
 		cpuTick = rcx = rdx = rsi = rdi = 0;
-#else
-		EFI_UINT32 randomValue = 0, cpuTick = 0;
-		EFI_UINT32 ecx = 0, edx = 0, esi = 0, edi = 0;
 #endif
 		// LEAF_1 - Feature Information (Function 01h).
 		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
@@ -819,8 +820,19 @@ void setupChosenNode()
 
 				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 //				printf("value: 0x%x\n", getCPUTick());
-#if RANDOMSEED
 
+#if RANDOMSEED
+				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				edi = esi;							// mov		%rsi,	%rdi
+				edi = (edi ^ cpuTick);						// xor		%rax,	%rdi
+				edi = (edi ^ ecx);						// xor		%rcx,	%rdi
+				edi = (edi ^ edx);						// xor		%rdx,	%rdi
+
+				seedBuffer[index] = (edi & 0xff);
+#else
 				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
 				rdx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
@@ -831,17 +843,6 @@ void setupChosenNode()
 				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
 
 				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
-#else
-				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
-				// shr		$0x8,	%rcx
-				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
-				// shr		$0x10,	%rdx
-				edi = esi;							// mov		%rsi,	%rdi
-				edi = (edi ^ cpuTick);						// xor		%rax,	%rdi
-				edi = (edi ^ ecx);						// xor		%rcx,	%rdi
-				edi = (edi ^ edx);						// xor		%rdx,	%rdi
-
-				seedBuffer[index] = (edi & 0xff);				// mov		%dil,	(%r15,%r12,1)
 #endif
 				edi = (edi & 0x2f);						// and		$0x2f,	%edi
 				edi = (edi + esi);						// add		%esi,	%edi
