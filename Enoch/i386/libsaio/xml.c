@@ -276,10 +276,10 @@ typedef const struct XMLEntity {
 #define _e(str,c) {str,sizeof(str)-1,c}
 const XMLEntity ents[] = {
 	_e("quot;",'"'),  // double quotation mark
-	_e("apos;",'\''), // ampersand
-	_e("lt;",  '<'),  // apostrophe (apostrophe-quote)
-	_e("gt;",  '>'),  // less-than sign
-	_e("amp;", '&')   // greater-than sign
+	_e("apos;",'\''), // apostrophe (apostrophe-quote)
+	_e("lt;",  '<'),  // less-than sign
+	_e("gt;",  '>'),  // greater-than sign
+	_e("amp;", '&')   // ampersand
 };
 
 /* Function for basic XML character entities parsing */
@@ -396,8 +396,8 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	if (!strncmp(tagName, kXMLTagPList, 6))
 	{
 		length = 0;
-        // just a header; nothing to parse
-        // return-via-reference tag should be left alone
+		// just a header; nothing to parse
+		// return-via-reference tag should be left alone
 	}
 	/***** dict ****/
 	else if (!strncmp(tagName, kXMLTagDict, sizeof(kXMLTagDict)))
@@ -822,7 +822,7 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 	{
 		val += 2;
 		while(*val)
-		{			
+		{
 			if ((*val >= '0' && *val <= '9'))	// 0 - 9
 			{
 				integer = (integer * 16) + (*val++ - '0');

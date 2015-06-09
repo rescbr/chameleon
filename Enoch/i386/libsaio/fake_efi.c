@@ -730,7 +730,7 @@ void setupChosenNode()
 {
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
-	if (chosenNode == 0)
+	if (chosenNode == NULL)
 	{
 		stop("setupChosenNode: Couldn't get '/chosen' node");
 	}
@@ -754,7 +754,7 @@ void setupChosenNode()
 
 	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
-	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	if ( YOSEMITE || ELCAPITAN )
 	{
 		//
 		// Pike R. Alpha - 12 October 2014
@@ -768,7 +768,7 @@ void setupChosenNode()
 #else
 		EFI_UINT32 randomValue, tempValue, cpuTick;
 		EFI_UINT32 ecx, esi, edi = 0;
-		EFI_UINT32 rcx, rdx, rsi, rdi;
+		EFI_UINT64 rcx, rdx, rsi, rdi;
 
 		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
 		cpuTick = rcx = rdx = rsi = rdi = 0;

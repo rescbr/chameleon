@@ -44,7 +44,7 @@
 #include "libsaio.h"
 
 
-#ifndef DEBUG_MEMRANGE
+#ifndef MEMRANGE
 	#define MEMRANGE 1
 #endif
 
