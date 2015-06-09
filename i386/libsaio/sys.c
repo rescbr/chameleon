@@ -82,8 +82,8 @@ static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x1
 	#define DBG(x...)	msglog(x)
 #endif
 
-#ifndef DEBUG_FEATURE_LAST_BOOT
-	#define DEBUG_FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
+#ifndef FEATURE_LAST_BOOT
+	#define FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
 #endif
 
 extern int multiboot_partition;
@@ -969,7 +969,7 @@ BVRef selectBootVolume(BVRef chain)
 	BVRef bvr1		= NULL;
 	BVRef bvr2		= NULL;
 
-#if DEBUG_FEATURE_LAST_BOOT
+#if FEATURE_LAST_BOOT
 	char dirSpec[]		= "hd(%d,%d)/";
 	char fileSpec[]		= "Volumes";
 	char *label;
@@ -994,7 +994,7 @@ BVRef selectBootVolume(BVRef chain)
 
 			if ( (bvr->part_no == multiboot_partition) && (bvr->biosdev == gBIOSDev) )
 			{
-#if DEBUG_FEATURE_LAST_BOOT
+#if FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("Multiboot partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 #endif
@@ -1028,7 +1028,7 @@ BVRef selectBootVolume(BVRef chain)
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
-#if DEBUG_FEATURE_LAST_BOOT
+#if FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("User default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 #endif
@@ -1038,7 +1038,7 @@ BVRef selectBootVolume(BVRef chain)
 		free(val);
 	}
 
-#if DEBUG_FEATURE_LAST_BOOT   // the above code cause "AllocateKernelMemory error"
+#if FEATURE_LAST_BOOT   // the above code cause "AllocateKernelMemory error"
 	// Bungo: select last booted partition as the boot volume
 	// TODO: support other OSes (foreign boot)
 	for (bvr = chain; bvr; bvr = bvr->next)
@@ -1140,7 +1140,7 @@ BVRef selectBootVolume(BVRef chain)
 	}
 
 	bvr = bvr2 ? bvr2 : (bvr1 ? bvr1 : chain);
-#if DEBUG_FEATURE_LAST_BOOT
+#if FEATURE_LAST_BOOT
 	label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 	DBG("Default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
 #endif
