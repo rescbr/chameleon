@@ -30,7 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
-//#define GALA            checkOSVersion("10.11") // Gala
+#define ELCAPITAN            checkOSVersion("10.11") // El Capitan
 #define YOSEMITE        checkOSVersion("10.10") // Yosemite
 #define MAVERICKS       checkOSVersion("10.9")  // Mavericks
 #define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
@@ -57,7 +57,7 @@
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
-#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and newer
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and El Capitan
 
 /*
  * Keys used in system Boot.plist

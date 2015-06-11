@@ -569,6 +569,7 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 	const void *probeBuffer = malloc(PROBEFS_SIZE);
 	if (probeBuffer == NULL)
 	{
+		verbose("\t[probeFileSystem] Error: can't alloc memory for probe buffer.\n");
 		goto exit;
 	}
 
@@ -577,6 +578,7 @@ static int probeFileSystem(int biosdev, unsigned int blkoff)
 
 	if (error)
 	{
+		verbose("\t[probeFileSystem] Error: can't read from device=%02Xh.\n", biosdev);
 		goto exit;
 	}
 
@@ -955,6 +957,8 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
     struct driveInfo		di;
     boot_drive_info_t		*dp;
 
+	verbose("\tAttempting to scan FDISK boot volumes [biosdev=%02Xh]:\n", biosdev);
+
 	/* Initialize disk info */
 
 	if (getDriveInfo(biosdev, &di) != 0)
@@ -1255,6 +1259,9 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 	struct Block0		*block0_p;
 	unsigned int		blksize;
 	unsigned int		factor;
+
+	verbose("\tAttempting to scan APM boot volumes [biosdev=%02Xh]:\n", biosdev);
+
 	void	*buffer = malloc(BPS);
 
 	if (!buffer)
@@ -1382,6 +1389,8 @@ static bool isPartitionUsed(gpt_ent * partition)
 
 static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 {
+	verbose("\tAttempting to scan GPT boot volumes [biosdev=%02Xh]:\n", biosdev);
+
 	struct DiskBVMap *map = NULL;
 
 	void *buffer = malloc(BPS);
@@ -1412,6 +1421,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 				// means the FDISK code will wind up parsing it.
 				if ( fdiskID )
 				{
+					verbose("\t[diskScanGPTBootVolumes] Error! Two GPT protective MBR (fdisk=0xEE) partitions found on same device, skipping.\n");
 					goto scanErr;
 				}
 
@@ -1471,7 +1481,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 	UInt32		gptCheck	= 0;
 	UInt32		gptCount	= 0;
 	UInt32		gptID		= 0;
-	gpt_ent		*gptMap		= 0;
+	gpt_ent		*gptMap		= NULL;
 	UInt32		gptSize		= 0;
 
 	gptBlock = OSSwapLittleToHostInt64(headerMap->hdr_lba_table);
@@ -1795,7 +1805,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 
 //		if ( YOSEMITE ){}
 
-//		if ( GALA ){}
+//		if ( ELCAPITAN ){}
 
 	}
 
