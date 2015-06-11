@@ -30,7 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
-#define ELCAPITAN            checkOSVersion("10.11") // El Capitan
+#define ELCAPITAN       checkOSVersion("10.11") // El Capitan
 #define YOSEMITE        checkOSVersion("10.10") // Yosemite
 #define MAVERICKS       checkOSVersion("10.9")  // Mavericks
 #define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
@@ -177,7 +177,7 @@
 #define kSkipAtiGfx			"SkipAtiGfx"			/* pci_setup.c */
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
-#define kIntelBdwFB			"IntelBDWFB"			/* gma.c */
+#define kIntelBdwFB			"IntelBdwFB"			/* gma.c */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */

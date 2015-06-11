@@ -809,7 +809,7 @@ int loadHelperConfig(config_file_t *config)
 		if(sfd >= 0)
 		{
 			// Use sfd
-			fixedsize = MIN(file_size(sfd),IO_CONFIG_DATA_SIZE);
+			fixedsize = MIN(file_size(sfd), IO_CONFIG_DATA_SIZE);
 			count = read(sfd, config->plist, fixedsize);
 			close(sfd);
 			close(pfd);
@@ -824,7 +824,7 @@ int loadHelperConfig(config_file_t *config)
 		else
 		{
 			// used pfd
-			fixedsize = MIN(file_size(pfd),IO_CONFIG_DATA_SIZE);
+			fixedsize = MIN(file_size(pfd), IO_CONFIG_DATA_SIZE);
 			count = read(pfd, config->plist, fixedsize);
 			close(pfd);
 			if (count != fixedsize) return -1;
@@ -845,7 +845,7 @@ int loadHelperConfig(config_file_t *config)
 			if(pfd >= 0)
 			{
 				// use sfd
-				fixedsize = MIN(file_size(pfd),IO_CONFIG_DATA_SIZE);
+				fixedsize = MIN(file_size(pfd), IO_CONFIG_DATA_SIZE);
 				count = read(pfd, config->plist, fixedsize);
 				close(pfd);
 				close(rfd);
@@ -860,7 +860,7 @@ int loadHelperConfig(config_file_t *config)
 			else
 			{
 				// use rfd
-                		fixedsize = MIN(file_size(rfd),IO_CONFIG_DATA_SIZE);
+                		fixedsize = MIN(file_size(rfd), IO_CONFIG_DATA_SIZE);
 				count = read(rfd, config->plist, fixedsize);
 				close(rfd);
 				if (count != fixedsize) return -1;
@@ -879,7 +879,7 @@ int loadHelperConfig(config_file_t *config)
 			if(sfd >= 0)
 			{
 				// use sfd
-				fixedsize = MIN(file_size(sfd),IO_CONFIG_DATA_SIZE);
+				fixedsize = MIN(file_size(sfd), IO_CONFIG_DATA_SIZE);
 				count = read(sfd, config->plist, fixedsize);
 				close(sfd);
 				if (count != fixedsize) return -1;

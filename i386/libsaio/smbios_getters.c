@@ -561,7 +561,7 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 
 	idx++;
 
-	//DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n",idx,MAX_RAM_SLOTS);
+	//DBG("getSMBMemoryDeviceSerialNumber index: %d, MAX_RAM_SLOTS: %d\n", idx, MAX_RAM_SLOTS);
 
 	if (idx < MAX_RAM_SLOTS)
 	{
