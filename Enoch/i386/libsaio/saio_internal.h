@@ -48,7 +48,7 @@ extern int    ebiosread(int dev, unsigned long long sec, int count);
 extern int    ebioswrite(int dev, long sec, int count);
 extern int    get_drive_info(int drive, struct driveInfo *dp);
 extern int    ebiosEjectMedia(int biosdev);
-extern void	  bios_putchar(int ch);
+extern void   bios_putchar(int ch);
 extern void   putca(int ch, int attr, int repeat);
 extern int    readKeyboardStatus(void);
 extern int    readKeyboardShiftFlags(void);
@@ -166,8 +166,8 @@ extern int    loadHelperConfig(config_file_t *configBuff);
 extern int    loadChameleonConfig(config_file_t *configBuff, BVRef chain);
 extern int    loadChameleonConfigForDevice(config_file_t *configBuff, const char *device, const char *path);
 extern char * newString(const char *oldString);
-extern char * getNextArg(char ** ptr, char * val);
-extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
+extern char * getNextArg(char **ptr, char *val);
+extern int	ParseXMLFile( char *buffer, TagPtr * dict );
 
 /* sys.c */
 extern BVRef  getBootVolumeRef( const char * path, const char ** outPath );
