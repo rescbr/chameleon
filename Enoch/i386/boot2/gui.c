@@ -54,8 +54,8 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
-//	iDeviceHFS_capitan,
-//	iDeviceHFS_capitan_o,
+	iDeviceHFS_cap,
+	iDeviceHFS_cap_o,
 	iDeviceHFS_yos,
 	iDeviceHFS_yos_o,
 	iDeviceHFS_mav,
@@ -73,8 +73,8 @@ enum {
 
 	iDeviceHFSRAID,
 	iDeviceHFSRAID_o,
-//	iDeviceHFSRAID_capitan,
-//	iDeviceHFSRAID_capitan_o,
+	iDeviceHFSRAID_cap,
+	iDeviceHFSRAID_cap_o,
 	iDeviceHFSRAID_yos,
 	iDeviceHFSRAID_yos_o,
 	iDeviceHFSRAID_mav,
@@ -95,8 +95,8 @@ enum {
 
 	iDeviceHFSFUSION,
 	iDeviceHFSFUSION_o,
-//	iDeviceHFSFUSION_capitan,
-//	iDeviceHFSFUSION_capitan_o,
+	iDeviceHFSFUSION_cap,
+	iDeviceHFSFUSION_cap_o,
 	iDeviceHFSFUSION_yos,
 	iDeviceHFSFUSION_yos_o,
 	iDeviceHFSFUSION_mav,
@@ -159,8 +159,8 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
-//	{.name = "device_hfsplus_capitan",         .image = NULL},
-//	{.name = "device_hfsplus_capitan_o",       .image = NULL},
+	{.name = "device_hfsplus_cap",          .image = NULL},
+	{.name = "device_hfsplus_cap_o",        .image = NULL},
 	{.name = "device_hfsplus_yos",          .image = NULL},
 	{.name = "device_hfsplus_yos_o",        .image = NULL},
 	{.name = "device_hfsplus_mav",          .image = NULL},
@@ -178,8 +178,8 @@ image_t images[] = {
 
 	{.name = "device_hfsraid",              .image = NULL},
 	{.name = "device_hfsraid_o",            .image = NULL},
-//	{.name = "device_hfsraid_capitan",         .image = NULL},
-//	{.name = "device_hfsraid_capitan_o",       .image = NULL},
+	{.name = "device_hfsraid_cap",          .image = NULL},
+	{.name = "device_hfsraid_cap_o",        .image = NULL},
 	{.name = "device_hfsraid_yos",          .image = NULL},
 	{.name = "device_hfsraid_yos_o",        .image = NULL},
 	{.name = "device_hfsraid_mav",          .image = NULL},
@@ -200,8 +200,8 @@ image_t images[] = {
 
 	{.name = "device_hfsfusion",            .image = NULL},
 	{.name = "device_hfsfusion_o",          .image = NULL},
-//	{.name = "device_hfsfusion_capitan",       .image = NULL},
-//	{.name = "device_hfsfusion_capitan_o",     .image = NULL},
+	{.name = "device_hfsfusion_cap",        .image = NULL},
+	{.name = "device_hfsfusion_cap_o",      .image = NULL},
 	{.name = "device_hfsfusion_yos",        .image = NULL},
 	{.name = "device_hfsfusion_yos_o",      .image = NULL},
 	{.name = "device_hfsfusion_mav",        .image = NULL},
@@ -416,8 +416,8 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
-//	LOADPNG(device_hfsplus_capitan,            iDeviceHFS);
-//	LOADPNG(device_hfsplus_capitan_o,          iDeviceHFS_capitan);
+	LOADPNG(device_hfsplus_cap,             iDeviceHFS);
+	LOADPNG(device_hfsplus_cap_o,           iDeviceHFS_cap);
 	LOADPNG(device_hfsplus_yos,             iDeviceHFS);
 	LOADPNG(device_hfsplus_yos_o,           iDeviceHFS_yos);
 	LOADPNG(device_hfsplus_mav,             iDeviceHFS);
@@ -435,8 +435,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsraid,                 iDeviceHFS);
 	LOADPNG(device_hfsraid_o,               iDeviceHFSRAID);
-//	LOADPNG(device_hfsraid_capitan,            iDeviceHFSRAID);
-//	LOADPNG(device_hfsraid_capitan_o,          iDeviceHFSRAID_capitan);
+	LOADPNG(device_hfsraid_cap,             iDeviceHFSRAID);
+	LOADPNG(device_hfsraid_cap_o,           iDeviceHFSRAID_cap);
 	LOADPNG(device_hfsraid_yos,             iDeviceHFSRAID);
 	LOADPNG(device_hfsraid_yos_o,           iDeviceHFSRAID_yos);
 	LOADPNG(device_hfsraid_mav,             iDeviceHFSRAID);
@@ -457,8 +457,8 @@ static int loadGraphics(void)
 
 	LOADPNG(device_hfsfusion,               iDeviceHFS);
 	LOADPNG(device_hfsfusion_o,             iDeviceHFSFUSION);
-//	LOADPNG(device_hfsfusion_capitan,          iDeviceHFSFUSION);
-//	LOADPNG(device_hfsfusion_capitan_o,        iDeviceHFSFUSION_capitan);
+	LOADPNG(device_hfsfusion_cap,           iDeviceHFSFUSION);
+	LOADPNG(device_hfsfusion_cap_o,         iDeviceHFSFUSION_cap);
 	LOADPNG(device_hfsfusion_yos,           iDeviceHFSFUSION);
 	LOADPNG(device_hfsfusion_yos_o,         iDeviceHFSFUSION_yos);
 	LOADPNG(device_hfsfusion_mav,           iDeviceHFSFUSION);
@@ -1111,11 +1111,11 @@ void drawDeviceIcon(BVRef device, pixmap_t *buffer, position_t p, bool isSelecte
 							break;
 						case '1':
 							if (device->OSVersion[4] == '0') { // 10.10
-								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos);
+								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos); // Yosemite
 								break;
 							}
 							if (device->OSVersion[4] == '1') { // 10.11
-								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_yos : iDeviceHFS_yos); // El Capitan
+								devicetype = (device->flags & kBVFlagBooter ? iDeviceHFSRAID_cap : iDeviceHFS_cap); // El Capitan
 								break;
 							}
 						default:
