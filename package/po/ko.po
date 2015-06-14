@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:31-0000\n"
-"Last-Translator: Mill <ceruns@ymail.com>\n"
+"PO-Revision-Date: 2015-06-14 11:00+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: ko <ko@li.org>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1418150892.0\n"
+"X-POOTLE-MTIME: 1434279632.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -698,7 +698,7 @@ msgstr "선택 시 맥 커널을 로딩하기 직전에 부팅 과정을 일시 
 #: Resources/templates/Localizable.strings:149
 #, no-wrap
 msgid "PrivateData=No"
-msgstr ""
+msgstr "PrivateData=No"
 
 #. type: "PrivateData_description"
 #: Resources/templates/Localizable.strings:150
@@ -710,7 +710,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:154
 #, no-wrap
 msgid "USBBusFix=Yes"
-msgstr ""
+msgstr "USBBusFix=Yes"
 
 #. type: "USBBusFix_description"
 #: Resources/templates/Localizable.strings:155
@@ -2266,70 +2266,70 @@ msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 08002e0a 로 �
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:588
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 04001204 로 설정."
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:592
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 00000604설정."
+msgstr "Intel Broadwell (모바일) 의 AAPL,ig-platform-id로 00000616설정."
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (모바일) 의 AAPL,ig-platform-id로 00000604설정."
+msgstr "Intel Broadwell (모바일) 의 AAPL,ig-platform-id로 00000e16설정."
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Broadwell AAPL, ig-platform-id를 00001616 로 설정."
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL, ig-platform-id를 00001e16 로 설정."
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
@@ -2354,71 +2354,71 @@ msgstr "00002604"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 00002604 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL 를 위해 ig-platform-id를 00002b16 로 설정."
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:611
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 00002604 로 설정."
+msgstr "Intel Broadwell AAPL 를 위해 ig-platform-id를 00002216 로 설정."
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:613
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:614
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Broadwell AAPL, ig-platform-id를 01000e16 로 설정."
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL, ig-platform-id를 01001e16 로 설정."
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 02001604 로 설정."
+msgstr "Intel Broadwell AAPL 를 위해 ig-platform-id를 02000616 로 설정."
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
@@ -2487,56 +2487,56 @@ msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
 #: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:638
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL, ig-platform-id를 00001604 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL, ig-platform-id를 04002b16 로 설정."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:641
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 00002604 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL 를 위해 ig-platform-id를 04002616 로 설정."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:644
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (모바일) AAPL 를 위해 ig-platform-id를 0500260a 로 설정."
+msgstr "Intel Broadwell (모바일) AAPL 를 위해 ig-platform-id를 05002616 로 설정."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Intel Haswell (Mobile) AAPL 를 위해 ig-platform-id를 0600260c 로 설정."
+msgstr "Intel Broadwell (Mobile) AAPL 를 위해 ig-platform-id를 06002616 로 설정."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:651
@@ -2638,7 +2638,7 @@ msgstr "NVIDIA 또는 AMD/ATI를 위한 HDMI 오디오 Inject"
 #: Resources/templates/Localizable.strings:677
 #, no-wrap
 msgid "UseIntelHDMI=Yes"
-msgstr ""
+msgstr "UseIntelHDMI=Yes"
 
 #. type: "UseIntelHDMI_description"
 #: Resources/templates/Localizable.strings:678
@@ -3132,10 +3132,10 @@ msgstr "Intel HD4000 을 위한 one AAPL,ig-platform-id 설정"
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "IIntel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
