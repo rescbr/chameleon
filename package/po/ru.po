@@ -8,17 +8,17 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:35-0000\n"
-"Last-Translator: SergeNu <konovalov_serj@mail.ru>\n"
+"PO-Revision-Date: 2015-06-14 11:18+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: ru <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1414012891.0\n"
+"X-POOTLE-MTIME: 1434280695.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -2193,98 +2193,102 @@ msgstr "Установить 08002e0a в качестве Intel Haswell (Mobile)
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:588
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 04001204 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:592
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00000604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 00000616 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00000604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 00000e16 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 00001616 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 00001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:605
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 00002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 00002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
@@ -2321,73 +2325,75 @@ msgstr ""
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 01001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 02001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 02000616 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 02001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 02001616 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:625
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:626
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 02001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 02002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:629
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 02001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 02002216 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx13_title"
 #: Resources/templates/Localizable.strings:631
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002b16"
-msgstr "02001604"
+msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:632
@@ -2453,17 +2459,18 @@ msgstr "Установить 0500260a в качестве Intel Haswell (Mobile)
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 0600260c в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 06002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:651
@@ -3044,24 +3051,28 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:830
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
-msgstr "Выберите значение AAPL,ig-platform-id, используемое по умолчанию для графического процессора Intel HD4000."
+msgstr ""
+"Выберите значение AAPL,ig-platform-id, используемое по умолчанию для "
+"графического процессора Intel Haswell."
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
-msgstr "Выберите значение AAPL,ig-platform-id, используемое по умолчанию для графического процессора Intel HD4000."
+msgstr ""
+"Выберите значение AAPL,ig-platform-id, используемое по умолчанию для "
+"графического процессора Intel Broadwell."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:837
