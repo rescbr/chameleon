@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:23-0000\n"
-"Last-Translator: Yllelder <yllelder@gmail.com>\n"
+"PO-Revision-Date: 2015-06-14 23:02+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: es <es@li.org>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1400536515.0\n"
+"X-POOTLE-MTIME: 1434322946.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -67,7 +67,9 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "Package built by: %WHOBUILD%, language traducido por: juanerson"
+msgstr ""
+"Paquete realizado por:% WHOBUILD%, el idioma traducido por: juanerson e "
+"FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -303,12 +305,20 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"Aquí usted puede optar por omitir la instalación del gestor de arranque, "
+"total o parcialmente.\n"
+"Esto puede ser muy útil si quieres escribir de extra, u omitir algún Stage "
+"(0,1 y la activación de la partición de destino).\n"
+"Saltarse todas las etapas « Stage » le permiten dejar como ya sectores de "
+"arranque de trabajo, especialmente útil con unidades de 4k.\n"
+"boot siempre se copia en la partición de destino cuando se va a omitir una o "
+"más etapas."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "Saltar Stage 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -317,12 +327,14 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evite escribir Stage 0 a el disco de destino.\n"
+"Stage 2 siempre se copia / reemplazado."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "Saltar Stage 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -331,12 +343,14 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evite escribir Stage 1 con el sector de inicio de partición.\n"
+"Stage 2 siempre se copia / reemplazado."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "Saltar activación"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -346,30 +360,38 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Previene la activación de la partición de destino.\n"
+"Algunas placas base antiguas tienen una mala implementación de GPT en bios y "
+"no pueden encontrar particiones si la tabla marcada unger activa Guid "
+"partición.\n"
+"Stage 2 siempre se copia / reemplazado."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;ha sido escrito en la raíz de la partición seleccionada."
+msgstr "Instala Chameleon en la partición elegida."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Instalar los archivos de Chameleon al directorio raíz de la partición seleccionada, usando boot0 o boot0md dependiendo de su sistema, sin destruir ninguna instalación de Windows, si usted la tiene."
+msgstr ""
+"nstalar los archivos de Chameleon al directorio raíz de la partición "
+"seleccionada, usando boot0 o boot0md dependiendo de su sistema, sin destruir "
+"ninguna instalación de Windows, si usted la tiene."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "Instale Chameleon en el ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
 msgstr "Instalar los archivos de Chameleon a la partición EFI, normalmente oculta, usando boot0 o boot0md dependiendo de su sistema, sin destruir ninguna instalación de Windows, si usted la tiene."
@@ -721,6 +743,8 @@ msgstr "PrivateData=No"
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
 msgstr ""
+"Mostrar enmascarado datos (número de serie) en el registro de bdmesg "
+"(activado por defecto)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:154
@@ -732,7 +756,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:155
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "Habilitar las correcciones XHCI, EHCI y UHCI (desactivado por defecto)."
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:157
@@ -744,7 +768,7 @@ msgstr "USBLegacyOff=Yes"
 #: Resources/templates/Localizable.strings:158
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
-msgstr ""
+msgstr "Fuerza USB Legacy off para XHCI y EHCI (desactivado por defecto)."
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:160
@@ -756,7 +780,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:161
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "Fuerza USB Legacy off para XHCI (desactivado por defecto)."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:163
@@ -2280,277 +2304,277 @@ msgstr "Establece 08002e0a para Intel Haswell (Mobile) AAPL,ig-platform-id."
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:588
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 04001204 para Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:592
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00000604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00000616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00000604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00000e16 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00001616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:605
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00002604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00002604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00002b16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:611
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00002604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 00002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:613
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:614
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 01000e16 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 01001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 02000616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 02001616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:625
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:626
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 02002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:629
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 02002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx13_title"
 #: Resources/templates/Localizable.strings:631
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002b16"
-msgstr "02001604"
+msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:632
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 02001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:634
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0300220d"
 msgid "03001216"
-msgstr "0300220d"
+msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:635
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 03001216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx15_title"
 #: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:638
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00001604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 04002b16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:641
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 00002604 para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 04002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:644
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 0500260a para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 05002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Establece 0600260c para Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Establece 06002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:651
@@ -2562,7 +2586,7 @@ msgstr "AD2000b"
 #: Resources/templates/Localizable.strings:652
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD2000b."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para Analog Devices AD2000b."
 
 #. type: "AD1981HD_PinConf_title"
 #: Resources/templates/Localizable.strings:654
@@ -2574,7 +2598,7 @@ msgstr "AD1981HD"
 #: Resources/templates/Localizable.strings:655
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1981HD."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para Analog Devices AD1981HD."
 
 #. type: "AD1988B_PinConf_title"
 #: Resources/templates/Localizable.strings:657
@@ -2586,7 +2610,7 @@ msgstr "AD1988b"
 #: Resources/templates/Localizable.strings:658
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1988b."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para Analog Devices AD1988B."
 
 #. type: "ALC888_PinConf_title"
 #: Resources/templates/Localizable.strings:660
@@ -2598,7 +2622,7 @@ msgstr "ALC888"
 #: Resources/templates/Localizable.strings:661
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC888."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para Realtek ALC888."
 
 #. type: "ALC1200_PinConf_title"
 #: Resources/templates/Localizable.strings:663
@@ -2610,7 +2634,7 @@ msgstr "ALC1200"
 #: Resources/templates/Localizable.strings:664
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC1200."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para Realtek ALC1200."
 
 #. type: "00_PinConf_title"
 #: Resources/templates/Localizable.strings:666
@@ -2622,7 +2646,7 @@ msgstr "00"
 #: Resources/templates/Localizable.strings:667
 #, no-wrap
 msgid "Set HDEF PinConfiguration for ???."
-msgstr ""
+msgstr "Establece HDEF PinConfiguration para ???."
 
 #. type: "GraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:671
@@ -2767,6 +2791,8 @@ msgstr "NvidiaGeneric=Yes"
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
 msgstr ""
+"Utilice el nombre básico de Nvidia para el SystemProfiler (desactivado por "
+"defecto)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:711
@@ -2889,6 +2915,10 @@ msgstr "kext-dev-mode=1"
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
+"En Yosemite desarrollador Previews, no se cargarán kexts sin firmar o mal "
+"firmados. Para utilizar kexts sin firmar durante el desarrollo, esta "
+"estricta verificación se puede desactivar mediante la adición 'kext-dev-"
+"mode=1' argumento de arranque."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:743
@@ -3136,24 +3166,24 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:830
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr "Establece una AAPL,ig-platform-id a utilizar para su Intel Haswell."
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr "Establecer una AAPL,ig-platform-id a utilizar para su Intel Broadwell."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:837
