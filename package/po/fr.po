@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:29-0000\n"
-"Last-Translator: JrCs <d2t56xxptp@snkmail.com>\n"
+"PO-Revision-Date: 2015-06-14 10:37+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: fr <fr@li.org>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388319299.0\n"
+"X-POOTLE-MTIME: 1434278264.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -67,7 +67,7 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "Paquet construit par: %WHOBUILD%, traduction par: JrCs"
+msgstr "Paquet construit par: %WHOBUILD%, traduction par: JrCs et FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -296,7 +296,7 @@ msgstr "Utile si vous souhaitez installer seulement les extra (options)."
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
 msgstr "Chargeur de Démarrage Chameleon"
@@ -310,12 +310,20 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"Ici vous pouvez choisir d’ignorer l’installation du chargeur de démarrage "
+"complètement ou partiellement.\n"
+"Cela peut être utile si vous voulez écrire d’autres, ou de sauter un certain "
+"stade (0,1 et l’activation de la partition cible).\n"
+"Sauter tous les stades vous permet de laisser comme c’est les secteurs de "
+"démarrage, utile avec les lecteurs 4k.\n"
+"boot est toujours copié dans la partition cible lorsque vous sautez une ou "
+"plusieurs étapes."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "Ignorer Stage 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -324,12 +332,14 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Éviter d’écrire le Stage 0 sur le disque cible.\n"
+"Stage 2 est toujours copié/remplacé."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "Ignorer Stage 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -338,12 +348,14 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Éviter d’écrire le Stage 1 dans le secteur d’amorçage de la partition.\n"
+"Stage 2 est toujours copié/remplacé."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "Ignorer l’activation"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -353,17 +365,22 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Empêche l’activation de la partition cible.\n"
+"Certaines cartes mères anciennes ont une mauvaise implémentation GPT dans le "
+"bios, et ils ne peuvent pas trouver les partitions sont marqué active dans "
+"la Table de Partition Guid.\n"
+"Stage 2 est toujours copié/remplacé."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;a été écrit à la racine de la partition choisie."
+msgstr "Installe Chameleon dans la partition choisi"
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
 msgstr "Installe les fichiers de Chameleon sur la racine de la partition sélectionnée en utilisant soit boot0, soit boot0md, selon votre système, sans détruire aucune installation Windows existante, si il y en a une."
@@ -372,11 +389,11 @@ msgstr "Installe les fichiers de Chameleon sur la racine de la partition sélect
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "Installer Chameleon dans l’ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
 msgstr "Installe les fichiers de Chameleon sur la partition système cachée 'EFI' en utilisant soit boot0, soit boot0md, selon votre système, sans détruire aucune installation Windows existante, si il y en a une."
@@ -727,6 +744,8 @@ msgstr "PrivateData=No"
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
 msgstr ""
+"Afficher les données masquées (numéro de série) dans le journal bdmesg "
+"(activé par défaut)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:154
@@ -738,7 +757,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:155
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "Activez les correctifs XHCI, EHCI et UHCI (désactivés par défaut)."
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:157
@@ -750,7 +769,7 @@ msgstr "USBLegacyOff=Yes"
 #: Resources/templates/Localizable.strings:158
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
-msgstr ""
+msgstr "Forcer USB Legacy pour XHCI et EHCI (désactivé par défaut)."
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:160
@@ -762,7 +781,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:161
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "Forcer USB Legacy pour XHCI (désactivé par défaut)."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:163
@@ -858,7 +877,7 @@ msgstr "ForceFullMemInfo=Yes"
 #: Resources/templates/Localizable.strings:185
 #, no-wrap
 msgid "Force SMBIOS Table 17 to be 27 bytes long."
-msgstr ""
+msgstr "Forcer SMBIOS Table 17 à 27 octets de long."
 
 #. type: "RestartFix_title"
 #: Resources/templates/Localizable.strings:187
@@ -1258,7 +1277,7 @@ msgid ""
 "Set HDEF layout-it to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 1:\n"
+"Règle HDEF layout-it à 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
@@ -1275,7 +1294,7 @@ msgid ""
 "Set HDEF layout-it to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 2:\n"
+"Règle HDEF layout-it à 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
@@ -1292,7 +1311,7 @@ msgid ""
 "Set HDEF layout-it to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 3:\n"
+"Règle HDEF layout-it à 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
@@ -1309,7 +1328,7 @@ msgid ""
 "Set HDEF layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 5:\n"
+"Règle HDEF layout-it à 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
@@ -1326,7 +1345,7 @@ msgid ""
 "Set HDEF layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 7:\n"
+"Règle HDEF layout-it à 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
@@ -1343,7 +1362,7 @@ msgid ""
 "Set HDEF layout-it to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 12:\n"
+"Règle HDEF layout-it à 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
@@ -1360,6 +1379,8 @@ msgid ""
 "Set HDEF layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
+"Règle layout-it HDEF à 32: \n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
 #: Resources/templates/Localizable.strings:317
@@ -1375,7 +1396,7 @@ msgid ""
 "Set HDEF layout-it to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 40:\n"
+"Règle HDEF layout-it à 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
@@ -1392,7 +1413,7 @@ msgid ""
 "Set HDEF layout-it to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 65:\n"
+"Règle HDEF layout-it à 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
@@ -1409,7 +1430,7 @@ msgid ""
 "Set HDEF layout-it to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 99:\n"
+"Règle HDEF layout-it  à 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
@@ -1426,7 +1447,7 @@ msgid ""
 "Set HDEF layout-it to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 269:\n"
+"Règle HDEF layout-it à 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
@@ -1443,7 +1464,7 @@ msgid ""
 "Set HDEF layout-it to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 387:\n"
+"Règle HDEF layout-it à 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
@@ -1460,7 +1481,7 @@ msgid ""
 "Set HDEF layout-it to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 388:\n"
+"Règle HDEF layout-it à 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
@@ -1477,7 +1498,7 @@ msgid ""
 "Set HDEF layout-it to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 389:\n"
+"Règle HDEF layout-it à 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
@@ -1494,7 +1515,7 @@ msgid ""
 "Set HDEF layout-it to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 392:\n"
+"Règle HDEF layout-it à 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
@@ -1511,7 +1532,7 @@ msgid ""
 "Set HDEF layout-it to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 398:\n"
+"Règle HDEF layout-it à 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
@@ -1528,7 +1549,7 @@ msgid ""
 "Set HDEF layout-it to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 662:\n"
+"Règle HDEF layout-it à 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
@@ -1545,7 +1566,7 @@ msgid ""
 "Set HDEF layout-it to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 663:\n"
+"Règle HDEF layout-it à 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
@@ -1562,7 +1583,7 @@ msgid ""
 "Set HDEF layout-it to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 664:\n"
+"Règle HDEF layout-it à 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
@@ -1579,7 +1600,7 @@ msgid ""
 "Set HDEF layout-it to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 885:\n"
+"Règle HDEF layout-it à 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
@@ -1596,7 +1617,7 @@ msgid ""
 "Set HDEF layout-it to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 887:\n"
+"Règle HDEF layout-it à 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
@@ -1613,7 +1634,7 @@ msgid ""
 "Set HDEF layout-it to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 888:\n"
+"Règle HDEF layout-it à 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
@@ -1630,7 +1651,7 @@ msgid ""
 "Set HDEF layout-it to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 889:\n"
+"Règle HDEF layout-it à 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
@@ -1647,7 +1668,7 @@ msgid ""
 "Set HDEF layout-it to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 892:\n"
+"Règle HDEF layout-it à 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
@@ -1664,7 +1685,7 @@ msgid ""
 "Set HDEF layout-it to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 898:\n"
+"Règle HDEF layout-it à 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
@@ -1681,7 +1702,7 @@ msgid ""
 "Set HDEF layout-it to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Set HDEF layout-it to 1981:\n"
+"Règle HDEF layout-it à 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx01_description"
@@ -1691,7 +1712,7 @@ msgid ""
 "Set HDAU layout-it to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 1:\n"
+"Règle HDAU layout-it à 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_description"
@@ -1701,7 +1722,7 @@ msgid ""
 "Set HDAU layout-it to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 2:\n"
+"Règle HDAU layout-it à 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_description"
@@ -1711,7 +1732,7 @@ msgid ""
 "Set HDAU layout-it to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 3:\n"
+"Règle HDAU layout-it à 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_description"
@@ -1721,7 +1742,7 @@ msgid ""
 "Set HDAU layout-it to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 5:\n"
+"Règle HDAU layout-it à 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_description"
@@ -1731,7 +1752,7 @@ msgid ""
 "Set HDAU layout-it to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 7:\n"
+"Règle HDAU layout-it à 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_description"
@@ -1741,7 +1762,7 @@ msgid ""
 "Set HDAU layout-it to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 12:\n"
+"Règle HDAU layout-it à 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_description"
@@ -1751,6 +1772,8 @@ msgid ""
 "Set HDAU layout-it to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
+"Règle layout-it HDAU à 32:\n"
+"020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:424
@@ -1759,7 +1782,7 @@ msgid ""
 "Set HDAU layout-it to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 40:\n"
+"Règle HDAU layout-it à 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_description"
@@ -1769,7 +1792,7 @@ msgid ""
 "Set HDAU layout-it to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 65:\n"
+"Règle HDAU layout-it à 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_description"
@@ -1779,7 +1802,7 @@ msgid ""
 "Set HDAU layout-it to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 99:\n"
+"Règle HDAU layout-it à 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_description"
@@ -1789,7 +1812,7 @@ msgid ""
 "Set HDAU layout-it to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 269:\n"
+"Règle HDAU layout-it à 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_description"
@@ -1799,7 +1822,7 @@ msgid ""
 "Set HDAU layout-it to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 387:\n"
+"Règle HDAU layout-it à 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_description"
@@ -1809,7 +1832,7 @@ msgid ""
 "Set HDAU layout-it to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 388:\n"
+"Règle HDAU layout-it à 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_description"
@@ -1819,7 +1842,7 @@ msgid ""
 "Set HDAU layout-it to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 389:\n"
+"Règle HDAU layout-it à 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_description"
@@ -1829,7 +1852,7 @@ msgid ""
 "Set HDAU layout-it to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 392:\n"
+"Règle HDAU layout-it à 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_description"
@@ -1839,7 +1862,7 @@ msgid ""
 "Set HDAU layout-it to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 398:\n"
+"Règle HDAU layout-it à 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_description"
@@ -1849,7 +1872,7 @@ msgid ""
 "Set HDAU layout-it to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 662:\n"
+"Règle HDAU layout-it à 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_description"
@@ -1859,7 +1882,7 @@ msgid ""
 "Set HDAU layout-it to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 663:\n"
+"Règle HDAU layout-it à 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_description"
@@ -1869,7 +1892,7 @@ msgid ""
 "Set HDAU layout-it to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 664:\n"
+"Règle HDAU layout-it à 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_description"
@@ -1879,7 +1902,7 @@ msgid ""
 "Set HDAU layout-it to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 885:\n"
+"Règle HDAU layout-it à 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_description"
@@ -1889,7 +1912,7 @@ msgid ""
 "Set HDAU layout-it to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 887:\n"
+"Règle HDAU layout-it à 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_description"
@@ -1899,7 +1922,7 @@ msgid ""
 "Set HDAU layout-it to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 888:\n"
+"Règle HDAU layout-it à 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_description"
@@ -1909,7 +1932,7 @@ msgid ""
 "Set HDAU layout-it to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 889:\n"
+"Règle HDAU layout-it à 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_description"
@@ -1919,7 +1942,7 @@ msgid ""
 "Set HDAU layout-it to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 892:\n"
+"Règle HDAU layout-it à 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_description"
@@ -1929,7 +1952,7 @@ msgid ""
 "Set HDAU layout-it to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 898:\n"
+"Règle HDAU layout-it à 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_description"
@@ -1939,7 +1962,7 @@ msgid ""
 "Set HDAU layout-it to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Set HDAU layout-it to 1981:\n"
+"Règle HDAU layout-it à 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "IntelCaprix00_title"
@@ -1952,7 +1975,7 @@ msgstr "01660000"
 #: Resources/templates/Localizable.strings:502
 #, no-wrap
 msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660000 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix01_title"
 #: Resources/templates/Localizable.strings:504
@@ -1964,7 +1987,7 @@ msgstr "01660001"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660001 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix02_title"
 #: Resources/templates/Localizable.strings:507
@@ -1976,7 +1999,7 @@ msgstr "01660002"
 #: Resources/templates/Localizable.strings:508
 #, no-wrap
 msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660002 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix03_title"
 #: Resources/templates/Localizable.strings:510
@@ -1988,7 +2011,7 @@ msgstr "01660003"
 #: Resources/templates/Localizable.strings:511
 #, no-wrap
 msgid "Set 01660003 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660003 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660003 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix04_title"
 #: Resources/templates/Localizable.strings:513
@@ -2000,7 +2023,7 @@ msgstr "01660004"
 #: Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660004 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix05_title"
 #: Resources/templates/Localizable.strings:516
@@ -2012,7 +2035,7 @@ msgstr "01620005"
 #: Resources/templates/Localizable.strings:517
 #, no-wrap
 msgid "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "Set 01620005 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
+msgstr "Règle 01620005 pour Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix06_title"
 #: Resources/templates/Localizable.strings:519
@@ -2024,7 +2047,7 @@ msgstr "01620006"
 #: Resources/templates/Localizable.strings:520
 #, no-wrap
 msgid "Set 01620006 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "Set 01620006 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
+msgstr "Règle 01620006 pour Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix07_title"
 #: Resources/templates/Localizable.strings:522
@@ -2036,7 +2059,7 @@ msgstr "01620007"
 #: Resources/templates/Localizable.strings:523
 #, no-wrap
 msgid "Set 01620007 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
-msgstr "Set 01620007 for Intel HD4000 (Desktop) AAPL,ig-platform-id ."
+msgstr "Règle 01620007 pour Intel HD4000 (Desktop) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix08_title"
 #: Resources/templates/Localizable.strings:525
@@ -2048,7 +2071,7 @@ msgstr "01660008"
 #: Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "Set 01660008 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660008 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660008 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix09_title"
 #: Resources/templates/Localizable.strings:528
@@ -2060,7 +2083,7 @@ msgstr "01660009"
 #: Resources/templates/Localizable.strings:529
 #, no-wrap
 msgid "Set 01660009 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 01660009 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01660009 pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix10_title"
 #: Resources/templates/Localizable.strings:531
@@ -2072,7 +2095,7 @@ msgstr "0166000a"
 #: Resources/templates/Localizable.strings:532
 #, no-wrap
 msgid "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 0166000a for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 0166000a pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelCaprix11_title"
 #: Resources/templates/Localizable.strings:534
@@ -2084,7 +2107,7 @@ msgstr "0166000b"
 #: Resources/templates/Localizable.strings:535
 #, no-wrap
 msgid "Set 0166000b for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
-msgstr "Set 0166000b for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 0166000b pour Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 
 #. type: "IntelAzulx00_title"
 #: Resources/templates/Localizable.strings:539
@@ -2096,7 +2119,7 @@ msgstr "00000604"
 #: Resources/templates/Localizable.strings:540
 #, no-wrap
 msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 00000604 pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx01_title"
 #: Resources/templates/Localizable.strings:542
@@ -2108,7 +2131,7 @@ msgstr "0000060c"
 #: Resources/templates/Localizable.strings:543
 #, no-wrap
 msgid "Set 0000060c for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000060c pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx02_title"
 #: Resources/templates/Localizable.strings:545
@@ -2120,7 +2143,7 @@ msgstr "00001604"
 #: Resources/templates/Localizable.strings:546
 #, no-wrap
 msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 00001604 pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx03_title"
 #: Resources/templates/Localizable.strings:548
@@ -2132,7 +2155,7 @@ msgstr "0000160a"
 #: Resources/templates/Localizable.strings:549
 #, no-wrap
 msgid "Set 0000160a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000160a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx04_title"
 #: Resources/templates/Localizable.strings:551
@@ -2144,7 +2167,7 @@ msgstr "0000160c"
 #: Resources/templates/Localizable.strings:552
 #, no-wrap
 msgid "Set 0000160c for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000160c pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx05_title"
 #: Resources/templates/Localizable.strings:554
@@ -2156,7 +2179,7 @@ msgstr "00002604"
 #: Resources/templates/Localizable.strings:555
 #, no-wrap
 msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 00002604 pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx06_title"
 #: Resources/templates/Localizable.strings:557
@@ -2168,7 +2191,7 @@ msgstr "0000260a"
 #: Resources/templates/Localizable.strings:558
 #, no-wrap
 msgid "Set 0000260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000260a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx07_title"
 #: Resources/templates/Localizable.strings:560
@@ -2180,7 +2203,7 @@ msgstr "0000260c"
 #: Resources/templates/Localizable.strings:561
 #, no-wrap
 msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000260c pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx08_title"
 #: Resources/templates/Localizable.strings:563
@@ -2192,7 +2215,7 @@ msgstr "0000260d"
 #: Resources/templates/Localizable.strings:564
 #, no-wrap
 msgid "Set 0000260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0000260d pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx09_title"
 #: Resources/templates/Localizable.strings:566
@@ -2204,7 +2227,7 @@ msgstr "02001604"
 #: Resources/templates/Localizable.strings:567
 #, no-wrap
 msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 02001604 pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx10_title"
 #: Resources/templates/Localizable.strings:569
@@ -2216,7 +2239,7 @@ msgstr "0300220d"
 #: Resources/templates/Localizable.strings:570
 #, no-wrap
 msgid "Set 0300220d for Intel Haswell (Desktop) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0300220d pour Intel Haswell (Desktop) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx11_title"
 #: Resources/templates/Localizable.strings:572
@@ -2228,7 +2251,7 @@ msgstr "0500260a"
 #: Resources/templates/Localizable.strings:573
 #, no-wrap
 msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0500260a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx12_title"
 #: Resources/templates/Localizable.strings:575
@@ -2240,7 +2263,7 @@ msgstr "0600260a"
 #: Resources/templates/Localizable.strings:576
 #, no-wrap
 msgid "Set 0600260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Réglez 0600260a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx13_title"
 #: Resources/templates/Localizable.strings:578
@@ -2252,7 +2275,7 @@ msgstr "0700260d"
 #: Resources/templates/Localizable.strings:579
 #, no-wrap
 msgid "Set 0700260d for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0700260d pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx14_title"
 #: Resources/templates/Localizable.strings:581
@@ -2264,7 +2287,7 @@ msgstr "0800260a"
 #: Resources/templates/Localizable.strings:582
 #, no-wrap
 msgid "Set 0800260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 0800260a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx15_title"
 #: Resources/templates/Localizable.strings:584
@@ -2276,283 +2299,283 @@ msgstr "08002e0a"
 #: Resources/templates/Localizable.strings:585
 #, no-wrap
 msgid "Set 08002e0a for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr ""
+msgstr "Règle 08002e0a pour Intel Haswell (Mobile) AAPL, ig-platform-id."
 
 #. type: "IntelAzulx16_title"
 #: Resources/templates/Localizable.strings:587
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:588
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660004 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 04001204 pour Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:592
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00000616 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00000e16 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00001616 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00001e16 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:605
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00002b16 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:611
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660002 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 00002216 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:613
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:614
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01000e16 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 01001e16 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 02000616 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660000 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 02001616 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:625
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:626
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 02002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:629
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 02002216 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx13_title"
 #: Resources/templates/Localizable.strings:631
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002b16"
-msgstr "02001604"
+msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:632
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 02002b16 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:634
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0300220d"
 msgid "03001216"
-msgstr "0300220d"
+msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:635
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 03001216 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx15_title"
 #: Resources/templates/Localizable.strings:637
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:638
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 04002b16 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:641
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 04002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:644
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 05002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Set 01660001 for Intel HD4000 (Mobile) AAPL,ig-platform-id ."
+msgstr "Règle 06002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:651
@@ -2564,7 +2587,7 @@ msgstr "AD2000b"
 #: Resources/templates/Localizable.strings:652
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD2000b."
-msgstr "Set HDEF PinConfiguration for Analog Devices AD2000b."
+msgstr "Règle HDEF PinConfiguration for Analog Devices AD2000b."
 
 #. type: "AD1981HD_PinConf_title"
 #: Resources/templates/Localizable.strings:654
@@ -2576,7 +2599,7 @@ msgstr "AD1981HD"
 #: Resources/templates/Localizable.strings:655
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1981HD."
-msgstr "Set HDEF PinConfiguration for Analog Devices AD1981HD."
+msgstr "Règle HDEF PinConfiguration pour Analogique Devices AD1981HD."
 
 #. type: "AD1988B_PinConf_title"
 #: Resources/templates/Localizable.strings:657
@@ -2588,7 +2611,7 @@ msgstr "AD1988b"
 #: Resources/templates/Localizable.strings:658
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Analog Devices AD1988b."
-msgstr "Set HDEF PinConfiguration for Analog Devices AD1988b."
+msgstr "Règle HDEF PinConfiguration pour Analogique Devices AD1988b."
 
 #. type: "ALC888_PinConf_title"
 #: Resources/templates/Localizable.strings:660
@@ -2600,7 +2623,7 @@ msgstr "ALC888"
 #: Resources/templates/Localizable.strings:661
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC888."
-msgstr "Définir la configuration Broche HREF pour Realtek ALC888."
+msgstr "Règle HDEF PinConfiguration pour Realtek ALC888."
 
 #. type: "ALC1200_PinConf_title"
 #: Resources/templates/Localizable.strings:663
@@ -2612,7 +2635,7 @@ msgstr "ALC1200"
 #: Resources/templates/Localizable.strings:664
 #, no-wrap
 msgid "Set HDEF PinConfiguration for Realtek ALC1200."
-msgstr "Définir la configuration Broche HREF pour Realtek ALC1200."
+msgstr "Règle HDEF PinConfiguration pour Realtek ALC1200."
 
 #. type: "00_PinConf_title"
 #: Resources/templates/Localizable.strings:666
@@ -2624,7 +2647,7 @@ msgstr "00"
 #: Resources/templates/Localizable.strings:667
 #, no-wrap
 msgid "Set HDEF PinConfiguration for ???."
-msgstr "Définir la configuration Broche HREF pour ???."
+msgstr "Règle HDEF PinConfiguration pour ???."
 
 #. type: "GraphicsEnabler_title"
 #: Resources/templates/Localizable.strings:671
@@ -2661,6 +2684,10 @@ msgstr "UseIntelHDMI=Yes"
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
 msgstr ""
+"Si OUI, hda-gfx=onboard-1 sera injecté dans les dispositifs de GFX0 et HDEF. "
+"En outre, si un dispositif ATI ou Nvidia HDMI est présent, ils vont être "
+"affectés à onboard-2. Si NON, dispositifs ATI ou NVIDIA vont monter à "
+"onboard-1 ainsi que le dispositif de HDAU si présent."
 
 #. type: "UseAtiROM_title"
 #: Resources/templates/Localizable.strings:680
@@ -2769,6 +2796,8 @@ msgstr "NvidiaGeneric=Yes"
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
 msgstr ""
+"Utilisez le nom Nvidia classique pour le SystemProfiler (désactivé par "
+"défaut)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:711
@@ -2875,7 +2904,11 @@ msgid ""
 "http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
 "Findings credits to meklort and Rampage Dev."
 msgstr ""
-"Il introduit un nouveau panneau de préférences dans Préférences système qui vous permet d'activer le Web Driver Nvidia. \\ NInfos ici: Nouvelle Solution Nvidia Driver Install détail\\Nhttp://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-install-solution/\n"
+"Il introduit un nouveau panneau de préférences dans Préférences système qui "
+"vous permet d'activer le Web Driver Nvidia.\n"
+"Infos ici: Nouvelle Solution Nvidia Driver Solution\n"
+"http://www.insanelymac.com/forum/topic/288582-new-nvidia-retail-driver-"
+"install-solution\n"
 "Merci à meklort et Rampage Dev."
 
 #. type: "kext-dev-mode1_title"
@@ -2889,6 +2922,10 @@ msgstr "kext-dev-mode=1"
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
+"Dans Yosemite Developer Previews, kexts non signés ou mal signés ne seront "
+"pas chargées. Pour utiliser kexts non signés au cours du développement, ce "
+"contrôle strict peut être désactivée en ajoutant 'kext-dev-mode=1' comme "
+"argument de démarrage."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:743
@@ -2902,7 +2939,12 @@ msgstr "dart=0"
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
 "More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
-msgstr "Éviter le traitement DMAR causer par les fonctions VT-d dans OSX (virtualisation). \\ NPlus d'informations grâce à BCC9 ici: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
+msgstr ""
+"Éviter le traitement DMAR causer par les fonctions VT-d dans OSX "
+"(virtualisation).\n"
+"Plus d'informations par bcc9 ici: "
+"http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-"
+"hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
 #: Resources/templates/Localizable.strings:751
@@ -2998,7 +3040,7 @@ msgstr "Legacy"
 #: Resources/templates/Localizable.strings:778
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
-msgstr "Thème original de Chameleon introduit lors de la version 2.0 RC1"
+msgstr "Thème original de Chameleon introduit pour la version 2.0 RC1"
 
 #. type: "Default_title"
 #: Resources/templates/Localizable.strings:780
@@ -3010,7 +3052,7 @@ msgstr "Standard"
 #: Resources/templates/Localizable.strings:781
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
-msgstr "Thème par défaut de Chameleon depuis la version 2.0 RC5"
+msgstr "Thème par défaut de Chameleon introduit pour la version 2.0 RC5"
 
 #. type: "Bullet_title"
 #: Resources/templates/Localizable.strings:783
@@ -3022,7 +3064,7 @@ msgstr "Bullet"
 #: Resources/templates/Localizable.strings:784
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
-msgstr "Un thème simple et sympa crée par NoSmokingBandit (Avril 2009)."
+msgstr "Un thème simple et sympa crée par NoSmokingBandit Avril 2009."
 
 #. type: "Audio_title"
 #: Resources/templates/Localizable.strings:793
@@ -3100,7 +3142,7 @@ msgstr "HDEF Layout"
 #: Resources/templates/Localizable.strings:818
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
-msgstr "Définissez une HDEF Layout ID à utiliser pour votre contrôleur HDA."
+msgstr "Définir une HDEF Layout ID à utiliser pour votre contrôleur HDA."
 
 #. type: "HDAULayout_title"
 #: Resources/templates/Localizable.strings:821
@@ -3112,7 +3154,7 @@ msgstr "HDAU Layout"
 #: Resources/templates/Localizable.strings:822
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
-msgstr "Définissez une HDAU Layout ID à utiliser pour votre contrôleur HDMi."
+msgstr "Définir une HDAU Layout ID à utiliser pour votre contrôleur HDMi."
 
 #. type: "IntelCapri_title"
 #: Resources/templates/Localizable.strings:825
@@ -3124,7 +3166,9 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 #: Resources/templates/Localizable.strings:826
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr ""
+"Définir une AAPL,ig-platform-id à utiliser pour votre contrôleur Intel "
+"HD4000."
 
 #. type: "IntelAzul_title"
 #: Resources/templates/Localizable.strings:829
@@ -3134,24 +3178,28 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
 #: Resources/templates/Localizable.strings:830
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr ""
+"Définir une AAPL, ig-platform-id à utiliser pour votre contrôleur Intel "
+"Haswell."
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
-msgstr "Set one AAPL,ig-platform-id to use for your Intel HD4000."
+msgstr ""
+"Définir une AAPL, ig-platform-id à utiliser pour votre contrôleur Intel "
+"Broadwell."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:837
