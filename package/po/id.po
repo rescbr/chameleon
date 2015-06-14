@@ -8,8 +8,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-05-23 13:27+0200\n"
-"PO-Revision-Date: 2015-02-13 18:30-0000\n"
-"Last-Translator: level9 <stoneisrock@gmail.com>\n"
+"PO-Revision-Date: 2015-06-14 10:52+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: id <id@li.org>\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1403740025.0\n"
+"X-POOTLE-MTIME: 1434279169.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -2288,7 +2288,7 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 #, fuzzy, no-wrap
 #| msgid "00000604"
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:593
@@ -2299,10 +2299,10 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:595
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000604"
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:596
@@ -2313,10 +2313,10 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:598
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:599
@@ -2327,10 +2327,10 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001604"
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:602
@@ -2341,10 +2341,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:605
@@ -2355,10 +2355,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:608
@@ -2369,10 +2369,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:611
@@ -2398,7 +2398,7 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 #: Resources/templates/Localizable.strings:616
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:617
@@ -2409,10 +2409,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01620006"
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:620
@@ -2423,10 +2423,10 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:622
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:623
@@ -2437,10 +2437,10 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:625
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:626
@@ -2451,10 +2451,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001604"
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:629
@@ -2506,10 +2506,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:641
@@ -2520,10 +2520,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:644
@@ -2534,10 +2534,10 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0600260a"
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:647
@@ -3127,10 +3127,10 @@ msgstr ""
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:833
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:834
