@@ -98,7 +98,7 @@ extern uint32_t devices_number;
 
 const char *hda_slot_name[]		=	{ "AAPL,slot-name", "Built In" };
 
-uint8_t default_HDEF_layout_id[]		=	{0x0C, 0x00, 0x00, 0x00};
+uint8_t default_HDEF_layout_id[]		=	{0x01, 0x00, 0x00, 0x00};
 #define HDEF_LEN ( sizeof(default_HDEF_layout_id) / sizeof(uint8_t) )
 uint8_t default_HDAU_layout_id[]		=	{0x01, 0x00, 0x00, 0x00};
 #define HDAU_LEN ( sizeof(default_HDAU_layout_id) / sizeof(uint8_t) )
@@ -552,9 +552,11 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_NVIDIAGT240, 0,     "GT240" },
 	{ HDA_CODEC_NVIDIAGTS450, 0,    "GTS450" },
 	{ HDA_CODEC_NVIDIAGT440, 0,     "GT440" }, // Revision Id: 0x100100
-	{ HDA_CODEC_NVIDIAGT440, 0,     "GT440" },
+	{ HDA_CODEC_NVIDIAGTX470, 0,     "GT470" },
 	{ HDA_CODEC_NVIDIAGTX550, 0,    "GTX550" },
 	{ HDA_CODEC_NVIDIAGTX570, 0,    "GTX570" },
+	{ HDA_CODEC_NVIDIAGT610, 0,	"GT610" },
+
 
 	{ HDA_CODEC_INTELIP, 0,         "Ibex Peak" },
 	{ HDA_CODEC_INTELBL, 0,         "Bearlake" },
@@ -745,11 +747,12 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 					default_HDEF_layout_id[0], default_HDEF_layout_id[1], default_HDEF_layout_id[2], default_HDEF_layout_id[3]);
 			}
 			devprop_add_value(device, "layout-id", default_HDEF_layout_id, HDEF_LEN);
-			devprop_add_value(device, "AAPL,slot-name", (uint8_t *)"Built-in", 9); // 0x09
+			devprop_add_value(device, "AAPL,slot-name", (uint8_t *)"Built-in", sizeof("Built-in")); // 0x09
 			devprop_add_value(device, "name", (uint8_t *)"audio", 6); // 0x06
-			devprop_add_value(device, "device_type", (uint8_t *)"High Definition Audio", 22); // 0x16
+			devprop_add_value(device, "device-type", (uint8_t *)"High Definition Audio Controller", sizeof("High Definition Audio Controller"));
+			devprop_add_value(device, "device_type", (uint8_t *)"Sound", sizeof("Sound"));
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
-			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", 10); // 0x0a
+			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-1", sizeof("onboard-1")); // 0x0a
 			// "AFGLowPowerState" = <03000000>
 			break;
 
@@ -791,7 +794,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 			devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
 			devprop_add_value(device, "@0,connector-type", connector_type_value, 4);
 			devprop_add_value(device, "@1,connector-type", connector_type_value, 4);
-			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", sizeof("onboard-2"));
 			devprop_add_value(device, "built-in", &BuiltIn, 1);
 			break;
 
