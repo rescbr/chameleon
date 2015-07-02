@@ -771,7 +771,9 @@ void common_boot(int biosdev)
 			if (strncmp(bootInfo->bootFile, "bt(", sizeof("bt(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "hd(", sizeof("hd(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "rd(", sizeof("rd(") ) == 0)
+			{
 				bootFileWithDevice = true;
+			}
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')

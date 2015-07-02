@@ -47,6 +47,7 @@
 
 boot_args		*bootArgs;
 boot_args_pre_lion	*bootArgsPreLion;
+
 PrivateBootInfo_t	*bootInfo;
 Node			*gMemoryMapNode;
 
