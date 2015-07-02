@@ -704,6 +704,9 @@ Dependencies: none";
 "NvidiaGeneric_title" = "NvidiaGeneric=Yes";
 "NvidiaGeneric_description" = "Use the classic Nvidia name for the SystemProfiler (disabled by default).";
 
+"NvidiaSingle_title" = "NvidiaSingle=No";
+"NvidiaSingle_description" = "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default).";
+
 // ----------------------------------------------------------------------------
 // Boot options - KERNEL FLAGS
 // ----------------------------------------------------------------------------

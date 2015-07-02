@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-23 13:27+0200\n"
+"POT-Creation-Date: 2015-07-02 01:00+0200\n"
 "PO-Revision-Date: 2014-11-24 20:12-0000\n"
 "Last-Translator: Желязко <slackjackie@gmail.com>\n"
 "Language-Team: bg <bg@li.org>\n"
@@ -454,7 +454,7 @@ msgstr ""
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:81
-#: Resources/templates/Localizable.strings:813
+#: Resources/templates/Localizable.strings:816
 #, no-wrap
 msgid "Resolution"
 msgstr "Резолюция на екрана"
@@ -2602,74 +2602,86 @@ msgstr "NvidiaGeneric=Yes"
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
 msgstr ""
 
+#. type: "NvidiaSingle_title"
+#: Resources/templates/Localizable.strings:707
+#, no-wrap
+msgid "NvidiaSingle=No"
+msgstr ""
+
+#. type: "NvidiaSingle_description"
+#: Resources/templates/Localizable.strings:708
+#, no-wrap
+msgid "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default)."
+msgstr ""
+
 #. type: "Verbose_title"
-#: Resources/templates/Localizable.strings:711
+#: Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "Verbose Mode"
 msgstr "Подробен режим /Verbose Mode/"
 
 #. type: "Verbose_description"
-#: Resources/templates/Localizable.strings:712
+#: Resources/templates/Localizable.strings:715
 #, no-wrap
 msgid "Turns on verbose logging and allows you to see messages from both Chameleon and the OS X kernel at boot time. Essential for troubleshooting."
 msgstr "Включва подробно зареждане и ви позволява да видите съобщенията от на Хамелеон както и от ядрото на OS X по време на зареждане. Съществено значение за отстраняване на неизправности."
 
 #. type: "Singleusermode_title"
-#: Resources/templates/Localizable.strings:714
+#: Resources/templates/Localizable.strings:717
 #, no-wrap
 msgid "Single User Mode"
 msgstr "Режим на единичен потребител /Single User Mode/"
 
 #. type: "Singleusermode_description"
-#: Resources/templates/Localizable.strings:715
+#: Resources/templates/Localizable.strings:718
 #, no-wrap
 msgid "A troubleshooting option used for booting into OS X's BSD/Unix command line."
 msgstr "Отстраняване на неизправности опцията се използва за зареждане на BSD/Unix в командния ред на OS X."
 
 #. type: "Ignorecaches_title"
-#: Resources/templates/Localizable.strings:717
+#: Resources/templates/Localizable.strings:720
 #, no-wrap
 msgid "Ignore Caches"
 msgstr "Игнорирай кеша /Ignore Caches/"
 
 #. type: "Ignorecaches_description"
-#: Resources/templates/Localizable.strings:718
+#: Resources/templates/Localizable.strings:721
 #, no-wrap
 msgid "Not an option that's needed for everyday booting, but it can be useful if you want OS X to load all files from it's system folders, rather than relying on it's pre-built caches."
 msgstr "Не е опция, за ежедневно зареждане на системата, но може да бъде полезно, ако искате OS X да зареди всички файлове от системните папки, отколкото да се разчита на предварително вграден кеш."
 
 #. type: "Npci_title"
-#: Resources/templates/Localizable.strings:720
+#: Resources/templates/Localizable.strings:723
 #, no-wrap
 msgid "npci=0x2000"
 msgstr "npci=0x2000"
 
 #. type: "Npci_description"
-#: Resources/templates/Localizable.strings:721
+#: Resources/templates/Localizable.strings:724
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x2000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "За поправка на 'PCI конфигурацията' на някои системи. 0x2000 е kIOPCIConfiguratorPFM64 флаг, както се вижда в IOPCIFamily изходния код."
 
 #. type: "Npci3_title"
-#: Resources/templates/Localizable.strings:723
+#: Resources/templates/Localizable.strings:726
 #, no-wrap
 msgid "npci=0x3000"
 msgstr "npci=0x3000"
 
 #. type: "Npci3_description"
-#: Resources/templates/Localizable.strings:724
+#: Resources/templates/Localizable.strings:727
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "За поправка на 'PCI конфигурацията' на някои системи. 0x3000 е kIOPCIConfiguratorPFM64 флаг, както се вижда в IOPCIFamily изходния код."
 
 #. type: "WaitingRootDevice_title"
-#: Resources/templates/Localizable.strings:726
+#: Resources/templates/Localizable.strings:729
 #, no-wrap
 msgid "ahcidisk=1 debug=8"
 msgstr ""
 
 #. type: "WaitingRootDevice_description"
-#: Resources/templates/Localizable.strings:727
+#: Resources/templates/Localizable.strings:730
 #, no-wrap
 msgid ""
 "Info here: Waiting for root device when kernel cache used only with some disks +FIX\n"
@@ -2678,25 +2690,25 @@ msgid ""
 msgstr ""
 
 #. type: "Darkwake_title"
-#: Resources/templates/Localizable.strings:731
+#: Resources/templates/Localizable.strings:734
 #, no-wrap
 msgid "darkwake=0"
 msgstr "darkwake=0"
 
 #. type: "Darkwake_description"
-#: Resources/templates/Localizable.strings:732
+#: Resources/templates/Localizable.strings:735
 #, no-wrap
 msgid "Lion only. Disables the 'low power wake' feature which can sometimes leave the screen black after wake from sleep."
 msgstr "Само за Lion. Забранява функцията 'събуждане на ниска мощност' което понякога може да остави черен екран след събуждане от сън /sleep/."
 
 #. type: "NvdaDrv1_title"
-#: Resources/templates/Localizable.strings:734
+#: Resources/templates/Localizable.strings:737
 #, no-wrap
 msgid "nvda_drv=1"
 msgstr ""
 
 #. type: "NvdaDrv1_description"
-#: Resources/templates/Localizable.strings:735
+#: Resources/templates/Localizable.strings:738
 #, no-wrap
 msgid ""
 "It introduces a new Preference Pane under System Preferences that allows you to enable the Nvidia Web Driver.\n"
@@ -2706,25 +2718,25 @@ msgid ""
 msgstr ""
 
 #. type: "kext-dev-mode1_title"
-#: Resources/templates/Localizable.strings:740
+#: Resources/templates/Localizable.strings:743
 #, no-wrap
 msgid "kext-dev-mode=1"
 msgstr ""
 
 #. type: "kext-dev-mode1_description"
-#: Resources/templates/Localizable.strings:741
+#: Resources/templates/Localizable.strings:744
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr ""
 
 #. type: "Dart0_title"
-#: Resources/templates/Localizable.strings:743
+#: Resources/templates/Localizable.strings:746
 #, no-wrap
 msgid "dart=0"
 msgstr ""
 
 #. type: "Dart0_description"
-#: Resources/templates/Localizable.strings:744
+#: Resources/templates/Localizable.strings:747
 #, no-wrap
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
@@ -2732,297 +2744,297 @@ msgid ""
 msgstr ""
 
 #. type: "mac-de_title"
-#: Resources/templates/Localizable.strings:751
+#: Resources/templates/Localizable.strings:754
 #, no-wrap
 msgid "German Mac Keyboard"
 msgstr ""
 
 #. type: "mac-de_description"
-#: Resources/templates/Localizable.strings:752
+#: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
 msgstr "Използване на клавиатурната подредба за немска клавиатура за Mac"
 
 #. type: "mac-es_title"
-#: Resources/templates/Localizable.strings:754
+#: Resources/templates/Localizable.strings:757
 #, no-wrap
 msgid "Spanish Mac Keyboard"
 msgstr ""
 
 #. type: "mac-es_description"
-#: Resources/templates/Localizable.strings:755
+#: Resources/templates/Localizable.strings:758
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
 msgstr "Използване на клавиатурната подредба за испански клавиатура за Mac"
 
 #. type: "mac-fr_title"
-#: Resources/templates/Localizable.strings:757
+#: Resources/templates/Localizable.strings:760
 #, no-wrap
 msgid "French Mac Keyboard"
 msgstr ""
 
 #. type: "mac-fr_description"
-#: Resources/templates/Localizable.strings:758
+#: Resources/templates/Localizable.strings:761
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
 msgstr "Използване на клавиатурната подредба за френски клавиатура за Mac"
 
 #. type: "mac-it_title"
-#: Resources/templates/Localizable.strings:760
+#: Resources/templates/Localizable.strings:763
 #, no-wrap
 msgid "Italian Mac Keyboard"
 msgstr ""
 
 #. type: "mac-it_description"
-#: Resources/templates/Localizable.strings:761
+#: Resources/templates/Localizable.strings:764
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
 msgstr "Използване на клавиатурната подредба за италианска клавиатура за Mac"
 
 #. type: "mac-se_title"
-#: Resources/templates/Localizable.strings:763
+#: Resources/templates/Localizable.strings:766
 #, no-wrap
 msgid "Swedish Mac Keyboard"
 msgstr ""
 
 #. type: "mac-se_description"
-#: Resources/templates/Localizable.strings:764
+#: Resources/templates/Localizable.strings:767
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
 msgstr "Използване на клавиатурната подредба за шведски клавиатура за Mac"
 
 #. type: "pc-fr_title"
-#: Resources/templates/Localizable.strings:766
+#: Resources/templates/Localizable.strings:769
 #, no-wrap
 msgid "French PC Keyboard"
 msgstr ""
 
 #. type: "pc-fr_description"
-#: Resources/templates/Localizable.strings:767
+#: Resources/templates/Localizable.strings:770
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
 msgstr "Използвайте клавиатурна подредба за френски клавиатура PC"
 
 #. type: "Embed_title"
-#: Resources/templates/Localizable.strings:774
+#: Resources/templates/Localizable.strings:777
 #, no-wrap
 msgid "Embed"
 msgstr "Embed"
 
 #. type: "Embed_description"
-#: Resources/templates/Localizable.strings:775
+#: Resources/templates/Localizable.strings:778
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
 msgstr "Опростена версия на тема по подразбиране се използва при изграждането на версия на Хамелеон, който изисква вграден тема."
 
 #. type: "Legacy_title"
-#: Resources/templates/Localizable.strings:777
+#: Resources/templates/Localizable.strings:780
 #, no-wrap
 msgid "Legacy"
 msgstr "Legacy"
 
 #. type: "Legacy_description"
-#: Resources/templates/Localizable.strings:778
+#: Resources/templates/Localizable.strings:781
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr "Оригинална по подразбиране Хамелеон тема въведена за v2.0 RC1"
 
 #. type: "Default_title"
-#: Resources/templates/Localizable.strings:780
+#: Resources/templates/Localizable.strings:783
 #, no-wrap
 msgid "Standard"
 msgstr "Стандартна"
 
 #. type: "Default_description"
-#: Resources/templates/Localizable.strings:781
+#: Resources/templates/Localizable.strings:784
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
 msgstr "Вградената тема в Хамелион v2.0 RC5"
 
 #. type: "Bullet_title"
-#: Resources/templates/Localizable.strings:783
+#: Resources/templates/Localizable.strings:786
 #, no-wrap
 msgid "Bullet"
 msgstr "Bullet"
 
 #. type: "Bullet_description"
-#: Resources/templates/Localizable.strings:784
+#: Resources/templates/Localizable.strings:787
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
 msgstr "Прекрасна проста тема от NoSmokingBandit от април 2009."
 
 #. type: "Audio_title"
-#: Resources/templates/Localizable.strings:793
+#: Resources/templates/Localizable.strings:796
 #, no-wrap
 msgid "Audio"
 msgstr ""
 
 #. type: "Audio_description"
-#: Resources/templates/Localizable.strings:794
+#: Resources/templates/Localizable.strings:797
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options that deal with audio."
 msgstr "А изборът на опции, които се занимават с видеото."
 
 #. type: "Control_title"
-#: Resources/templates/Localizable.strings:797
+#: Resources/templates/Localizable.strings:800
 #, no-wrap
 msgid "Control Options"
 msgstr "Опциите за контрол"
 
 #. type: "Control_description"
-#: Resources/templates/Localizable.strings:798
+#: Resources/templates/Localizable.strings:801
 #, no-wrap
 msgid "Settings to control how Chameleon works."
 msgstr "Настройки, за да контролирате как работи Хамелеон."
 
 #. type: "General_title"
-#: Resources/templates/Localizable.strings:801
+#: Resources/templates/Localizable.strings:804
 #, no-wrap
 msgid "General Options"
 msgstr "Общи опции"
 
 #. type: "General_description"
-#: Resources/templates/Localizable.strings:802
+#: Resources/templates/Localizable.strings:805
 #, no-wrap
 msgid "Choose from a selection of base options."
 msgstr "Изберете от избора на базови възможности."
 
 #. type: "KernelFlags_title"
-#: Resources/templates/Localizable.strings:805
+#: Resources/templates/Localizable.strings:808
 #, no-wrap
 msgid "Kernel Flags"
 msgstr "Ядрото опции /Kernel Flags/"
 
 #. type: "KernelFlags_description"
-#: Resources/templates/Localizable.strings:806
+#: Resources/templates/Localizable.strings:809
 #, no-wrap
 msgid "Choose from a selection of kernel flags."
 msgstr "Изберете от избора на ядрото опции /kernel flags/."
 
 #. type: "PowerManagement_title"
-#: Resources/templates/Localizable.strings:809
+#: Resources/templates/Localizable.strings:812
 #, no-wrap
 msgid "Power Management"
 msgstr "Опции на захранването"
 
 #. type: "PowerManagement_description"
-#: Resources/templates/Localizable.strings:810
+#: Resources/templates/Localizable.strings:813
 #, no-wrap
 msgid "A selection of options that deal with power management and speedstep."
 msgstr "Изборът на опции, които се занимават с управление на захранването и speedstep."
 
 #. type: "Resolution_description"
-#: Resources/templates/Localizable.strings:814
+#: Resources/templates/Localizable.strings:817
 #, no-wrap
 msgid "Set one resolution to use."
 msgstr "Задаване на една резолюция."
 
 #. type: "HDEFLayout_title"
-#: Resources/templates/Localizable.strings:817
+#: Resources/templates/Localizable.strings:820
 #, no-wrap
 msgid "HDEF Layout"
 msgstr "HDEF Layout"
 
 #. type: "HDEFLayout_description"
-#: Resources/templates/Localizable.strings:818
+#: Resources/templates/Localizable.strings:821
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
 msgstr ""
 
 #. type: "HDAULayout_title"
-#: Resources/templates/Localizable.strings:821
+#: Resources/templates/Localizable.strings:824
 #, no-wrap
 msgid "HDAU Layout"
 msgstr "HDAU Layout"
 
 #. type: "HDAULayout_description"
-#: Resources/templates/Localizable.strings:822
+#: Resources/templates/Localizable.strings:825
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
 msgstr ""
 
 #. type: "IntelCapri_title"
-#: Resources/templates/Localizable.strings:825
+#: Resources/templates/Localizable.strings:828
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
 msgstr ""
 
 #. type: "IntelCapri_description"
-#: Resources/templates/Localizable.strings:826
+#: Resources/templates/Localizable.strings:829
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgstr ""
 
 #. type: "IntelAzul_title"
-#: Resources/templates/Localizable.strings:829
+#: Resources/templates/Localizable.strings:832
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr ""
 
 #. type: "IntelAzul_description"
-#: Resources/templates/Localizable.strings:830
+#: Resources/templates/Localizable.strings:833
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgstr ""
 
 #. type: "IntelBdw_title"
-#: Resources/templates/Localizable.strings:833
+#: Resources/templates/Localizable.strings:836
 #, no-wrap
 msgid "Intel Bdw AAPL,ig-platform-id"
 msgstr ""
 
 #. type: "IntelBdw_description"
-#: Resources/templates/Localizable.strings:834
+#: Resources/templates/Localizable.strings:837
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
 msgstr ""
 
 #. type: "HDEFPinConfiguration_title"
-#: Resources/templates/Localizable.strings:837
+#: Resources/templates/Localizable.strings:840
 #, no-wrap
 msgid "HDEF PinConfiguration"
 msgstr ""
 
 #. type: "HDEFPinConfiguration_description"
-#: Resources/templates/Localizable.strings:838
+#: Resources/templates/Localizable.strings:841
 #, fuzzy, no-wrap
 #| msgid "Set one resolution to use."
 msgid "Set one HDEF PinConfiguration to use."
 msgstr "Задаване на една резолюция."
 
 #. type: "Video_title"
-#: Resources/templates/Localizable.strings:841
+#: Resources/templates/Localizable.strings:844
 #, no-wrap
 msgid "Video"
 msgstr "Видео"
 
 #. type: "Video_description"
-#: Resources/templates/Localizable.strings:842
+#: Resources/templates/Localizable.strings:845
 #, no-wrap
 msgid "A selection of options that deal with video."
 msgstr "А изборът на опции, които се занимават с видеото."
 
 #. type: "Keymaps_title"
-#: Resources/templates/Localizable.strings:845
+#: Resources/templates/Localizable.strings:848
 #, no-wrap
 msgid "KeyLayout"
 msgstr "KeyLayout"
 
 #. type: "Keymaps_description"
-#: Resources/templates/Localizable.strings:846
+#: Resources/templates/Localizable.strings:849
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Изберете един keylayout да се използва. Това също така ще инсталирате модула Keylayout и keymaps."
 
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:852
+#: Resources/templates/Localizable.strings:855
 #, no-wrap
 msgid "Themes"
 msgstr "Теми"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:853
+#: Resources/templates/Localizable.strings:856
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"

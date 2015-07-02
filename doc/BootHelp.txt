@@ -89,6 +89,7 @@ Options useful in the org.chameleon.Boot.plist file:
     SkipAtiGfx=Yes|No       Skip the Automatic device-properties generation for Ati cards.
 
     NvidiaGeneric =Yes|No   Use the classic Nvidia name for the SystemProfiler (disabled by default).
+    NvidiaSingle =Yes|No    If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enbaled by default).
 
     AtiConfig=<cardcfg>   Use a different card config, e.g. AtiConfig=Megalodon.
     AtiPorts=<value>      Specify the number of ports, e.g. AtiPorts=2.
