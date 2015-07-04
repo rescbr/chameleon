@@ -316,7 +316,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
+				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCachePath);
 			}
 			closedir(cacheDir);
 		}
@@ -325,7 +325,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
 			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCachePath);
 
 		}
 	}
