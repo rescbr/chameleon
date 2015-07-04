@@ -19,6 +19,7 @@
 #endif
 
 #define XEON "Xeon"
+#define CORE_M "Core(TM) M"
 #define CORE_I3 "Core(TM) i3"
 #define CORE_I5 "Core(TM) i5"
 #define CORE_I7 "Core(TM) i7"
@@ -384,7 +385,37 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPUID_MODEL_HASWELL_U5:			// 0x3D -
 
-						value->word = 0x606;			// 1542
+						if (strstr(Platform.CPU.BrandString, CORE_M))
+						{
+							value->word = 0xB06;		// 2822
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I3))
+						{
+							value->word = 0x906;		// 2310 - Apple doesn't use it
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I5))
+						{
+							value->word = 0x606;		// 1542
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I7))
+						{
+							value->word = 0x706;		// 1798
+							return true;
+						}
+
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x606;		// 1542
+							return true;
+						}
+
+//						value->word = 0x706;			// 1798
 						return true;
 
 					case CPUID_MODEL_IVYBRIDGE_XEON:		// 0x3E - Mac Pro 6,1

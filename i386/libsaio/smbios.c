@@ -368,9 +368,10 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, partNumber),
 		kSMBMemoryDevicePartNumberKey, getSMBMemoryDevicePartNumber, NULL},
 
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Apple Specific
-	//-------------------------------------------------------------------------------------------------------------------------
+	/* ============
+	 Apple Specific
+	 ============== */
+
 	// OEM Processor Type (Apple Specific - Type 131)
 	{kSMBTypeOemProcessorType,	kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),	kSMBOemProcessorTypeKey,		
 		getSMBOemProcessorType,			NULL},
