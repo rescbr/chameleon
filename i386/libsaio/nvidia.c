@@ -1931,7 +1931,7 @@ static int devprop_add_nvidia_template(DevPropDevice *device)
 	}
 
 	// Slice added selector for single nvidia card
-	if (getBoolForKey(kNvidiaSingle, &nvidiaSingle, &bootInfo->chameleonConfig))
+	if (!getBoolForKey(kNvidiaSingle, &nvidiaSingle, &bootInfo->chameleonConfig))
 	{
 		if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_1))
 		{
@@ -2235,6 +2235,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			nvda_dev->subsys_id.subsys.vendor_id, nvda_dev->subsys_id.subsys.device_id,
 			devicepath);
 	verbose("\tNvidiaGeneric = %s\n", showGeneric ? "Yes" : "No");
+	verbose("\tNvidiaSingle = %s\n", nvidiaSingle ? "Yes" : "No");
 
 	if (!string)
 	{
