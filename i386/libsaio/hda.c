@@ -662,6 +662,12 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	uint16_t	controller_device_id = hda_dev->device_id;
 	const char	*value;
 
+	// Skip keys
+	bool do_skip_n_devprop = false;
+	bool do_skip_a_devprop = false;
+	getBoolForKey(kSkipNvidiaGfx, &do_skip_n_devprop, &bootInfo->chameleonConfig);
+	getBoolForKey(kSkipAtiGfx, &do_skip_a_devprop, &bootInfo->chameleonConfig);
+
 	verbose("\tClass code: [%04X]\n", hda_dev->class_id);
 
 	devicepath = get_pci_dev_path(hda_dev);
@@ -773,29 +779,35 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_NVIDIA_0BE4:
 		case HDA_NVIDIA_0BE3:
 		case HDA_NVIDIA_0BE2:
-
-			/* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
-			if (getValueForKey(kHDAULayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDAU_LEN * 2)
+			if ( do_skip_n_devprop )
 			{
-				uint8_t new_HDAU_layout_id[HDAU_LEN];
-				if (hex2bin(value, new_HDAU_layout_id, HDAU_LEN) == 0)
-				{
-					memcpy(default_HDAU_layout_id, new_HDAU_layout_id, HDAU_LEN);
-					verbose("\tUsing user supplied HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
-						default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
-				}
+				verbose("Skip Nvidia audio device!\n");
 			}
 			else
 			{
-				verbose("\tUsing default HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
-					default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
-			}
+				/* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
+				if (getValueForKey(kHDAULayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDAU_LEN * 2)
+				{
+					uint8_t new_HDAU_layout_id[HDAU_LEN];
+					if (hex2bin(value, new_HDAU_layout_id, HDAU_LEN) == 0)
+					{
+						memcpy(default_HDAU_layout_id, new_HDAU_layout_id, HDAU_LEN);
+						verbose("\tUsing user supplied HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+							default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
+					}
+				}
+				else
+				{
+					verbose("\tUsing default HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+						default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
+				}
 
-			devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
-			devprop_add_value(device, "@0,connector-type", connector_type_value, 4);
-			devprop_add_value(device, "@1,connector-type", connector_type_value, 4);
-			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", sizeof("onboard-2"));
-			devprop_add_value(device, "built-in", &BuiltIn, 1);
+				devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
+				devprop_add_value(device, "@0,connector-type", connector_type_value, 4);
+				devprop_add_value(device, "@1,connector-type", connector_type_value, 4);
+				devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", sizeof("onboard-2"));
+				devprop_add_value(device, "built-in", &BuiltIn, 1);
+			}
 			break;
 
 		/**************************************************************************************************************
@@ -828,27 +840,33 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_ATI_R1000:
 		case HDA_ATI_SI:
 		case HDA_ATI_VERDE:
-
-			/* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
-			if (getValueForKey(kHDAULayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDAU_LEN * 2)
+			if ( do_skip_a_devprop )
 			{
-				uint8_t new_HDAU_layout_id[HDAU_LEN];
-				if (hex2bin(value, new_HDAU_layout_id, HDAU_LEN) == 0)
-				{
-					memcpy(default_HDAU_layout_id, new_HDAU_layout_id, HDAU_LEN);
-					verbose("\tUsing user supplied HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
-						default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
-				}
+				verbose("Skip ATi/AMD audio device!\n");
 			}
 			else
 			{
-				verbose("\tUsing default HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
-					default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
-			}
+				/* if the key value kHDAULayoutID as a value set that value, if not will assign a default layout */
+				if (getValueForKey(kHDAULayoutID, &value, &len, &bootInfo->chameleonConfig) && len == HDAU_LEN * 2)
+				{
+					uint8_t new_HDAU_layout_id[HDAU_LEN];
+					if (hex2bin(value, new_HDAU_layout_id, HDAU_LEN) == 0)
+					{
+						memcpy(default_HDAU_layout_id, new_HDAU_layout_id, HDAU_LEN);
+						verbose("\tUsing user supplied HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+							default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
+					}
+				}
+				else
+				{
+					verbose("\tUsing default HDAU layout-id: 0x%02x, 0x%02x, 0x%02x, 0x%02x\n",
+						default_HDAU_layout_id[0], default_HDAU_layout_id[1], default_HDAU_layout_id[2], default_HDAU_layout_id[3]);
+				}
 
-			devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
-			devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
-			devprop_add_value(device, "built-in", &BuiltIn, 1);
+				devprop_add_value(device, "layout-id", default_HDAU_layout_id, HDAU_LEN); /*FIX ME*/
+				devprop_add_value(device, "hda-gfx", (uint8_t *)"onboard-2", 10);
+				devprop_add_value(device, "built-in", &BuiltIn, 1);
+			}
 			break;
 
 		default:
