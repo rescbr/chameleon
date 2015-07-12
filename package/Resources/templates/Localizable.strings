@@ -134,6 +134,15 @@ Dependencies: none";
 "LegacyLogo_title" = "LegacyLogo=Yes";
 "LegacyLogo_description" = "Use the legacy 'dark grey' apple logo on the light grey screen for the boot process rather than the boot.png in the theme.";
 
+"RebootOnPanic_title" = "RebootOnPanic=No";
+"RebootOnPanic_description" = "Reboot On Panic.";
+
+"EnableHiDPI_title" = "EnableHiDPI=Yes";
+"EnableHiDPI_description" = "Enable High resolution display (aka retina).";
+
+"BlackMode_title" = "BlackMode=Yes";
+"BlackMode_description" = "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background.";
+
 "InstantMenu_title" = "InstantMenu=Yes";
 "InstantMenu_description" = "By default, when Chameleon loads you'll see the icon for the current default partition, along with a timeout progress bar which left alone will count down before Chameleon automatically boots that partition. This options skips that and takes you directly to the device selection screen.";
 
@@ -742,6 +751,9 @@ Findings credits to meklort and Rampage Dev.";
 
 "kext-dev-mode1_title" = "kext-dev-mode=1";
 "kext-dev-mode1_description" = "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg.";
+
+"rootless0_title" = "rootless=0";
+"rootless0_description" = "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)";
 
 "Dart0_title" = "dart=0";
 "Dart0_description" = "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).
