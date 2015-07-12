@@ -2334,21 +2334,31 @@ void drawBootGraphics(void)
 	bool legacy_logo;
 	uint16_t x, y; 
 	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig) && legacy_logo) {
+	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig) && legacy_logo)
+	{
 		usePngImage = false; 
-	} else if (bootImageData == NULL) {
+	}
+	else if (bootImageData == NULL)
+	{
 		loadBootGraphics();
 	}
 
 	// parse screen size parameters
-	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0) {
+	if (getIntForKey("boot_width", &pos, &bootInfo->themeConfig) && pos > 0)
+	{
 		screen_params[0] = pos;
-	} else {
+	}
+	else
+	{
 		screen_params[0] = DEFAULT_SCREEN_WIDTH;
 	}
-	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0) {
+
+	if (getIntForKey("boot_height", &pos, &bootInfo->themeConfig) && pos > 0)
+	{
 		screen_params[1] = pos;
-	} else {
+	}
+	else
+	{
 		screen_params[1] = DEFAULT_SCREEN_HEIGHT;
 	}
 
@@ -2363,23 +2373,31 @@ void drawBootGraphics(void)
 	getGraphicModeParams(screen_params);
 
 	// Set graphics mode if the booter was in text mode or the screen resolution has changed.
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) ) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
+	{
 		setVideoMode(GRAPHICS_MODE, 0);
 	}
 
-	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig)) {
+	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig))
+	{
 		drawCheckerBoard();
-	} else {
+	}
+	else
+	{
 		// Fill the background to 75% grey (same as BootX). 
 		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01); 
 	}
-	if ((bootImageData) && (usePngImage)) { 
+
+	if ((bootImageData) && (usePngImage))
+	{
 		x = (screen_params[0] - MIN(bootImageWidth, screen_params[0])) / 2; 
 		y = (screen_params[1] - MIN(bootImageHeight, screen_params[1])) / 2; 
 
 		// Draw the image in the center of the display. 
 		blendImage(x, y, bootImageWidth, bootImageHeight, bootImageData); 
-	} else { 
+	}
+	else
+	{
 		uint8_t *appleBootPict; 
 		bootImageData = NULL; 
 		bootImageWidth = kAppleBootWidth; 
@@ -2387,9 +2405,11 @@ void drawBootGraphics(void)
 
 		// Prepare the data for the default Apple boot image. 
 		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
-		if (appleBootPict) { 
+		if (appleBootPict)
+		{
 			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
-			if (bootImageData) {	
+			if (bootImageData)
+			{
 				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
 				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
 				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);

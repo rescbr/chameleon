@@ -654,7 +654,7 @@ void setupBoardId()
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
 	}
 }
 

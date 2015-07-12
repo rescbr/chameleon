@@ -233,8 +233,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 
 //==========================================================================
 
-static const char *getNameForValue( const struct NamedValue *nameTable,
-                                     unsigned char value )
+static const char *getNameForValue( const struct NamedValue *nameTable, unsigned char value )
 {
 	const struct NamedValue *np;
 
@@ -328,7 +327,7 @@ static int Biosread( int biosdev, unsigned long long secno )
 		{
 			if (rc == ECC_CORRECTED_ERR)
 			{
-				rc = 0; /* Ignore corrected ECC errors */
+				rc = 0; // Ignore corrected ECC errors
 				break;
 			}
 
@@ -368,9 +367,10 @@ static int Biosread( int biosdev, unsigned long long secno )
 		{
 			if (rc == ECC_CORRECTED_ERR)
 			{
-				rc = 0; /* Ignore corrected ECC errors */
+				rc = 0; // Ignore corrected ECC errors
 				break;
 			}
+
 			error("  BIOS read error: %s\n", bios_error(rc), rc);
 			error("  Block %d, Cyl %d Head %d Sector %d\n", secno, cyl, head, sec);
 			sleep(1);

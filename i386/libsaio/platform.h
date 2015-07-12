@@ -417,7 +417,15 @@ typedef struct _PlatformInfo_t
 
 	} CPU;
 
-	struct RAM {
+	struct DMI
+	{
+		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
+		int			CntMemorySlots;		// number of memory slots counted
+		int			MemoryModules;		// number of memory modules installed
+		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
+	} DMI;
+	struct RAM
+	{
 		uint64_t		Frequency;		// Ram Frequency
 		uint32_t		Divider;		// Memory divider
 		uint8_t			CAS;			// CAS 1/2/2.5/3/4/5/6/7
@@ -429,13 +437,6 @@ typedef struct _PlatformInfo_t
 		uint8_t			Type;			// Standard SMBIOS v2.5 Memory Type
 		RamSlotInfo_t	DIMM[MAX_RAM_SLOTS];		// Information about each slot
 	} RAM;
-
-	struct DMI {
-		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
-		int			CntMemorySlots;		// number of memory slots counted
-		int			MemoryModules;		// number of memory modules installed
-		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
-	} DMI;
 
 	uint8_t				Type;			// system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;			// system-id (SMBIOS Table 1: system uuid)

@@ -31,45 +31,52 @@
 
 #include "bootargs.h"
 
-typedef union {
-	unsigned int      rx;
-	unsigned short    rr;
-	struct {
-		unsigned char l;
-		unsigned char h;
+typedef union
+{
+	unsigned int	rx;
+	unsigned short	rr;
+
+	struct
+	{
+		unsigned char	l;
+		unsigned char	h;
 	} r;
 } machineRegister_t;
 
-typedef struct {
-	unsigned short cf  :1;
-	unsigned short     :1;
-	unsigned short pf  :1;
-	unsigned short     :1;
-	unsigned short af  :1;
-	unsigned short     :1;
-	unsigned short zf  :1;
-	unsigned short sf  :1;
-	unsigned short tf  :1;
-	unsigned short _if :1;
-	unsigned short df  :1;
-	unsigned short of  :1;
-	unsigned short iopl:2;
-	unsigned short nt  :1;
+
+typedef struct
+{
+	unsigned short cf	: 1;
+	unsigned short		: 1;
+	unsigned short pf	: 1;
+	unsigned short		: 1;
+	unsigned short af	: 1;
+	unsigned short		: 1;
+	unsigned short zf	: 1;
+	unsigned short sf	: 1;
+	unsigned short tf	: 1;
+	unsigned short _if	: 1;
+	unsigned short df	: 1;
+	unsigned short of	: 1;
+	unsigned short iopl	: 2;
+	unsigned short nt	: 1;
 } machineFlags_t;
 
-typedef struct {
-	unsigned int      intno;
-	machineRegister_t eax;
-	machineRegister_t ebx;
-	machineRegister_t ecx;
-	machineRegister_t edx;
-	machineRegister_t edi;
-	machineRegister_t esi;
-	machineRegister_t ebp;
-	unsigned short    cs;
-	unsigned short    ds;
-	unsigned short    es;
-	machineFlags_t    flags;
+
+typedef struct
+{
+	unsigned int		intno;
+	machineRegister_t	eax;
+	machineRegister_t	ebx;
+	machineRegister_t	ecx;
+	machineRegister_t	edx;
+	machineRegister_t	edi;
+	machineRegister_t	esi;
+	machineRegister_t	ebp;
+	unsigned short		cs;
+	unsigned short		ds;
+	unsigned short		es;
+	machineFlags_t		flags;
 } biosBuf_t;
 
 #define EBIOS_FIXED_DISK_ACCESS		0x01
@@ -82,7 +89,8 @@ typedef struct {
 /* 
  * ACPI defined memory range types.
  */
-enum {
+enum
+{
 	kMemoryRangeUsable   = 1,    // RAM usable by the OS.
 	kMemoryRangeReserved = 2,    // Reserved. (Do not use)
 	kMemoryRangeACPI     = 3,    // ACPI tables. Can be reclaimed.
@@ -95,11 +103,12 @@ enum {
 /*
  * Memory range descriptor.
  */
-typedef struct MemoryRange {
-	unsigned long long base;     // 64-bit base address
-	unsigned long long length;   // 64-bit length in bytes
-	unsigned long      type;     // type of memory range
-	unsigned long      reserved;
+typedef struct MemoryRange
+{
+	unsigned long long	base;		// 64-bit base address
+	unsigned long long	length;		// 64-bit length in bytes
+	unsigned long		type;		// type of memory range
+	unsigned long		reserved;
 } MemoryRange;
 
 #endif /* !__LIBSAIO_BIOS_H */

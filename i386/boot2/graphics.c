@@ -780,11 +780,12 @@ void drawCheckerBoard()
 
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 {
-    long result, red, green, blue;
-  
-    red   = appleClut8[index * 3 + 0];
-    green = appleClut8[index * 3 + 1];
-    blue  = appleClut8[index * 3 + 2];
+    long result;
+
+    long colorIndex = (index * 3);
+    long red   = appleClut8[ colorIndex   ];
+    long green = appleClut8[ colorIndex++ ];
+    long blue  = appleClut8[ colorIndex++ ];
 
     switch (depth) {
         case 16 :
@@ -810,7 +811,7 @@ unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 //==========================================================================
 // drawColorRectangle
 
-void * stosl(void * dst, long val, long len)
+void *stosl(void *dst, long val, long len)
 {
 	asm volatile ( "rep; stosl"
 				  : "=c" (len), "=D" (dst)
@@ -828,9 +829,9 @@ void drawColorRectangle( unsigned short x,
                                 unsigned short height,
                                 unsigned char  colorIndex )
 {
-	long   pixelBytes;
-	long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
-	char * vram;
+	long	pixelBytes;
+	long	color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
+	char	*vram;
 
 	pixelBytes = VIDEO(depth) / 8;
 	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
@@ -878,12 +879,12 @@ void drawDataRectangle( unsigned short  x,
 
 void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or)
 {
-	int x,y, off;
-	int red=0x7f, green=0x7f, blue=0x7f;
-	for (x=0;x<ow;x++)
-		for (y=0;y<oh;y++)
+	int x, y, off;
+	int red = 0x7f, green = 0x7f, blue = 0x7f;
+	for ( x = 0; x < ow; x++)
+		for ( y = 0; y < oh; y++ )
 		{
-			off=(x*iw)/ow+((y*ih)/oh)*iw;
+			off = ( x * iw ) / ow +( ( y * ih ) / oh ) * iw;
 			switch (ip)
 			{
 				case 16:

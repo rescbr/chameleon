@@ -117,24 +117,32 @@ size_t strlen(const char * s)
 
 /*#endif*/
 
+
+//==========================================================================
 /* NOTE: Moved from ntfs.c */
-int
-memcmp(const void *p1, const void *p2, size_t len)
+int memcmp(const void *p1, const void *p2, size_t len)
 {
-    while (len--) {
-        if (*(const char*)(p1++) != *(const char*)(p2++))
-            return -1;
-    }
+	while (len--)
+	{
+		if (*(const char*)(p1++) != *(const char*)(p2++))
+		{
+			return -1;
+		}
+	}
     return 0;
 }
 
-int
-strcmp(const char * s1, const char * s2)
+
+//==========================================================================
+
+int strcmp(const char * s1, const char * s2)
 {
-	while (*s1 && (*s1 == *s2)) {
+	while (*s1 && (*s1 == *s2))
+	{
 		s1++;
 		s2++;
 	}
+
 	return (*s1 - *s2);
 }
 
@@ -220,24 +228,43 @@ char *strstr(const char *in, const char *str)
     return (char *) (in - 1);
 }
 
+
+//==========================================================================
+
 int ptol(const char *str)
 {
 	register int c = *str;
 
 	if (c <= '7' && c >= '0')
+	{
 		c -= '0';
+	}
 	else if (c <= 'h' && c >= 'a')
+	{
 		c -= 'a';
-	else c = 0;
+	}
+	else
+	{
+		c = 0;
+	}
+
 	return c;
 }
+
+
+//==========================================================================
 
 int atoi(const char *str)
 {
 	register int sum = 0;
+
 	while (*str == ' ' || *str == '\t')
+	{
 		str++;
-	while (*str >= '0' && *str <= '9') {
+	}
+
+	while (*str >= '0' && *str <= '9')
+	{
 		sum *= 10;
 		sum += *str++ - '0';
 	}
@@ -373,9 +400,9 @@ char *strbreak(const char *str, char **next, long *len)
 /* COPYRIGHT NOTICE: checksum8 from AppleSMBIOS */
 uint8_t checksum8( void *start, unsigned int length )
 {
-    uint8_t   csum = 0;
-    uint8_t * cp = (uint8_t *) start;
-    unsigned int i;
+	uint8_t	csum = 0;
+	uint8_t	*cp = (uint8_t *) start;
+	unsigned int i;
 
 	for ( i = 0; i < length; i++)
 	{
