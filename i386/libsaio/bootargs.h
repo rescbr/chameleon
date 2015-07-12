@@ -116,8 +116,8 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsVersion		2
 
 // Snow Leopard and older
-#define kBootArgsPreLionRevision	6
-#define kBootArgsPreLionVersion		1
+#define kBootArgsLegacyVersion		1
+#define kBootArgsLegacyRevision		6
 
 /* Snapshot constants of previous revisions that are supported */
 #define kBootArgsVersion1		1
@@ -187,7 +187,7 @@ typedef struct boot_args
 
 } boot_args;
 
-typedef struct boot_args_pre_lion
+typedef struct boot_args_legacy
 {
     uint16_t    Revision;	/* Revision of boot_args structure */
     uint16_t    Version;	/* Version of boot_args structure */
@@ -220,6 +220,6 @@ typedef struct boot_args_pre_lion
     uint64_t    efiRuntimeServicesVirtualPageStart; /* virtual address of defragmented runtime pages */
     uint32_t    __reserved3[2];
 
-} boot_args_pre_lion;
+} boot_args_legacy;
 
 #endif /* _PEXPERT_I386_BOOT_H */

@@ -236,9 +236,9 @@ static int ExecKernel(void *binary)
 	if ( TIGER || LEOPARD || SNOW_LEOPARD )
 	{
 		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsPreLion, NULL, NULL);
+		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsLegacy, NULL, NULL);
 
-		startprog( kernelEntry, bootArgsPreLion );
+		startprog( kernelEntry, bootArgsLegacy );
 	}
 	else
 	{
