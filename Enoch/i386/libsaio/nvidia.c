@@ -79,6 +79,7 @@
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
 static bool	showGeneric	= false;
+static bool	nvidiaSingle	= true;
 static bool	doit		= false;
 char generic_name[128];
 extern uint32_t devices_number;
@@ -1906,7 +1907,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 
 static int devprop_add_nvidia_template(DevPropDevice *device)
 {
-	char tmp[16];
+	//char tmp[16];
 	DBG("\tdevprop_add_nvidia_template\n");
 
 	if (!device)
@@ -1929,19 +1930,28 @@ static int devprop_add_nvidia_template(DevPropDevice *device)
 		return 0;
 	}
 
-	if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_1))
+	// Slice added selector for single nvidia card
+	if (!getBoolForKey(kNvidiaSingle, &nvidiaSingle, &bootInfo->chameleonConfig))
 	{
-		return 0;
-	}
+		if (!DP_ADD_TEMP_VAL(device, nvidia_compatible_1))
+		{
+			return 0;
+		}
 
-	if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_1))
-	{
-		return 0;
-	}
+		if (!DP_ADD_TEMP_VAL(device, nvidia_device_type_1))
+		{
+			return 0;
+		}
 
-	if (!DP_ADD_TEMP_VAL(device, nvidia_name_1))
+		if (!DP_ADD_TEMP_VAL(device, nvidia_name_1))
+		{
+			return 0;
+		}
+
+	}
+	else
 	{
-		return 0;
+		DBG("\tNVidia: Injecting only device 0\n");
 	}
 
 	if (devices_number == 1)
@@ -1958,8 +1968,8 @@ static int devprop_add_nvidia_template(DevPropDevice *device)
 
 	// Rek : Dont use sprintf return, it does not WORK !! our custom sprintf() always return 0!
 	// len = sprintf(tmp, "Slot-%x", devices_number);
-	snprintf(tmp, sizeof(tmp), "Slot-%x",devices_number);
-	devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, (uint32_t)strlen(tmp));
+	//snprintf(tmp, sizeof(tmp), "Slot-%x",devices_number);
+	//devprop_add_value(device, "AAPL,slot-name", (uint8_t *) tmp, (uint32_t)strlen(tmp));
 	devices_number++;
 
 	return 1;
@@ -2225,6 +2235,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 			nvda_dev->subsys_id.subsys.vendor_id, nvda_dev->subsys_id.subsys.device_id,
 			devicepath);
 	verbose("\tNvidiaGeneric = %s\n", showGeneric ? "Yes" : "No");
+	verbose("\tNvidiaSingle = %s\n", nvidiaSingle ? "Yes" : "No");
 
 	if (!string)
 	{
@@ -2235,10 +2246,7 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 
 	/* FIXME: for primary graphics card only */
 	boot_display = 1;
-	if (devices_number == 1)
-	{
-		devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t *)&boot_display, 4);
-	}
+	devprop_add_value(device, "@0,AAPL,boot-display", (uint8_t *)&boot_display, 4);
 
 	if (getBoolForKey(kUseIntelHDMI, &doit, &bootInfo->chameleonConfig) && doit)
 	{

@@ -236,9 +236,9 @@ static int ExecKernel(void *binary)
 	if ( TIGER || LEOPARD || SNOW_LEOPARD )
 	{
 		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsPreLion, NULL, NULL);
+		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsLegacy, NULL, NULL);
 
-		startprog( kernelEntry, bootArgsPreLion );
+		startprog( kernelEntry, bootArgsLegacy );
 	}
 	else
 	{
@@ -312,7 +312,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
+				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCachePath);
 			}
 			closedir(cacheDir);
 		}
@@ -321,7 +321,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
 			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCachePath);
 
 		}
 	}
@@ -767,7 +767,9 @@ void common_boot(int biosdev)
 			if (strncmp(bootInfo->bootFile, "bt(", sizeof("bt(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "hd(", sizeof("hd(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "rd(", sizeof("rd(") ) == 0)
+			{
 				bootFileWithDevice = true;
+			}
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')

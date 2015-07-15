@@ -56,8 +56,7 @@
  * Printn prints a number n in base b.
  * We don't use recursion to avoid deep kernel stacks.
  */
-static void
-printn(n, b, flag, minwidth, putfn_p, putfn_arg)
+static void printn(n, b, flag, minwidth, putfn_p, putfn_arg)
 	u_long n;
 	int b, flag, minwidth;
 	void (*putfn_p)();

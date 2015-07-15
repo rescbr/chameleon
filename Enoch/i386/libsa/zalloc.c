@@ -109,12 +109,9 @@ void * safe_malloc(size_t size, const char *file, int line)
 
 	size = ((size + 0xf) & ~0xf);
 
-	if (size == 0)
+	if (size == 0 && zerror)
 	{
-		if (zerror)
-		{
-			(*zerror)((char *)0xdeadbeef, 0, file, line);
-        	}
+		(*zerror)((char *)0xdeadbeef, 0, file, line);
         }
 #if BEST_FIT
 	smallestSize = 0;

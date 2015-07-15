@@ -233,8 +233,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 
 //==========================================================================
 
-static const char *getNameForValue( const struct NamedValue *nameTable,
-                                     unsigned char value )
+static const char *getNameForValue( const struct NamedValue *nameTable, unsigned char value )
 {
 	const struct NamedValue *np;
 
@@ -328,7 +327,7 @@ static int Biosread( int biosdev, unsigned long long secno )
 		{
 			if (rc == ECC_CORRECTED_ERR)
 			{
-				rc = 0; /* Ignore corrected ECC errors */
+				rc = 0; // Ignore corrected ECC errors
 				break;
 			}
 
@@ -368,9 +367,10 @@ static int Biosread( int biosdev, unsigned long long secno )
 		{
 			if (rc == ECC_CORRECTED_ERR)
 			{
-				rc = 0; /* Ignore corrected ECC errors */
+				rc = 0; // Ignore corrected ECC errors
 				break;
 			}
+
 			error("  BIOS read error: %s\n", bios_error(rc), rc);
 			error("  Block %d, Cyl %d Head %d Sector %d\n", secno, cyl, head, sec);
 			sleep(1);
@@ -842,7 +842,7 @@ EFI_GUID const GPT_BASICDATA2_GUID	= { 0xE3C9E316, 0x0B5C, 0x4DB8, { 0x81, 0x7D,
 //EFI_GUID const GPT_RAID_OFFLINE_GUID	= { 0x52414944, 0x5f4f, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF02 "Apple RAID offline"
 //EFI_GUID const GPT_LABEL_GUID		= { 0x4C616265, 0x6C00, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF03 "Apple label"
 //EFI_GUID const GPT_APPLETV_GUID	= { 0x5265636F, 0x7665, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF04 "Apple TV recovery"
-//EFI_GUID const GPT_CORESTORAGE_GUID	= { 0x53746F72, 0x6167, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF05 "Apple Core storage"
+EFI_GUID const GPT_CORESTORAGE_GUID	= { 0x53746F72, 0x6167, 0x11AA, { 0xAA, 0x11, 0x00, 0x30, 0x65, 0x43, 0xEC, 0xAC } }; // 0xAF05 "Apple Core storage"
 // same as Apple ZFS
 //EFI_GUID const GPT_ZFS_GUID		= { 0x6A898CC3, 0x1DD2, 0x11B2, { 0x99, 0xA6, 0x08, 0x00, 0x20, 0x73, 0x66, 0x31 } };  // 0xBF01 "Solaris /usr & Apple ZFS
 

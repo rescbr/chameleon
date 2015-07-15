@@ -500,71 +500,6 @@ static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 	return dst;
 }
 
-// Bungo
-/*
- * Get the SystemID from the bios dmi info
-
-static	EFI_CHAR8 *getSmbiosUUID()
-{
-	static EFI_CHAR8	uuid[UUID_LEN];
-	int			i;
-	int			isZero;
-	int			isOnes;
-	SMBByte			*p;
-
-	p = (SMBByte *)Platform.UUID;
-
-	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
-	{
-		if (p[i] != 0x00)
-		{
-			isZero = 0;
-		}
-
-		if (p[i] != 0xff)
-		{
-			isOnes = 0;
-		}
-	}
-
-	if (isZero || isOnes) // empty or setable means: no uuid present
-	{
-		verbose("No UUID present in SMBIOS System Information Table\n");
-		return 0;
-	}
-
-	memcpy(uuid, p, UUID_LEN);
-	return uuid;
-}
-
-
-// return a binary UUID value from the overriden SystemID and SMUUID if found, 
-// or from the bios if not, or from a fixed value if no bios value is found 
-
-static EFI_CHAR8 *getSystemID()
-{
-	// unable to determine UUID for host. Error: 35 fix
-	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
-	// belong to smbios config only ...
-	const char *sysId = getStringForKey(kSystemID, &bootInfo->chameleonConfig);
-	EFI_CHAR8*	ret = getUUIDFromString(sysId);
-
-	if (!sysId || !ret) // try bios dmi info UUID extraction
-	{
-		ret = getSmbiosUUID();
-		sysId = 0;
-	}
-
-	if (!ret)
-	{
-		// no bios dmi UUID available, set a fixed value for system-id
-		ret=getUUIDFromString((sysId = (const char *) SYSTEM_ID));
-	}
-	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
-	return ret;
-}
- */
-
 /*
  * Must be called AFTER setupAcpi because we need to take care of correct
  * FACP content to reflect in ioregs
@@ -678,14 +613,6 @@ static void setupEfiDeviceTree(void)
 
 	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(DEVICE_PATHS_SUPPORTED), (EFI_UINT8 *) &DEVICE_PATHS_SUPPORTED);
 
-	// Bungo
-	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID()))
-	{
-		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *) ret);
-	}
-	*/
-
 	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
 	// Export SystemSerialNumber if present
@@ -715,10 +642,10 @@ void setupBoardId()
 	{
 		stop("Couldn't get root '/' node");
 	}
-	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig); // SMboardserial
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
 	}
 }
 
@@ -754,7 +681,7 @@ void setupChosenNode()
 
 	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
-	if ( YOSEMITE || ELCAPITAN )
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) // Yosemite+
 	{
 		//
 		// Pike R. Alpha - 12 October 2014
@@ -855,6 +782,7 @@ void setupChosenNode()
 
 		}
 	}
+
 }
 
 /*

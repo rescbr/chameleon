@@ -669,6 +669,7 @@ LoadMatchedModules( void )
 			{
 				fileName = prop->string;
 				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
+
 				length = LoadThinFatFile(gFileSpec, &executableAddr);
 				if (length == 0)
 				{
@@ -678,7 +679,9 @@ LoadMatchedModules( void )
 //				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
 			}
 			else
+			{
 				length = 0;
+			}
 
 			if (length != -1)
 			{
@@ -699,6 +702,7 @@ LoadMatchedModules( void )
 				driver = (DriverInfoPtr)driverAddr;
 				driver->plistAddr = (char *)(driverAddr + sizeof(DriverInfo));
 				driver->plistLength = module->plistLength;
+
 				if (length != 0)
 				{
 					driver->executableAddr = (void *)(driverAddr + sizeof(DriverInfo) +
@@ -710,16 +714,19 @@ LoadMatchedModules( void )
 					driver->executableAddr	 = 0;
 					driver->executableLength = 0;
 				}
+
 				driver->bundlePathAddr = (void *)(driverAddr + sizeof(DriverInfo) +
 									 module->plistLength + driver->executableLength);
 				driver->bundlePathLength = module->bundlePathLength;
 
 				// Save the plist, module and bundle.
 				strlcpy(driver->plistAddr, module->plistAddr, driver->plistLength);
+
 				if (length != 0)
 				{
 					memcpy(driver->executableAddr, executableAddr, length);
 				}
+
 				strlcpy(driver->bundlePathAddr, module->bundlePath, module->bundlePathLength);
 
 				// Add an entry to the memory map.
@@ -1004,6 +1011,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	// Bungo: scan binary for Darwin Kernel Version string
 	uint32_t offset = 0;
 	strncpy(gDarwinBuildVerStr, "Darwin Kernel Version", sizeof(gDarwinBuildVerStr));
+
 	while ((offset < 0xFFFFFFFF - (uint32_t)binary - 256) && memcmp(binary + offset, gDarwinBuildVerStr, 21))
 	{
 		offset++;

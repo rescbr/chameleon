@@ -97,26 +97,37 @@ strtol(nptr, endptr, base)
 	 * If base is 0, allow 0x for hex and 0 for octal, else
 	 * assume decimal; if base is already 16, allow 0x.
 	 */
-	do {
+
+	do
+	{
 		c = *s++;
 	} while (isspace(c));
-	if (c == '-') {
+
+	if (c == '-')
+	{
 		neg = 1;
 		c = *s++;
-	} else if (c == '+') {
+	}
+	else if (c == '+')
+	{
 		c = *s++;
 	}
 
-	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X')) {
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
-	} else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B')) {
+	}
+	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
+	{
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
-	if (base == 0) {
+
+	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
 	}
 
@@ -137,36 +148,57 @@ strtol(nptr, endptr, base)
 	 * Set any if any `digits' consumed; make it negative to indicate
 	 * overflow.
 	 */
+
 	cutoff = neg ? -(unsigned long)LONG_MIN : LONG_MAX;
 	cutlim = cutoff % (unsigned long)base;
 	cutoff /= (unsigned long)base;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c)) {
+
+	for (acc = 0, any = 0;; c = *s++)
+	{
+		if (isdigit(c))
+		{
 			c -= '0';
-		} else if (isalpha(c)) {
+		}
+		else if (isalpha(c))
+		{
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		} else {
+		}
+		else
+		{
 			break;
 		}
-		if (c >= base) {
+
+		if (c >= base)
+		{
 			break;
 		}
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
+
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		{
 			any = -1;
-		} else {
+		}
+		else
+		{
 			any = 1;
 			acc *= base;
 			acc += c;
 		}
 	}
-	if (any < 0) {
+
+	if (any < 0)
+	{
 		acc = neg ? LONG_MIN : LONG_MAX;
-//		errno = ERANGE;
-	} else if (neg)
+	}
+	else if (neg)
+	{
 		acc = -acc;
-	if (endptr != 0) {
+	}
+
+	if (endptr != 0)
+	{
 		*endptr = (char *)(any ? s - 1 : nptr);
 	}
+
 	return (acc);
 }
 
@@ -192,57 +224,88 @@ strtoul(nptr, endptr, base)
 	/*
 	 * See strtol for comments as to the logic used.
 	 */
-	do {
+	do
+	{
 		c = *s++;
 	} while (isspace(c));
-	if (c == '-') {
+
+	if (c == '-')
+	{
 		neg = 1;
 		c = *s++;
-	} else if (c == '+') {
+	}
+	else if (c == '+')
+	{
 		c = *s++;
 	}
-	if ((base == 0 || base == 16) &&  c == '0' && (*s == 'x' || *s == 'X'))	{
+
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
-	} else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B')) {
+	}
+	else if ((base == 0 || base == 2) && c == '0' && (*s == 'b' || *s == 'B'))
+	{
 		c = s[1];
 		s += 2;
 		base = 2;
 	}
-	if (base == 0) {
+
+	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
 	}
+
 	cutoff = (unsigned long)ULONG_MAX / (unsigned long)base;
 	cutlim = (unsigned long)ULONG_MAX % (unsigned long)base;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c)) {
+
+	for (acc = 0, any = 0;; c = *s++)
+	{
+		if (isdigit(c))
+		{
 			c -= '0';
-		} else if (isalpha(c)) {
+		}
+		else if (isalpha(c))
+		{
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		} else {
+		}
+		else
+		{
 			break;
 		}
-		if (c >= base) {
+
+		if (c >= base)
+		{
 			break;
 		}
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
+
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		{
 			any = -1;
-		} else {
+		}
+		else
+		{
 			any = 1;
 			acc *= base;
 			acc += c;
 		}
 	}
-	if (any < 0) {
+
+	if (any < 0)
+	{
 		acc = ULONG_MAX;
-//		errno = ERANGE;
-	} else if (neg) {
+	}
+	else if (neg)
+	{
 		acc = -acc;
 	}
-	if (endptr != 0) {
+
+	if (endptr != 0)
+	{
 		*endptr = (char *)(any ? s - 1 : nptr);
 	}
+
 	return (acc);
 }
 
@@ -268,56 +331,88 @@ strtouq(nptr, endptr, base)
 	 * See strtoq for comments as to the logic used.
 	 */
 	s = nptr;
-	do {
+
+	do
+	{
 		c = *s++;
 	} while (isspace(c));
-	if (c == '-') {
+
+	if (c == '-')
+	{
 		neg = 1;
 		c = *s++;
-	} else { 
+	}
+	else
+	{
 		neg = 0;
-		if (c == '+') {
+
+		if (c == '+')
+		{
 			c = *s++;
 		}
 	}
-	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X')) {
+
+	if ((base == 0 || base == 16) && c == '0' && (*s == 'x' || *s == 'X'))
+	{
 		c = s[1];
 		s += 2;
 		base = 16;
 	}
-	if (base == 0) {
+
+	if (base == 0)
+	{
 		base = c == '0' ? 8 : 10;
 	}
+
 	qbase = (unsigned)base;
 	cutoff = (unsigned long long)UQUAD_MAX / qbase;
 	cutlim = (unsigned long long)UQUAD_MAX % qbase;
-	for (acc = 0, any = 0;; c = *s++) {
-		if (isdigit(c)) {
+
+	for (acc = 0, any = 0;; c = *s++)
+	{
+		if (isdigit(c))
+		{
 			c -= '0';
-		} else if (isalpha(c)) {
+		}
+		else if (isalpha(c))
+		{
 			c -= isupper(c) ? 'A' - 10 : 'a' - 10;
-		} else {
+		}
+		else
+		{
 			break;
 		}
-		if (c >= base) {
+
+		if (c >= base)
+		{
 			break;
 		}
-		if (any < 0 || acc > cutoff || (acc == cutoff && c > cutlim)) {
+
+		if ((any < 0 || acc > cutoff) || (acc == cutoff && c > cutlim))
+		{
 			any = -1;
-		} else {
+		}
+		else
+		{
 			any = 1;
 			acc *= qbase;
 			acc += c;
 		}
 	}
-	if (any < 0) {
+
+	if (any < 0)
+	{
 		acc = UQUAD_MAX;
-//		errno = ERANGE;
-	} else if (neg) {
+	}
+	else if (neg)
+	{
 		acc = -acc;
 	}
-	if (endptr != 0) {
+
+	if (endptr != 0)
+	{
 		*endptr = (char *)(any ? s - 1 : nptr);
 	}
+
 	return (acc);
 }

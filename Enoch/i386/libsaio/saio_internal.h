@@ -202,6 +202,7 @@ extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * fla
                           u_int32_t * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
+
 extern void   scanDisks(int biosdev, int *count);
 extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);

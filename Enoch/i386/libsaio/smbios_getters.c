@@ -19,6 +19,7 @@
 #endif
 
 #define XEON "Xeon"
+#define CORE_M "Core(TM) M"
 #define CORE_I3 "Core(TM) i3"
 #define CORE_I5 "Core(TM) i5"
 #define CORE_I7 "Core(TM) i7"
@@ -384,7 +385,37 @@ bool getSMBOemProcessorType(returnType *value)
 
 					case CPUID_MODEL_HASWELL_U5:			// 0x3D -
 
-						value->word = 0x606;			// 1542
+						if (strstr(Platform.CPU.BrandString, CORE_M))
+						{
+							value->word = 0xB06;		// 2822
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I3))
+						{
+							value->word = 0x906;		// 2310 - Apple doesn't use it
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I5))
+						{
+							value->word = 0x606;		// 1542
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_I7))
+						{
+							value->word = 0x706;		// 1798
+							return true;
+						}
+
+						if (Platform.CPU.NoCores <= 2)
+						{
+							value->word = 0x606;		// 1542
+							return true;
+						}
+
+//						value->word = 0x706;			// 1798
 						return true;
 
 					case CPUID_MODEL_IVYBRIDGE_XEON:		// 0x3E - Mac Pro 6,1
@@ -466,11 +497,6 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 	static int idx = -1;
 	int	map;
 
-	if (!bootInfo->memDetect)
-	{
-		return false;
-	}
-
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
 	{
@@ -483,8 +509,7 @@ bool getSMBMemoryDeviceMemoryType(returnType *value)
 		}
 	}
 
-	value->byte = 2; // means Unknown
-	return true;
+	return false;
 //	value->byte = SMB_MEM_TYPE_DDR2;
 //	return true;
 }
@@ -500,11 +525,6 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 	static int idx = -1;
 	int	map;
 
-	if (!bootInfo->memDetect)
-	{
-		return false;
-	}
-
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
 	{
@@ -517,8 +537,7 @@ bool getSMBMemoryDeviceMemorySpeed(returnType *value)
 		}
 	}
 
-	value->dword = 0; // means Unknown
-	return true;
+	return false;
 //	value->dword = 800;
 //	return true;
 }
@@ -527,11 +546,6 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 {
 	static int idx = -1;
 	int	map;
-
-	if (!bootInfo->memDetect)
-	{
-		return false;
-	}
 
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
@@ -545,6 +559,10 @@ bool getSMBMemoryDeviceManufacturer(returnType *value)
 		}
 	}
 
+	if (!bootInfo->memDetect)
+	{
+		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -553,11 +571,6 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 {
 	static int idx = -1;
 	int	map;
-
-	if (!bootInfo->memDetect)
-	{
-		return false;
-	}
 
 	idx++;
 
@@ -574,6 +587,10 @@ bool getSMBMemoryDeviceSerialNumber(returnType *value)
 		}
 	}
 
+	if (!bootInfo->memDetect)
+	{
+		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }
@@ -582,11 +599,6 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 {
 	static int idx = -1;
 	int	map;
-
-	if (!bootInfo->memDetect)
-	{
-		return false;
-	}
 
 	idx++;
 	if (idx < MAX_RAM_SLOTS)
@@ -600,6 +612,10 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 		}
 	}
 
+	if (!bootInfo->memDetect)
+	{
+		return false;
+	}
 	value->string = NOT_AVAILABLE;
 	return true;
 }

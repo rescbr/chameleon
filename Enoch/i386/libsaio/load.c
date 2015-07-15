@@ -32,11 +32,12 @@
 #include <sl.h>
 
 #if DEBUG
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
+// Private functions.
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
@@ -44,7 +45,7 @@ static long DecodeSymbolTable(long cmdBase);
 
 static unsigned long gBinaryAddress;
 bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
-cpu_type_t archCpuType=CPU_TYPE_I386;
+cpu_type_t archCpuType = CPU_TYPE_I386;
 
 
 //==============================================================================
@@ -182,8 +183,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		switch (cmd)
 		{
-			case LC_SEGMENT_64:
 			case LC_SEGMENT:
+			case LC_SEGMENT_64:
 			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
 
 			if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR)
@@ -193,6 +194,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			}
 			break;
 
+			case LC_MAIN:	/* Mountain Lion's replacement for LC_UNIXTHREAD */
 			case LC_UNIXTHREAD:
 				ret = DecodeUnixThread(cmdBase, &entry);
 			break;
@@ -257,7 +259,7 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		struct segment_command_64 *segCmd;
 		segCmd = (struct segment_command_64 *)cmdBase;
 		vmaddr = (segCmd->vmaddr & 0x3fffffff);
-		vmsize = segCmd->vmsize;	  
+		vmsize = segCmd->vmsize;
 		fileaddr = (gBinaryAddress + segCmd->fileoff);
 		filesize = segCmd->filesize;
 		segname = segCmd->segname;
@@ -287,6 +289,8 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	getchar();
 #endif
 	}
+
+//===================================================
 
 	if (vmsize == 0 || filesize == 0)
 	{
