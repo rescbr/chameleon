@@ -68,7 +68,7 @@ Options useful in the org.chameleon.Boot.plist file:
   "Boot Banner"=Yes|No    Show boot banner in GUI mode (disabled by default).
   ShowInfo=No             Disables display of partition and resolution details.
                             "Boot Banner"=No will also disable this info.
-  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
+  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (enabled by default).
 
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
 

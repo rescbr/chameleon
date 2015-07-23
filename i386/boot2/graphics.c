@@ -397,7 +397,7 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
-char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
+char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 {
     char *out, *cp;
 
@@ -859,14 +859,17 @@ void drawDataRectangle( unsigned short  x,
                         unsigned short  y,
                         unsigned short  width,
                         unsigned short  height,
-                        unsigned char * data )
+                        unsigned char *data )
 {
 	unsigned short drawWidth;
+
 	long   pixelBytes = VIDEO(depth) / 8;
+
 	unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
 	drawWidth = MIN(width, VIDEO(width) - x);
 	height = MIN(height, VIDEO(height) - y);
+
 	while ( height-- )
 	{
 		bcopy( data, vram, drawWidth * pixelBytes );
@@ -927,12 +930,12 @@ DECLARE_IOHIBERNATEPROGRESSALPHA
 
 void drawPreview(void *src, uint8_t * saveunder)
 {
-	uint8_t *  screen;
+	uint8_t *screen;
 	uint32_t   rowBytes, pixelShift;
 	uint32_t   x, y;
 	int32_t    blob;
 	uint32_t   alpha, in, color, result;
-	uint8_t *  out;
+	uint8_t *out;
 	void *uncomp;
 	int origwidth, origheight, origbpx;
 	uint32_t   saveindex[kIOHibernateProgressCount] = { 0 };
