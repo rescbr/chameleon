@@ -289,7 +289,7 @@ convertImage( unsigned short width,
               unsigned short height,
               const unsigned char *imageData,
               unsigned char **newImageData );
-extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
+extern char *decodeRLE( const void *rleData, int rleBlocks, int outBytes );
 extern void drawBootGraphics(void);
 extern void drawPreview(void *src, uint8_t *saveunder);
 extern int getVideoMode(void);

@@ -1336,8 +1336,7 @@ void updateGraphicBootPrompt()
 
 // ====================================================================
 
-static inline
-void vramwrite (void *data, int width, int height)
+static inline void vramwrite (void *data, int width, int height)
 {
 	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4)
 	{
@@ -1417,14 +1416,13 @@ void updateVRAM()
 
 struct putc_info //Azi: exists on console.c & printf.c
 {
-	char * str;
-	char * last_str;
+	char *str;
+	char *last_str;
 };
 
 // ====================================================================
 
-static int
-sputc(int c, struct putc_info * pi) //Azi: same as above
+static int sputc(int c, struct putc_info * pi) //Azi: same as above
 {
 	if (pi->last_str)
 	{
@@ -2327,9 +2325,9 @@ int updateInfoMenu(int key)
 
 // ====================================================================
 
-uint16_t bootImageWidth = 0; 
-uint16_t bootImageHeight = 0; 
-uint8_t *bootImageData = NULL; 
+uint16_t bootImageWidth = 0;
+uint16_t bootImageHeight = 0;
+uint8_t *bootImageData = NULL;
 static bool usePngImage = true;
 
 //==========================================================================
@@ -2364,10 +2362,13 @@ void drawBootGraphics(void)
 	int length;
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
-	bool legacy_logo;
-	uint16_t x, y; 
-	
-	if (getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig) && legacy_logo)
+	bool legacy_logo = true; // ErmaC: Legacy Logo is enabled by default
+
+	uint16_t x, y;
+
+	getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig);
+
+	if ( legacy_logo )
 	{
 		usePngImage = false; 
 	}
@@ -2417,8 +2418,8 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		// Fill the background to 75% grey (same as BootX). 
-		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01); 
+		// Fill the background to 75% grey (same as BootX).
+		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01);
 	}
 
 	if ((bootImageData) && (usePngImage))
@@ -2431,25 +2432,25 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		uint8_t *appleBootPict; 
-		bootImageData = NULL; 
-		bootImageWidth = kAppleBootWidth; 
-		bootImageHeight = kAppleBootHeight; 
+		uint8_t *appleBootPict;
+		bootImageData = NULL;
+		bootImageWidth = kAppleBootWidth;
+		bootImageHeight = kAppleBootHeight;
 
-		// Prepare the data for the default Apple boot image. 
-		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight); 
+		// Prepare the data for the default Apple boot image.
+		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight);
 		if (appleBootPict)
 		{
-			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData); 
+			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData);
 			if (bootImageData)
 			{
-				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2; 
-				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2; 
+				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2;
+				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2;
 				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
 				free(bootImageData);
 			}
-			free(appleBootPict); 
-		} 
+			free(appleBootPict);
+		}
 	}
 }
 // ====================================================================

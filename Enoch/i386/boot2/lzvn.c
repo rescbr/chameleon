@@ -62,9 +62,10 @@ size_t lzvn_decode(void *dst,
 			const void *src,
 			size_t src_size)
 {
+    const uint64_t rdi = (const uint64_t)dst;
+
     size_t   rax = 0;
     
-    const uint64_t rdi = (const uint64_t)dst;
     uint64_t rsi       = dst_size;
     uint64_t rcx       = src_size;
     uint64_t rdx       = (uint64_t)src;

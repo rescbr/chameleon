@@ -397,7 +397,7 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
-char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
+char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 {
     char *out, *cp;
 
@@ -483,82 +483,84 @@ setVESAGraphicsMode( unsigned short width,
 //             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
 //         }
 
-        // Set the mode with default refresh rate.
+		// Set the mode with default refresh rate.
 
-        err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
+		err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
 
-        if (err != errSuccess)
-        {
-            break;
-        }
+		if (err != errSuccess)
+		{
+			break;
+		}
 
-        // Set 8-bit color palette.
+		// Set 8-bit color palette.
 
-        if ( minfo.BitsPerPixel == 8 )
-        {
-            VBEPalette palette;
-            setupPalette( &palette, appleClut8 );
-            if ((err = setVBEPalette(palette)) != errSuccess)
-            {
-                break;
-            }
-        }
+		if ( minfo.BitsPerPixel == 8 )
+		{
+			VBEPalette palette;
+			setupPalette( &palette, appleClut8 );
+			if ((err = setVBEPalette(palette)) != errSuccess)
+			{
+				break;
+			}
+		}
 
-        // Is this required for buggy Video BIOS implementations?
-        // On which adapter?
+		// Is this required for buggy Video BIOS implementations?
+		// On which adapter?
 
-        if ( minfo.BytesPerScanline == 0 )
-             minfo.BytesPerScanline = ( minfo.XResolution *
-                                        minfo.BitsPerPixel ) >> 3;
+		if ( minfo.BytesPerScanline == 0 )
+		{
+			minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
+		}
 
-        // Update KernBootStruct using info provided by the selected
-        // VESA mode.
+		// Update KernBootStruct using info provided by the selected
+		// VESA mode.
 
-        bootArgs->Video.v_display  = GRAPHICS_MODE;
-        bootArgs->Video.v_width    = minfo.XResolution;
-        bootArgs->Video.v_height   = minfo.YResolution;
-        bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-        bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-        bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+		bootArgs->Video.v_display  = GRAPHICS_MODE;
+		bootArgs->Video.v_width    = minfo.XResolution;
+		bootArgs->Video.v_height   = minfo.YResolution;
+		bootArgs->Video.v_depth    = minfo.BitsPerPixel;
+		bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
+		bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
 
 	} while ( 0 );
 
-    return err;
+	return err;
 }
 
 //==============================================================================
 
 int convertImage( unsigned short width, unsigned short height, const unsigned char *imageData, unsigned char **newImageData )
 {
-    int cnt;
-    unsigned char *img = 0;
-    unsigned short *img16;
-    unsigned long *img32;
+	int cnt;
+	unsigned char *img = 0;
+	unsigned short *img16;
+	unsigned long *img32;
 
-    switch ( VIDEO(depth) ) {
-    case 16 :
-        img16 = malloc(width * height * 2);
-        if ( !img16 ) break;
-        for (cnt = 0; cnt < (width * height); cnt++)
-            img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
-        img = (unsigned char *)img16;
-        break;
+	switch ( VIDEO(depth) )
+	{
+		case 16 :
+			img16 = malloc(width * height * 2);
+			if ( !img16 ) break;
+			for (cnt = 0; cnt < (width * height); cnt++)
+				img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
+			img = (unsigned char *)img16;
+		break;
 
-    case 32 :
-        img32 = malloc(width * height * 4);
-        if ( !img32 ) break;
-        for (cnt = 0; cnt < (width * height); cnt++)
-            img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
-        img = (unsigned char *)img32;
-        break;
+		case 32 :
+			img32 = malloc(width * height * 4);
+			if ( !img32 ) break;
+			for (cnt = 0; cnt < (width * height); cnt++)
+				img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
+			img = (unsigned char *)img32;
+		break;
 
-    default :
-        img = malloc(width * height);
-        bcopy(imageData, img, width * height);
-        break;
-    }
-    *newImageData = img;
-    return 0;
+		default :
+			img = malloc(width * height);
+			bcopy(imageData, img, width * height);
+		break;
+	}
+	*newImageData = img;
+	return 0;
 }
 
 //==============================================================================
@@ -860,14 +862,17 @@ void drawDataRectangle( unsigned short  x,
                         unsigned short  y,
                         unsigned short  width,
                         unsigned short  height,
-                        unsigned char * data )
+                        unsigned char   *data )
 {
 	unsigned short drawWidth;
+
 	long   pixelBytes = VIDEO(depth) / 8;
+
 	unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
 	drawWidth = MIN(width, VIDEO(width) - x);
 	height = MIN(height, VIDEO(height) - y);
+
 	while ( height-- )
 	{
 		bcopy( data, vram, drawWidth * pixelBytes );
@@ -928,13 +933,13 @@ DECLARE_IOHIBERNATEPROGRESSALPHA
 
 void drawPreview(void *src, uint8_t * saveunder)
 {
-	uint8_t *  screen;
+	uint8_t    *screen;
 	uint32_t   rowBytes, pixelShift;
 	uint32_t   x, y;
 	int32_t    blob;
 	uint32_t   alpha, in, color, result;
-	uint8_t *  out;
-	void *uncomp;
+	uint8_t    *out;
+	void       *uncomp;
 	int origwidth, origheight, origbpx;
 	uint32_t   saveindex[kIOHibernateProgressCount] = { 0 };
 
@@ -959,6 +964,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
+
 		// Set the screen to 75% grey.
 		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
 	}
@@ -1022,12 +1028,12 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 {
-	uint8_t * screen;
-	uint32_t  rowBytes, pixelShift;
-	uint32_t  x, y;
-	int32_t   blob, lastBlob;
-	uint32_t  alpha, in, color, result;
-	uint8_t * out;
+	uint8_t		*screen;
+	uint32_t	rowBytes, pixelShift;
+	uint32_t	x, y;
+	int32_t		blob, lastBlob;
+	uint32_t	alpha, in, color, result;
+	uint8_t		*out;
 	uint32_t  saveindex[kIOHibernateProgressCount] = { 0 };
 
 	pixelShift = VIDEO(depth) >> 4;
