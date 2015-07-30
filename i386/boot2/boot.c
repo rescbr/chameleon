@@ -105,7 +105,7 @@ static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
 /** options.c **/
-extern char* msgbuf;
+extern char *msgbuf;
 void showTextBuffer(char *buf, int size);
 
 //==========================================================================

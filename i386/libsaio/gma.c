@@ -48,10 +48,6 @@
 	#define DEBUG_GMA 0
 #endif
 
-#ifndef DEBUG_BDW
-	#define DEBUG_BDW 1
-#endif
-
 #if DEBUG_GMA
 	#define DBG(x...)	printf(x)
 #else
@@ -69,10 +65,8 @@ static uint8_t default_aapl_ivy[]		=	{ 0x05,0x00,0x62,0x01 }; // ivy_bridge_ig_v
 static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_vals[7]
 #define AAPL_LEN_HSW ( sizeof(default_aapl_haswell) / sizeof(uint8_t) )
 
-#if DEBUG_BDW
 static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[2]
 #define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
-#endif
 
 uint8_t GMAX3100_vals[23][4] = {
 	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
@@ -135,7 +129,6 @@ uint8_t haswell_ig_vals[17][4] = {
 	{ 0x04,0x00,0x12,0x04 }		// 16 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 };
 
-#if DEBUG_BDW
 uint8_t broadwell_ig_vals[19][4] = {
 	{ 0x00,0x00,0x06,0x16 },	// 0  - 16060000 Broadwell GT1 (Intel HD Graphics)
 	{ 0x00,0x00,0x0e,0x16 },	// 1  - 160e0000 Broadwell GT1 (Intel HD Graphics)
@@ -157,7 +150,6 @@ uint8_t broadwell_ig_vals[19][4] = {
 	{ 0x05,0x00,0x26,0x16 },	// 17 - 16260005 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 	{ 0x06,0x00,0x26,0x16 }		// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 };
-#endif
 
 uint8_t HD2000_vals[16][4] = {
 	{ 0x00,0x00,0x00,0x00 },    //0 "AAPL00,PixelFormat"
@@ -869,7 +861,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 			break;
 
-#if DEBUG_BDW
 		/* Broadwell */
 		/* HD Graphics 5300 Mobile, HD Graphics 6000 Mobile, HD Graphics 6100 Mobile */
 		case GMA_BROADWELL_BDW_0bd0:    // 0bd0
@@ -939,7 +930,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "class-code", ClassFix, 4);
 
 			break;
-#endif // DEBUG_BDW
+
 		default:
 			break;
 	}

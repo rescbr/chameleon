@@ -1382,7 +1382,7 @@ int processBootOptions()
 	}
 
 	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
-	if ( YOSEMITE ) // OS X is 10.10
+	if ( MacOSVerCurrent == MacOSVer2Int("10.10") ) // OS X is 10.10
 	{
 		addBootArg("kext-dev-mode=1");
 	}

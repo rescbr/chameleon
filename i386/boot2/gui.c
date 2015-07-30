@@ -2330,6 +2330,7 @@ void drawBootGraphics(void)
 	const char *dummyVal;
 	int oldScreenWidth, oldScreenHeight;
 	bool legacy_logo = true; // ErmaC: Legacy Logo is enabled by default
+
 	uint16_t x, y;
 
 	getBoolForKey("Legacy Logo", &legacy_logo, &bootInfo->chameleonConfig);
@@ -2384,8 +2385,8 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		// Fill the background to 75% grey (same as BootX). 
-		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01); 
+		// Fill the background to 75% grey (same as BootX).
+		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01);
 	}
 
 	if ((bootImageData) && (usePngImage))

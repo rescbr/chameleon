@@ -780,32 +780,33 @@ void drawCheckerBoard()
 
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 {
-    long result;
+	long result;
 
-    long colorIndex = (index * 3);
-    long red   = appleClut8[ colorIndex   ];
-    long green = appleClut8[ colorIndex++ ];
-    long blue  = appleClut8[ colorIndex++ ];
+	long colorIndex = (index * 3);
+	long red   = appleClut8[ colorIndex   ];
+	long green = appleClut8[ colorIndex++ ];
+	long blue  = appleClut8[ colorIndex++ ];
 
-    switch (depth) {
-        case 16 :
-            result = ((red   & 0xF8) << 7) | 
-                     ((green & 0xF8) << 2) |
-                     ((blue  & 0xF8) >> 3);
-            result |= (result << 16);
-            break;
+	switch (depth)
+	{
+		case 16 :
+			result = ((red   & 0xF8) << 7) | 
+				((green & 0xF8) << 2) |
+				((blue  & 0xF8) >> 3);
+			result |= (result << 16);
+			break;
 
-        case 32 :
-            result = (red << 16) | (green << 8) | blue;
-            break;
+		case 32 :
+			result = (red << 16) | (green << 8) | blue;
+			break;
 
-        default :
-            result = index | (index << 8);
-            result |= (result << 16);
-            break;
-    }
+		default :
+			result = index | (index << 8);
+			result |= (result << 16);
+			break;
+	}
 
-    return result;
+	return result;
 }
 
 //==========================================================================
@@ -859,7 +860,7 @@ void drawDataRectangle( unsigned short  x,
                         unsigned short  y,
                         unsigned short  width,
                         unsigned short  height,
-                        unsigned char *data )
+                        unsigned char   *data )
 {
 	unsigned short drawWidth;
 
@@ -930,13 +931,13 @@ DECLARE_IOHIBERNATEPROGRESSALPHA
 
 void drawPreview(void *src, uint8_t * saveunder)
 {
-	uint8_t *screen;
+	uint8_t    *screen;
 	uint32_t   rowBytes, pixelShift;
 	uint32_t   x, y;
 	int32_t    blob;
 	uint32_t   alpha, in, color, result;
-	uint8_t *out;
-	void *uncomp;
+	uint8_t    *out;
+	void       *uncomp;
 	int origwidth, origheight, origbpx;
 	uint32_t   saveindex[kIOHibernateProgressCount] = { 0 };
 
@@ -961,6 +962,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
+
 		// Set the screen to 75% grey.
 		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
 	}
@@ -1024,12 +1026,12 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
 {
-	uint8_t * screen;
-	uint32_t  rowBytes, pixelShift;
-	uint32_t  x, y;
-	int32_t   blob, lastBlob;
-	uint32_t  alpha, in, color, result;
-	uint8_t * out;
+	uint8_t		*screen;
+	uint32_t	rowBytes, pixelShift;
+	uint32_t	x, y;
+	int32_t		blob, lastBlob;
+	uint32_t	alpha, in, color, result;
+	uint8_t		*out;
 	uint32_t  saveindex[kIOHibernateProgressCount] = { 0 };
 
 	pixelShift = VIDEO(depth) >> 4;
