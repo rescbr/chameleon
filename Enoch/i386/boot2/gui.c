@@ -54,6 +54,7 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
+
 	iDeviceHFS_cap,
 	iDeviceHFS_cap_o,
 	iDeviceHFS_yos,
@@ -159,6 +160,7 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
+
 	{.name = "device_hfsplus_cap",          .image = NULL},
 	{.name = "device_hfsplus_cap_o",        .image = NULL},
 	{.name = "device_hfsplus_yos",          .image = NULL},
@@ -416,6 +418,7 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+
 	LOADPNG(device_hfsplus_cap,             iDeviceHFS);
 	LOADPNG(device_hfsplus_cap_o,           iDeviceHFS_cap);
 	LOADPNG(device_hfsplus_yos,             iDeviceHFS);
@@ -1034,7 +1037,7 @@ int initGUI(void)
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 
-								setVideoMode( GRAPHICS_MODE, 0 );
+								setVideoMode( GRAPHICS_MODE );
 
 								gui.initialised = true;
 								return 0;
@@ -2409,7 +2412,7 @@ void drawBootGraphics(void)
 	// Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
 	{
-		setVideoMode(GRAPHICS_MODE, 0);
+		setVideoMode(GRAPHICS_MODE );
 	}
 
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig))
@@ -2419,7 +2422,7 @@ void drawBootGraphics(void)
 	else
 	{
 		// Fill the background to 75% grey (same as BootX).
-		drawColorRectangle(0xffbfbfbf);
+		setBackgroundColor(0xffbfbfbf);
 	}
 
 	if ((bootImageData) && (usePngImage))

@@ -271,8 +271,7 @@ static unsigned short getVESAModeWithProperties( unsigned short	width,
 
 	// Loop through the mode list, and find the matching mode.
 
-	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-		*modePtr != modeEndOfList; modePtr++ )
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr ); *modePtr != modeEndOfList; modePtr++ )
 	{
 		// Get mode information.
 
@@ -286,15 +285,14 @@ static unsigned short getVESAModeWithProperties( unsigned short	width,
 
 #if DEBUG
 		printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
-               *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-               modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-               modeInfo.ModeAttributes);
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
 #endif
 
 		// Filter out unwanted modes based on mode attributes.
 
-		if ( ( ( modeInfo.ModeAttributes & attributesSet ) != attributesSet )
-        ||   ( ( modeInfo.ModeAttributes & attributesClear ) != 0 ) )
+		if (((modeInfo.ModeAttributes & attributesSet) != attributesSet) || ((modeInfo.ModeAttributes & attributesClear) != 0))
 		{
 			continue;
 		}
@@ -303,73 +301,62 @@ static unsigned short getVESAModeWithProperties( unsigned short	width,
 
 		modeBitsPerPixel = modeInfo.BitsPerPixel;
 
-		if ( ( modeBitsPerPixel == 4 ) && ( modeInfo.MemoryModel == 0 ) )
+		if ((modeBitsPerPixel == 4) && (modeInfo.MemoryModel == 0))
 		{
 			// Text mode, 16 colors.
 		}
-		else if ( ( modeBitsPerPixel == 8 ) && ( modeInfo.MemoryModel == 4 ) )
+			else if ((modeBitsPerPixel == 8) && (modeInfo.MemoryModel == 4))
 		{
 			// Packed pixel, 256 colors.
 		}
-		else if ( ( ( modeBitsPerPixel == 16 ) || ( modeBitsPerPixel == 15 ) )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 5 )
-			&&   ( modeInfo.GreenMaskSize == 5 )
-			&&   ( modeInfo.BlueMaskSize  == 5 ) )
+		else if (((modeBitsPerPixel == 16) || (modeBitsPerPixel == 15)) && (modeInfo.MemoryModel == 6) && (modeInfo.RedMaskSize == 5) &&
+			(modeInfo.GreenMaskSize == 5) && (modeInfo.BlueMaskSize  == 5))
 		{
 			// Direct color, 16 bpp (1:5:5:5).
 			modeInfo.BitsPerPixel = modeBitsPerPixel = 16;
 		}
-		else if ( ( modeBitsPerPixel == 32 )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 8 )
-			&&   ( modeInfo.GreenMaskSize == 8 )
-			&&   ( modeInfo.BlueMaskSize  == 8 ) )
+		else if ((modeBitsPerPixel == 32) && (modeInfo.MemoryModel == 6) && (modeInfo.RedMaskSize == 8) &&
+			(modeInfo.GreenMaskSize == 8) && (modeInfo.BlueMaskSize  == 8))
 		{
 			// Direct color, 32 bpp (8:8:8:8).
 		}
 		else
 		{
-			continue; // Not a supported mode.
+			continue;	// Not a supported mode.
 		}
 
 		// Modes larger than the specified dimensions are skipped.
 
-		if ( ( modeInfo.XResolution > width  ) ||
-			( modeInfo.YResolution > height ) )
+		if ((modeInfo.XResolution > width) || (modeInfo.YResolution > height))
 		{
 			continue;
 		}
 
 		// Perfect match, we're done looking.
 
-		if ( ( modeInfo.XResolution == width  ) &&
-			( modeInfo.YResolution == height ) &&
-			( modeBitsPerPixel     == bitsPerPixel ) )
+		if (modeInfo.XResolution == width && modeInfo.YResolution == height && modeBitsPerPixel == bitsPerPixel)
 		{
 			matchedMode = *modePtr;
-			bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+			bcopy(&modeInfo, outModeInfo, sizeof(modeInfo));
 			break;
 		}
 
 		// Save the next "best" mode in case a perfect match is not found.
 
-		if ( modeInfo.XResolution == outModeInfo->XResolution &&
-			modeInfo.YResolution == outModeInfo->YResolution &&
-			modeBitsPerPixel     <= outModeInfo->BitsPerPixel )
+		if (modeInfo.XResolution == outModeInfo->XResolution && modeInfo.YResolution == outModeInfo->YResolution &&
+			modeBitsPerPixel <= outModeInfo->BitsPerPixel)
 		{
-			continue;  // Saved mode has more depth.
+			continue;	// Saved mode has more depth.
 		}
 
-		if ( modeInfo.XResolution < outModeInfo->XResolution ||
-			modeInfo.YResolution < outModeInfo->YResolution ||
-			modeBitsPerPixel     < outModeInfo->BitsPerPixel )
+		if (modeInfo.XResolution < outModeInfo->XResolution || modeInfo.YResolution < outModeInfo->YResolution ||
+			modeBitsPerPixel < outModeInfo->BitsPerPixel)
 		{
-			continue;  // Saved mode has more resolution.
+			continue;	// Saved mode has more resolution.
 		}
 
 		matchedMode = *modePtr;
-		bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+		bcopy(&modeInfo, outModeInfo, sizeof(modeInfo));
 	}
 
 	return matchedMode;
@@ -377,7 +364,7 @@ static unsigned short getVESAModeWithProperties( unsigned short	width,
 
 //==========================================================================
 // setupPalette
-
+/*
 static void setupPalette( VBEPalette *p, const unsigned char *g )
 {
     int             i;
@@ -391,7 +378,7 @@ static void setupPalette( VBEPalette *p, const unsigned char *g )
         (*p)[i] |= ((unsigned long)((*source++) >> 2));         // Blue
     }
 }
-
+*/
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
@@ -420,65 +407,21 @@ char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 //==========================================================================
 // setVESAGraphicsMode
 
-static int setVESAGraphicsMode( unsigned short width,
-                     unsigned short height,
-                     unsigned char  bitsPerPixel,
-                     unsigned short refreshRate )
+static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
 {
 	VBEModeInfoBlock  minfo;
-	unsigned short    mode;
+	unsigned short    mode = 280; // Default to 1024 * 768 * 32 (1920 * 1200 * 32 would be 330)
 	unsigned short    vesaVersion;
 	int               err = errFuncNotSupported;
 
 	do {
 		mode = getVESAModeWithProperties( width, height, bitsPerPixel,
-                                          maColorModeBit             |
-                                          maModeIsSupportedBit       |
-                                          maGraphicsModeBit          |
-                                          maLinearFrameBufferAvailBit,
-                                          0,
-                                          &minfo, &vesaVersion );
+                                          maColorModeBit | maModeIsSupportedBit | maGraphicsModeBit | maLinearFrameBufferAvailBit,
+                                          0, &minfo, &vesaVersion );
 		if ( mode == modeEndOfList )
 		{
 			break;
 		}
-
-//
-// FIXME : generateCRTCTiming() causes crash.
-//
-
-//         if ( (vesaVersion >> 8) >= 3 && refreshRate >= 60 &&
-//              (gBootMode & kBootModeSafe) == 0 )
-//         {
-//             VBECRTCInfoBlock timing;
-//     
-//             // Generate CRTC timing for given refresh rate.
-// 
-//             generateCRTCTiming( minfo.XResolution, minfo.YResolution,
-//                                 refreshRate, kCRTCParamRefreshRate,
-//                                 &timing );
-// 
-//             // Find the actual pixel clock supported by the hardware.
-// 
-//             getVBEPixelClock( mode, &timing.PixelClock );
-// 
-//             // Re-compute CRTC timing based on actual pixel clock.
-// 
-//             generateCRTCTiming( minfo.XResolution, minfo.YResolution,
-//                                 timing.PixelClock, kCRTCParamPixelClock,
-//                                 &timing );
-// 
-//             // Set the video mode and use specified CRTC timing.
-// 
-//             err = setVBEMode( mode | kLinearFrameBufferBit |
-//                               kCustomRefreshRateBit, &timing );
-//         }
-//         else
-//         {
-//             // Set the mode with default refresh rate.
-// 
-//             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
-//         }
 
 		// Set the mode with default refresh rate.
 
@@ -489,35 +432,20 @@ static int setVESAGraphicsMode( unsigned short width,
 			break;
 		}
 
-		// Set 8-bit color palette.
+		// Is this required for buggy Video BIOS implementations? If so for which adapter?
 
-		if ( minfo.BitsPerPixel == 8 )
+		if (minfo.BytesPerScanline == 0)
 		{
-			VBEPalette palette;
-			setupPalette( &palette, AppleLogoClut );
-			if ((err = setVBEPalette(palette)) != errSuccess)
-			{
-				break;
-			}
+			minfo.BytesPerScanline = (minfo.XResolution * minfo.BitsPerPixel) >> 3; // ((1920 * 32 = 61440) >> 3) = 7680
 		}
 
-		// Is this required for buggy Video BIOS implementations?
-		// On which adapter?
-
-		if ( minfo.BytesPerScanline == 0 )
-		{
-			minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
-		}
-
-		// Update KernBootStruct using info provided by the selected
-		// VESA mode.
-
-		bootArgs->Video.v_display  = GRAPHICS_MODE;
-		bootArgs->Video.v_width    = minfo.XResolution;
-		bootArgs->Video.v_height   = minfo.YResolution;
-		bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-		bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-		bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+		// Update bootArgs with the data provided by the selected VESA mode.
+		bootArgs->Video.v_display	= GRAPHICS_MODE;
+		bootArgs->Video.v_width		= minfo.XResolution;		/* 1920 or 1600 */
+		bootArgs->Video.v_height	= minfo.YResolution;		/* 1200 or 900 */
+		bootArgs->Video.v_depth		= minfo.BitsPerPixel;		/* 32 */
+		bootArgs->Video.v_rowBytes	= minfo.BytesPerScanline;	/* 7680 or 6400 */
+		bootArgs->Video.v_baseAddr	= VBEMakeUInt32(minfo.PhysBasePtr);
 
 	} while ( 0 );
 
@@ -528,35 +456,34 @@ static int setVESAGraphicsMode( unsigned short width,
 
 int convertImage( unsigned short width, unsigned short height, const unsigned char *imageData, unsigned char **newImageData )
 {
-	int cnt;
+	int index = 0;
+	int size = (width * height); // 16384
+	int depth = VIDEO(depth);
+
 	unsigned char *img = 0;
-	unsigned short *img16;
 	unsigned long *img32;
 
-	switch ( VIDEO(depth) )
+	switch (depth)
 	{
-		case 16 :
-			img16 = malloc(width * height * 2);
-			if ( !img16 ) break;
-			for (cnt = 0; cnt < (width * height); cnt++)
-				img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
-			img = (unsigned char *)img16;
-		break;
+		case 32:
+			img32 = malloc(size * 4);
 
-		case 32 :
-			img32 = malloc(width * height * 4);
-			if ( !img32 ) break;
-			for (cnt = 0; cnt < (width * height); cnt++)
-				img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
+			if (!img32)
+			{
+				break;
+			}
+
+			for (; index < size; index++)
+			{
+				img32[index] = lookUpCLUTIndex(imageData[index]);
+			}
+
 			img = (unsigned char *)img32;
-		break;
-
-		default :
-			img = malloc(width * height);
-			bcopy(imageData, img, width * height);
-		break;
+			break;
 	}
+
 	*newImageData = img;
+
 	return 0;
 }
 
@@ -758,7 +685,7 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t
 }
 
 //==============================================================================
-
+// ProgressBar
 void drawCheckerBoard()
 {
     uint32_t *vram = (uint32_t *) VIDEO(baseAddr);
@@ -776,10 +703,8 @@ void drawCheckerBoard()
 //==========================================================================
 // LookUpCLUTIndex
 
-unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
+unsigned long lookUpCLUTIndex( unsigned char index )
 {
-	long result;
-
 	long colorIndex = (index * 3);
 	long red;
 	long green;
@@ -789,30 +714,10 @@ unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 	green = AppleLogoClut[ colorIndex++ ];
 	blue  = AppleLogoClut[ colorIndex++ ];
 
-	switch (depth)
-	{
-		case 16 :
-			result = ((red   & 0xF8) << 7) | 
-				((green & 0xF8) << 2) |
-				((blue  & 0xF8) >> 3);
-			result |= (result << 16);
-			break;
-
-		case 32 :
-			result = (red << 16) | (green << 8) | blue;
-			break;
-
-		default :
-			result = index | (index << 8);
-			result |= (result << 16);
-			break;
-	}
-
-	return result;
+	return (red << 16) | (green << 8) | blue;
 }
 
 //==========================================================================
-// drawColorRectangle
 
 void *stosl(void *dst, long val, long len)
 {
@@ -826,7 +731,7 @@ void *stosl(void *dst, long val, long len)
 
 //==============================================================================
 
-void drawColorRectangle( uint32_t color )
+void setBackgroundColor( uint32_t color )
 {
 	long	pixelBytes = VIDEO(depth) / 8;
 	char	*vram = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) + pixelBytes;
@@ -849,11 +754,7 @@ void drawColorRectangle( uint32_t color )
 //==========================================================================
 // drawDataRectangle
 
-void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
-                        unsigned char   *data )
+void drawDataRectangle( unsigned short  x, unsigned short  y, unsigned short  width, unsigned short  height, unsigned char   *data )
 {
 	unsigned short drawWidth;
 
@@ -957,7 +858,7 @@ void drawPreview(void *src, uint8_t *saveunder)
 		rowBytes = VIDEO (rowBytes);
 
 		// Set the screen to 75% grey.
-		drawColorRectangle(0xffbfbfbf);
+		setBackgroundColor(0xffbfbfbf);
 	}
 
 	pixelShift = VIDEO (depth) >> 4;
@@ -1191,42 +1092,28 @@ int initGraphicsMode ()
 //
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
 
-void setVideoMode( int mode, int drawgraphics)
+void setVideoMode( int mode )
 {
 	unsigned long params[4];
-	int           count;
 	int           err = errSuccess;
 
 	if ( mode == GRAPHICS_MODE )
 	{
   		if ( (err = initGraphicsMode()) == errSuccess )
 		{
-			if (gVerboseMode)
-			{
-				// Tell the kernel to use text mode on a linear frame buffer display
-				bootArgs->Video.v_display = FB_TEXT_MODE;
-			}
-			else
-			{
-				bootArgs->Video.v_display = GRAPHICS_MODE;
-			}
+			// Tell the kernel to use text mode on a linear frame buffer display
+			bootArgs->Video.v_display = (gVerboseMode) ? /* 2 */ FB_TEXT_MODE : /* 1 */ GRAPHICS_MODE;
 		}
 	}
 
 	if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
 	{
-		count = getNumberArrayFromProperty(kTextModeKey, params, 2);
-		if ( count < 2 )
-		{
-			params[0] = 80;  // Default text mode is 80x25.
-			params[1] = 25;
-		}
+		params[0] = 80;  // Default text mode is 80x25.
+		params[1] = 25;
 
 		setVESATextMode(params[0], params[1], 4);
 		bootArgs->Video.v_display = VGA_TEXT_MODE;
 	}
-
-	currentIndicator = 0;
 }
 
 //==============================================================================

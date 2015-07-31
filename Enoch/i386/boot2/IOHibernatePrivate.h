@@ -26,12 +26,15 @@
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
 
+#include <stdint.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 #ifdef KERNEL
-#include <crypto/aes.h>
+#include <libkern/crypto/aes.h>
+#include <uuid/uuid.h>
 #endif
 
 #ifndef __IOKIT_IOHIBERNATEPRIVATE_H
@@ -356,6 +359,7 @@ struct hibernate_statistics_t
 void     IOHibernateSystemInit(IOPMrootDomain * rootDomain);
 
 IOReturn IOHibernateSystemSleep(void);
+IOReturn IOHibernateOpenForDebugData(void);
 IOReturn IOHibernateIOKitSleep(void);
 IOReturn IOHibernateSystemHasSlept(void);
 IOReturn IOHibernateSystemWake(void);
@@ -371,7 +375,7 @@ void     IOHibernateSystemRestart(void);
 typedef void (*kern_get_file_extents_callback_t)(void * ref, uint64_t start, uint64_t size);
 
 struct kern_direct_file_io_ref_t *
-kern_open_file_for_direct_io(const char * name,
+kern_open_file_for_direct_io(const char * name, boolean_t create_file,
 				kern_get_file_extents_callback_t callback,
 				void * callback_ref,
 
@@ -386,11 +390,13 @@ kern_open_file_for_direct_io(const char * name,
 				uint64_t * partitionbase_result,
 				uint64_t * maxiocount_result,
 				uint32_t * oflags);
-void
-kern_close_file_for_direct_io(struct kern_direct_file_io_ref_t * ref,
+int kern_write_file(struct kern_direct_file_io_ref_t * ref, off_t offset, caddr_t addr, vm_size_t len, int ioflag);
+void kern_close_file_for_direct_io(struct kern_direct_file_io_ref_t * ref,
                                   off_t write_offset, caddr_t addr, vm_size_t write_length,
                                   off_t discard_offset, off_t discard_end);
 #endif /* _SYS_CONF_H_ */
+
+void vm_compressor_do_warmup(void);
 
 hibernate_page_list_t *
 hibernate_page_list_allocate(boolean_t log);
@@ -503,8 +509,6 @@ extern uint32_t    gIOHibernateFreeTime;	// max time to spend freeing pages (ms)
 extern uint8_t     gIOHibernateRestoreStack[];
 extern uint8_t     gIOHibernateRestoreStackEnd[];
 extern IOHibernateImageHeader *    gIOHibernateCurrentHeader;
-extern hibernate_graphics_t *      gIOHibernateGraphicsInfo;
-extern hibernate_cryptwakevars_t * gIOHibernateCryptWakeVars;
 
 #define HIBLOG(fmt, args...)	\
 	{ kprintf(fmt, ## args); printf(fmt, ## args); }
@@ -540,7 +544,9 @@ enum
 enum
 {
 	kIOHibernateHeaderSignature        = 0x73696d65,
-	kIOHibernateHeaderInvalidSignature = 0x7a7a7a7a
+	kIOHibernateHeaderInvalidSignature = 0x7a7a7a7a,
+	kIOHibernateHeaderOpenSignature    = 0xf1e0be9d,
+	kIOHibernateHeaderDebugDataSignature = 0xfcddfcdd
 };
 
 // kind for hibernate_set_page_state()
@@ -573,7 +579,8 @@ enum {
 
 #define kIOHibernateOptionsKey      "IOHibernateOptions"
 #define kIOHibernateGfxStatusKey    "IOHibernateGfxStatus"
-enum {
+enum
+{
 	kIOHibernateGfxStatusUnknown = ((int32_t) 0xFFFFFFFF)
 };
 
@@ -594,13 +601,15 @@ enum {
 
 #define kIOHibernateUseKernelInterpreter    0x80000000
 
-enum {
+enum
+{
 	kIOPreviewImageIndexDesktop = 0, 
 	kIOPreviewImageIndexLockScreen = 1, 
 	kIOPreviewImageCount = 2
 };
 
-enum {
+enum
+{
 	kIOScreenLockNoLock          = 1,
 	kIOScreenLockUnlocked        = 2,
 	kIOScreenLockLocked          = 3,

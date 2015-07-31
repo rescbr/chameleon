@@ -161,7 +161,7 @@ long HFSInitPartition(CICell ih)
 #ifdef __i386__
 		CacheInit(ih, gCacheBlockSize);
 #endif
-	return 0;
+	return 0L;
 	}
 
 #ifdef __i386__
@@ -255,7 +255,8 @@ long HFSInitPartition(CICell ih)
 	{
 		verbose("HFS signature was not present.\n");
 		gCurrentIH = 0;
-		return -1;
+
+		return -1L;
 	}
 
 	gIsHFSPlus = 1;
@@ -284,7 +285,7 @@ long HFSInitPartition(CICell ih)
 		CacheInit(ih, gCacheBlockSize);
 	}
 
-	return 0;
+	return 0L;
 }
 
 //==============================================================================
@@ -323,7 +324,7 @@ long HFSReadFile(CICell ih, char *filePath, void *base, u_int64_t offset,  u_int
 
 			if (dirID == 0)
 			{
-				return -1;
+				return -1L;
 			}
 
 			filePath++;
@@ -336,7 +337,7 @@ long HFSReadFile(CICell ih, char *filePath, void *base, u_int64_t offset,  u_int
 
 	if ((result == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 	{
-		return -1;
+		return -1L;
 	}
 
 #if UNUSED
@@ -344,14 +345,14 @@ long HFSReadFile(CICell ih, char *filePath, void *base, u_int64_t offset,  u_int
 	// Check file owner and permissions.
 	if (flags & (kOwnerNotRoot | kPermGroupWrite | kPermOtherWrite))
 	{
-		return -1;
+		return -1L;
 	}
 #endif
 
 	result = ReadFile(entry, &length, base, offset);
 	if (result == -1)
 	{
-		return -1;
+		return -1L;
 	}
 
 	getDeviceDescription(ih, devStr);
@@ -479,7 +480,7 @@ long HFSGetFileBlock(CICell ih, char *filePath, u_int64_t *firstBlock)
 
 	if (HFSInitPartition(ih) == -1)
 	{
-		return -1;
+		return -1L;
 	}
 
 	dirID = kHFSRootFolderID;
@@ -511,7 +512,7 @@ long HFSGetFileBlock(CICell ih, char *filePath, u_int64_t *firstBlock)
 	if ((result == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 	{
 		printf("HFS: Resolve path '%s' failed\n", filePath);
-		return -1;
+		return -1L;
 	}
 
 	if (gIsHFSPlus)
@@ -529,7 +530,7 @@ long HFSGetFileBlock(CICell ih, char *filePath, u_int64_t *firstBlock)
 	printf("Allocation offset 0x%x\n", (unsigned long)gAllocationOffset);
 #endif
 	*firstBlock = ((u_int64_t) GetExtentStart(extents, 0) * (u_int64_t) gBlockSize + gAllocationOffset) / 512ULL;
-	return 0;
+	return 0L;
 }
 
 
@@ -578,7 +579,7 @@ static long ReadFile(void * file, u_int64_t * length, void * base, u_int64_t off
 	{
 		printf("ReadFile(HFS%s): Offset is too large.\n", gIsHFSPlus ? "+" : "");
 
-		return -1;
+		return -1L;
 	}
 
 	if ((*length == 0) || ((offset + *length) > fileLength))
@@ -596,15 +597,15 @@ static long ReadFile(void * file, u_int64_t * length, void * base, u_int64_t off
 
 	*length = ReadExtent((char *)extents, fileLength, fileID, offset, *length, (char *)base, 0);
 
-	return 0;
+	return 0L;
 }
 
 //==============================================================================
 
 static long GetCatalogEntryInfo(void * entry, long * flags, u_int32_t * time, FinderInfo * finderInfo, long * infoValid)
 {
-	u_int32_t tmpTime = 0;
-	long valid = 0;
+	u_int32_t tmpTime = 0L;
+	long valid = 0L;
 
 	// Get information about the file.
 
@@ -671,7 +672,7 @@ static long GetCatalogEntryInfo(void * entry, long * flags, u_int32_t * time, Fi
 		*infoValid = valid;
 	}
 
-	return 0;
+	return 0L;
 }
 
 //==============================================================================
@@ -1225,7 +1226,7 @@ static u_int32_t GetExtentStart(void * extents, u_int32_t index)
 
 static u_int32_t GetExtentSize(void * extents, u_int32_t index)
 {
-	u_int32_t size = 0;
+	u_int32_t size = 0L;
 
 	HFSExtentDescriptor     *hfsExtents     = extents;
 	HFSPlusExtentDescriptor *hfsPlusExtents = extents;
