@@ -48,6 +48,10 @@
 	#define DEBUG_GMA 0
 #endif
 
+#ifndef REPLACE_DEVICE_ID
+	#define REPLACE_DEVICE_ID 0
+#endif
+
 #if DEBUG_GMA
 	#define DBG(x...)	printf(x)
 #else
@@ -669,7 +673,6 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 			devprop_add_value(device, "vendor-id",			(uint8_t *)INTEL_VENDORID, 4);
 
-
 			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
 
@@ -776,13 +779,13 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_HASWELL_E_GT2: // 041e
 		case GMA_HASWELL_ULT_M_GT2: // 0a16
 		case GMA_HASWELL_ULT_E_GT2: // 0a1e
-
+#if REPLACE_DEVICE_ID
 			verbose("\tInjecting a valid desktop GPU device id (0x0412) instead of patching kexts.\n");
 			device_id = 0x00000412;		// Inject a valid desktop GPU device id (0x0412) instead of patching kexts
 			devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			devprop_add_value(device, "device-id",	(uint8_t *)&device_id, sizeof(device_id));
 			verbose("\tInjeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
-
+#endif // REPLACE_DEVICE_ID
 		case GMA_HASWELL_D_GT1: // 0402
 		case GMA_HASWELL_M_GT1: // 0406
 		case GMA_HASWELL_S_GT1: // 040a
