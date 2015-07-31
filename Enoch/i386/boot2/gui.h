@@ -33,6 +33,12 @@
 #define MENU_SHOW_VIDEO_INFO		5
 #define MENU_SHOW_HELP			6
 
+#define APPLE_LOGO_WIDTH  84
+#define APPLE_LOGO_HEIGHT 103
+
+#define APPLE_LOGO_X    ((VIDEO(width) - APPLE_LOGO_WIDTH) / 2)
+#define APPLE_LOGO_Y    ((VIDEO(height) - APPLE_LOGO_HEIGHT) / 2)
+
 // ====================================================================
 
 enum {

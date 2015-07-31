@@ -108,8 +108,7 @@ char *getVBEInfoString()
 //==========================================================================
 //
 
-void 
-printVBEModeInfo()
+void printVBEModeInfo()
 {
 	VBEInfoBlock     vbeInfo;
 	unsigned short * modePtr;
@@ -233,8 +232,7 @@ char *getVBEModeInfoString()
 // Return the VESA mode that matches the properties specified.
 // If a mode is not found, then return the "best" available mode.
 
-static unsigned short
-getVESAModeWithProperties( unsigned short	width,
+static unsigned short getVESAModeWithProperties( unsigned short	width,
                            unsigned short	height,
                            unsigned char	bitsPerPixel,
                            unsigned short	attributesSet,
@@ -380,7 +378,7 @@ getVESAModeWithProperties( unsigned short	width,
 //==========================================================================
 // setupPalette
 
-static void setupPalette( VBEPalette * p, const unsigned char * g )
+static void setupPalette( VBEPalette *p, const unsigned char *g )
 {
     int             i;
     unsigned char * source = (unsigned char *) g;
@@ -422,8 +420,7 @@ char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 //==========================================================================
 // setVESAGraphicsMode
 
-static int
-setVESAGraphicsMode( unsigned short width,
+static int setVESAGraphicsMode( unsigned short width,
                      unsigned short height,
                      unsigned char  bitsPerPixel,
                      unsigned short refreshRate )
@@ -497,7 +494,7 @@ setVESAGraphicsMode( unsigned short width,
 		if ( minfo.BitsPerPixel == 8 )
 		{
 			VBEPalette palette;
-			setupPalette( &palette, appleClut8 );
+			setupPalette( &palette, AppleLogoClut );
 			if ((err = setVBEPalette(palette)) != errSuccess)
 			{
 				break;
@@ -565,8 +562,7 @@ int convertImage( unsigned short width, unsigned short height, const unsigned ch
 
 //==============================================================================
 
-int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
-        uint8_t **imageData)
+int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_t **imageData)
 {
     uint8_t *pngData = NULL;
     int pngFile = 0, pngSize;
@@ -619,7 +615,8 @@ failed:
 
 //==============================================================================
 
-int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData) {
+int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData)
+{
     PNG_info_t *info;
     int error = 0;
 	
@@ -649,8 +646,7 @@ failed:
 
 //==============================================================================
 
-void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-        uint8_t *data)
+void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data)
 {
     uint16_t drawWidth;
     uint8_t *vram = (uint8_t *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + 4 * x;
@@ -785,9 +781,13 @@ unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 	long result;
 
 	long colorIndex = (index * 3);
-	long red   = appleClut8[ colorIndex   ];
-	long green = appleClut8[ colorIndex++ ];
-	long blue  = appleClut8[ colorIndex++ ];
+	long red;
+	long green;
+	long blue;
+
+	red   = AppleLogoClut[ colorIndex   ];
+	green = AppleLogoClut[ colorIndex++ ];
+	blue  = AppleLogoClut[ colorIndex++ ];
 
 	switch (depth)
 	{
@@ -826,31 +826,22 @@ void *stosl(void *dst, long val, long len)
 
 //==============================================================================
 
-void drawColorRectangle( unsigned short x,
-                                unsigned short y,
-                                unsigned short width,
-                                unsigned short height,
-                                unsigned char  colorIndex )
+void drawColorRectangle( uint32_t color )
 {
-	long	pixelBytes;
-	long	color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
-	char	*vram;
+	long	pixelBytes = VIDEO(depth) / 8;
+	char	*vram = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) + pixelBytes;
 
-	pixelBytes = VIDEO(depth) / 8;
-	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
+	int width = VIDEO(width);
+	int height = VIDEO(height);
 
-	width = MIN(width, VIDEO(width) - x);
-	height = MIN(height, VIDEO(height) - y);
+	int rem = ( pixelBytes * width ) % 4;
+	int length = pixelBytes * width / 4;
+
+	bcopy( &color, vram, rem );
 
 	while ( height-- )
 	{
-		int rem = ( pixelBytes * width ) % 4;
-		if ( rem )
-		{
-			bcopy( &color, vram, rem );
-		}
-
-		stosl( vram + rem, color, pixelBytes * width / 4 );
+		stosl( vram + rem, color, length );
 		vram += VIDEO(rowBytes);
 	}
 }
@@ -875,7 +866,7 @@ void drawDataRectangle( unsigned short  x,
 
 	while ( height-- )
 	{
-		bcopy( data, vram, drawWidth * pixelBytes );
+		bcopy( data, vram, width * pixelBytes );
 		vram += VIDEO(rowBytes);
 		data += width * pixelBytes;
 	}
@@ -931,7 +922,7 @@ void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, 
 
 DECLARE_IOHIBERNATEPROGRESSALPHA
 
-void drawPreview(void *src, uint8_t * saveunder)
+void drawPreview(void *src, uint8_t *saveunder)
 {
 	uint8_t    *screen;
 	uint32_t   rowBytes, pixelShift;
@@ -966,7 +957,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 		rowBytes = VIDEO (rowBytes);
 
 		// Set the screen to 75% grey.
-		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
+		drawColorRectangle(0xffbfbfbf);
 	}
 
 	pixelShift = VIDEO (depth) >> 4;
@@ -1026,7 +1017,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 //==============================================================================
 
-void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
+void updateProgressBar(uint8_t *saveunder, int32_t firstBlob, int32_t select)
 {
 	uint8_t		*screen;
 	uint32_t	rowBytes, pixelShift;
@@ -1124,7 +1115,7 @@ static int setVESATextMode( unsigned short cols, unsigned short rows, unsigned c
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int getNumberArrayFromProperty( const char *  propKey,
+static int getNumberArrayFromProperty( const char *propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {

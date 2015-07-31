@@ -22,7 +22,7 @@ int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_
 
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth );
 
-void drawColorRectangle( unsigned short x, unsigned short y, unsigned short width, unsigned short height, unsigned char  colorIndex );
+void drawColorRectangle( uint32_t color );
 void drawDataRectangle( unsigned short x, unsigned short y, unsigned short width, unsigned short height, unsigned char * data );
 int convertImage( unsigned short width, unsigned short height, const unsigned char *imageData, unsigned char **newImageData );
 

@@ -270,13 +270,7 @@ extern void setVideoMode(int mode, int drawgraphics);
 extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
-extern void drawColorRectangle(
-                               unsigned short x,
-                               unsigned short y,
-                               unsigned short width,
-                               unsigned short height,
-                               unsigned char  colorIndex
-                               );
+extern void drawColorRectangle( uint32_t color );
 extern void drawDataRectangle(
                               unsigned short  x,
                               unsigned short  y,

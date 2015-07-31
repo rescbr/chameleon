@@ -2419,7 +2419,7 @@ void drawBootGraphics(void)
 	else
 	{
 		// Fill the background to 75% grey (same as BootX).
-		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01);
+		drawColorRectangle(0xffbfbfbf);
 	}
 
 	if ((bootImageData) && (usePngImage))
@@ -2432,24 +2432,25 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		uint8_t *appleBootPict;
-		bootImageData = NULL;
-		bootImageWidth = kAppleBootWidth;
-		bootImageHeight = kAppleBootHeight;
+		// Standard size (Width 84 Height 103)
+		// TODO HiDPI size (Width 168 Height 206)
 
-		// Prepare the data for the default Apple boot image.
-		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight);
-		if (appleBootPict)
+		int logoSize = (APPLE_LOGO_WIDTH * APPLE_LOGO_HEIGHT);
+
+		void *dst = malloc(logoSize);
+
+		void *logoData = (void *)AppleLogoPacked;
+		uint32_t src_size = sizeof(AppleLogoPacked);
+
+		if (dst)
 		{
-			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData);
-			if (bootImageData)
+			if (lzvn_decode(dst, logoSize, logoData, src_size) == logoSize)
 			{
-				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2;
-				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2;
-				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
-				free(bootImageData);
+				uint8_t *bootImageData = NULL;
+				convertImage(APPLE_LOGO_WIDTH, APPLE_LOGO_HEIGHT, dst, &bootImageData);
+				drawDataRectangle(APPLE_LOGO_X, APPLE_LOGO_Y, APPLE_LOGO_WIDTH, APPLE_LOGO_HEIGHT, bootImageData);
 			}
-			free(appleBootPict);
+			free(dst);
 		}
 	}
 }
