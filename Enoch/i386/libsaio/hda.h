@@ -62,7 +62,13 @@
 #ifndef __LIBSAIO_HDA_H
 #define __LIBSAIO_HDA_H
 
-bool setup_hda_devprop(pci_dt_t *hda_dev);
+static char *get_hda_controller_name( uint16_t controller_device_id, uint16_t controller_vendor_id );
+static char *get_hda_codec_name( uint16_t codec_vendor_id, uint16_t codec_device_id, uint8_t codec_revision_id, uint8_t codec_stepping_id );
+bool setup_hda_devprop( pci_dt_t *hda_dev );
+static int immediate_command(uint32_t command, uint32_t* response);
+static uint32_t get_parameter(uint8_t codec_id, uint8_t node_id, uint8_t parameter_id);
+static int getHDABar(uint32_t pci_addr, uint32_t* bar_phys_addr);
+void probe_hda_bus(uint32_t pci_addr);
 
 struct hda_controller_devices;
 typedef struct
@@ -73,7 +79,6 @@ typedef struct
 	// char		quirks_off;
 } hda_controller_devices;
 
-/*
 struct hdacc_codecs;
 typedef struct
 {
@@ -81,7 +86,6 @@ typedef struct
 	uint32_t rev;
 	const char *name;
 } hdacc_codecs;
-*/
 
 /****************************************************************************
  * Miscellanious defines
@@ -973,5 +977,51 @@ HDAC_STATESTS_SDIWAKE_SHIFT) >> (n)) & 0x0001)
 #define HDAC_SDSTS_DESE			(1 << 4)
 #define HDAC_SDSTS_FIFOE		(1 << 3)
 #define HDAC_SDSTS_BCIS			(1 << 2)
+
+/****************************************************************************
+ * Helper Macros
+ ****************************************************************************/
+
+#define HDA_DMA_ALIGNMENT       128
+
+#define HDA_BDL_MIN             2
+#define HDA_BDL_MAX             256
+#define HDA_BDL_DEFAULT         HDA_BDL_MIN
+
+#define HDA_BLK_MIN             HDA_DMA_ALIGNMENT
+#define HDA_BLK_ALIGN           (~(HDA_BLK_MIN - 1))
+
+#define HDA_BUFSZ_MIN           (HDA_BDL_MIN * HDA_BLK_MIN)
+#define HDA_BUFSZ_MAX           262144
+#define HDA_BUFSZ_DEFAULT       65536
+
+#define HDA_GPIO_MAX            8
+
+#define HDA_DEV_MATCH(fl, v)    ((fl) == (v) || \
+(fl) == 0xffffffff || \
+(((fl) & 0xffff0000) == 0xffff0000 && \
+((fl) & 0x0000ffff) == ((v) & 0x0000ffff)) || \
+(((fl) & 0x0000ffff) == 0x0000ffff && \
+((fl) & 0xffff0000) == ((v) & 0xffff0000)))
+
+#define HDA_MATCH_ALL           0xffffffff
+#define HDA_INVALID             0xffffffff
+
+#define HDA_BOOTVERBOSE(stmt) do {                    \
+    if (bootverbose != 0 || snd_verbose > 3) {      \
+        stmt                                    \
+    }                                               \
+} while (0)
+
+#define HDA_BOOTHVERBOSE(stmt) do {                    \
+    if (snd_verbose > 3) {                          \
+        stmt                                    \
+    }                                               \
+} while (0)
+
+#define hda_command(dev, verb)                                  \
+HDAC_CODEC_COMMAND(device_get_parent(dev), (dev), (verb))
+
+extern void probe_hda_bus(uint32_t pci_addr);
 
 #endif /* !__LIBSAIO_HDA_H */
