@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-12 19:02+0200\n"
-"PO-Revision-Date: 2015-07-11 23:58+0100\n"
+"PO-Revision-Date: 2015-08-12 13:33+0000\n"
 "Last-Translator: FurtiF <msntchat@hotmail.fr>\n"
 "Language-Team: fr <fr@li.org>\n"
 "Language: fr\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388319299.0\n"
+"X-POOTLE-MTIME: 1439386420.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -651,7 +651,7 @@ msgstr "RebootOnPanic=No"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr ""
+msgstr "Redémarrer en panique."
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
@@ -663,7 +663,7 @@ msgstr "EnableHiDPI=Yes"
 #: Resources/templates/Localizable.strings:141
 #, no-wrap
 msgid "Enable High resolution display (aka retina)."
-msgstr ""
+msgstr "Activer l’affichage haute résolution (aka rétine)."
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
@@ -676,6 +676,8 @@ msgstr "BlackMode=Yes"
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
 msgstr ""
+"Le nouveau BlackMode charge le logo Apple blanc, à la place de l’Apple logo "
+"gris, sur un fond noir."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -2859,13 +2861,18 @@ msgstr "Dans Yosemite Developer Previews, kexts non signés ou mal signés ne se
 #: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "rootless=0"
-msgstr ""
+msgstr "rootless=0"
 
 #. type: "rootless0_description"
 #: Resources/templates/Localizable.strings:756
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
 msgstr ""
+"Rootless est une nouvelle fonctionnalité introduite dans OS X 10.11 (El "
+"Capitan), et il rejette la modification des fichiers système. Pour en "
+"contournant cette restriction, cette fonctionnalité stricte peut être "
+"désactivée en ajoutant 'rootless=0' aux arguments de démarrage. "
+"('rootless=1’ pour activer)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:758
