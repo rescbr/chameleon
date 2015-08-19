@@ -296,7 +296,7 @@ msgstr "Útil se você quer instalar apenas os extras."
 #: Resources/templates/Localizable.strings:28
 #, no-wrap
 msgid "Bootloader Stages"
-msgstr "Chameleon Bootloader"
+msgstr "Gerenciador de inicialização Chameleon"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -684,7 +684,7 @@ msgstr "RebootOnPanic=No"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr ""
+msgstr "Reinicie Em Pânico."
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
@@ -696,7 +696,7 @@ msgstr "EnableHiDPI=Yes"
 #: Resources/templates/Localizable.strings:141
 #, no-wrap
 msgid "Enable High resolution display (aka retina)."
-msgstr ""
+msgstr "Ativar modo de exibição de alta resolução (aka retina)."
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
@@ -709,6 +709,8 @@ msgstr "BlackMode=Yes"
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
 msgstr ""
+"O novo BlackMode carrega o logotipo da Apple branco, em vez do logotipo "
+"cinza da Apple, em um fundo preto."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -2918,13 +2920,17 @@ msgstr "Em Yosemite desenvolvedor Previews, kexts não assinados ou assinados in
 #: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "rootless=0"
-msgstr ""
+msgstr "rootless=0"
 
 #. type: "rootless0_description"
 #: Resources/templates/Localizable.strings:756
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
 msgstr ""
+"Rootless é um novo recurso introduzido no OS X 10.11 (El Capitan), e ele não "
+"permite que modificam arquivos do sistema. Para contornando esta restrição, "
+"esse recurso pode ser desativado estrita adicionando ‘rootless=0’ aos "
+"parâmetros de arranque. (‘rootless=1’ habilitá-lo)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:758
