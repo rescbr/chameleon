@@ -302,7 +302,7 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_SANDYBRIDGE_M_GT1,		HD_GRAPHICS_2000 },
 	{GMA_SANDYBRIDGE_M_GT2,		HD_GRAPHICS_3000 },
 	{GMA_SANDYBRIDGE_M_GT2_PLUS,	HD_GRAPHICS_3000 },
-	{GMA_SANDYBRIDGE_S_GT,		HD_GRAPHICS },
+	{GMA_SANDYBRIDGE_S_GT,		"HD Graphics P3000" }, /* 010a */
 	// 010B /* ??? */
 	// 010E /* ??? */
 
