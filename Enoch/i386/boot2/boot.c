@@ -312,7 +312,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCachePath);
+				verbose("Kernel Cache file path (Mac OS X 10.6): %s\n", kernelCachePath);
 			}
 			closedir(cacheDir);
 		}

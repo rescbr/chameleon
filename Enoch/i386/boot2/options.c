@@ -389,16 +389,20 @@ static int   gMenuSelection;
 static int	 gMenuStart;
 static int	 gMenuEnd;
 
-static void printMenuItem( const MenuItem * item, int highlight )
+static void printMenuItem( const MenuItem *item, int highlight )
 {
-    printf("  ");
+	printf("  ");
 
-    if ( highlight )
-        putca(' ', 0x70, strlen(item->name) + 4);
-    else
-        putca(' ', 0x07, 40);
+	if ( highlight )
+	{
+		putca(' ', 0x70, strlen(item->name) + 4);
+	}
+	else
+	{
+		putca(' ', 0x07, 40);
+	}
 
-    printf("  %40s\n", item->name);
+	printf("  %40s\n", item->name);
 }
 
 //==========================================================================
@@ -665,7 +669,7 @@ static void skipblanks( const char ** cpp )
 
 //==========================================================================
 
-static const char * extractKernelName( char ** cpp )
+static const char *extractKernelName( char ** cpp )
 {
     char * kn = *cpp;
     char * cp = *cpp;
@@ -1659,6 +1663,13 @@ void showTextFile(const char * filename)
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
+
+	if (!buf)
+	{
+		printf("Couldn't allocate memory for the buf in showTextFile\n");
+		return;
+	}
+
         read(fd, buf, size);
         close(fd);
 	showTextBuffer(buf, size);
