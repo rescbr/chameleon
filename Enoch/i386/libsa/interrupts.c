@@ -84,9 +84,6 @@ uint32_t* counters = NULL;
 static
 uint32_t lapic_base = 0U;
 
-static
-uint8_t const PicPorts[2][2] = { { 0x20U, 0x21U }, { 0xA0U, 0xA1U } };
-
 #pragma mark -
 #pragma mark Assembly Stubs
 #pragma mark -
@@ -107,7 +104,6 @@ void InterruptStub(void)
 					  "addl $4, %%esp\n\t"
 					  "iretl"
 					  :);
-	__builtin_unreachable();
 }
 
 static
@@ -132,7 +128,6 @@ void ExceptionWithCodeStub(void)
 					 "addl $8, %%esp\n\t"
 					 "iretl"
 					 :);
-	__builtin_unreachable();
 }
 
 /*
@@ -197,19 +192,15 @@ void WriteLapic(uint32_t offset, uint32_t value)
 	*(uint32_t volatile*) (lapic_base + offset) = value;
 }
 
-static inline
-uint8_t ReadPic(int pic, int index)
-{
-	uint8_t value;
-	__asm__ volatile ("inb %1, %0" : "=a"(value) : "N"(PicPorts[pic][index]));
-	return value;
-}
+#define ChoosePicPort(pic, index) (pic == 0 ? (index == 0 ? 0x20U : 0x21U) : (index == 0 ? 0xA0U : 0xA1U))
 
-static inline
-void WritePic(int pic, int index, uint8_t value)
-{
-	__asm__ volatile ("outb %0, %1" : : "a"(value), "N"(PicPorts[pic][index]));
-}
+#define ReadPic(pic, index) ({ \
+uint8_t value; \
+__asm__ volatile ("inb %1, %0" : "=a"(value) : "N"(ChoosePicPort(pic, index))); \
+value; \
+})
+
+#define WritePic(pic, index, value) __asm__ volatile ("outb %0, %1" : : "a"((uint8_t)value), "N"(ChoosePicPort(pic, index)))
 
 #pragma mark -
 #pragma mark Main Code
