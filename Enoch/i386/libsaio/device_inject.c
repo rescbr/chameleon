@@ -291,7 +291,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 // devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
-	int len = string->length * 2;
+	int len = string->length * 2 + 1;
 	char *buffer = (char*)malloc(len);
 	char *ptr = buffer;
 
