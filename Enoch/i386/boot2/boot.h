@@ -186,7 +186,7 @@
 /* cparm: added these keys */
 
 /* ErmaC: added these keys */
-#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
+#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
 #define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
@@ -254,7 +254,7 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-extern bool checkOSVersion(const char * version);
+extern bool checkOSVersion(const char *version);
 extern uint32_t getMacOSVerCurrent();
 
 /*

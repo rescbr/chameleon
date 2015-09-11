@@ -1340,7 +1340,6 @@ int processBootOptions()
 	}
 	else
 	{
-
 		// Load org.chameleon.Boot.plist from the selected volume
 		// and use its contents to override default bootConfig.
 

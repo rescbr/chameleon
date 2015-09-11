@@ -103,12 +103,12 @@ typedef struct gpt_ent gpt_ent;
 
 //==========================================================================
 // Maps (E)BIOS return codes to message strings.
-
 struct NamedValue {
 	unsigned char   value;
 	const char     *name;
 };
 
+// =========================================================================
 /*
  * Map a disk drive to bootable volumes contained within.
  */
@@ -141,6 +141,7 @@ int (*p_get_ramdisk_info)(int biosdev, struct driveInfo *dip) = NULL;
 static bool getOSVersion(BVRef bvr, char *str);
 static bool cache_valid = false;
 
+// =============================================================================
 static const struct NamedValue bios_errors[] =
 {
 	{ 0x10, "Media error"                },
@@ -152,6 +153,7 @@ static const struct NamedValue bios_errors[] =
 	{ 0x00, NULL                         }
 };
 
+// =============================================================================
 static const struct NamedValue fdiskTypes[] =
 {
 	{ FDISK_DOS12,		"DOS_FAT_12"           }, // 0x01
@@ -180,11 +182,9 @@ static const struct NamedValue fdiskTypes[] =
 };
 
 //==============================================================================
-
 extern void spinActivityIndicator(int sectors);
 
-//==========================================================================
-
+//==============================================================================
 static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 {
 	static struct driveInfo cached_di;
@@ -231,8 +231,7 @@ static int getDriveInfo( int biosdev,  struct driveInfo *dip )
 	return 0;
 }
 
-//==========================================================================
-
+//==============================================================================
 static const char *getNameForValue( const struct NamedValue *nameTable, unsigned char value )
 {
 	const struct NamedValue *np;
@@ -249,8 +248,7 @@ static const char *getNameForValue( const struct NamedValue *nameTable, unsigned
 }
 
 //==============================================================================
-
-static const char * bios_error(int errnum)
+static const char *bios_error(int errnum)
 {
 	static char  errorstr[] = "Error 0x00";
 	const char * errname;
@@ -393,15 +391,13 @@ static int Biosread( int biosdev, unsigned long long secno )
 }
 
 //==============================================================================
-
 int testBiosread(int biosdev, unsigned long long secno)
 {
 	return Biosread(biosdev, secno);
 }
 
 //==============================================================================
-
-static int readBytes(int biosdev, unsigned long long blkno, unsigned int byteoff, unsigned int byteCount, void * buffer)
+static int readBytes(int biosdev, unsigned long long blkno, unsigned int byteoff, unsigned int byteCount, void *buffer)
 {
 	// ramdisks require completely different code for reading.
 	if(p_ramdiskReadBytes != NULL && biosdev >= 0x100)
@@ -438,7 +434,6 @@ static int readBytes(int biosdev, unsigned long long blkno, unsigned int byteoff
 }
 
 //==============================================================================
-
 static int isExtendedFDiskPartition( const struct fdisk_part *part )
 {
 	static unsigned char extParts[] =
@@ -461,7 +456,6 @@ static int isExtendedFDiskPartition( const struct fdisk_part *part )
 }
 
 //==============================================================================
-
 static int getNextFDiskPartition( int biosdev, int *partno, const struct fdisk_part **outPart )
 {
 	static int                 sBiosdev = -1;
@@ -552,7 +546,6 @@ static int getNextFDiskPartition( int biosdev, int *partno, const struct fdisk_p
 }
 
 //==============================================================================
-
 /*
  * Trying to figure out the filsystem type of a given partition.
  *  X = fdisk partition type
@@ -646,7 +639,6 @@ exit:
 }
 
 //==============================================================================
-
 static BVRef newFDiskBVRef( int biosdev,
                             int partno,
                             unsigned int blkoff,
@@ -743,7 +735,6 @@ static BVRef newFDiskBVRef( int biosdev,
 }
 
 //==============================================================================
-
 static BVRef newAPMBVRef( int biosdev, int partno, unsigned int blkoff,
                    const DPME * part,
                    FSInit initFunc, FSLoadFile loadFunc,
@@ -943,7 +934,6 @@ static BVRef newGPTBVRef( int biosdev,
  * So, for example, if you have two primary partitions and
  * one extended partition they will be numbered 1, 2, 5.
  */
-
 static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
 {
     const struct fdisk_part	*part;
@@ -1252,8 +1242,7 @@ static BVRef diskScanFDiskBootVolumes( int biosdev, int *countPtr )
 }
 
 //==============================================================================
-
-static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
+static BVRef diskScanAPMBootVolumes( int biosdev, int *countPtr )
 {
 	struct DiskBVMap	*map;
 	struct Block0		*block0_p;
@@ -1376,7 +1365,6 @@ static BVRef diskScanAPMBootVolumes( int biosdev, int * countPtr )
 }
 
 //==============================================================================
-
 static bool isPartitionUsed(gpt_ent * partition)
 {
 
@@ -1386,8 +1374,7 @@ static bool isPartitionUsed(gpt_ent * partition)
 }
 
 //==============================================================================
-
-static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
+static BVRef diskScanGPTBootVolumes(int biosdev, int *countPtr)
 {
 	verbose("\tAttempting to scan GPT boot volumes [biosdev=%02Xh]:\n", biosdev);
 
@@ -1708,10 +1695,9 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int * countPtr)
 }
 
 //==============================================================================
-
 static bool getOSVersion(BVRef bvr, char *str)
 {
-	bool valid = false;	
+	bool valid = false;
 	config_file_t systemVersion;
 	char  dirSpec[512];
 
@@ -1835,7 +1821,6 @@ static bool getOSVersion(BVRef bvr, char *str)
 }
 
 //==============================================================================
-
 static void scanFSLevelBVRSettings(BVRef chain)
 {
 	BVRef bvr;
@@ -1901,7 +1886,6 @@ static void scanFSLevelBVRSettings(BVRef chain)
 }
 
 //==============================================================================
-
 void rescanBIOSDevice(int biosdev)
 {
 	struct DiskBVMap *oldMap = diskResetBootVolumes(biosdev);
@@ -1917,7 +1901,6 @@ void rescanBIOSDevice(int biosdev)
 }
 
 //==============================================================================
-
 struct DiskBVMap* diskResetBootVolumes(int biosdev)
 {
 	struct DiskBVMap *        map;
@@ -1951,7 +1934,6 @@ struct DiskBVMap* diskResetBootVolumes(int biosdev)
 }
 
 //==============================================================================
-
 // Frees a DiskBVMap and all of its BootVolume's
 void diskFreeMap(struct DiskBVMap *map)
 {
@@ -1969,8 +1951,7 @@ void diskFreeMap(struct DiskBVMap *map)
 }
 
 //==============================================================================
-
-BVRef diskScanBootVolumes(int biosdev, int * countPtr)
+BVRef diskScanBootVolumes(int biosdev, int *countPtr)
 {
 	struct DiskBVMap *map;
 	BVRef bvr;
@@ -2019,7 +2000,6 @@ BVRef diskScanBootVolumes(int biosdev, int * countPtr)
 }
 
 //==============================================================================
-
 BVRef getBVChainForBIOSDev(int biosdev)
 {
 	BVRef chain = NULL;
@@ -2038,7 +2018,6 @@ BVRef getBVChainForBIOSDev(int biosdev)
 }
 
 //==============================================================================
-
 BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count)
 {
 	BVRef chain = NULL;
@@ -2164,7 +2143,6 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 }
 
 //==============================================================================
-
 int freeFilteredBVChain(const BVRef chain)
 {
 	int ret = 1;
@@ -2197,8 +2175,7 @@ int freeFilteredBVChain(const BVRef chain)
 }
 
 //==============================================================================
-
-bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
+bool matchVolumeToString( BVRef bvr, const char *match, long matchLen)
 {
 	char testStr[128];
 
@@ -2242,13 +2219,12 @@ bool matchVolumeToString( BVRef bvr, const char* match, long matchLen)
 }
 
 //==============================================================================
-
 /* If Rename Partition has defined an alias, then extract it for description purpose.
  * The format for the rename string is the following:
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias"; etc...
  */
 
-static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
+static bool getVolumeLabelAlias(BVRef bvr, char *str, long strMaxLen)
 {
 	char *aliasList, *entryStart, *entryNext;
     
@@ -2302,7 +2278,6 @@ static bool getVolumeLabelAlias(BVRef bvr, char* str, long strMaxLen)
 }
 
 //==============================================================================
-
 void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool useDeviceDescription )
 {
 	unsigned char type;
@@ -2375,9 +2350,7 @@ void getBootVolumeDescription( BVRef bvr, char *str, long strMaxLen, bool useDev
 	strncpy(bvr->label, p, sizeof(bvr->label) );
 }
 
-
 //==============================================================================
-
 int readBootSector(int biosdev, unsigned int secno, void *buffer)
 {
 	int error;
@@ -2408,11 +2381,9 @@ int readBootSector(int biosdev, unsigned int secno, void *buffer)
 }
 
 //==============================================================================
-
 /*
  * Format of boot1f32 block.
  */
-
 #define BOOT1F32_MAGIC      "BOOT       "
 #define BOOT1F32_MAGICLEN   11
 
@@ -2453,27 +2424,22 @@ int testFAT32EFIBootSector(int biosdev, unsigned int secno, void *buffer)
 	return 0;
 }
 
-
 //==============================================================================
 // Handle seek request from filesystem modules.
-
 void diskSeek(BVRef bvr, long long position)
 {
 	bvr->fs_boff = position / BPS;
 	bvr->fs_byteoff = position % BPS;
 }
 
-
 //==============================================================================
 // Handle read request from filesystem modules.
-
 int diskRead(BVRef bvr, long addr, long length)
 {
 	return readBytes(bvr->biosdev, bvr->fs_boff + bvr->part_boff, bvr->fs_byteoff, length, (void *) addr);
 }
 
 //==============================================================================
-
 int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
 {
 	int secs;
@@ -2521,7 +2487,6 @@ int rawDiskRead( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
 }
 
 //==============================================================================
-
 int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len )
 {
     int secs;
@@ -2566,7 +2531,6 @@ int rawDiskWrite( BVRef bvr, unsigned int secno, void *buffer, unsigned int len 
 }
 
 //==============================================================================
-
 int diskIsCDROM(BVRef bvr)
 {
 	struct driveInfo    di;
@@ -2579,7 +2543,6 @@ int diskIsCDROM(BVRef bvr)
 }
 
 //==============================================================================
-
 int biosDevIsCDROM(int biosdev)
 {
 	struct driveInfo    di;

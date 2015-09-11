@@ -58,7 +58,7 @@ void setupDeviceProperties(Node *node)
    */  
 	if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->chameleonConfig) && string)
 	{
-		val = (const char*)string;
+		val = (const char *)string;
 		cnt = strlength * 2;
 	}
 
@@ -231,7 +231,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 
 	memset(data, 0, length);
 	uint32_t off = 0;
-	data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
+	data[off+1] = (uint8_t)(((strlen(nm) * 2) + 6) >> 8);
 	data[off] =   ((strlen(nm) * 2) + 6) & 0x00FF;
 
 	off += 4;
@@ -291,8 +291,8 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 // devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
-	int len = string->length * 2 + 1;
-	char *buffer = (char*)malloc(len);
+	int len = ((string->length * 2) + 1);
+	char *buffer = (char *)malloc(len);
 	char *ptr = buffer;
 
 	if(!buffer)

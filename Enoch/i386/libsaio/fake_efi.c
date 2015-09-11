@@ -652,7 +652,6 @@ void setupBoardId()
 /*
  * Populate the chosen node
  */
-
 void setupChosenNode()
 {
 	Node *chosenNode;

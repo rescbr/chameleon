@@ -41,8 +41,7 @@ bool sysConfigValid;
 /*
  * Compare a string to a key with quoted characters
  */
-static inline int
-keyncmp(const char *str, const char *key, int n)
+static inline int keyncmp(const char *str, const char *key, int n)
 {
     int c;
     while (n--) {
@@ -90,9 +89,7 @@ static void eatThru(char val, const char **table_p)
 }
 
 /* Remove key and its associated value from the table. */
-
-bool
-removeKeyFromTable(const char *key, char *table)
+bool removeKeyFromTable(const char *key, char *table)
 {
     register int len;
     register char *tab;
@@ -266,8 +263,7 @@ char *newStringForStringTableKey(char *table, char *key, config_file_t *config)
 
 #endif
 
-char *
-newStringForKey(char *key, config_file_t *config)
+char *newStringForKey(char *key, config_file_t *config)
 {
 	const char *val;
 	char *newstr;
@@ -291,7 +287,6 @@ newStringForKey(char *key, config_file_t *config)
  * both <option> and <value> must be either composed of
  * non-whitespace characters, or enclosed in quotes.
  */
-
 static const char *getToken(const char *line, const char **begin, int *len)
 {
 	if (*line == '\"') {
@@ -426,7 +421,6 @@ bool getIntForKey(const char *key, int *value, config_file_t *config)
 /*
  *
  */
-
 bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
 {
 	const char *val;
@@ -496,7 +490,6 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 /*
  *	get color value from plist format #RRGGBB
  */
-
 bool getColorForKey( const char *key, unsigned int *value, config_file_t *config )
 {
 	const char *val;
@@ -559,10 +552,8 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 	return ret;
 }
 
-
 #if UNUSED
-void
-printSystemConfig(char *p1)
+void printSystemConfig(char *p1)
 {
 	char *p2 = p1, tmp;
 
@@ -645,7 +636,7 @@ int ParseXMLFile( char *buffer, TagPtr *dict )
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadConfigFile (const char *configFile, config_file_t *config)
+int loadConfigFile(const char *configFile, config_file_t *config)
 {
 	int fd, count;
 
@@ -661,7 +652,6 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	ParseXMLFile(config->plist, &config->dictionary);
 	return 0;
 }
-
 
 /* loadSystemConfig
  *
@@ -897,7 +887,7 @@ int loadHelperConfig(config_file_t *config)
 	return ret;
 }
 
-char * newString(const char * oldString)
+char *newString(const char *oldString)
 {
 	if ( oldString )
 	{
@@ -912,7 +902,7 @@ char * newString(const char * oldString)
 /*
  * Extracts the next argument from the command line, double quotes are allowed here.
  */
-char * getNextArg(char ** argPtr, char * val)
+char *getNextArg(char **argPtr, char *val)
 {
 	char * ptr = *argPtr;
 	const char * strStart;

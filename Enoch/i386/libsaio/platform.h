@@ -424,6 +424,7 @@ typedef struct _PlatformInfo_t
 		int			MemoryModules;		// number of memory modules installed
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
+
 	struct RAM
 	{
 		uint64_t		Frequency;		// Ram Frequency
