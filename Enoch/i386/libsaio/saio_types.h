@@ -211,6 +211,7 @@ struct BootVolume {
 	bool			filtered;		/* newFilteredBVChain() will set to TRUE */
 	bool			visible;		/* will shown in the device list */
 	char			OSVersion[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' e.g. "10.10.10" - hope will not reach e.g. 111.222.333 soon:) If so, OSVERSTRLEN 9 change to 12 */
+	char			OSFullVer[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' */
 	bool			OSisServer;		/* 1 = OS X server , 0 = OS X client */
 	bool			OSisInstaller;		/* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
 

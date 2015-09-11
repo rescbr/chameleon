@@ -1800,8 +1800,13 @@ static bool getOSVersion(BVRef bvr, char *str)
 		const char *val;
 		int len;
 
+		// ProductVersion
 		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
 		{
+			// Copy the complete value into OSFullVer
+			strncpy( bvr->OSFullVer, val, len );
+			bvr->OSFullVer[len] = '\0';   /* null character manually added */
+
 			// getValueForKey uses const char for val
 			// so copy it and trim
 			*str = '\0';
