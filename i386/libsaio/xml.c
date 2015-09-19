@@ -38,6 +38,7 @@
 #endif
 
 string_ref *ref_strings = NULL;
+string_ref *ref_integer = NULL;
 
 /// TODO: remove below
 static char *buffer_start = NULL;
@@ -65,6 +66,27 @@ void SaveRefString(char *string, int id)
 	ref_strings = new_ref;
 }
 
+void SaveRefInteger(int integer, int id)
+{
+	//printf("Adding Ref Integer %d (%s)\n", id, integer);
+	string_ref *tmp = ref_integer;
+	while(tmp)
+	{
+		if(tmp->id == id)
+		{
+			tmp->string = (char*)integer;
+			return;
+		}
+		tmp = tmp->next;
+	}
+	
+	string_ref *new_ref = malloc(sizeof(string_ref));
+	new_ref->string = (char*)integer;
+	new_ref->id = id;
+	new_ref->next = ref_integer;
+	ref_integer = new_ref;
+}
+
 char *GetRefString(int id)
 {
 	string_ref *tmp = ref_strings;
@@ -76,6 +98,19 @@ char *GetRefString(int id)
 	//verbose("Unable to locate Ref String %d\n", id);
 	return "Unknown";
 }
+
+int GetRefInteger(int id)
+{
+	string_ref *tmp = ref_integer;
+	while(tmp)
+	{
+		if(tmp->id == id) return (int)tmp->string;
+		tmp = tmp->next;
+	}
+	//verbose("Unable to locate Ref String %d\n", id);
+	return 0;
+}
+
 
 struct Module {
 	struct Module *nextModule;
@@ -517,7 +552,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 			}
 			length = ParseTagInteger(buffer + pos, tag);
 
-			SaveRefString((*tag)->string, id);
+			SaveRefInteger((int)(*tag)->string, id);
 		}
 		else if(!strncmp(tagName + strlen(kXMLTagInteger " "), kXMLStringIDRef, strlen(kXMLStringIDRef)))
 		{
@@ -540,7 +575,7 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 					return -1;
 				}
 			}
-			int integer = (int)GetRefString(id);
+			int integer = GetRefInteger(id);
 
 			TagPtr tmpTag = NewTag();
 			if (tmpTag == 0)
