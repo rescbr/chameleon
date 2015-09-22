@@ -255,17 +255,17 @@ static radeon_card_info_t radeon_cards[] = {
 	// TAHITI
 	//Framebuffers: Aji - 4 Desktop, Buri - 4 Mobile, Chutoro - 5 Mobile,  Dashimaki - 4, IkuraS - HMDI
 	// Ebi - 5 Mobile, Gari - 5 M, Futomaki - 4 D, Hamachi - 4 D, OPM - 6 Server, Ikura - 6
-	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kIkuraS		},
 	{ 0x6784,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6788,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
-	{ 0x678A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
-	{ 0x6790,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x678A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD FirePro W8000",		kFutomaki	},
+	{ 0x6790,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7970"	,	kFutomaki	},
 	{ 0x6791,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6792,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6798,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7970X/8970/R9 280X",	kFutomaki	},
 	{ 0x6799,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kAji		},
 	{ 0x679A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950/8950/R9 280",	kFutomaki	},
-	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kFutomaki	},
+	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kChutoro	},
 	{ 0x679E,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7870 XT",	kFutomaki	},
 	{ 0x679F,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950 Series",	kFutomaki	},
 
@@ -371,9 +371,9 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68BF,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750 Series",	kHoolock	},
 
 	// REDWOOD
-	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730 Series",	kBaboon	}, // Mobile
-	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5650 Series",	kBaboon	}, // Mobile
-	{ 0x68C7,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5570",	kEulemur	}, // Mobile
+	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730 Series",	kGalago	}, // Mobile
+	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5650 Series",	kGalago	}, // Mobile
+	{ 0x68C7,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5570",	kGalago	}, // Mobile
 	{ 0x68C8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI FirePro v4800",    kBaboon	},
 	{ 0x68C9,	0x00000000, CHIP_FAMILY_REDWOOD,	"FirePro 3D V3800",	kBaboon	},
 	{ 0x68D8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670 Series",	kBaboon	},
@@ -382,10 +382,10 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68DE,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5000 Series",	kNull	},
 
 	// CEDAR
-	{ 0x68E0,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5470 Series",	kEulemur	},
-	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230",		kEulemur	},
-	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6370M Series",	kEulemur	},
-	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6300M Series",	kEulemur	},
+	{ 0x68E0,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5470 Series",	kGalago		},
+	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230",		kGalago		},
+	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6370M Series",	kGalago		},
+	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6300M Series",	kGalago		},
 //	{ 0x68E8,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 //	{ 0x68E9,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 	{ 0x68F1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD FirePro 2460",	kEulemur	},
@@ -396,11 +396,11 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x68FE,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 
 	// 
-	{ 0x6900,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R7 M260/M265",  kBuri	},
-	{ 0x6901,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R5 M255",       kBuri	},
-	{ 0x6921,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kBuri	},
-	{ 0x6938,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kBuri	},
-	{ 0x6939,	0x00000000, CHIP_FAMILY_TONGA,		"ATI Radeon R9 285",        kFutomaki	},
+	{ 0x6900,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R7 M260/M265",  kExmoor	},
+	{ 0x6901,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R5 M255",       kExmoor	},
+	{ 0x6921,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kExmoor	},
+	{ 0x6938,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kExmoor	},
+	{ 0x6939,	0x00000000, CHIP_FAMILY_TONGA,		"ATI Radeon R9 285",        kBaladi	},
 
 	// R520
 	{ 0x7100, 0x00000000, CHIP_FAMILY_R520,  "ATI Radeon HD Desktop ",	kNull		},
