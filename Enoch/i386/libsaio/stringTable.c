@@ -356,11 +356,9 @@ const char *getStringForKey(const char *key,  config_file_t *config)
 	return value;
 }
 
-
 /* Returns TRUE if a value was found, FALSE otherwise.
  * The boolean value of the key is stored in 'val'.
  */
-
 bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 {
     const char *key_val;
