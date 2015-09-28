@@ -666,7 +666,7 @@ msgstr "(默认是 No) 开机画面使用传统的 Apple Logo(白底灰苹果)�
 #: Resources/templates/Localizable.strings:137
 #, no-wrap
 msgid "RebootOnPanic=No"
-msgstr ""
+msgstr "RebootOnPanic=No"
 
 #. type: "RebootOnPanic_description"
 #: Resources/templates/Localizable.strings:138
@@ -676,10 +676,9 @@ msgstr ""
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
-#, fuzzy, no-wrap
-#| msgid "EnableHDMIAudio=Yes"
+#, no-wrap
 msgid "EnableHiDPI=Yes"
-msgstr "EnableHDMIAudio=Yes"
+msgstr "EnableHiDPI=Yes"
 
 #. type: "EnableHiDPI_description"
 #: Resources/templates/Localizable.strings:141
@@ -689,10 +688,9 @@ msgstr ""
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
-#, fuzzy, no-wrap
-#| msgid "Wake=Yes"
+#, no-wrap
 msgid "BlackMode=Yes"
-msgstr "Wake=Yes"
+msgstr "BlackMode=Yes"
 
 #. type: "BlackMode_description"
 #: Resources/templates/Localizable.strings:144
@@ -1287,10 +1285,10 @@ msgstr "LayoutID=1"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1:\n"
+"Set HDEF layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 1:\n"
+"设置 HDEF layout-id 为 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx02_title"
@@ -1304,10 +1302,10 @@ msgstr "LayoutID=2"
 #: Resources/templates/Localizable.strings:303
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 2:\n"
+"Set HDEF layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 2:\n"
+"设置 HDEF layout-id 为 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx03_title"
@@ -1321,10 +1319,10 @@ msgstr "LayoutID=3"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 3:\n"
+"Set HDEF layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 3:\n"
+"设置 HDEF layout-id 为 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx05_title"
@@ -1338,10 +1336,10 @@ msgstr "LayoutID=5"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 5:\n"
+"Set HDEF layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 5:\n"
+"设置 HDEF layout-id 为 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx07_title"
@@ -1355,10 +1353,10 @@ msgstr "LayoutID=7"
 #: Resources/templates/Localizable.strings:315
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 7:\n"
+"Set HDEF layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 7:\n"
+"设置 HDEF layout-id 为 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx12_title"
@@ -1372,10 +1370,10 @@ msgstr "LayoutID=12"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 12:\n"
+"Set HDEF layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 12:\n"
+"设置 HDEF layout-id 为 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx32_title"
@@ -1389,10 +1387,10 @@ msgstr "LayoutID=32"
 #: Resources/templates/Localizable.strings:323
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 32:\n"
+"Set HDEF layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 32:\n"
+"设置 HDEF layout-id 为 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx40_title"
@@ -1406,10 +1404,10 @@ msgstr "LayoutID=40"
 #: Resources/templates/Localizable.strings:327
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 40:\n"
+"Set HDEF layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 40:\n"
+"设置 HDEF layout-id 为 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx65_title"
@@ -1423,10 +1421,10 @@ msgstr "LayoutID=65"
 #: Resources/templates/Localizable.strings:331
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 65:\n"
+"Set HDEF layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 65:\n"
+"设置 HDEF layout-id 为 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx99_title"
@@ -1440,10 +1438,10 @@ msgstr "LayoutID=99"
 #: Resources/templates/Localizable.strings:335
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 99:\n"
+"Set HDEF layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 99:\n"
+"设置 HDEF layout-id 为 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx269_title"
@@ -1457,10 +1455,10 @@ msgstr "LayoutID=269"
 #: Resources/templates/Localizable.strings:339
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 269:\n"
+"Set HDEF layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 269:\n"
+"设置 HDEF layout-id 为 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx387_title"
@@ -1474,10 +1472,10 @@ msgstr "LayoutID=387"
 #: Resources/templates/Localizable.strings:343
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 387:\n"
+"Set HDEF layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 387:\n"
+"设置 HDEF layout-id 为 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx388_title"
@@ -1491,10 +1489,10 @@ msgstr "LayoutID=388"
 #: Resources/templates/Localizable.strings:347
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 388:\n"
+"Set HDEF layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 388:\n"
+"设置 HDEF layout-id 为 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx389_title"
@@ -1508,10 +1506,10 @@ msgstr "LayoutID=389"
 #: Resources/templates/Localizable.strings:351
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 389:\n"
+"Set HDEF layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 389:\n"
+"设置 HDEF layout-id 为 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx392_title"
@@ -1525,10 +1523,10 @@ msgstr "LayoutID=392"
 #: Resources/templates/Localizable.strings:355
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 392:\n"
+"Set HDEF layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 392:\n"
+"设置 HDEF layout-id 为 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx398_title"
@@ -1542,10 +1540,10 @@ msgstr "LayoutID=398"
 #: Resources/templates/Localizable.strings:359
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 398:\n"
+"Set HDEF layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 398:\n"
+"设置 HDEF layout-id 为 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx662_title"
@@ -1559,10 +1557,10 @@ msgstr "LayoutID=662"
 #: Resources/templates/Localizable.strings:363
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 662:\n"
+"Set HDEF layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 662:\n"
+"设置 HDEF layout-id 为 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx663_title"
@@ -1576,10 +1574,10 @@ msgstr "LayoutID=663"
 #: Resources/templates/Localizable.strings:367
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 663:\n"
+"Set HDEF layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 663:\n"
+"设置 HDEF layout-id 为 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx664_title"
@@ -1593,10 +1591,10 @@ msgstr "LayoutID=664"
 #: Resources/templates/Localizable.strings:371
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 664:\n"
+"Set HDEF layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 664:\n"
+"设置 HDEF layout-id 为 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx885_title"
@@ -1610,10 +1608,10 @@ msgstr "LayoutID=885"
 #: Resources/templates/Localizable.strings:375
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 885:\n"
+"Set HDEF layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 885:\n"
+"设置 HDEF layout-id 为 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx887_title"
@@ -1627,10 +1625,10 @@ msgstr "LayoutID=887"
 #: Resources/templates/Localizable.strings:379
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 887:\n"
+"Set HDEF layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 887:\n"
+"设置 HDEF layout-id 为 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx888_title"
@@ -1644,10 +1642,10 @@ msgstr "LayoutID=888"
 #: Resources/templates/Localizable.strings:383
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 888:\n"
+"Set HDEF layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 388:\n"
+"设置 HDEF layout-id 为 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx889_title"
@@ -1661,10 +1659,10 @@ msgstr "LayoutID=889"
 #: Resources/templates/Localizable.strings:387
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 889:\n"
+"Set HDEF layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 889:\n"
+"设置 HDEF layout-id 为 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx892_title"
@@ -1678,10 +1676,10 @@ msgstr "LayoutID=892"
 #: Resources/templates/Localizable.strings:391
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 892:\n"
+"Set HDEF layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 892:\n"
+"设置 HDEF layout-id 为 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx898_title"
@@ -1695,10 +1693,10 @@ msgstr "LayoutID=898"
 #: Resources/templates/Localizable.strings:395
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 898:\n"
+"Set HDEF layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 898:\n"
+"设置 HDEF layout-id 为 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDxBD7_title"
@@ -1712,270 +1710,270 @@ msgstr "LayoutID=1981"
 #: Resources/templates/Localizable.strings:399
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1981:\n"
+"Set HDEF layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"设置 HDEF layout-it 为 1981:\n"
+"设置 HDEF layout-id 为 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx01_description"
 #: Resources/templates/Localizable.strings:405
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1:\n"
+"Set HDAU layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 1:\n"
+"设置 HDAU layout-id 为 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx02_description"
 #: Resources/templates/Localizable.strings:409
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 2:\n"
+"Set HDAU layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 2:\n"
+"设置 HDAU layout-id 为 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx03_description"
 #: Resources/templates/Localizable.strings:413
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 3:\n"
+"Set HDAU layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 3:\n"
+"设置 HDAU layout-id 为 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:417
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 5:\n"
+"Set HDAU layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 5:\n"
+"设置 HDAU layout-id 为 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:421
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 7:\n"
+"Set HDAU layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 7:\n"
+"设置 HDAU layout-id 为 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:425
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 12:\n"
+"Set HDAU layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 12:\n"
+"设置 HDAU layout-id 为 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:429
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 32:\n"
+"Set HDAU layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 32:\n"
+"设置 HDAU layout-id 为 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:433
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 40:\n"
+"Set HDAU layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 40:\n"
+"设置 HDAU layout-id 为 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx65_description"
 #: Resources/templates/Localizable.strings:437
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 65:\n"
+"Set HDAU layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 65:\n"
+"设置 HDAU layout-id 为 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx99_description"
 #: Resources/templates/Localizable.strings:441
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 99:\n"
+"Set HDAU layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 99:\n"
+"设置 HDAU layout-id 为 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx269_description"
 #: Resources/templates/Localizable.strings:445
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 269:\n"
+"Set HDAU layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 269:\n"
+"设置 HDAU layout-id 为 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx387_description"
 #: Resources/templates/Localizable.strings:449
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 387:\n"
+"Set HDAU layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 387:\n"
+"设置 HDAU layout-id 为 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx388_description"
 #: Resources/templates/Localizable.strings:453
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 388:\n"
+"Set HDAU layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 388:\n"
+"设置 HDAU layout-id 为 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx389_description"
 #: Resources/templates/Localizable.strings:457
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 389:\n"
+"Set HDAU layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 389:\n"
+"设置 HDAU layout-id 为 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx392_description"
 #: Resources/templates/Localizable.strings:461
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 392:\n"
+"Set HDAU layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 392:\n"
+"设置 HDAU layout-id 为 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx398_description"
 #: Resources/templates/Localizable.strings:465
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 398:\n"
+"Set HDAU layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 398:\n"
+"设置 HDAU layout-id 为 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx662_description"
 #: Resources/templates/Localizable.strings:469
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 662:\n"
+"Set HDAU layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 662:\n"
+"设置 HDAU layout-id 为 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx663_description"
 #: Resources/templates/Localizable.strings:473
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 663:\n"
+"Set HDAU layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 663:\n"
+"设置 HDAU layout-id 为 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx664_description"
 #: Resources/templates/Localizable.strings:477
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 664:\n"
+"Set HDAU layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 664:\n"
+"设置 HDAU layout-id 为 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx885_description"
 #: Resources/templates/Localizable.strings:481
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 885:\n"
+"Set HDAU layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 885:\n"
+"设置 HDAU layout-id 为 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx887_description"
 #: Resources/templates/Localizable.strings:485
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 887:\n"
+"Set HDAU layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 887:\n"
+"设置 HDAU layout-id 为 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx888_description"
 #: Resources/templates/Localizable.strings:489
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 888:\n"
+"Set HDAU layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 888:\n"
+"设置 HDAU layout-id 为 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx889_description"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 889:\n"
+"Set HDAU layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 889:\n"
+"设置 HDAU layout-id 为 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx892_description"
 #: Resources/templates/Localizable.strings:497
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 892:\n"
+"Set HDAU layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 892:\n"
+"设置 HDAU layout-id 为 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDx898_description"
 #: Resources/templates/Localizable.strings:501
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 898:\n"
+"Set HDAU layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 898:\n"
+"设置 HDAU layout-id 为 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)。"
 
 #. type: "HDAULayoutIDxBD7_description"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1981:\n"
+"Set HDAU layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"设置 HDAU layout-it 为 1981:\n"
+"设置 HDAU layout-id 为 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "IntelCaprix00_title"
@@ -2774,7 +2772,7 @@ msgstr "(默认是 No) 启用 nVidia 显卡的 传统名称 (只显示 显卡型
 #: Resources/templates/Localizable.strings:716
 #, no-wrap
 msgid "NvidiaSingle=No"
-msgstr ""
+msgstr "NvidiaSingle=No"
 
 #. type: "NvidiaSingle_description"
 #: Resources/templates/Localizable.strings:717
@@ -2908,7 +2906,7 @@ msgstr "Yosemite Developer Previews 不加载未签署或不当签署的 kexts�
 #: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "rootless=0"
-msgstr ""
+msgstr "rootless=0"
 
 #. type: "rootless0_description"
 #: Resources/templates/Localizable.strings:756
@@ -3214,14 +3212,130 @@ msgstr "键盘布局"
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "设置选用一个键盘布局。将会安装键盘布局模组与键盘映射文件。"
 
+#. type: "Patches_title"
+#: Resources/templates/Localizable.strings:870
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Patches"
+msgstr "Kext Patcher"
+
+#. type: "Patches_description"
+#: Resources/templates/Localizable.strings:871
+#, fuzzy, no-wrap
+#| msgid "A selection of options that deal with video."
+msgid "A selection of options to patch the kernel."
+msgstr "一些设置显卡的选项。"
+
+#. type: "kernelPatcher_title"
+#: Resources/templates/Localizable.strings:873
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "kernel Patcher"
+msgstr "Kernel Patcher"
+
+#. type: "kernelPatcher_description"
+#: Resources/templates/Localizable.strings:874
+#, no-wrap
+msgid "Select one patch for your kernel."
+msgstr ""
+
+#. type: "KernelBooter_kexts_title"
+#: Resources/templates/Localizable.strings:877
+#, no-wrap
+msgid "KernelBooter_kexts"
+msgstr ""
+
+#. type: "KernelBooter_kexts_description"
+#: Resources/templates/Localizable.strings:878
+#, no-wrap
+msgid "Re-enable /Extra/Extensions kexts on newer OSes."
+msgstr ""
+
+#. type: "KernelPm_title"
+#: Resources/templates/Localizable.strings:881
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelPm"
+msgstr "Kernel Patcher"
+
+#. type: "KernelPm_description"
+#: Resources/templates/Localizable.strings:882
+#, fuzzy, no-wrap
+#| msgid "Power Management"
+msgid "Kernel Power Management patch."
+msgstr "电源管理"
+
+#. type: "KernelLapicError_title"
+#: Resources/templates/Localizable.strings:885
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicError"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicError_description"
+#: Resources/templates/Localizable.strings:886
+#, no-wrap
+msgid "Remove the Local Apic Error panic."
+msgstr ""
+
+#. type: "KernelLapicVersion_title"
+#: Resources/templates/Localizable.strings:889
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicVersion"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicVersion_description"
+#: Resources/templates/Localizable.strings:890
+#, no-wrap
+msgid "Remove the Local Apic Version panic."
+msgstr ""
+
+#. type: "KernelHaswell_title"
+#: Resources/templates/Localizable.strings:893
+#, fuzzy, no-wrap
+#| msgid "Kernel Flags"
+msgid "KernelHaswell"
+msgstr "内核参数"
+
+#. type: "KernelHaswell_description"
+#: Resources/templates/Localizable.strings:894
+#, no-wrap
+msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
+msgstr ""
+
+#. type: "KernelcpuFamily_title"
+#: Resources/templates/Localizable.strings:897
+#, no-wrap
+msgid "KernelcpuFamily"
+msgstr ""
+
+#. type: "KernelcpuFamily_description"
+#: Resources/templates/Localizable.strings:898
+#, no-wrap
+msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
+msgstr ""
+
+#. type: "KernelSSE3_title"
+#: Resources/templates/Localizable.strings:901
+#, no-wrap
+msgid "KernelSSE3"
+msgstr ""
+
+#. type: "KernelSSE3_description"
+#: Resources/templates/Localizable.strings:902
+#, no-wrap
+msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:867
+#: Resources/templates/Localizable.strings:907
 #, no-wrap
 msgid "Themes"
 msgstr "主题选项"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:868
+#: Resources/templates/Localizable.strings:908
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"

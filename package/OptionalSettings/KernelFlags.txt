@@ -33,6 +33,6 @@ List@Npci3:Kernel Flags=npci=0x3000
 List@WaitingRootDevice:Kernel Flags=ahcidisk=1 debug=8
 List@Darkwake:Kernel Flags=darkwake=0
 List@NvdaDrv1:Kernel Flags=nvda_drv=1
-List@kext-dev-mode1:Kernel Flags=kext-dev-mode=1
-List@rootless0:Kernel Flags=rootless=0
+#List@kext-dev-mode1:Kernel Flags=kext-dev-mode=1
+#List@rootless0:Kernel Flags=rootless=0
 List@Dart0:Kernel Flags=dart=0
