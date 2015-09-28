@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-12 19:02+0200\n"
+"POT-Creation-Date: 2015-09-28 01:18+0200\n"
 "PO-Revision-Date: 2015-02-13 18:35-0000\n"
 "Last-Translator: arsradu <arsradu@yahoo.com>\n"
 "Language-Team: ro <ro@li.org>\n"
@@ -280,10 +280,9 @@ msgstr "Folositor in cazul in care se doreste instalarea extra-uriilor doar."
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
-#| msgid "Chameleon Bootloader Package"
+#, no-wrap
 msgid "Bootloader Stages"
-msgstr "Bootloaderul Chameleon"
+msgstr "Stagiile bootloader-ului"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -294,12 +293,16 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"Aici puteti alege sa treceti cu totul peste instalarea bootloader-ului, sau doar partial.\n"
+"Acest lucru poate fi util daca doriti sa scrieti in Extra, sau sa treceti peste anumiti pasi (0,1 si activarea partitiei tinta).\n"
+"Saltul peste toti pasii va permite sa pastrati intacte sectoarele de boot deja functionale, in special pentru 4k.\n"
+"Boot-ul este intotdeauna copiat pe partitia tinta cand alegeti saltul peste unul sau mai multi pasi."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "Salt peste pasul 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -308,12 +311,14 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evita scrierea pasului 0 pe partitia tinta.\n"
+"Pasul 2 este intotdeauna copiat/inlocuit."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "Salt peste pasul 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -322,12 +327,14 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evita scrierea pasului 1 pe partitia tinta.\n"
+"Pasul 2 este intotdeauna copiat/inlocuit."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "Treci peste activare"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -337,33 +344,33 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Previne activarea partitiei tinta.\n"
+"Unele placi de baza mai vechi au o implementare GPT defectuoasa in BIOS, si nu pot gasi partitiile marcate ca active in GUID Partition Table.\n"
+"Pasul 2 este intotdeauna copiat/inlocuit. "
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
-#| msgid "&nbsp;has been written to the root of your chosen partition."
+#, no-wrap
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;a fost salvat in directorul principal al partitiei selectate."
+msgstr "Instaleaza Chameleon pe partitia aleasa."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
-#| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
+#, no-wrap
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Instalarea Chameleon in directorul principal al partitiei selectate, folosind boot0 sau boot0md in functie de configuratia sistemului, fara a distruge o instalare de Windows daca aceasta e prezenta."
+msgstr "Instaleaza Chameleon in directorul principal al partitiei selectate, folosind boot0, boot0md sau boot0hfs in functie de configuratia sistemului, fara a distruge o instalare de Windows daca exista."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "Instaleaza Chameleon in ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
-#| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
+#, no-wrap
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "Instalarea Chameleon in partitia EFI (de obicei ascunsa) folosind boot0 sau boot0md in functie de configuratia sistemului, fara a distruge o instalare de Windows daca aceasta e prezenta."
+msgstr "Instaleaza Chameleon in ESP (EFI System Partition) pe partitia tinta folosind boot0, boot0md sau boot0hfs, in functie de configuratia sistemului, fara a distruge o instalare de Windows daca exista."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -655,39 +662,37 @@ msgstr "Folosirea logoului apple normal, gri pe fundal gri deschis, in loc de ce
 #: Resources/templates/Localizable.strings:137
 #, no-wrap
 msgid "RebootOnPanic=No"
-msgstr ""
+msgstr "RebootOnPanic=No"
 
 #. type: "RebootOnPanic_description"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr ""
+msgstr "Repornire in caz de Kernel Panic."
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
-#, fuzzy, no-wrap
-#| msgid "EnableHDMIAudio=Yes"
+#, no-wrap
 msgid "EnableHiDPI=Yes"
-msgstr "EnableHDMIAudio=Yes"
+msgstr "EnableHiDPI=Yes"
 
 #. type: "EnableHiDPI_description"
 #: Resources/templates/Localizable.strings:141
 #, no-wrap
 msgid "Enable High resolution display (aka retina)."
-msgstr ""
+msgstr "Activeaza display cu rezolutie mare (aka Retina)."
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
-#, fuzzy, no-wrap
-#| msgid "Wake=Yes"
+#, no-wrap
 msgid "BlackMode=Yes"
-msgstr "Wake=Yes"
+msgstr "BlackMode=Yes"
 
 #. type: "BlackMode_description"
 #: Resources/templates/Localizable.strings:144
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
-msgstr ""
+msgstr "Noul mod BlackMode incarca logo-ul alb Apple, in loc de logo-ul gri, pe fundal negru."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -751,7 +756,7 @@ msgstr "PrivateData=No"
 #: Resources/templates/Localizable.strings:159
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
-msgstr ""
+msgstr "Afiseaza datele mascate (serialul) in log-ul bdmesg (activat implicit)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:163
@@ -763,7 +768,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:164
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "Activeaza fix-urile pentru XHCI, EHCI si UHCI (dezactivate implicit)."
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:166
@@ -775,7 +780,7 @@ msgstr "USBLegacyOff=Yes"
 #: Resources/templates/Localizable.strings:167
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
-msgstr ""
+msgstr "Forteaza USB Legacy Off pentru XHCI si EHCI (dezactivat implicit)."
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:169
@@ -787,7 +792,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:170
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "Forteaza USB Legacy Off pentru XHCI (dezactivat implicit)."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:172
@@ -1280,10 +1285,10 @@ msgstr "LayoutID=1"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1:\n"
+"Set HDEF layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 1:\n"
+"Seteaza HDEF layout-id la 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
@@ -1297,10 +1302,10 @@ msgstr "LayoutID=2"
 #: Resources/templates/Localizable.strings:303
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 2:\n"
+"Set HDEF layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 2:\n"
+"Seteaza HDEF layout-id la 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
@@ -1314,10 +1319,10 @@ msgstr "LayoutID=3"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 3:\n"
+"Set HDEF layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 3:\n"
+"Seteaza HDEF layout-id la 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
@@ -1331,10 +1336,10 @@ msgstr "LayoutID=5"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 5:\n"
+"Set HDEF layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 5:\n"
+"Seteaza HDEF layout-id la 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
@@ -1348,10 +1353,10 @@ msgstr "LayoutID=7"
 #: Resources/templates/Localizable.strings:315
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 7:\n"
+"Set HDEF layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 7:\n"
+"Seteaza HDEF layout-id la 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
@@ -1365,10 +1370,10 @@ msgstr "LayoutID=12"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 12:\n"
+"Set HDEF layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 12:\n"
+"Seteaza HDEF layout-id la 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
@@ -1382,10 +1387,10 @@ msgstr "LayoutID=32"
 #: Resources/templates/Localizable.strings:323
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 32:\n"
+"Set HDEF layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 32:\n"
+"Seteaza HDEF layout-id la 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
@@ -1399,10 +1404,10 @@ msgstr "LayoutID=40"
 #: Resources/templates/Localizable.strings:327
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 40:\n"
+"Set HDEF layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 40:\n"
+"Seteaza HDEF layout-id la 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
@@ -1416,10 +1421,10 @@ msgstr "LayoutID=65"
 #: Resources/templates/Localizable.strings:331
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 65:\n"
+"Set HDEF layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 65:\n"
+"Seteaza HDEF layout-id la 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
@@ -1433,10 +1438,10 @@ msgstr "LayoutID=99"
 #: Resources/templates/Localizable.strings:335
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 99:\n"
+"Set HDEF layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 99:\n"
+"Seteaza HDEF layout-id la 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
@@ -1450,10 +1455,10 @@ msgstr "LayoutID=269"
 #: Resources/templates/Localizable.strings:339
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 269:\n"
+"Set HDEF layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 269:\n"
+"Seteaza HDEF layout-id la 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
@@ -1467,10 +1472,10 @@ msgstr "LayoutID=387"
 #: Resources/templates/Localizable.strings:343
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 387:\n"
+"Set HDEF layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 387:\n"
+"Seteaza HDEF layout-id la 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
@@ -1484,10 +1489,10 @@ msgstr "LayoutID=388"
 #: Resources/templates/Localizable.strings:347
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 388:\n"
+"Set HDEF layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 388:\n"
+"Seteaza HDEF layout-id la 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
@@ -1501,10 +1506,10 @@ msgstr "LayoutID=389"
 #: Resources/templates/Localizable.strings:351
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 389:\n"
+"Set HDEF layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 389:\n"
+"Seteaza HDEF layout-id la 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
@@ -1518,10 +1523,10 @@ msgstr "LayoutID=392"
 #: Resources/templates/Localizable.strings:355
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 392:\n"
+"Set HDEF layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 392:\n"
+"Seteaza HDEF layout-id la 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
@@ -1535,10 +1540,10 @@ msgstr "LayoutID=398"
 #: Resources/templates/Localizable.strings:359
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 398:\n"
+"Set HDEF layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 398:\n"
+"Seteaza HDEF layout-id la 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
@@ -1552,10 +1557,10 @@ msgstr "LayoutID=662"
 #: Resources/templates/Localizable.strings:363
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 662:\n"
+"Set HDEF layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 662:\n"
+"Seteaza HDEF layout-id la 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
@@ -1569,10 +1574,10 @@ msgstr "LayoutID=663"
 #: Resources/templates/Localizable.strings:367
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 663:\n"
+"Set HDEF layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 663:\n"
+"Seteaza HDEF layout-id la 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
@@ -1586,10 +1591,10 @@ msgstr "LayoutID=664"
 #: Resources/templates/Localizable.strings:371
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 664:\n"
+"Set HDEF layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 664:\n"
+"Seteaza HDEF layout-id la 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
@@ -1603,10 +1608,10 @@ msgstr "LayoutID=885"
 #: Resources/templates/Localizable.strings:375
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 885:\n"
+"Set HDEF layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 885:\n"
+"Seteaza HDEF layout-id la 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
@@ -1620,10 +1625,10 @@ msgstr "LayoutID=887"
 #: Resources/templates/Localizable.strings:379
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 887:\n"
+"Set HDEF layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 887:\n"
+"Seteaza HDEF layout-id la 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
@@ -1637,10 +1642,10 @@ msgstr "LayoutID=888"
 #: Resources/templates/Localizable.strings:383
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 888:\n"
+"Set HDEF layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 888:\n"
+"Seteaza HDEF layout-id la 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
@@ -1654,10 +1659,10 @@ msgstr "LayoutID=889"
 #: Resources/templates/Localizable.strings:387
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 889:\n"
+"Set HDEF layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 889:\n"
+"Seteaza HDEF layout-id la 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
@@ -1671,10 +1676,10 @@ msgstr "LayoutID=892"
 #: Resources/templates/Localizable.strings:391
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 892:\n"
+"Set HDEF layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 892:\n"
+"Seteaza HDEF layout-id la 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
@@ -1688,10 +1693,10 @@ msgstr "LayoutID=898"
 #: Resources/templates/Localizable.strings:395
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 898:\n"
+"Set HDEF layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 898:\n"
+"Seteaza HDEF layout-id la 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
@@ -1705,270 +1710,270 @@ msgstr "LayoutID=1981"
 #: Resources/templates/Localizable.strings:399
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1981:\n"
+"Set HDEF layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDEF layout-it la 1981:\n"
+"Seteaza HDEF layout-id la 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx01_description"
 #: Resources/templates/Localizable.strings:405
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1:\n"
+"Set HDAU layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 1:\n"
+"Seteaza HDAU layout-id la 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_description"
 #: Resources/templates/Localizable.strings:409
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 2:\n"
+"Set HDAU layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 2:\n"
+"Seteaza HDAU layout-id la 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_description"
 #: Resources/templates/Localizable.strings:413
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 3:\n"
+"Set HDAU layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 3:\n"
+"Seteaza HDAU layout-id la 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:417
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 5:\n"
+"Set HDAU layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 5:\n"
+"Seteaza HDAU layout-id la 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:421
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 7:\n"
+"Set HDAU layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 7:\n"
+"Seteaza HDAU layout-id la 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:425
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 12:\n"
+"Set HDAU layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 12:\n"
+"Seteaza HDAU layout-id la 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:429
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 32:\n"
+"Set HDAU layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 32:\n"
+"Seteaza HDAU layout-id la 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:433
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 40:\n"
+"Set HDAU layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 40:\n"
+"Seteaza HDAU layout-id la 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_description"
 #: Resources/templates/Localizable.strings:437
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 65:\n"
+"Set HDAU layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 65:\n"
+"Seteaza HDAU layout-id la 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_description"
 #: Resources/templates/Localizable.strings:441
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 99:\n"
+"Set HDAU layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 99:\n"
+"Seteaza HDAU layout-id la 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_description"
 #: Resources/templates/Localizable.strings:445
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 269:\n"
+"Set HDAU layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 269:\n"
+"Seteaza HDAU layout-id la 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_description"
 #: Resources/templates/Localizable.strings:449
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 387:\n"
+"Set HDAU layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 387:\n"
+"Seteaza HDAU layout-id la 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_description"
 #: Resources/templates/Localizable.strings:453
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 388:\n"
+"Set HDAU layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 388:\n"
+"Seteaza HDAU layout-id la 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_description"
 #: Resources/templates/Localizable.strings:457
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 389:\n"
+"Set HDAU layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 389:\n"
+"Seteaza HDAU layout-id la 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_description"
 #: Resources/templates/Localizable.strings:461
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 392:\n"
+"Set HDAU layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 392:\n"
+"Seteaza HDAU layout-id la 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_description"
 #: Resources/templates/Localizable.strings:465
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 398:\n"
+"Set HDAU layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 398:\n"
+"Seteaza HDAU layout-id la 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_description"
 #: Resources/templates/Localizable.strings:469
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 662:\n"
+"Set HDAU layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 662:\n"
+"Seteaza HDAU layout-id la 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_description"
 #: Resources/templates/Localizable.strings:473
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 663:\n"
+"Set HDAU layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 663:\n"
+"Seteaza HDAU layout-id la 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_description"
 #: Resources/templates/Localizable.strings:477
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 664:\n"
+"Set HDAU layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 664:\n"
+"Seteaza HDAU layout-id la 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_description"
 #: Resources/templates/Localizable.strings:481
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 885:\n"
+"Set HDAU layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 885:\n"
+"Seteaza HDAU layout-id la 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_description"
 #: Resources/templates/Localizable.strings:485
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 887:\n"
+"Set HDAU layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 887:\n"
+"Seteaza HDAU layout-id la 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_description"
 #: Resources/templates/Localizable.strings:489
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 888:\n"
+"Set HDAU layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 888:\n"
+"Seteaza HDAU layout-id la 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_description"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 889:\n"
+"Set HDAU layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 889:\n"
+"Seteaza HDAU layout-id la 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_description"
 #: Resources/templates/Localizable.strings:497
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 892:\n"
+"Set HDAU layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 892:\n"
+"Seteaza HDAU layout-id la 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_description"
 #: Resources/templates/Localizable.strings:501
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 898:\n"
+"Set HDAU layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 898:\n"
+"Seteaza HDAU layout-id la 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_description"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1981:\n"
+"Set HDAU layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Seteaza HDAU layout-it la 1981:\n"
+"Seteaza HDAU layout-id la 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "IntelCaprix00_title"
@@ -2311,277 +2316,241 @@ msgstr "Seteaza 08002e0a pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
 #: Resources/templates/Localizable.strings:596
 #, no-wrap
 msgid "04001204"
-msgstr ""
+msgstr "04001204"
 
 #. type: "IntelAzulx16_description"
 #: Resources/templates/Localizable.strings:597
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 04001204 for Intel Haswell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 04001204 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx00_title"
 #: Resources/templates/Localizable.strings:601
-#, fuzzy, no-wrap
-#| msgid "00000604"
+#, no-wrap
 msgid "00000616"
-msgstr "00000604"
+msgstr "00000616"
 
 #. type: "IntelBroadwellx00_description"
 #: Resources/templates/Localizable.strings:602
-#, fuzzy, no-wrap
-#| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00000604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00000616 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx01_title"
 #: Resources/templates/Localizable.strings:604
-#, fuzzy, no-wrap
-#| msgid "00000604"
+#, no-wrap
 msgid "00000e16"
-msgstr "00000604"
+msgstr "00000e16"
 
 #. type: "IntelBroadwellx01_description"
 #: Resources/templates/Localizable.strings:605
-#, fuzzy, no-wrap
-#| msgid "Set 00000604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00000604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00000e16 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx02_title"
 #: Resources/templates/Localizable.strings:607
-#, fuzzy, no-wrap
-#| msgid "00001604"
+#, no-wrap
 msgid "00001616"
-msgstr "00001604"
+msgstr "00001616"
 
 #. type: "IntelBroadwellx02_description"
 #: Resources/templates/Localizable.strings:608
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00001616 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx03_title"
 #: Resources/templates/Localizable.strings:610
-#, fuzzy, no-wrap
-#| msgid "00001604"
+#, no-wrap
 msgid "00001e16"
-msgstr "00001604"
+msgstr "00001e16"
 
 #. type: "IntelBroadwellx03_description"
 #: Resources/templates/Localizable.strings:611
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00001e16 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx04_title"
 #: Resources/templates/Localizable.strings:613
-#, fuzzy, no-wrap
-#| msgid "00002604"
+#, no-wrap
 msgid "00002616"
-msgstr "00002604"
+msgstr "00002616"
 
 #. type: "IntelBroadwellx04_description"
 #: Resources/templates/Localizable.strings:614
-#, fuzzy, no-wrap
-#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00002604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00002616 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx05_title"
 #: Resources/templates/Localizable.strings:616
-#, fuzzy, no-wrap
-#| msgid "00002604"
+#, no-wrap
 msgid "00002b16"
-msgstr "00002604"
+msgstr "00002b16"
 
 #. type: "IntelBroadwellx05_description"
 #: Resources/templates/Localizable.strings:617
-#, fuzzy, no-wrap
-#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00002604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00002b16 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:619
-#, fuzzy, no-wrap
-#| msgid "00002604"
+#, no-wrap
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:620
-#, fuzzy, no-wrap
-#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00002604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 00002216 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:622
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:623
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 01000e16 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:625
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:626
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 01001e16 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx09_title"
 #: Resources/templates/Localizable.strings:628
-#, fuzzy, no-wrap
-#| msgid "01620006"
+#, no-wrap
 msgid "02000616"
-msgstr "01620006"
+msgstr "02000616"
 
 #. type: "IntelBroadwellx09_description"
 #: Resources/templates/Localizable.strings:629
-#, fuzzy, no-wrap
-#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 02000616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 02001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 02000616 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx10_title"
 #: Resources/templates/Localizable.strings:631
-#, fuzzy, no-wrap
-#| msgid "02001604"
+#, no-wrap
 msgid "02001616"
-msgstr "02001604"
+msgstr "02001616"
 
 #. type: "IntelBroadwellx10_description"
 #: Resources/templates/Localizable.strings:632
-#, fuzzy, no-wrap
-#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 02001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 02001616 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx11_title"
 #: Resources/templates/Localizable.strings:634
-#, fuzzy, no-wrap
-#| msgid "02001604"
+#, no-wrap
 msgid "02002616"
-msgstr "02001604"
+msgstr "02002616"
 
 #. type: "IntelBroadwellx11_description"
 #: Resources/templates/Localizable.strings:635
-#, fuzzy, no-wrap
-#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 02002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 02001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 02002616 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx12_title"
 #: Resources/templates/Localizable.strings:637
-#, fuzzy, no-wrap
-#| msgid "02001604"
+#, no-wrap
 msgid "02002216"
-msgstr "02001604"
+msgstr "02002216"
 
 #. type: "IntelBroadwellx12_description"
 #: Resources/templates/Localizable.strings:638
-#, fuzzy, no-wrap
-#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 02001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 02002216 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx13_title"
 #: Resources/templates/Localizable.strings:640
-#, fuzzy, no-wrap
-#| msgid "02001604"
+#, no-wrap
 msgid "02002b16"
-msgstr "02001604"
+msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:641
-#, fuzzy, no-wrap
-#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 02001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 02002b16 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:643
-#, fuzzy, no-wrap
-#| msgid "0300220d"
+#, no-wrap
 msgid "03001216"
-msgstr "0300220d"
+msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:644
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 03001216 pentru Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx15_title"
 #: Resources/templates/Localizable.strings:646
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:647
-#, fuzzy, no-wrap
-#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00001604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 04002b16 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:649
-#, fuzzy, no-wrap
-#| msgid "00002604"
+#, no-wrap
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:650
-#, fuzzy, no-wrap
-#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 00002604 pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 04002616 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:652
-#, fuzzy, no-wrap
-#| msgid "0500260a"
+#, no-wrap
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:653
-#, fuzzy, no-wrap
-#| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 0500260a pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 05002616 pentru  Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:655
-#, fuzzy, no-wrap
-#| msgid "0600260a"
+#, no-wrap
 msgid "06002616"
-msgstr "0600260a"
+msgstr "06002616"
 
 #. type: "IntelBroadwellx18_description"
 #: Resources/templates/Localizable.strings:656
-#, fuzzy, no-wrap
-#| msgid "Set 0600260c for Intel Haswell (Mobile) AAPL,ig-platform-id."
+#, no-wrap
 msgid "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Seteaza 0600260c pentru Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Seteaza 06002616 pentru Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:660
@@ -2689,7 +2658,7 @@ msgstr "UseIntelHDMI=Yes"
 #: Resources/templates/Localizable.strings:687
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
-msgstr ""
+msgstr "Daca DA, hda-gfx=onboard-1 va fi injectat in GFX0 si HDEF. De asemenea, daca un terminal ATI sau Nvidia HDMI este prezent, vor fi alocate catre onboard-2. Daca NU, atunci terminalele ATI sau Nvidia vor primi onboard-1, ca si HDAU, daca e prezent. "
 
 #. type: "UseAtiROM_title"
 #: Resources/templates/Localizable.strings:689
@@ -2797,19 +2766,19 @@ msgstr "NvidiaGeneric=Yes"
 #: Resources/templates/Localizable.strings:714
 #, no-wrap
 msgid "Use the classic Nvidia name for the SystemProfiler (disabled by default)."
-msgstr ""
+msgstr "Foloseste numele clasic Nvidia pentru SystemProfiler (dezactivat implicit)."
 
 #. type: "NvidiaSingle_title"
 #: Resources/templates/Localizable.strings:716
 #, no-wrap
 msgid "NvidiaSingle=No"
-msgstr ""
+msgstr "NvidiaSingle=No"
 
 #. type: "NvidiaSingle_description"
 #: Resources/templates/Localizable.strings:717
 #, no-wrap
 msgid "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default)."
-msgstr ""
+msgstr "Daca aveti doua placi Nvidia si doriti sa injectati doar in prima, atunci puteti seta acest parametru (activat implicit)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:723
@@ -2931,19 +2900,19 @@ msgstr "kext-dev-mode=1"
 #: Resources/templates/Localizable.strings:753
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
-msgstr ""
+msgstr "In versiunile de Preview pentru Dezvoltatori ale Yosemite, kext-urile nesemnate sau semnate necorespunzator, nu vor fi incarcate. Pentru a putea folosi kext-uri nesemnate pe parcursul dezvoltarii, aceasta verificare poate fi dezactivata adaugand 'kext-dev-mode=1' ca argument de boot."
 
 #. type: "rootless0_title"
 #: Resources/templates/Localizable.strings:755
 #, no-wrap
 msgid "rootless=0"
-msgstr ""
+msgstr "rootless=0"
 
 #. type: "rootless0_description"
 #: Resources/templates/Localizable.strings:756
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
-msgstr ""
+msgstr "'Rootless' este o noua facilitate introdusa in OS X 10.11 (El Capitan), care interzice modificarea fisierelor de sistem. Pentru a trece peste restrictie, aceasta facilitate poate fi dezactivate adaugand 'tootless=0' ca argument de boot. ('rootless=1' o activeaza)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:758
@@ -2958,6 +2927,8 @@ msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
 "More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 msgstr ""
+"Evita procesarea DMAR cauzata de functia VT-d in OS X (Virtualizare).\n"
+"Mai multe informatii de la bcc9 aici: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
 #: Resources/templates/Localizable.strings:766
@@ -3155,7 +3126,7 @@ msgstr "HDEF Layout"
 #: Resources/templates/Localizable.strings:833
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
-msgstr ""
+msgstr "Seteaza un HDEF Layout ID pentru controller-ul HDA."
 
 #. type: "HDAULayout_title"
 #: Resources/templates/Localizable.strings:836
@@ -3167,7 +3138,7 @@ msgstr "HDAU Layout"
 #: Resources/templates/Localizable.strings:837
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
-msgstr ""
+msgstr "Seteaza un HDAU Layout ID pentru controller-ul HDMI."
 
 #. type: "IntelCapri_title"
 #: Resources/templates/Localizable.strings:840
@@ -3179,7 +3150,7 @@ msgstr "Intel Capri AAPL,ig-platform-id"
 #: Resources/templates/Localizable.strings:841
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
-msgstr ""
+msgstr "Seteaza un AAPL,ig-platform-id pentru Intel HD4000."
 
 #. type: "IntelAzul_title"
 #: Resources/templates/Localizable.strings:844
@@ -3191,20 +3162,19 @@ msgstr "Intel Azul AAPL,ig-platform-id"
 #: Resources/templates/Localizable.strings:845
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
-msgstr ""
+msgstr "Seteaza un AAPL,ig-platform-id pentru Intel Haswell."
 
 #. type: "IntelBdw_title"
 #: Resources/templates/Localizable.strings:848
-#, fuzzy, no-wrap
-#| msgid "Intel Azul AAPL,ig-platform-id"
+#, no-wrap
 msgid "Intel Bdw AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
 #: Resources/templates/Localizable.strings:849
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
-msgstr ""
+msgstr "Seteaza un AAPL,ig-platform-id pentru Intel Broadwell."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:852
@@ -3242,14 +3212,130 @@ msgstr "Tastatura"
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Selectati o limba a tastaturii, aceasta va instala si modulul pentru diverse limbi."
 
+#. type: "Patches_title"
+#: Resources/templates/Localizable.strings:870
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Patches"
+msgstr "Kext Patcher"
+
+#. type: "Patches_description"
+#: Resources/templates/Localizable.strings:871
+#, fuzzy, no-wrap
+#| msgid "A selection of options that deal with video."
+msgid "A selection of options to patch the kernel."
+msgstr "O selectie de optiuni care au de aface cu functionarea video."
+
+#. type: "kernelPatcher_title"
+#: Resources/templates/Localizable.strings:873
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "kernel Patcher"
+msgstr "Kernel Patcher"
+
+#. type: "kernelPatcher_description"
+#: Resources/templates/Localizable.strings:874
+#, no-wrap
+msgid "Select one patch for your kernel."
+msgstr ""
+
+#. type: "KernelBooter_kexts_title"
+#: Resources/templates/Localizable.strings:877
+#, no-wrap
+msgid "KernelBooter_kexts"
+msgstr ""
+
+#. type: "KernelBooter_kexts_description"
+#: Resources/templates/Localizable.strings:878
+#, no-wrap
+msgid "Re-enable /Extra/Extensions kexts on newer OSes."
+msgstr ""
+
+#. type: "KernelPm_title"
+#: Resources/templates/Localizable.strings:881
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelPm"
+msgstr "Kernel Patcher"
+
+#. type: "KernelPm_description"
+#: Resources/templates/Localizable.strings:882
+#, fuzzy, no-wrap
+#| msgid "Power Management"
+msgid "Kernel Power Management patch."
+msgstr "Management al energiei"
+
+#. type: "KernelLapicError_title"
+#: Resources/templates/Localizable.strings:885
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicError"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicError_description"
+#: Resources/templates/Localizable.strings:886
+#, no-wrap
+msgid "Remove the Local Apic Error panic."
+msgstr ""
+
+#. type: "KernelLapicVersion_title"
+#: Resources/templates/Localizable.strings:889
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicVersion"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicVersion_description"
+#: Resources/templates/Localizable.strings:890
+#, no-wrap
+msgid "Remove the Local Apic Version panic."
+msgstr ""
+
+#. type: "KernelHaswell_title"
+#: Resources/templates/Localizable.strings:893
+#, fuzzy, no-wrap
+#| msgid "Kernel Flags"
+msgid "KernelHaswell"
+msgstr "Flag-uri pentru kernel"
+
+#. type: "KernelHaswell_description"
+#: Resources/templates/Localizable.strings:894
+#, no-wrap
+msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
+msgstr ""
+
+#. type: "KernelcpuFamily_title"
+#: Resources/templates/Localizable.strings:897
+#, no-wrap
+msgid "KernelcpuFamily"
+msgstr ""
+
+#. type: "KernelcpuFamily_description"
+#: Resources/templates/Localizable.strings:898
+#, no-wrap
+msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
+msgstr ""
+
+#. type: "KernelSSE3_title"
+#: Resources/templates/Localizable.strings:901
+#, no-wrap
+msgid "KernelSSE3"
+msgstr ""
+
+#. type: "KernelSSE3_description"
+#: Resources/templates/Localizable.strings:902
+#, no-wrap
+msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:867
+#: Resources/templates/Localizable.strings:907
 #, no-wrap
 msgid "Themes"
 msgstr "Teme"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:868
+#: Resources/templates/Localizable.strings:908
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"

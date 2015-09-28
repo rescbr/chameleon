@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-12 19:02+0200\n"
+"POT-Creation-Date: 2015-09-28 01:18+0200\n"
 "PO-Revision-Date: 2015-07-12 00:00+0100\n"
 "Last-Translator: FurtiF <msntchat@hotmail.fr>\n"
 "Language-Team: es <es@li.org>\n"
@@ -69,7 +69,9 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "Paquete realizado por:% WHOBUILD%, el idioma traducido por: juanerson e FurtiF"
+msgstr ""
+"Paquete realizado por:% WHOBUILD%, el idioma traducido por: juanerson e "
+"FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -78,28 +80,42 @@ msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
-msgstr "El Bootloader Chameleon es la combinación de varios componentes. Esta basado en la implementación EFI falsa de David Elliott, incorporada al método Boot-132, a partir del proyecto de código abierto Darwin de Apple"
+msgid ""
+"Chameleon is a boot loader built using a combination of components which "
+"evolved from the development of David Elliott's fake EFI implementation "
+"added to Apple's boot-132 project."
+msgstr ""
+"El Bootloader Chameleon es la combinación de varios componentes. Esta basado "
+"en la implementación EFI falsa de David Elliott, incorporada al método "
+"Boot-132, a partir del proyecto de código abierto Darwin de Apple"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
 msgid "Chameleon v2 is extended with many features. For example:"
-msgstr "Entre las Novedades en Chameleon v2 se encuentran muchas funciones extendidas, por ejemplo:"
+msgstr ""
+"Entre las Novedades en Chameleon v2 se encuentran muchas funciones "
+"extendidas, por ejemplo:"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr "- Interfaz GUI totalmente personalizada para brindarle más colorido al Dawin Bootloader."
+msgstr ""
+"- Interfaz GUI totalmente personalizada para brindarle más colorido al Dawin "
+"Bootloader."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr "- Booteo de DVDs con simplemente cargar una imagen ramdisk sin la ayuda de programas adicionales."
+msgid ""
+"- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr ""
+"- Booteo de DVDs con simplemente cargar una imagen ramdisk sin la ayuda de "
+"programas adicionales."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
-msgstr "- Hibernación. Disfrute reanudar su MAC OS X con una imagen de muestra."
+msgstr ""
+"- Hibernación. Disfrute reanudar su MAC OS X con una imagen de muestra."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
@@ -108,8 +124,11 @@ msgstr "- Anulación de SMBIOS, para modificar los valores de fábrica SMBIOS."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr "- Anulación de DSDT, para usar un DSDT modificado y arreglado capaz de resolver varios inconvenientes."
+msgid ""
+"- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr ""
+"- Anulación de DSDT, para usar un DSDT modificado y arreglado capaz de "
+"resolver varios inconvenientes."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
@@ -119,7 +138,9 @@ msgstr "- Inyección de Propiedades de Dispositivos a través de EFI strings."
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
 msgid "- hybrid boot0 / boot1h for MBR and GPT partitioned disks."
-msgstr "- Permite el arranque de esquemas híbridos boot0 / boot1h, para discos particionados en MBR y GPT."
+msgstr ""
+"- Permite el arranque de esquemas híbridos boot0 / boot1h, para discos "
+"particionados en MBR y GPT."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:29
@@ -148,8 +169,11 @@ msgstr "- Detección de Memoria adaptada desde memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid "- Automatic P-State &amp; C-State generation for native power management."
-msgstr "- Generación automática de P-States &amp; C-States para gestión de energía nativa."
+msgid ""
+"- Automatic P-State &amp; C-State generation for native power management."
+msgstr ""
+"- Generación automática de P-States &amp; C-States para gestión de energía "
+"nativa."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:35
@@ -193,8 +217,12 @@ msgstr "léalo"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
-msgstr "&nbsp;para saber si la instalación fue exitosa y mantener un registro de lo que se hizo."
+msgid ""
+"&nbsp;to find out if the installation was successful and keep it for a "
+"record of what was done."
+msgstr ""
+"&nbsp;para saber si la instalación fue exitosa y mantener un registro de lo "
+"que se hizo."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
@@ -454,7 +482,8 @@ msgstr ""
 "Dependencias: ninguna"
 
 #. type: "Resolution_title"
-#: Resources/templates/Localizable.strings:81 Resources/templates/Localizable.strings:828
+#: Resources/templates/Localizable.strings:81
+#: Resources/templates/Localizable.strings:828
 #, no-wrap
 msgid "Resolution"
 msgstr "Resolución"
@@ -678,9 +707,7 @@ msgstr "BlackMode=Yes"
 #: Resources/templates/Localizable.strings:144
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
-msgstr ""
-"El nuevo BlackMode carga el logotipo blanco de Apple, en lugar del logotipo "
-"gris de Apple, en un fondo negro."
+msgstr "El nuevo BlackMode carga el logotipo blanco de Apple, en lugar del logotipo gris de Apple, en un fondo negro."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -1259,7 +1286,8 @@ msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "Establecer el Modo de Gráficos en 1920x1200x32"
 
 #. type: "HDAULayoutIDx01_title"
-#: Resources/templates/Localizable.strings:298 Resources/templates/Localizable.strings:404
+#: Resources/templates/Localizable.strings:298
+#: Resources/templates/Localizable.strings:404
 #, no-wrap
 msgid "LayoutID=1"
 msgstr "LayoutID=1"
@@ -1268,14 +1296,15 @@ msgstr "LayoutID=1"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1:\n"
+"Set HDEF layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 1:\n"
+"Establecer el Modo de HDEF layout-id en 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
-#: Resources/templates/Localizable.strings:302 Resources/templates/Localizable.strings:408
+#: Resources/templates/Localizable.strings:302
+#: Resources/templates/Localizable.strings:408
 #, no-wrap
 msgid "LayoutID=2"
 msgstr "LayoutID=2"
@@ -1284,14 +1313,15 @@ msgstr "LayoutID=2"
 #: Resources/templates/Localizable.strings:303
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 2:\n"
+"Set HDEF layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 2:\n"
+"Establecer el Modo de HDEF layout-id en 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
-#: Resources/templates/Localizable.strings:306 Resources/templates/Localizable.strings:412
+#: Resources/templates/Localizable.strings:306
+#: Resources/templates/Localizable.strings:412
 #, no-wrap
 msgid "LayoutID=3"
 msgstr "LayoutID=3"
@@ -1300,14 +1330,15 @@ msgstr "LayoutID=3"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 3:\n"
+"Set HDEF layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 3:\n"
+"Establecer el Modo de HDEF layout-id en 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
-#: Resources/templates/Localizable.strings:310 Resources/templates/Localizable.strings:416
+#: Resources/templates/Localizable.strings:310
+#: Resources/templates/Localizable.strings:416
 #, no-wrap
 msgid "LayoutID=5"
 msgstr "LayoutID=5"
@@ -1316,14 +1347,15 @@ msgstr "LayoutID=5"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 5:\n"
+"Set HDEF layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 5:\n"
+"Establecer el Modo de HDEF layout-id en 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
-#: Resources/templates/Localizable.strings:314 Resources/templates/Localizable.strings:420
+#: Resources/templates/Localizable.strings:314
+#: Resources/templates/Localizable.strings:420
 #, no-wrap
 msgid "LayoutID=7"
 msgstr "LayoutID=7"
@@ -1332,14 +1364,15 @@ msgstr "LayoutID=7"
 #: Resources/templates/Localizable.strings:315
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 7:\n"
+"Set HDEF layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 7:\n"
+"Establecer el Modo de HDEF layout-id en 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
-#: Resources/templates/Localizable.strings:318 Resources/templates/Localizable.strings:424
+#: Resources/templates/Localizable.strings:318
+#: Resources/templates/Localizable.strings:424
 #, no-wrap
 msgid "LayoutID=12"
 msgstr "LayoutID=12"
@@ -1348,14 +1381,15 @@ msgstr "LayoutID=12"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 12:\n"
+"Set HDEF layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 12:\n"
+"Establecer el Modo de HDEF layout-id en 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
-#: Resources/templates/Localizable.strings:322 Resources/templates/Localizable.strings:428
+#: Resources/templates/Localizable.strings:322
+#: Resources/templates/Localizable.strings:428
 #, no-wrap
 msgid "LayoutID=32"
 msgstr "LayoutID=32"
@@ -1364,14 +1398,15 @@ msgstr "LayoutID=32"
 #: Resources/templates/Localizable.strings:323
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 32:\n"
+"Set HDEF layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 32:\n"
+"Establecer el Modo de HDEF layout-id en 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
-#: Resources/templates/Localizable.strings:326 Resources/templates/Localizable.strings:432
+#: Resources/templates/Localizable.strings:326
+#: Resources/templates/Localizable.strings:432
 #, no-wrap
 msgid "LayoutID=40"
 msgstr "LayoutID=40"
@@ -1380,14 +1415,15 @@ msgstr "LayoutID=40"
 #: Resources/templates/Localizable.strings:327
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 40:\n"
+"Set HDEF layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 40:\n"
+"Establecer el Modo de HDEF layout-id en 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
-#: Resources/templates/Localizable.strings:330 Resources/templates/Localizable.strings:436
+#: Resources/templates/Localizable.strings:330
+#: Resources/templates/Localizable.strings:436
 #, no-wrap
 msgid "LayoutID=65"
 msgstr "LayoutID=65"
@@ -1396,14 +1432,15 @@ msgstr "LayoutID=65"
 #: Resources/templates/Localizable.strings:331
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 65:\n"
+"Set HDEF layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 65:\n"
+"Establecer el Modo de HDEF layout-id en 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
-#: Resources/templates/Localizable.strings:334 Resources/templates/Localizable.strings:440
+#: Resources/templates/Localizable.strings:334
+#: Resources/templates/Localizable.strings:440
 #, no-wrap
 msgid "LayoutID=99"
 msgstr "LayoutID=99"
@@ -1412,14 +1449,15 @@ msgstr "LayoutID=99"
 #: Resources/templates/Localizable.strings:335
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 99:\n"
+"Set HDEF layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 99:\n"
+"Establecer el Modo de HDEF layout-id en 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
-#: Resources/templates/Localizable.strings:338 Resources/templates/Localizable.strings:444
+#: Resources/templates/Localizable.strings:338
+#: Resources/templates/Localizable.strings:444
 #, no-wrap
 msgid "LayoutID=269"
 msgstr "LayoutID=269"
@@ -1428,14 +1466,15 @@ msgstr "LayoutID=269"
 #: Resources/templates/Localizable.strings:339
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 269:\n"
+"Set HDEF layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 269:\n"
+"Establecer el Modo de HDEF layout-id en 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
-#: Resources/templates/Localizable.strings:342 Resources/templates/Localizable.strings:448
+#: Resources/templates/Localizable.strings:342
+#: Resources/templates/Localizable.strings:448
 #, no-wrap
 msgid "LayoutID=387"
 msgstr "LayoutID=387"
@@ -1444,14 +1483,15 @@ msgstr "LayoutID=387"
 #: Resources/templates/Localizable.strings:343
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 387:\n"
+"Set HDEF layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 387:\n"
+"Establecer el Modo de HDEF layout-id en 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
-#: Resources/templates/Localizable.strings:346 Resources/templates/Localizable.strings:452
+#: Resources/templates/Localizable.strings:346
+#: Resources/templates/Localizable.strings:452
 #, no-wrap
 msgid "LayoutID=388"
 msgstr "LayoutID=388"
@@ -1460,14 +1500,15 @@ msgstr "LayoutID=388"
 #: Resources/templates/Localizable.strings:347
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 388:\n"
+"Set HDEF layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 388:\n"
+"Establecer el Modo de HDEF layout-id en 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
-#: Resources/templates/Localizable.strings:350 Resources/templates/Localizable.strings:456
+#: Resources/templates/Localizable.strings:350
+#: Resources/templates/Localizable.strings:456
 #, no-wrap
 msgid "LayoutID=389"
 msgstr "LayoutID=389"
@@ -1476,14 +1517,15 @@ msgstr "LayoutID=389"
 #: Resources/templates/Localizable.strings:351
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 389:\n"
+"Set HDEF layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 389:\n"
+"Establecer el Modo de HDEF layout-id en 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
-#: Resources/templates/Localizable.strings:354 Resources/templates/Localizable.strings:460
+#: Resources/templates/Localizable.strings:354
+#: Resources/templates/Localizable.strings:460
 #, no-wrap
 msgid "LayoutID=392"
 msgstr "LayoutID=392"
@@ -1492,14 +1534,15 @@ msgstr "LayoutID=392"
 #: Resources/templates/Localizable.strings:355
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 392:\n"
+"Set HDEF layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 392:\n"
+"Establecer el Modo de HDEF layout-id en 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
-#: Resources/templates/Localizable.strings:358 Resources/templates/Localizable.strings:464
+#: Resources/templates/Localizable.strings:358
+#: Resources/templates/Localizable.strings:464
 #, no-wrap
 msgid "LayoutID=398"
 msgstr "LayoutID=398"
@@ -1508,14 +1551,15 @@ msgstr "LayoutID=398"
 #: Resources/templates/Localizable.strings:359
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 398:\n"
+"Set HDEF layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 398:\n"
+"Establecer el Modo de HDEF layout-id en 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
-#: Resources/templates/Localizable.strings:362 Resources/templates/Localizable.strings:468
+#: Resources/templates/Localizable.strings:362
+#: Resources/templates/Localizable.strings:468
 #, no-wrap
 msgid "LayoutID=662"
 msgstr "LayoutID=662"
@@ -1524,14 +1568,15 @@ msgstr "LayoutID=662"
 #: Resources/templates/Localizable.strings:363
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 662:\n"
+"Set HDEF layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 662:\n"
+"Establecer el Modo de HDEF layout-id en 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
-#: Resources/templates/Localizable.strings:366 Resources/templates/Localizable.strings:472
+#: Resources/templates/Localizable.strings:366
+#: Resources/templates/Localizable.strings:472
 #, no-wrap
 msgid "LayoutID=663"
 msgstr "LayoutID=663"
@@ -1540,14 +1585,15 @@ msgstr "LayoutID=663"
 #: Resources/templates/Localizable.strings:367
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 663:\n"
+"Set HDEF layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 663:\n"
+"Establecer el Modo de HDEF layout-id en 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
-#: Resources/templates/Localizable.strings:370 Resources/templates/Localizable.strings:476
+#: Resources/templates/Localizable.strings:370
+#: Resources/templates/Localizable.strings:476
 #, no-wrap
 msgid "LayoutID=664"
 msgstr "LayoutID=664"
@@ -1556,14 +1602,15 @@ msgstr "LayoutID=664"
 #: Resources/templates/Localizable.strings:371
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 664:\n"
+"Set HDEF layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 664:\n"
+"Establecer el Modo de HDEF layout-id en 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
-#: Resources/templates/Localizable.strings:374 Resources/templates/Localizable.strings:480
+#: Resources/templates/Localizable.strings:374
+#: Resources/templates/Localizable.strings:480
 #, no-wrap
 msgid "LayoutID=885"
 msgstr "LayoutID=885"
@@ -1572,14 +1619,15 @@ msgstr "LayoutID=885"
 #: Resources/templates/Localizable.strings:375
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 885:\n"
+"Set HDEF layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 885:\n"
+"Establecer el Modo de HDEF layout-id en 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
-#: Resources/templates/Localizable.strings:378 Resources/templates/Localizable.strings:484
+#: Resources/templates/Localizable.strings:378
+#: Resources/templates/Localizable.strings:484
 #, no-wrap
 msgid "LayoutID=887"
 msgstr "LayoutID=887"
@@ -1588,14 +1636,15 @@ msgstr "LayoutID=887"
 #: Resources/templates/Localizable.strings:379
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 887:\n"
+"Set HDEF layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 887:\n"
+"Establecer el Modo de HDEF layout-id en 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
-#: Resources/templates/Localizable.strings:382 Resources/templates/Localizable.strings:488
+#: Resources/templates/Localizable.strings:382
+#: Resources/templates/Localizable.strings:488
 #, no-wrap
 msgid "LayoutID=888"
 msgstr "LayoutID=888"
@@ -1604,14 +1653,15 @@ msgstr "LayoutID=888"
 #: Resources/templates/Localizable.strings:383
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 888:\n"
+"Set HDEF layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 888:\n"
+"Establecer el Modo de HDEF layout-id en 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
-#: Resources/templates/Localizable.strings:386 Resources/templates/Localizable.strings:492
+#: Resources/templates/Localizable.strings:386
+#: Resources/templates/Localizable.strings:492
 #, no-wrap
 msgid "LayoutID=889"
 msgstr "LayoutID=889"
@@ -1620,14 +1670,15 @@ msgstr "LayoutID=889"
 #: Resources/templates/Localizable.strings:387
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 889:\n"
+"Set HDEF layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 889:\n"
+"Establecer el Modo de HDEF layout-id en 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
-#: Resources/templates/Localizable.strings:390 Resources/templates/Localizable.strings:496
+#: Resources/templates/Localizable.strings:390
+#: Resources/templates/Localizable.strings:496
 #, no-wrap
 msgid "LayoutID=892"
 msgstr "LayoutID=892"
@@ -1636,14 +1687,15 @@ msgstr "LayoutID=892"
 #: Resources/templates/Localizable.strings:391
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 892:\n"
+"Set HDEF layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 892:\n"
+"Establecer el Modo de HDEF layout-id en 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
-#: Resources/templates/Localizable.strings:394 Resources/templates/Localizable.strings:500
+#: Resources/templates/Localizable.strings:394
+#: Resources/templates/Localizable.strings:500
 #, no-wrap
 msgid "LayoutID=898"
 msgstr "LayoutID=898"
@@ -1652,14 +1704,15 @@ msgstr "LayoutID=898"
 #: Resources/templates/Localizable.strings:395
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 898:\n"
+"Set HDEF layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 898:\n"
+"Establecer el Modo de HDEF layout-id en 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
-#: Resources/templates/Localizable.strings:398 Resources/templates/Localizable.strings:504
+#: Resources/templates/Localizable.strings:398
+#: Resources/templates/Localizable.strings:504
 #, no-wrap
 msgid "LayoutID=1981"
 msgstr "LayoutID=1981"
@@ -1668,270 +1721,270 @@ msgstr "LayoutID=1981"
 #: Resources/templates/Localizable.strings:399
 #, no-wrap
 msgid ""
-"Set HDEF layout-it to 1981:\n"
+"Set HDEF layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDEF layout-it en 1981:\n"
+"Establecer el Modo de HDEF layout-id en 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx01_description"
 #: Resources/templates/Localizable.strings:405
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1:\n"
+"Set HDAU layout-id to 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 1:\n"
+"Establecer el Modo de HDAU layout-id en 1:\n"
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_description"
 #: Resources/templates/Localizable.strings:409
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 2:\n"
+"Set HDAU layout-id to 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 2:\n"
+"Establecer el Modo de HDAU layout-id en 2:\n"
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_description"
 #: Resources/templates/Localizable.strings:413
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 3:\n"
+"Set HDAU layout-id to 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 3:\n"
+"Establecer el Modo de HDAU layout-id en 3:\n"
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_description"
 #: Resources/templates/Localizable.strings:417
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 5:\n"
+"Set HDAU layout-id to 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 5:\n"
+"Establecer el Modo de HDAU layout-id en 5:\n"
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_description"
 #: Resources/templates/Localizable.strings:421
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 7:\n"
+"Set HDAU layout-id to 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 7:\n"
+"Establecer el Modo de HDAU layout-id en 7:\n"
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_description"
 #: Resources/templates/Localizable.strings:425
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 12:\n"
+"Set HDAU layout-id to 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 12:\n"
+"Establecer el Modo de HDAU layout-id en 12:\n"
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_description"
 #: Resources/templates/Localizable.strings:429
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 32:\n"
+"Set HDAU layout-id to 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 32:\n"
+"Establecer el Modo de HDAU layout-id en 32:\n"
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_description"
 #: Resources/templates/Localizable.strings:433
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 40:\n"
+"Set HDAU layout-id to 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 40:\n"
+"Establecer el Modo de HDAU layout-id en 40:\n"
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_description"
 #: Resources/templates/Localizable.strings:437
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 65:\n"
+"Set HDAU layout-id to 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 65:\n"
+"Establecer el Modo de HDAU layout-id en 65:\n"
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_description"
 #: Resources/templates/Localizable.strings:441
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 99:\n"
+"Set HDAU layout-id to 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 99:\n"
+"Establecer el Modo de HDAU layout-id en 99:\n"
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_description"
 #: Resources/templates/Localizable.strings:445
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 269:\n"
+"Set HDAU layout-id to 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 269:\n"
+"Establecer el Modo de HDAU layout-id en 269:\n"
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_description"
 #: Resources/templates/Localizable.strings:449
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 387:\n"
+"Set HDAU layout-id to 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 387:\n"
+"Establecer el Modo de HDAU layout-id en 387:\n"
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_description"
 #: Resources/templates/Localizable.strings:453
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 388:\n"
+"Set HDAU layout-id to 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 388:\n"
+"Establecer el Modo de HDAU layout-id en 388:\n"
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_description"
 #: Resources/templates/Localizable.strings:457
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 389:\n"
+"Set HDAU layout-id to 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 389:\n"
+"Establecer el Modo de HDAU layout-id en 389:\n"
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_description"
 #: Resources/templates/Localizable.strings:461
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 392:\n"
+"Set HDAU layout-id to 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 392:\n"
+"Establecer el Modo de HDAU layout-id en 392:\n"
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_description"
 #: Resources/templates/Localizable.strings:465
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 398:\n"
+"Set HDAU layout-id to 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 398:\n"
+"Establecer el Modo de HDAU layout-id en 398:\n"
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_description"
 #: Resources/templates/Localizable.strings:469
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 662:\n"
+"Set HDAU layout-id to 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 662:\n"
+"Establecer el Modo de HDAU layout-id en 662:\n"
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_description"
 #: Resources/templates/Localizable.strings:473
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 663:\n"
+"Set HDAU layout-id to 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 663:\n"
+"Establecer el Modo de HDAU layout-id en 663:\n"
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_description"
 #: Resources/templates/Localizable.strings:477
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 664:\n"
+"Set HDAU layout-id to 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 664:\n"
+"Establecer el Modo de HDAU layout-id en 664:\n"
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_description"
 #: Resources/templates/Localizable.strings:481
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 885:\n"
+"Set HDAU layout-id to 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 885:\n"
+"Establecer el Modo de HDAU layout-id en 885:\n"
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_description"
 #: Resources/templates/Localizable.strings:485
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 887:\n"
+"Set HDAU layout-id to 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 887:\n"
+"Establecer el Modo de HDAU layout-id en 887:\n"
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_description"
 #: Resources/templates/Localizable.strings:489
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 888:\n"
+"Set HDAU layout-id to 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 888:\n"
+"Establecer el Modo de HDAU layout-id en 888:\n"
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_description"
 #: Resources/templates/Localizable.strings:493
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 889:\n"
+"Set HDAU layout-id to 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 889:\n"
+"Establecer el Modo de HDAU layout-id en 889:\n"
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_description"
 #: Resources/templates/Localizable.strings:497
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 892:\n"
+"Set HDAU layout-id to 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 892:\n"
+"Establecer el Modo de HDAU layout-id en 892:\n"
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_description"
 #: Resources/templates/Localizable.strings:501
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 898:\n"
+"Set HDAU layout-id to 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 898:\n"
+"Establecer el Modo de HDAU layout-id en 898:\n"
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_description"
 #: Resources/templates/Localizable.strings:505
 #, no-wrap
 msgid ""
-"Set HDAU layout-it to 1981:\n"
+"Set HDAU layout-id to 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 msgstr ""
-"Establecer el Modo de HDAU layout-it en 1981:\n"
+"Establecer el Modo de HDAU layout-id en 1981:\n"
 "7BD (0xBD, 0x07, 0x00, 0x00)."
 
 #. type: "IntelCaprix00_title"
@@ -2870,12 +2923,7 @@ msgstr "rootless=0"
 #: Resources/templates/Localizable.strings:756
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
-msgstr ""
-"Rootless es una nueva característica introducida en OS X 10,11 (El Capitán), "
-"y no permite la modificación de los archivos del sistema. Para pasando por "
-"alto esta restricción, esta función estricta se puede desactivar mediante la "
-"adición de ‘rootless = 0’ en argumento de arranque. (‘rootless = 1’ "
-"habilitarlo)"
+msgstr "Rootless es una nueva característica introducida en OS X 10,11 (El Capitán), y no permite la modificación de los archivos del sistema. Para pasando por alto esta restricción, esta función estricta se puede desactivar mediante la adición de ‘rootless = 0’ en argumento de arranque. (‘rootless = 1’ habilitarlo)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:758
@@ -3175,14 +3223,130 @@ msgstr "KeyLayout"
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "Selecciona una asignaciones de teclas. Esto también instalará el módulo keylayout y asignaciones del teclado."
 
+#. type: "Patches_title"
+#: Resources/templates/Localizable.strings:870
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Patches"
+msgstr "Kext Patcher"
+
+#. type: "Patches_description"
+#: Resources/templates/Localizable.strings:871
+#, fuzzy, no-wrap
+#| msgid "A selection of options that deal with video."
+msgid "A selection of options to patch the kernel."
+msgstr "Una selección de opciones relacionadas con el video."
+
+#. type: "kernelPatcher_title"
+#: Resources/templates/Localizable.strings:873
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "kernel Patcher"
+msgstr "Kernel Patcher"
+
+#. type: "kernelPatcher_description"
+#: Resources/templates/Localizable.strings:874
+#, no-wrap
+msgid "Select one patch for your kernel."
+msgstr ""
+
+#. type: "KernelBooter_kexts_title"
+#: Resources/templates/Localizable.strings:877
+#, no-wrap
+msgid "KernelBooter_kexts"
+msgstr ""
+
+#. type: "KernelBooter_kexts_description"
+#: Resources/templates/Localizable.strings:878
+#, no-wrap
+msgid "Re-enable /Extra/Extensions kexts on newer OSes."
+msgstr ""
+
+#. type: "KernelPm_title"
+#: Resources/templates/Localizable.strings:881
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelPm"
+msgstr "Kernel Patcher"
+
+#. type: "KernelPm_description"
+#: Resources/templates/Localizable.strings:882
+#, fuzzy, no-wrap
+#| msgid "Power Management"
+msgid "Kernel Power Management patch."
+msgstr "Gestión de Energía"
+
+#. type: "KernelLapicError_title"
+#: Resources/templates/Localizable.strings:885
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicError"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicError_description"
+#: Resources/templates/Localizable.strings:886
+#, no-wrap
+msgid "Remove the Local Apic Error panic."
+msgstr ""
+
+#. type: "KernelLapicVersion_title"
+#: Resources/templates/Localizable.strings:889
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "KernelLapicVersion"
+msgstr "Kernel Patcher"
+
+#. type: "KernelLapicVersion_description"
+#: Resources/templates/Localizable.strings:890
+#, no-wrap
+msgid "Remove the Local Apic Version panic."
+msgstr ""
+
+#. type: "KernelHaswell_title"
+#: Resources/templates/Localizable.strings:893
+#, fuzzy, no-wrap
+#| msgid "Kernel Flags"
+msgid "KernelHaswell"
+msgstr "Kernel Flags"
+
+#. type: "KernelHaswell_description"
+#: Resources/templates/Localizable.strings:894
+#, no-wrap
+msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
+msgstr ""
+
+#. type: "KernelcpuFamily_title"
+#: Resources/templates/Localizable.strings:897
+#, no-wrap
+msgid "KernelcpuFamily"
+msgstr ""
+
+#. type: "KernelcpuFamily_description"
+#: Resources/templates/Localizable.strings:898
+#, no-wrap
+msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
+msgstr ""
+
+#. type: "KernelSSE3_title"
+#: Resources/templates/Localizable.strings:901
+#, no-wrap
+msgid "KernelSSE3"
+msgstr ""
+
+#. type: "KernelSSE3_description"
+#: Resources/templates/Localizable.strings:902
+#, no-wrap
+msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:867
+#: Resources/templates/Localizable.strings:907
 #, no-wrap
 msgid "Themes"
 msgstr "Temas"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:868
+#: Resources/templates/Localizable.strings:908
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -3202,23 +3366,42 @@ msgstr ""
 #~ msgid "Install Type"
 #~ msgstr "Tipo de Instalación"
 
-#~ msgid "Choose to perform a new installation or upgrade an existing installation."
-#~ msgstr "Realizar una instalación nueva o actualizar una instalación existente del gestor de arranque (Bootloader)."
+#~ msgid ""
+#~ "Choose to perform a new installation or upgrade an existing installation."
+#~ msgstr ""
+#~ "Realizar una instalación nueva o actualizar una instalación existente del "
+#~ "gestor de arranque (Bootloader)."
 
 #~ msgid "New Installation"
 #~ msgstr "Instalación Nueva"
 
-#~ msgid "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader."
-#~ msgstr "Realizar Copia de seguridad de una carpeta existente /Extra, si es encontrada en la partición de destino. Una nueva será creada si se eligen opciones desde el instalador, aparte del Bootloader en si mismo."
+#~ msgid ""
+#~ "Backup an existing /Extra folder, if found on the target partition. A new "
+#~ "one will be created if any options are chosen from the installer, other "
+#~ "than the Bootloader."
+#~ msgstr ""
+#~ "Realizar Copia de seguridad de una carpeta existente /Extra, si es "
+#~ "encontrada en la partición de destino. Una nueva será creada si se eligen "
+#~ "opciones desde el instalador, aparte del Bootloader en si mismo."
 
 #~ msgid "Upgrade"
 #~ msgstr "Actualización"
 
-#~ msgid "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up."
-#~ msgstr "Combinar una carpeta existente /Extra, si se encuentra en el destino, con las opciones elegidas a partir de la instalación, aparte del Bootloader en si mismo."
+#~ msgid ""
+#~ "Merge an existing /Extra folder, if found on the target, with any options "
+#~ "chosen from the installer, other than the Bootloader. The original /Extra "
+#~ "folder will be backed up."
+#~ msgstr ""
+#~ "Combinar una carpeta existente /Extra, si se encuentra en el destino, con "
+#~ "las opciones elegidas a partir de la instalación, aparte del Bootloader "
+#~ "en si mismo."
 
-#~ msgid "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default."
-#~ msgstr "Este módulo permite al usuario definir las asignaciones de teclas del teclado."
+#~ msgid ""
+#~ "This module permits the user to define the keyboard key mappings. This "
+#~ "module and associated keymaps are installed by default."
+#~ msgstr ""
+#~ "Este módulo permite al usuario definir las asignaciones de teclas del "
+#~ "teclado."
 
 #~ msgid "Utilities"
 #~ msgstr "Utilidades"
