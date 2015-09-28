@@ -364,7 +364,7 @@ static unsigned short getVESAModeWithProperties( unsigned short	width,
 
 //==========================================================================
 // setupPalette
-/*
+
 static void setupPalette( VBEPalette *p, const unsigned char *g )
 {
     int             i;
@@ -378,7 +378,7 @@ static void setupPalette( VBEPalette *p, const unsigned char *g )
         (*p)[i] |= ((unsigned long)((*source++) >> 2));         // Blue
     }
 }
-*/
+
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
@@ -434,12 +434,14 @@ static int setVESAGraphicsMode( unsigned short width, unsigned short height, uns
 
 		// Is this required for buggy Video BIOS implementations? If so for which adapter?
 
-		if (minfo.BytesPerScanline == 0)
+		if ( minfo.BytesPerScanline == 0 )
 		{
-			minfo.BytesPerScanline = (minfo.XResolution * minfo.BitsPerPixel) >> 3; // ((1920 * 32 = 61440) >> 3) = 7680
+	             minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
 		}
 
-		// Update bootArgs with the data provided by the selected VESA mode.
+		// Update KernBootStruct using info provided by the selected
+		// VESA mode.
+
 		bootArgs->Video.v_display	= GRAPHICS_MODE;
 		bootArgs->Video.v_width		= minfo.XResolution;		/* 1920 or 1600 */
 		bootArgs->Video.v_height	= minfo.YResolution;		/* 1200 or 900 */

@@ -167,7 +167,7 @@ static long InitDriverSupport( void )
 
 //==========================================================================
 // LoadDrivers
-long LoadDrivers( char * dirSpec )
+long LoadDrivers( char *dirSpec )
 {
 	char dirSpecExtra[1024];
 
@@ -250,13 +250,18 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				if ( MAVERICKS || YOSEMITE || ELCAPITAN ) // issue 352
+				verbose("Attempting to loading drivers from standard repositories:\n");
+
+				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || gMacOSVersion[4] == '1' ) )) // issue 352
 				{
-					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
+					verbose("\t- Third party extensions search path: /Library/Extensions\n");
+					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
 				}
-				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/") */
+
+				verbose("\t- Apple extensions search path: /System/Library/Extensions\n");
+				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/")  mean 4096 -16 = 4080 */
 				strcat(gExtensionsSpec, "System/Library/");
 				FileLoadDrivers(gExtensionsSpec, 0);
 			}
@@ -279,7 +284,7 @@ long LoadDrivers( char * dirSpec )
 
 //==========================================================================
 // FileLoadMKext
-static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
+static long FileLoadMKext( const char *dirSpec, const char *extDirSpec )
 {
 	long		ret, flags;
 	u_int32_t	time, time2;
@@ -310,7 +315,7 @@ static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 
 //==========================================================================
 // FileLoadDrivers
-long FileLoadDrivers( char * dirSpec, long plugin )
+long FileLoadDrivers( char *dirSpec, long plugin )
 {
 	long long	index;
 	long		ret, length, flags, bundleType;
@@ -434,12 +439,12 @@ long NetLoadDrivers( char *dirSpec )
 
 //==========================================================================
 // loadDriverMKext
-long LoadDriverMKext( char * fileSpec )
+long LoadDriverMKext( char *fileSpec )
 {
-	unsigned long    driversAddr, driversLength;
-	long             length;
-	char             segName[32];
-	DriversPackage * package;
+	unsigned long	driversAddr, driversLength;
+	long		length;
+	char		segName[32];
+	DriversPackage	*package;
 
 #define GetPackageElement(e)     OSSwapBigToHostInt32(package->e)
 
@@ -451,7 +456,7 @@ long LoadDriverMKext( char * fileSpec )
 	}
 
 	// call hook to notify modules that the mkext has been loaded
-	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) &length, NULL);
+	execute_hook("LoadDriverMKext", (void *)fileSpec, (void *)package, (void *) &length, NULL);
 
 	
 	// Verify the MKext.

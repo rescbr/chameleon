@@ -241,7 +241,6 @@ TagPtr XMLGetValueForKey(TagPtr key)
 	return key->tag;
 }
 
-
 // XMLGetTag(int index)
 
 // XMLTagCount( TagPtr dict )

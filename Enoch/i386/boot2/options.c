@@ -402,7 +402,9 @@ static void printMenuItem( const MenuItem *item, int highlight )
 		putca(' ', 0x07, 40);
 	}
 
-	printf("  %40s\n", item->name);
+	char Item[40];
+	strncpy(Item, item->name, sizeof(Item));
+	printf("  %s\n", Item);
 }
 
 //==========================================================================
@@ -1385,8 +1387,9 @@ int processBootOptions()
 	}
 
 	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
-	if ( MacOSVerCurrent == MacOSVer2Int("10.10") ) // OS X is 10.10
+	if ( (gMacOSVersion[3] == '1') && (gMacOSVersion[4] == '0') ) // OS X is 10.10
 	{
+		verbose("Added: kext-dev-mode=1\n");
 		addBootArg("kext-dev-mode=1");
 	}
 

@@ -634,7 +634,7 @@ int ParseXMLFile( char *buffer, TagPtr *dict )
  * Returns 0 - successful.
  *		  -1 - unsuccesful.
  */
-int loadConfigFile(const char *configFile, config_file_t *config)
+int loadConfigFile (const char *configFile, config_file_t *config)
 {
 	int fd, count;
 

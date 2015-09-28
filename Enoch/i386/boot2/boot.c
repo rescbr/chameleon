@@ -233,7 +233,7 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ( TIGER || LEOPARD || SNOW_LEOPARD )
+	if ( MacOSVerCurrent < MacOSVer2Int("10.7") )
 	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsLegacy, NULL, NULL);
@@ -278,7 +278,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	else
 	{
 		// Leopard prelink kernel cache file
-		if ( TIGER || LEOPARD ) // OSX is 10.4 or 10.5
+		if ( MacOSVerCurrent >= MacOSVer2Int("10.4") && MacOSVerCurrent <= MacOSVer2Int("10.5") ) // OSX is 10.4 or 10.5
 		{
 			// Reset cache name.
 			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
@@ -289,7 +289,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 
 		}
 		// Snow Leopard prelink kernel cache file
-		else if ( SNOW_LEOPARD )
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.6") && MacOSVerCurrent < MacOSVer2Int("10.7") )
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
@@ -312,7 +312,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6): %s\n", kernelCachePath);
+				verbose("Kernel Cache file path (Mac OS X 10.6): %s\n", kernelCacheFile);
 			}
 			closedir(cacheDir);
 		}
@@ -321,7 +321,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
 			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCachePath);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
 		}
 	}
@@ -329,7 +329,6 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	// Check if the kernel cache file exists
 	ret = -1;
 
-	// If boot from a boot helper partition check the kernel cache file on it
 	if (gBootVolume->flags & kBVFlagBooter)
 	{
 		snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
@@ -873,6 +872,9 @@ void common_boot(int biosdev)
 
 }
 
+
+// =========================================================================
+
 /*!
 	Selects a new BIOS device, taking care to update the global state appropriately.
  */
@@ -894,7 +896,8 @@ static void selectBiosDevice(void)
 }
 */
 
-bool checkOSVersion(const char * version)
+// =========================================================================
+bool checkOSVersion(const char *version)
 {
 	if ( (sizeof(version) > 4) && ('.' != version[4]) && ('\0' != version[4]) )
 	{
@@ -907,7 +910,6 @@ bool checkOSVersion(const char * version)
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 	}
-
 }
 
 uint32_t getMacOSVerCurrent()
@@ -916,6 +918,9 @@ uint32_t getMacOSVerCurrent()
 	return MacOSVerCurrent;
 }
 
+// =========================================================================
+unsigned long Adler32(unsigned char *buf, long len)
+{
 #define BASE 65521L /* largest prime smaller than 65536 */
 #define NMAX 5000
 // NMAX (was 5521) the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
@@ -926,28 +931,36 @@ uint32_t getMacOSVerCurrent()
 #define DO8(buf, i)	DO4(buf, i); DO4(buf, i + 4);
 #define DO16(buf)	DO8(buf, 0); DO8(buf, 8);
 
-unsigned long Adler32(unsigned char *buf, long len)
-{
+	int k;
+
 	unsigned long s1 = 1; // adler & 0xffff;
 	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
 	unsigned long result;
-	int k;
 
 	while (len > 0) {
 		k = len < NMAX ? len : NMAX;
 		len -= k;
-		while (k >= 16) {
+		while (k >= 16)
+		{
 			DO16(buf);
 			buf += 16;
 			k -= 16;
 		}
-		if (k != 0) do {
-			s1 += *buf++;
-			s2 += s1;
-		} while (--k);
+
+		if (k != 0)
+		{
+			do
+			{
+				s1 += *buf++;
+				s2 += s1;
+			} while (--k);
+		}
+
 		s1 %= BASE;
 		s2 %= BASE;
 	}
+
 	result = (s2 << 16) | s1;
+
 	return OSSwapHostToBigInt32(result);
 }

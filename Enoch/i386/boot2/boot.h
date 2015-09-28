@@ -62,6 +62,7 @@
 /*
  * Keys used in system Boot.plist
  */
+
 #define kGraphicsModeKey		"Graphics Mode"
 #define kTextModeKey			"Text Mode"
 #define kQuietBootKey			"Quiet Boot"

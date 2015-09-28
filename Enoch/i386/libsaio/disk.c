@@ -1877,7 +1877,7 @@ static void scanFSLevelBVRSettings(BVRef chain)
 			}
 		}
 
-		// Check for SystemVersion.plist or ServerVersion.plist to determine if a volume hosts an installed system.
+		// Check for SystemVersion.plist or ServerVersion.plist or com.apple.boot.plist to determine if a volume hosts an installed system.
 
 		if (bvr->flags & kBVFlagNativeBoot)
 		{
@@ -2228,7 +2228,6 @@ bool matchVolumeToString( BVRef bvr, const char *match, long matchLen)
  * The format for the rename string is the following:
  * hd(x,y)|uuid|"label" "alias";hd(m,n)|uuid|"label" "alias"; etc...
  */
-
 static bool getVolumeLabelAlias(BVRef bvr, char *str, long strMaxLen)
 {
 	char *aliasList, *entryStart, *entryNext;
