@@ -33,9 +33,9 @@
 /*
  * Kernel boot args global also used by booter for its own data.
  */
-extern boot_args		*bootArgs;
-extern boot_args_legacy		*bootArgsLegacy;
-extern Node *gMemoryMapNode;
+extern boot_args	*bootArgs;
+extern boot_args_legacy	*bootArgsLegacy;
+extern Node		*gMemoryMapNode;
 
 #define VGA_TEXT_MODE 0
 //defined in /usr/../boot.h

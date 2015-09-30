@@ -126,7 +126,7 @@ void initKernBootStruct( void )
 
 void reserveKernBootStruct(void)
 {
-	if ( TIGER || LEOPARD || SNOW_LEOPARD )
+	if ( MacOSVerCurrent < MacOSVer2Int("10.7") )
 	{
 		// for 10.4 10.5 10.6
 		void *oldAddr = bootArgsLegacy;
