@@ -1,0 +1,19 @@
+INITIAL_DIR=`pwd` # Save current dir
+SCRIPT_DIR_TMP=`dirname "$0"`
+cd "${SCRIPT_DIR_TMP}" # Go to script dir
+SCRIPT_DIR=`pwd` # Save script dir
+cd "${INITIAL_DIR}" # Go back to initial directory 
+
+#export PATH=/usr/sbin:$PATH
+
+TMPFILE=`mktemp /tmp/diskutil.XXXXXXXXXX`
+diskutil info -plist ChameleonDev > $TMPFILE
+rc=$?
+if [[ $rc != 0 ]] ; then
+    echo --------------- No ChameleonDev partition ------------------
+    exit $rc
+fi
+
+rm "$SCRIPT_DIR"/../ChameleonDevRawDisk.vmdk
+/ApplicationsJief/VMware\ Fusion-v7.1.0.app/Contents/Library/vmware-rawdiskCreator create /dev/`/usr/libexec/PlistBuddy -c "print ParentWholeDisk" $TMPFILE` fullDevice "$SCRIPT_DIR"/../ChameleonDevRawDisk ide
+/ApplicationsJief/VMware\ Fusion-v7.1.0.app/Contents/Library/vmrun start "$SCRIPT_DIR"/../ChameleonDebug.vmwarevm

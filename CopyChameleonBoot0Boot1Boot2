@@ -1,0 +1,25 @@
+INITIAL_DIR=`pwd` # Save current dir
+SCRIPT_DIR_TMP=`dirname "$0"`
+cd "${SCRIPT_DIR_TMP}" # Go to script dir
+SCRIPT_DIR=`pwd` # Save script dir
+cd "${INITIAL_DIR}" # Go back to initial directory 
+
+#export PATH=/usr/sbin:$PATH
+
+TMPFILE=`mktemp /tmp/diskutil.XXXXXXXXXX`
+diskutil info -plist ChameleonDev > $TMPFILE
+rc=$?
+if [[ $rc != 0 ]] ; then
+    echo --------------- No ChameleonDev partition ------------------
+    exit $rc
+fi
+
+echo ChameleonDev disk is `/usr/libexec/PlistBuddy -c "print ParentWholeDisk" $TMPFILE`
+diskutil mount ChameleonDev
+cp "$SCRIPT_DIR"/sym/i386/boot /Volumes/ChameleonDev/
+cp "$SCRIPT_DIR"/sym/i386/boot0 /Volumes/ChameleonDev/
+cp "$SCRIPT_DIR"/sym/i386/boot1h /Volumes/ChameleonDev/
+sudo -A fdisk -f "$SCRIPT_DIR"/sym/i386/boot0 -u -y /dev/`/usr/libexec/PlistBuddy -c "print ParentWholeDisk" $TMPFILE`
+diskutil umount /Volumes/ChameleonDev/
+sudo dd if="$SCRIPT_DIR"/sym/i386/boot1h of=`/usr/libexec/PlistBuddy -c "print DeviceNode" $TMPFILE` count=2
+diskutil mount ChameleonDev
