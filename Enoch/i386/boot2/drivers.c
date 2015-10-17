@@ -198,6 +198,8 @@ long LoadDrivers( char *dirSpec )
 			strcpy(dirSpecExtra, "rd(0,0)/Extra/");
 			FileLoadDrivers(dirSpecExtra, 0);
 		}
+		verbose("Attempting to loading drivers from \"Extra\" repository:\n");
+
 
 		// Next try to load Extra extensions from the selected root partition.
 		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));

@@ -2421,8 +2421,16 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		// Fill the background to 75% grey (same as BootX).
-		setBackgroundColor(0xffbfbfbf);
+		if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+		{
+			// BlackMode
+			setBackgroundColor(0xff030000);
+		}
+		else
+		{
+			// Fill the background to 75% grey (same as BootX).
+			setBackgroundColor(0xffbfbfbf);
+		}
 	}
 
 	if ((bootImageData) && (usePngImage))
@@ -2437,24 +2445,32 @@ void drawBootGraphics(void)
 	{
 		// Standard size (Width 84 Height 103)
 		// TODO HiDPI size (Width 168 Height 206)
-
-		int logoSize = (APPLE_LOGO_WIDTH * APPLE_LOGO_HEIGHT);
-
-		void *dst = malloc(logoSize);
-
-		void *logoData = (void *)AppleLogoPacked;
-		uint32_t src_size = sizeof(AppleLogoPacked);
-
-		if (dst)
-		{
-			if (lzvn_decode(dst, logoSize, logoData, src_size) == logoSize)
-			{
-				uint8_t *bootImageData = NULL;
-				convertImage(APPLE_LOGO_WIDTH, APPLE_LOGO_HEIGHT, dst, &bootImageData);
-				drawDataRectangle(APPLE_LOGO_X, APPLE_LOGO_Y, APPLE_LOGO_WIDTH, APPLE_LOGO_HEIGHT, bootImageData);
-			}
-			free(dst);
-		}
+		// So still need to probe and assign HiDPIOption properly
+		chooseLogoMode();
 	}
 }
 // ====================================================================
+void chooseLogoMode()
+{
+	int logoWith	= HiDPIOption ? (APPLE_LOGO_WIDTH * 2) : APPLE_LOGO_WIDTH;
+	int logoHeight	= HiDPIOption ? (APPLE_LOGO_HEIGHT * 2) : APPLE_LOGO_HEIGHT;
+	int logoX	= HiDPIOption ? APPLE_LOGO_2X_X : APPLE_LOGO_X;
+	int logoY	= HiDPIOption ? APPLE_LOGO_2X_Y : APPLE_LOGO_Y;
+	int logoSize	= ( logoWith * logoHeight );
+
+	void *dst = malloc(logoSize);
+
+	void *logoData = ( FlagBlackOption ? (void *)AppleLogoBlackPacked : (void *)AppleLogoPacked );
+	uint32_t src_size = ( FlagBlackOption ? sizeof(AppleLogoBlackPacked) : sizeof(AppleLogoPacked) );
+
+	if (dst)
+	{
+		if (lzvn_decode(dst, logoSize, logoData, src_size) == logoSize)
+		{
+			uint8_t *bootImageData = NULL;
+			convertImage(logoWith, logoHeight, dst, &bootImageData);
+			drawDataRectangle(logoX, logoY, logoWith, logoHeight, bootImageData);
+		}
+		free(dst);
+	}
+}

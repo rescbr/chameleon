@@ -185,7 +185,7 @@
 #define kEnableHDMIAudio		"EnableHDMIAudio"		/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
-
+#define kEnableHiDPI			"EnableHiDPI"			// enable High resolution display (aka Retina)
 /* ErmaC: added these keys */
 #define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
@@ -195,6 +195,7 @@
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
 #define kIntelBdwFB			"IntelBdwFB"			/* gma.c */
+#define kIntelSklFB			"IntelSklFB"			/* gma.c */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
@@ -203,6 +204,9 @@
 #define kDropBGRT			"DropBGRT"			/* acpi_patcher.c */
 #define kDropMCFG			"DropMCFG"			/* acpi_patcher.c */
 #define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
+
+/* Pike R. Alpha: added this key */
+#define kBlackMode			"BlackMode"
 
 /* Karas: added this key */
 #define kMemFullInfo			"ForceFullMemInfo"		/* smbios.c */
@@ -344,6 +348,9 @@ extern size_t lzvn_encode(void		*dst,
                           size_t	src_size,
                           void		*work);
 */
+
+bool FlagBlackOption;
+bool HiDPIOption;
 
 struct compressed_kernel_header {
 	u_int32_t signature;

@@ -434,6 +434,29 @@ static int setVESAGraphicsMode( unsigned short width, unsigned short height, uns
 
 		// Is this required for buggy Video BIOS implementations? If so for which adapter?
 
+		if ( minfo.BitsPerPixel == 8 )
+        	{
+			VBEPalette palette;
+
+			// A switch is needed for the two clut way...
+			if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+			{
+				setupPalette( &palette, AppleLogoBlackClut );
+			}
+			else
+			{
+				setupPalette( &palette, AppleLogoClut );
+			}
+
+			if ((err = setVBEPalette(palette)) != errSuccess)
+			{
+				break;
+			}
+		}
+
+		// Is this required for buggy Video BIOS implementations?
+		// On which adapter?
+
 		if ( minfo.BytesPerScanline == 0 )
 		{
 	             minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
@@ -712,9 +735,19 @@ unsigned long lookUpCLUTIndex( unsigned char index )
 	long green;
 	long blue;
 
-	red   = AppleLogoClut[ colorIndex   ];
-	green = AppleLogoClut[ colorIndex++ ];
-	blue  = AppleLogoClut[ colorIndex++ ];
+	if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+	{
+		// BlackMode
+		red   = AppleLogoBlackClut[ colorIndex   ];
+		green = AppleLogoBlackClut[ colorIndex++ ];
+		blue  = AppleLogoBlackClut[ colorIndex++ ];
+	}
+	else
+	{
+		red   = AppleLogoClut[ colorIndex   ];
+		green = AppleLogoClut[ colorIndex++ ];
+		blue  = AppleLogoClut[ colorIndex++ ];
+	}
 
 	return (red << 16) | (green << 8) | blue;
 }
@@ -859,8 +892,16 @@ void drawPreview(void *src, uint8_t *saveunder)
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 
-		// Set the screen to 75% grey.
-		setBackgroundColor(0xffbfbfbf);
+		if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+		{
+			// BlackMode
+			setBackgroundColor(0xff000000);
+		}
+		else
+		{
+			// Set the screen to 75% grey.
+			setBackgroundColor(0xffbfbfbf);
+		}
 	}
 
 	pixelShift = VIDEO (depth) >> 4;

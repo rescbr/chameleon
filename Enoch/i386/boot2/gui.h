@@ -39,6 +39,9 @@
 #define APPLE_LOGO_X    ((VIDEO(width) - APPLE_LOGO_WIDTH) / 2)
 #define APPLE_LOGO_Y    ((VIDEO(height) - APPLE_LOGO_HEIGHT) / 2)
 
+#define APPLE_LOGO_2X_X    ((VIDEO(width) - (APPLE_LOGO_WIDTH * 2)) / 2)
+#define APPLE_LOGO_2X_Y    ((VIDEO(height) - (APPLE_LOGO_HEIGHT * 2)) / 2)
+
 // ====================================================================
 
 enum {
@@ -166,5 +169,7 @@ void updateVRAM();
 position_t drawChar(unsigned char ch, font_t *font, pixmap_t *blendInto, position_t p);
 void drawStr(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
 void drawStrCenteredAt(char *ch, font_t *font, pixmap_t *blendInto, position_t p);
+
+void chooseLogoMode();
 
 #endif /* !__BOOT2_GUI_H */

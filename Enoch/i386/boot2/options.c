@@ -402,9 +402,10 @@ static void printMenuItem( const MenuItem *item, int highlight )
 		putca(' ', 0x07, 40);
 	}
 
-	char Item[40];
-	strncpy(Item, item->name, sizeof(Item));
-	printf("  %s\n", Item);
+	//char Item[40];
+	//strncpy(Item, item->name, sizeof(Item));
+	//printf("  %s\n", Item);
+	printf("  %40s\n", item->name);
 }
 
 //==========================================================================
