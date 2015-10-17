@@ -11,7 +11,7 @@ typedef struct _vidTag
 {
 	uint8_t		bank;
 	uint8_t		code;
-	const char*	name;
+	const char	*name;
 } VenIdName;
 
 VenIdName vendorMap[] = {

@@ -131,6 +131,8 @@ uint8_t haswell_ig_vals[17][4] = {
 	{ 0x08,0x00,0x26,0x0a },	// 14 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
 	{ 0x08,0x00,0x2e,0x0a },	// 15 "AAPL,ig-platform-id" //FB: 64MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT reserved GT3
 	{ 0x04,0x00,0x12,0x04 }		// 16 "AAPL,ig-platform-id" //FB: 32MB, Pipes: 3, Ports: 3, FBMem: 3 - ULT mobile GT3
+	//0x0412000b
+	//0x0d260009
 };
 
 uint8_t broadwell_ig_vals[19][4] = {
@@ -671,7 +673,16 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "built-in",			&BuiltIn, 1);
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 
-			devprop_add_value(device, "vendor-id",			(uint8_t *)INTEL_VENDORID, 4);
+			// patch by ikunikun for i3-2125 and i5-2500K to enable HD3000.
+			if(((device_id << 16) | vendor_id) != GMA_SANDYBRIDGE_GT2) {
+				devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
+			}
+			else
+			{
+				device_id = 0x00000126;
+				devprop_add_value(device, "device-id", (uint8_t *)&device_id, sizeof(device_id));
+				verbose("\tInjeting done: was [%04x:%04x] now is [%04x:%04x]\n", gma_dev->vendor_id, gma_dev->device_id, gma_dev->vendor_id, device_id);
+			}
 
 			devprop_add_value(device, "AAPL,tbl-info",		HD3000_tbl_info, 18);
 			devprop_add_value(device, "AAPL,os-info",		HD3000_os_info, 20);
