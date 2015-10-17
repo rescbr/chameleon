@@ -70,6 +70,11 @@ Options useful in the org.chameleon.Boot.plist file:
                             "Boot Banner"=No will also disable this info.
   "Legacy Logo"=Yes|No    Use the legacy grey apple logo (enabled by default).
 
+  EnableHiDPI=Yes|No      Enable High resolution display (disabled by default).
+
+  BlackMode=Yes|No        The new BlackMode loads the white Apple logo,
+                             instead of the gray Apple logo, on a black background (disabled by default).
+
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
 
   UseKernelCache=Yes|No   Yes will load pre-linked kernel and will ignore /E/E
@@ -104,6 +109,7 @@ Options useful in the org.chameleon.Boot.plist file:
     IntelCapriFB=<value>    For Intel Ivy Bridge, range 0-11.
     IntelAzulFB=<value>     For Intel Haswell, range 0-16.
     IntelBdwFB=<value>      For Intel Broadwell, range 0-18.
+    IntelSklFB=<value>      For Intel Skylake, range 0-12.
     InjectIntel-ig=<value>  Inject alternate value into AAPL,ig-platform-id (HEX).
 
     EnableBacklight=Yes	  Enable Back light option for NVIDIA and ATI

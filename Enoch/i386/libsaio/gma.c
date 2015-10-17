@@ -72,6 +72,9 @@ static uint8_t default_aapl_haswell[]		=	{ 0x00,0x00,0x26,0x0c }; // haswell_ig_
 static uint8_t default_aapl_broadwell[]		=	{ 0x00,0x00,0x1e,0x16 }; // broadwell_ig_vals[2]
 #define AAPL_LEN_BDW ( sizeof(default_aapl_broadwell) / sizeof(uint8_t) )
 
+static uint8_t default_aapl_skylake[]		=	{ 0x00,0x00,0x16,0x19 }; // skylike_ig_vals[2]
+#define AAPL_LEN_SKL ( sizeof(default_aapl_skylake) / sizeof(uint8_t) )
+
 uint8_t GMAX3100_vals[23][4] = {
 	{ 0x01,0x00,0x00,0x00 },	//0 "AAPL,HasPanel"
 	{ 0x01,0x00,0x00,0x00 },	//1 "AAPL,SelfRefreshSupported"
@@ -155,6 +158,21 @@ uint8_t broadwell_ig_vals[19][4] = {
 	{ 0x04,0x00,0x26,0x16 },	// 16 - 16260004 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 	{ 0x05,0x00,0x26,0x16 },	// 17 - 16260005 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 	{ 0x06,0x00,0x26,0x16 }		// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+};
+
+uint8_t skylake_ig_vals[12][4] = {
+	{ 0x00,0x00,0xe0,0x19 }, // 0  - 191e0000 – Skylake ULX GT2
+	{ 0x00,0x00,0x16,0x19 }, // 1  - 19160000 – Skylake ULT GT2
+	{ 0x00,0x00,0x26,0x19 }, // 2  - 19260000 – Skylake ULT GT3
+	{ 0x00,0x00,0x1b,0x19 }, // 3  - 191b0000 – Skylake HALO GT2
+	{ 0x00,0x00,0x12,0x19 }, // 4  - 19120000 – Skylake Desktop GT2
+	{ 0x01,0x00,0x02,0x19 }, // 5  - 19020001 – Skylake Desktop GT1
+	{ 0x01,0x00,0x17,0x19 }, // 6  - 19170001 – Skylake Desktop GT1.5
+	{ 0x01,0x00,0x12,0x19 }, // 7  - 19120001 – Skylake Desktop GT2
+	{ 0x01,0x00,0x32,0x19 }, // 8  - 19320001 – Skylake Desktop GT4
+	{ 0x02,0x00,0x16,0x19 }, // 9  - 19160002 – Skylake ULT GT2
+	{ 0x02,0x00,0x26,0x19 }, // 10 - 19260002 – Skylake ULT GT3
+	{ 0x03,0x00,0x1e,0x19 }  // 11 - 191e0003 – Skylake ULX GT2
 };
 
 uint8_t HD2000_vals[16][4] = {
@@ -958,6 +976,67 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			else
 			{
 				uint32_t ig_platform_id = 0x16160000; // set the default platform ig
+				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
+			}
+
+			devprop_add_value(device, "AAPL00,DualLink",    HD4000_vals[10], 4);
+			devprop_add_value(device, "built-in", &BuiltIn, 1);
+			devprop_add_value(device, "class-code", ClassFix, 4);
+
+			break;
+
+		/* Skylake */
+		/* HD Graphics */
+		case GMA_SKYLAKE_ULT_GT1:	// 1906
+		case GMA_SKYLAKE_ULT_GT15:	// 1913
+		case GMA_SKYLAKE_ULT_GT2:	// 1916
+		case GMA_SKYLAKE_ULX_GT1:	// 190E
+		case GMA_SKYLAKE_ULX_GT2:	// 191E
+		case GMA_SKYLAKE_DT_GT2:	// 1912
+		case GMA_SKYLAKE_1921:		// 1921
+		case GMA_SKYLAKE_ULT_GT3_E:	// 1926
+		case GMA_SKYLAKE_ULT_GT3:	// 1923
+		case GMA_SKYLAKE_ULT_GT3_28W:	// 1927
+		case GMA_SKYLAKE_DT_GT15:	// 1917
+		case GMA_SKYLAKE_DT_GT1:	// 1902
+		case GMA_SKYLAKE_DT_GT4:	// 1932
+		case GMA_SKYLAKE_GT4:		// 193B
+		case GMA_SKYLAKE_GT3_FE:	// 192B
+		case GMA_SKYLAKE_GT2:		// 191B
+		case GMA_SKYLAKE_192A:		// 192A
+		case GMA_SKYLAKE_SRW_GT4:	// 193A
+		case GMA_SKYLAKE_WS_GT2:	// 191D
+		case GMA_SKYLAKE_WS_GT4:	// 193D
+
+			if (getValueForKey(kAAPLCustomIG, &value, &len, &bootInfo->chameleonConfig) && len == AAPL_LEN_SKL * 2)
+			{
+				uint8_t new_aapl0[AAPL_LEN_SKL];
+
+				if (hex2bin(value, new_aapl0, AAPL_LEN_SKL) == 0)
+				{
+					memcpy(default_aapl_skylake, new_aapl0, AAPL_LEN_SKL);
+
+					verbose("\tUsing user supplied AAPL,ig-platform-id\n");
+					verbose("\tAAPL,ig-platform-id: %02x%02x%02x%02x\n",
+						default_aapl_skylake[0], default_aapl_skylake[1], default_aapl_skylake[2], default_aapl_skylake[3]);
+				}
+				devprop_add_value(device, "AAPL,ig-platform-id", default_aapl_skylake, AAPL_LEN_SKL);
+			}
+			else if (getIntForKey(kIntelSklFB, &n_igs, &bootInfo->chameleonConfig))
+			{
+				if ((n_igs >= 0) || (n_igs <= 12))
+				{
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
+					devprop_add_value(device, "AAPL,ig-platform-id", skylake_ig_vals[n_igs], 4);
+				}
+				else
+				{
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 12.\n");
+				}
+			}
+			else
+			{
+				uint32_t ig_platform_id = 0x19260000; // set the default platform ig
 				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
 			}
 
