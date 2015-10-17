@@ -38,41 +38,43 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
 #define CPUID_MODEL_YONAH		0x0E			// Sossaman, Yonah
 #define CPUID_MODEL_MEROM		0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
-#define CPUID_MODEL_CONROE		0x0F			//
-#define CPUID_MODEL_CELERON		0x16			// Merom, Conroe (65nm), Celeron (45nm)
+#define CPUID_MODEL_CONROE		0x16			// Merom, Conroe (65nm), Celeron (45nm)
 #define CPUID_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 #define CPUID_MODEL_WOLFDALE		0x17			// Xeon 31xx, 33xx, 52xx, 54xx, Core 2 Quad 8xxx and 9xxx
 #define CPUID_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
 #define CPUID_MODEL_ATOM		0x1C			// Pineview, Bonnell
 #define CPUID_MODEL_XEON_MP		0x1D			// MP 7400
-#define CPUID_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
-#define CPUID_MODEL_CLARKDALE		0x1F			// Havendale, Auburndale
-#define CPUID_MODEL_DALES		0x25			// Clarkdale, Arrandale
+#define CPUID_MODEL_FIELDS		0x1E			// Core i7 and i5 Processor - Clarksfield, Lynnfield, Jasper Forest
+#define CPUID_MODEL_CLARKDALE		0x1F			// Core i7 and i5 Processor - Nehalem (Havendale, Auburndale)
+#define CPUID_MODEL_DALES		0x25			// Westmere Client - Clarkdale, Arrandale
 #define CPUID_MODEL_ATOM_SAN		0x26			// Lincroft
-#define CPUID_MODEL_LINCROFT		0x27			// Bonnell
+#define CPUID_MODEL_LINCROFT		0x27			// Bonnell, penwell
 #define CPUID_MODEL_SANDYBRIDGE		0x2A			// Sandy Bridge
 #define CPUID_MODEL_WESTMERE		0x2C			// Gulftown, Westmere-EP, Westmere-WS
 #define CPUID_MODEL_JAKETOWN		0x2D			// Sandy Bridge-E, Sandy Bridge-EP
-#define CPUID_MODEL_NEHALEM_EX		0x2E			// Beckton
-#define CPUID_MODEL_WESTMERE_EX		0x2F			// Westmere-EX
-//#define CPUID_MODEL_BONNELL_ATOM	0x35			// Atom Family Bonnell
+#define CPUID_MODEL_NEHALEM_EX		0x2E			// Nehalem-EX Xeon - Beckton
+#define CPUID_MODEL_WESTMERE_EX		0x2F			// Westmere-EX Xeon - Eagleton
+#define CPUID_MODEL_CLOVERVIEW      0x35			// Atom Family Bonnell, cloverview
 #define CPUID_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
-#define CPUID_MODEL_ATOM_3700		0x37			// Atom E3000, Z3000 Atom Silvermont
+#define CPUID_MODEL_ATOM_3700		0x37			// Atom E3000, Z3000 Atom Silvermont **BYT
 #define CPUID_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
-#define CPUID_MODEL_HASWELL		0x3C			// Haswell DT
+#define CPUID_MODEL_HASWELL		0x3C			// Haswell DT ex.i7 4790K
 #define CPUID_MODEL_HASWELL_U5		0x3D			// Haswell U5  5th generation Broadwell, Core M / Core-AVX2
 #define CPUID_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
-#define CPUID_MODEL_HASWELL_SVR		0x3F			// Haswell Server, Xeon E5-2600/1600 v3 (Haswell-E)
+#define CPUID_MODEL_HASWELL_SVR		0x3F			// Haswell Server, Xeon E5-2600/1600 v3 (Haswell-E) **HSX
 //#define CPUID_MODEL_HASWELL_H		0x??			// Haswell H
-#define CPUID_MODEL_HASWELL_ULT		0x45			// Haswell ULT, 4th gen Core, Xeon E3-12xx v3
+#define CPUID_MODEL_HASWELL_ULT		0x45			// Haswell ULT, 4th gen Core, Xeon E3-12xx v3 C8/C9/C10
 #define CPUID_MODEL_HASWELL_ULX		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
-//#define CPUID_MODEL_			0x4A			// Future Atom E3000, Z3000 silvermont / atom
-#define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000
-//#define CPUID_MODEL_			0x4E			// Future Core
-#define CPUID_MODEL_BRODWELL_SVR	0x4F			// Broadwell Server
-#define CPUID_MODEL_BRODWELL_MSVR	0x56			// Broadwell Micro Server, Future Xeon
-//#define CPUID_MODEL_			0x5A			// Silvermont, Future Atom E3000, Z3000
-//#define CPUID_MODEL_			0x5D			// Silvermont, Future Atom E3000, Z3000
+#define CPUID_MODEL_BROADWELL_HQ	0x47            // Broadwell BDW
+#define CPUID_MODEL_MERRIFIELD		0x4A			// Future Atom E3000, Z3000 silvermont / atom (Marrifield)
+#define CPUID_MODEL_BRASWELL    0x4C            // Atom (Braswell)
+#define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000 **AVN
+#define CPUID_MODEL_SKYLAKE		0x4E			// Future Core **SKL
+#define CPUID_MODEL_BRODWELL_SVR	0x4F			// Broadwell Server **BDX
+#define CPUID_MODEL_BRODWELL_MSVR	0x56			// Broadwell Micro Server, Future Xeon **BDX-DE
+#define CPUID_MODEL_ANNIDALE		0x5A			// Silvermont, Future Atom E3000, Z3000 (Annidale)
+#define CPUID_MODEL_VALLEYVIEW      0x5D			// Silvermont, Future Atom E3000, Z3000
+#define CPUID_MODEL_SKYLAKE_S     0x5E          // Skylake **SKL
 
 /* CPUID Vendor */
 #define	CPUID_VID_INTEL			"GenuineIntel"
@@ -224,6 +226,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_IA32_BIOS_SIGN_ID		0x008B	/* microcode version */
 #define MSR_FSB_FREQ			0x00CD	/* limited use - not for i7 */
 #define	MSR_PLATFORM_INFO		0x00CE	/* limited use - MinRatio for i7 but Max for Yonah	*/
+
 /* turbo for penryn */
 #define MSR_PKG_CST_CONFIG_CONTROL	0x00E2		// sandy and ivy
 #define MSR_PMG_IO_CAPTURE_BASE		0x00E4
@@ -246,6 +249,15 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define IA32_PLATFORM_DCA_CAP		0x01F8
 #define MSR_POWER_CTL			0x01FC		// MSR 000001FC  0000-0000-0004-005F
 
+// Nehalem (NHM) adds support for additional MSRs
+#define MSR_SMI_COUNT                   0x034
+#define MSR_NHM_PLATFORM_INFO           0x0ce
+#define MSR_NHM_SNB_PKG_CST_CFG_CTL     0x0e2
+#define MSR_PKG_C3_RESIDENCY            0x3f8
+#define MSR_PKG_C6_RESIDENCY            0x3f9
+#define MSR_CORE_C3_RESIDENCY           0x3fc
+#define MSR_CORE_C6_RESIDENCY           0x3fd
+
 // Sandy Bridge & JakeTown specific 'Running Average Power Limit' MSR's.
 #define MSR_RAPL_POWER_UNIT		0x606		// R/O
 //MSR 00000606                                      0000-0000-000A-1003
@@ -256,6 +268,10 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 //Valid + 010=1024ns + 0x54=84mks
 #define MSR_PKGC7_IRTL			0x60C		// RW time limit to go C7
 //MSR 0000060C                                      0000-0000-0000-8854
+
+// Sandy Bridge (SNB) adds support for additional MSRs
+#define MSR_PKG_C7_RESIDENCY		0x3FA
+#define MSR_CORE_C7_RESIDENCY       0x3FE
 #define MSR_PKG_C2_RESIDENCY		0x60D		// same as TSC but in C2 only
 
 #define MSR_PKG_RAPL_POWER_LIMIT	0x610		//MSR 00000610  0000-A580-0000-8960
@@ -264,14 +280,13 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 // Sandy Bridge IA (Core) domain MSR's.
 #define MSR_PP0_POWER_LIMIT		0x638
-#define MSR_PP0_ENERGY_STATUS		0x639
+#define MSR_PP0_ENERGY_STATUS	0x639
 #define MSR_PP0_POLICY			0x63A
 #define MSR_PP0_PERF_STATUS		0x63B
 
 // Sandy Bridge Uncore (IGPU) domain MSR's (Not on JakeTown).
 #define MSR_PP1_POWER_LIMIT		0x640
-#define MSR_PP1_ENERGY_STATUS	    	0x641
-//MSR 00000641                                      0000-0000-0000-0000
+#define MSR_PP1_ENERGY_STATUS	0x641
 #define MSR_PP1_POLICY			0x642
 
 // JakeTown only Memory MSR's.
@@ -281,17 +296,28 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_DRAM_PERF_STATUS		0x61B
 #define MSR_DRAM_POWER_INFO		0x61C
 
-//IVY_BRIDGE
+// Ivy Bridge
 #define MSR_CONFIG_TDP_NOMINAL		0x648
 #define MSR_CONFIG_TDP_LEVEL1		0x649
 #define MSR_CONFIG_TDP_LEVEL2		0x64A
 #define MSR_CONFIG_TDP_CONTROL		0x64B		// write once to lock
 #define MSR_TURBO_ACTIVATION_RATIO	0x64C
 
+// Haswell (HSW) adds support for additional MSRs
+#define MSR_PKG_C8_RESIDENCY            0x630
+#define MSR_PKG_C9_RESIDENCY            0x631
+#define MSR_PKG_C10_RESIDENCY           0x632
+
+// Skylake (SKL) adds support for additional MSRs
+#define MSR_PKG_WEIGHTED_CORE_C0_RES    0x658
+#define MSR_PKG_ANY_CORE_C0_RES         0x659
+#define MSR_PKG_ANY_GFXE_C0_RES         0x65A
+#define MSR_PKG_BOTH_CORE_GFXE_C0_RES   0x65B
+
 /* AMD Defined MSRs */
-#define MSR_K6_EFER			0xC0000080
-#define MSR_K6_STAR			0xC0000081
-#define MSR_K6_WHCR			0xC0000082
+#define MSR_K6_EFER			0xC0000080	// extended feature register
+#define MSR_K6_STAR			0xC0000081	// legacy mode SYSCALL target
+#define MSR_K6_WHCR			0xC0000082	// long mode SYSCALL target
 #define MSR_K6_UWCCR			0xC0000085
 #define MSR_K6_EPMR			0xC0000086
 #define MSR_K6_PSOR			0xC0000087

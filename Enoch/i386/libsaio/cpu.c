@@ -491,6 +491,8 @@ void scan_cpu(PlatformInfo_t *p)
 				//case CPUID_MODEL_HASWELL_H:
 				case CPUID_MODEL_HASWELL_ULT:
 				case CPUID_MODEL_HASWELL_ULX:
+				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_SKYLAKE_S:
 				//case CPUID_MODEL_:
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
@@ -647,6 +649,8 @@ void scan_cpu(PlatformInfo_t *p)
 
 				case CPUID_MODEL_HASWELL_ULT:
 				case CPUID_MODEL_HASWELL_ULX:
+				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_SKYLAKE_S:
 /* --------------------------------------------------------- */
 					msr = rdmsr64(MSR_PLATFORM_INFO);
 					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
