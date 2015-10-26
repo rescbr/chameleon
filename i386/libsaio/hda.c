@@ -62,6 +62,7 @@
 
 #include "boot.h"
 #include "bootstruct.h"
+#include "cpu.h"
 #include "pci.h"
 #include "pci_root.h"
 #include "platform.h"
@@ -94,7 +95,12 @@
 	#define CDBG(x...)
 #endif
 
-extern uint32_t devices_number;
+#define UNKNOWN "Unknown "
+
+#define hdacc_lock(codec)       snd_mtxlock((codec)->lock)
+#define hdacc_unlock(codec)     snd_mtxunlock((codec)->lock)
+#define hdacc_lockassert(codec) snd_mtxassert((codec)->lock)
+#define hdacc_lockowned(codec)  mtx_owned((codec)->lock)
 
 const char *hda_slot_name[]		=	{ "AAPL,slot-name", "Built In" };
 
@@ -258,7 +264,6 @@ static hda_controller_devices know_hda_controller[] = {
  * --------------------------------
  */
 
-/*
 static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_CS4206, 0,		"CS4206" },
 	{ HDA_CODEC_CS4207, 0,		"CS4207" },
@@ -597,7 +602,6 @@ static hdacc_codecs know_codecs[] = {
 };
 
 #define HDACC_CODECS_LEN        (sizeof(know_codecs) / sizeof(know_codecs[0]))
-*/
 
 /*****************
  * Device Methods
@@ -655,6 +659,97 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 	return desc;
 }
 
+/* get Codec name */
+static char *get_hda_codec_name( uint16_t codec_vendor_id, uint16_t codec_device_id, uint8_t codec_revision_id, uint8_t codec_stepping_id )
+{
+	static char desc[128];
+
+	char		*lName_format  = NULL;
+	uint32_t	lCodec_model = ((uint32_t)(codec_vendor_id) << 16) + (codec_device_id);
+	uint32_t	lCodec_rev = (((uint16_t)(codec_revision_id) << 8) + codec_stepping_id);
+	int i;
+
+	// Get format for vendor ID
+	switch ( codec_vendor_id ) // uint16_t
+	{
+		case ANALOGDEVICES_VENDORID:
+			lName_format = "Analog Devices %s"; break;
+
+		case AGERE_VENDORID:
+			lName_format = "Agere Systems %s "; break;
+
+		case REALTEK_VENDORID:
+			lName_format = "Realtek %s"; break;
+
+		case ATI_VENDORID:
+			lName_format = "ATI %s"; break;
+
+		case CREATIVE_VENDORID:
+			lName_format = "Creative %s"; break;
+
+		case CMEDIA_VENDORID:
+		case CMEDIA2_VENDORID:
+			lName_format = "CMedia %s"; break;
+
+		case CIRRUSLOGIC_VENDORID:
+			lName_format = "Cirrus Logic %s"; break;
+
+		case CONEXANT_VENDORID:
+			lName_format = "Conexant %s"; break;
+
+		case CHRONTEL_VENDORID:
+			lName_format = "Chrontel %s"; break;
+
+		case IDT_VENDORID:
+			lName_format = "IDT %s"; break;
+
+		case INTEL_VENDORID:
+			lName_format = "Intel %s"; break;
+
+		case MOTO_VENDORID:
+			lName_format = "Motorola %s"; break;
+
+		case NVIDIA_VENDORID:
+			lName_format = "nVidia %s"; break;
+
+		case SII_VENDORID:
+			lName_format = "Silicon Image %s"; break;
+
+		case SIGMATEL_VENDORID:
+			lName_format = "Sigmatel %s"; break;
+
+		case VIA_VENDORID:
+			lName_format = "VIA %s"; break;
+
+		default:
+			lName_format = UNKNOWN; break;
+			break;
+	}
+
+	for (i = 0; i < HDACC_CODECS_LEN; i++)
+	{
+		if ( know_codecs[i].id == lCodec_model )
+		{
+			if ( ( know_codecs[i].rev == 0x00000000 ) || ( know_codecs[i].rev == lCodec_rev ) )
+			{
+//				verbose("\tRevision in table (%06x) | burned chip revision (%06x).\n", know_codecs[i].rev, lCodec_rev );
+				snprintf(desc, sizeof(desc), lName_format, know_codecs[i].name);
+				return desc;
+			}
+		}
+	}
+
+	if ( ( lName_format != UNKNOWN ) && ( strstr(lName_format, "%s" ) != NULL ) )
+	{
+		// Dirty way to remove '%s' from the end of the lName_format
+		int len = strlen(lName_format);
+		lName_format[len-2] = '\0';
+	}
+
+	// Not in table
+	snprintf(desc, sizeof(desc), "unknown %s Codec", lName_format);
+	return desc;
+}
 
 bool setup_hda_devprop(pci_dt_t *hda_dev)
 {
@@ -702,6 +797,7 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		 controller_name, hda_dev->vendor_id, hda_dev->device_id, hda_dev->revision_id,
 		hda_dev->subsys_id.subsys.vendor_id, hda_dev->subsys_id.subsys.device_id, devicepath);
 
+	probe_hda_bus(hda_dev->dev.addr);
 
 	switch ((controller_device_id << 16) | controller_vendor_id)
 	{
@@ -883,4 +979,344 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 	stringlength = string->length;
 
 	return true;
+}
+
+/*
+ * Structure of HDA MMIO Region
+ */
+struct HDARegs
+{
+	uint16_t gcap;
+	uint8_t vmin;
+	uint8_t vmaj;
+	uint16_t outpay;
+	uint16_t inpay;
+	uint32_t gctl;
+	uint16_t wakeen;
+	uint16_t statests;
+	uint16_t gsts;
+	uint8_t rsvd0[6];
+	uint16_t outstrmpay;
+	uint16_t instrmpay;
+	uint8_t rsvd1[4];
+	uint32_t intctl;
+	uint32_t intsts;
+	uint8_t rsvd2[8];
+	uint32_t walclk;
+	uint8_t rsvd3[4];
+	uint32_t ssync;
+	uint8_t rsvd4[4];
+	uint32_t corblbase;
+	uint32_t corbubase;
+	uint16_t corbwp;
+	uint16_t corbrp;
+	uint8_t corbctl;
+	uint8_t corbsts;
+	uint8_t corbsize;
+	uint8_t rsvd5;
+	uint32_t rirblbase;
+	uint32_t rirbubase;
+	uint16_t rirbwp;
+	uint16_t rintcnt;
+	uint8_t rirbctl;
+	uint8_t rirbsts;
+	uint8_t rirbsize;
+	uint8_t rsvd6;
+	uint32_t icoi;
+	uint32_t icii;
+	uint16_t icis;
+	uint8_t rsvd7[6];
+	uint32_t dpiblbase;
+	uint32_t dpibubase;
+	uint8_t rsvd8[8];
+/*
+ * Stream Descriptors follow
+ */
+} __attribute__((aligned(16), packed));
+
+/*
+ * Data to be discovered for HDA codecs
+ */
+
+struct HDACodecInfo
+{
+	uint16_t vendor_id;
+	uint16_t device_id;
+	uint8_t revision_id;
+	uint8_t stepping_id;
+	uint8_t maj_rev;
+	uint8_t min_rev;
+	uint8_t num_function_groups;
+	const char     *name;
+};
+
+/*
+ * Timing Functions
+ */
+
+static int wait_for_register_state_16(uint16_t const volatile* reg,
+				uint16_t target_mask,
+				uint16_t target_value,
+				uint32_t timeout_us,
+				uint32_t tsc_ticks_per_us)
+{
+	uint64_t deadline = rdtsc64() + MultU32x32(timeout_us, tsc_ticks_per_us);
+	do
+	{
+		uint16_t value = *reg;
+		if ((value & target_mask) == target_value)
+			return 0;
+		CpuPause();
+	}
+	while (rdtsc64() < deadline);
+	return -1;
+}
+
+static void delay_us(uint32_t timeout_us, uint32_t tsc_ticks_per_us)
+{
+	uint64_t deadline = rdtsc64() + MultU32x32(timeout_us, tsc_ticks_per_us);
+
+	do
+	{
+		CpuPause();
+	}
+	while (rdtsc64() < deadline);
+}
+
+static struct HDARegs volatile* hdaMemory = NULL;
+static uint32_t tsc_ticks_per_us = 0U;
+
+#define ICIS_ICB 1U
+#define ICIS_IRV 2U
+
+static int immediate_command(uint32_t command, uint32_t* response)
+{
+	/*
+	 * Wait up to 1ms for for ICB 0
+	 */
+	(void) wait_for_register_state_16(&hdaMemory->icis, ICIS_ICB, 0U, 1000U, tsc_ticks_per_us);
+	/*
+	 * Ignore timeout and force ICB to 0
+	 * Clear IRV while at it
+	 */
+	hdaMemory->icis = ICIS_IRV;
+	/*
+	 * Program command
+	 */
+	hdaMemory->icoi = command;
+	/*
+	 * Trigger command
+	 * Clear IRV again just in case
+	 */
+	hdaMemory->icis = ICIS_ICB | ICIS_IRV;
+	/*
+	 * Wait up to 1ms for response
+	 */
+	if (wait_for_register_state_16(&hdaMemory->icis, ICIS_IRV, ICIS_IRV, 1000U, tsc_ticks_per_us) < 0)
+	{
+		/*
+		 * response timed out
+		 */
+		return -1;
+	}
+	*response = hdaMemory->icii;
+	return 0;
+}
+
+#define PACK_CID(x) ((x & 15U) << 28)
+#define PACK_NID(x) ((x & 127U) << 20)
+#define PACK_VERB_12BIT(x) ((x & 4095U) << 8)
+#define PACK_PAYLOAD_8BIT(x) (x & UINT8_MAX)
+#define VERB_GET_PARAMETER 0xF00U
+
+static uint32_t get_parameter(uint8_t codec_id, uint8_t node_id, uint8_t parameter_id)
+{
+	uint32_t command, response;
+
+	command = PACK_CID(codec_id) | PACK_NID(node_id) | PACK_VERB_12BIT(VERB_GET_PARAMETER) | PACK_PAYLOAD_8BIT(parameter_id);
+	response = UINT32_MAX;
+
+	/*
+	 * Ignore timeout, return UINT32_MAX as error value
+	 */
+	(void) immediate_command(command, &response);
+	return response;
+}
+
+#define PARAMETER_VID_DID 0U
+#define PARAMETER_RID 2U
+#define PARAMETER_NUM_NODES 4U
+
+static void probe_hda_codec(uint8_t codec_id, struct HDACodecInfo *codec_info)
+{
+	uint32_t response;
+	CDBG("\tprobing codec %d\n", codec_id);
+	response = get_parameter(codec_id, 0U, PARAMETER_VID_DID);
+	codec_info->vendor_id = (response >> 16) & UINT16_MAX;
+	codec_info->device_id = response & UINT16_MAX;
+	response = get_parameter(codec_id, 0U, PARAMETER_RID);
+	codec_info->revision_id = (response >> 8) & UINT8_MAX;
+	codec_info->stepping_id = response & UINT8_MAX;
+	codec_info->maj_rev = (response >> 20) & 15U;
+	codec_info->min_rev = (response >> 16) & 15U;
+	response = get_parameter(codec_id, 0U, PARAMETER_NUM_NODES);
+	codec_info->num_function_groups = response & UINT8_MAX;
+	codec_info->name = get_hda_codec_name(codec_info->vendor_id, codec_info->device_id, codec_info->revision_id, codec_info->stepping_id);
+
+}
+
+static int getHDABar(uint32_t pci_addr, uint32_t* bar_phys_addr)
+{
+	uint32_t barlow = pci_config_read32(pci_addr, PCI_BASE_ADDRESS_0);
+
+	if ((barlow & PCI_BASE_ADDRESS_SPACE) != PCI_BASE_ADDRESS_SPACE_MEMORY)
+	{
+		CDBG("\tBAR0 for HDA Controller 0x%x is not an MMIO space\n", pci_addr);
+		return -1;
+	}
+
+	if ((barlow & PCI_BASE_ADDRESS_MEM_TYPE_MASK) == PCI_BASE_ADDRESS_MEM_TYPE_64)
+	{
+		uint32_t barhigh = pci_config_read32(pci_addr, PCI_BASE_ADDRESS_1);
+
+		if (barhigh)
+		{
+			//verbose("\tBAR0 for HDA Controller 0x%x is located ouside 32-bit physical address space (0x%x%08x)\n",
+			//pci_addr, barhigh, barlow & PCI_BASE_ADDRESS_MEM_MASK);
+			return -1;
+		}
+	}
+
+	if (bar_phys_addr)
+	{
+		*bar_phys_addr = (barlow & PCI_BASE_ADDRESS_MEM_MASK);
+	}
+	return 0;
+}
+
+void probe_hda_bus(uint32_t pci_addr)
+{
+	uint64_t tsc_frequency;
+	uint32_t bar_phys_addr;
+	uint16_t pci_cmd, statests;
+	uint16_t const pci_cmd_wanted = PCI_COMMAND_MEMORY | PCI_COMMAND_MASTER;
+	uint8_t codec_id, original_reset_state;
+	struct HDACodecInfo codec_info;
+
+	CDBG("\tlooking for HDA bar0 on pci_addr 0x%x\n", pci_addr);
+	if (getHDABar(pci_addr, &bar_phys_addr) < 0)
+	{
+		return;
+	}
+
+	CDBG("\tfound HDA memory at 0x%x\n", bar_phys_addr);
+	hdaMemory = (struct HDARegs volatile*) bar_phys_addr;
+
+	tsc_frequency = Platform.CPU.TSCFrequency;
+	tsc_ticks_per_us = DivU64x32(tsc_frequency, 1000000U);  // TSC ticks per microsecond
+	CDBG("\ttsc_ticks_per_us %d\n", tsc_ticks_per_us);
+
+	/*
+	 * Enable Memory Space and Bus Mastering
+	 */
+	pci_cmd = pci_config_read16(pci_addr, PCI_COMMAND);
+	if ((pci_cmd & pci_cmd_wanted) != pci_cmd_wanted)
+	{
+		pci_cmd |= pci_cmd_wanted;
+		pci_config_write16(pci_addr, PCI_COMMAND, pci_cmd);
+	}
+
+	/*
+	 * Remember entering reset state
+	 */
+	original_reset_state = (hdaMemory->gctl & HDAC_GCTL_CRST) ? 1U : 0U;
+
+	/*
+	 * Reset HDA Controller
+	 */
+	hdaMemory->wakeen = 0U;
+	hdaMemory->statests = UINT16_MAX;
+	hdaMemory->gsts = UINT16_MAX;
+	hdaMemory->intctl = 0U;
+	CDBG("\tStarting reset\n");
+	hdaMemory->gctl = 0U;
+
+	/*
+	 * Wait up to 10ms to enter Reset
+	 */
+	if (wait_for_register_state_16((uint16_t volatile const*) &hdaMemory->gctl,
+				HDAC_GCTL_CRST,
+				0U,
+				10000U,
+				tsc_ticks_per_us) < 0)
+	{
+		CDBG("\tHDA Controller 0x%x timed out 10ms entering reset\n", pci_addr);
+		return;
+	}
+	CDBG("\tReset asserted, delay 100us\n");
+
+	/*
+	 * Delay 2400 BCLK (100us)
+	 */
+	delay_us(100U, tsc_ticks_per_us);
+	CDBG("\tDeasserting reset\n");
+
+	/*
+	 * Wait up to 10ms to exit Reset
+	 */
+	hdaMemory->gctl = HDAC_GCTL_CRST;
+	if (wait_for_register_state_16((uint16_t volatile const*) &hdaMemory->gctl,
+				HDAC_GCTL_CRST,
+				HDAC_GCTL_CRST,
+				10000U,
+				tsc_ticks_per_us) < 0)
+	{
+		CDBG("\tHDA Controller 0x%x timed out 10ms exiting reset\n", pci_addr);
+		return;
+	}
+	CDBG("\tReset complete\n");
+
+	/*
+	 * Wait 1ms for codecs to request enumeration (spec says 521us).
+	 */
+	delay_us(1000U, tsc_ticks_per_us);
+
+	/*
+	 * See which codecs want enumeration
+	 */
+	statests = hdaMemory->statests;
+	hdaMemory->statests = statests; // clear statests
+	CDBG("\tstatests is now 0x%x\n", statests);
+	codec_id = 0U;
+	while (statests)
+	{
+		if (statests & 1U)
+		{
+			probe_hda_codec(codec_id, &codec_info);
+
+			verbose("\tFound %s (%04x%04x), rev(%04x)",
+			codec_info.name,
+			codec_info.vendor_id,
+			codec_info.device_id,
+			codec_info.revision_id);
+#if DEBUG_CODEC
+			verbose(", stepping 0x%x, major rev 0x%x, minor rev 0x%x, %d function groups",
+			codec_info.stepping_id,
+			codec_info.maj_rev,
+			codec_info.min_rev,
+			codec_info.num_function_groups);
+#endif
+			verbose("\n");
+		}
+		++codec_id;
+		statests >>= 1;
+	}
+
+	/*
+	 * Restore reset state entered with
+	 */
+	if (!original_reset_state)
+	{
+		hdaMemory->gctl = 0U;
+	}
 }

@@ -224,6 +224,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_IA32_BIOS_SIGN_ID		0x008B	/* microcode version */
 #define MSR_FSB_FREQ			0x00CD	/* limited use - not for i7 */
 #define	MSR_PLATFORM_INFO		0x00CE	/* limited use - MinRatio for i7 but Max for Yonah	*/
+
 /* turbo for penryn */
 #define MSR_PKG_CST_CONFIG_CONTROL	0x00E2		// sandy and ivy
 #define MSR_PMG_IO_CAPTURE_BASE		0x00E4
@@ -424,6 +425,7 @@ typedef struct _PlatformInfo_t
 		int			MemoryModules;		// number of memory modules installed
 		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
+
 	struct RAM
 	{
 		uint64_t		Frequency;		// Ram Frequency

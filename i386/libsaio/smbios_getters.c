@@ -383,7 +383,7 @@ bool getSMBOemProcessorType(returnType *value)
 
 						return true;
 
-					case CPUID_MODEL_HASWELL_U5:			// 0x3D -
+						case CPUID_MODEL_HASWELL_U5:		// 0x3D -
 
 						if (strstr(Platform.CPU.BrandString, CORE_M))
 						{

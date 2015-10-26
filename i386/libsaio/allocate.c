@@ -35,8 +35,7 @@ static long  gImageLastKernelAddr;
 
 //==============================================================================
 
-long
-AllocateMemoryRange(char * rangeName, long start, long length, long type)
+long AllocateMemoryRange(char * rangeName, long start, long length, long type)
 {
 	char *nameBuf;
 	uint32_t *buffer;
@@ -67,8 +66,7 @@ AllocateMemoryRange(char * rangeName, long start, long length, long type)
 
 //==============================================================================
 
-long
-AllocateKernelMemory(long inSize)
+long AllocateKernelMemory(long inSize)
 {
 	long addr;
 

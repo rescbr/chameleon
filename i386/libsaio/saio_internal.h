@@ -147,15 +147,15 @@ extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 
 /* stringTable.c */
-extern char * newStringFromList(char **list, int *size);
+extern char *newStringFromList(char **list, int *size);
 extern int    stringLength(const char *table, int compress);
 extern bool   getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size);
 extern bool   removeKeyFromTable(const char *key, char *table);
-extern char * newStringForStringTableKey(config_file_t *config, char *key);
-extern char * newStringForKey(char *key, config_file_t *configBuff);
+extern char *newStringForStringTableKey(config_file_t *config, char *key);
+extern char *newStringForKey(char *key, config_file_t *configBuff);
 extern bool   getValueForBootKey(const char *line, const char *match, const char **matchval, int *len);
 extern bool   getValueForKey(const char *key, const char **val, int *size, config_file_t *configBuff);
-extern const char * getStringForKey(const char * key,  config_file_t *config);
+extern const char *getStringForKey(const char * key,  config_file_t *config);
 extern bool   getBoolForKey(const char *key, bool *val, config_file_t *configBuff);
 extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff);
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
@@ -165,8 +165,8 @@ extern int    loadSystemConfig(config_file_t *configBuff);
 extern int    loadHelperConfig(config_file_t *configBuff);
 extern int    loadChameleonConfig(config_file_t *configBuff, BVRef chain);
 extern int    loadChameleonConfigForDevice(config_file_t *configBuff, const char *device, const char *path);
-extern char * newString(const char *oldString);
-extern char * getNextArg(char **ptr, char *val);
+extern char *newString(const char *oldString);
+extern char *getNextArg(char **ptr, char *val);
 extern int	ParseXMLFile( char *buffer, TagPtr * dict );
 
 /* sys.c */
