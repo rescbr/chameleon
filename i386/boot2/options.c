@@ -389,16 +389,20 @@ static int   gMenuSelection;
 static int	 gMenuStart;
 static int	 gMenuEnd;
 
-static void printMenuItem( const MenuItem * item, int highlight )
+static void printMenuItem( const MenuItem *item, int highlight )
 {
-    printf("  ");
+	printf("  ");
 
-    if ( highlight )
-        putca(' ', 0x70, strlen(item->name) + 4);
-    else
-        putca(' ', 0x07, 40);
+	if ( highlight )
+	{
+		putca(' ', 0x70, strlen(item->name) + 4);
+	}
+	else
+	{
+		putca(' ', 0x07, 40);
+	}
 
-    printf("  %40s\n", item->name);
+	printf("  %40s\n", item->name);
 }
 
 //==========================================================================
@@ -665,7 +669,7 @@ static void skipblanks( const char ** cpp )
 
 //==========================================================================
 
-static const char * extractKernelName( char ** cpp )
+static const char *extractKernelName( char ** cpp )
 {
     char * kn = *cpp;
     char * cp = *cpp;
@@ -1336,7 +1340,6 @@ int processBootOptions()
 	}
 	else
 	{
-
 		// Load org.chameleon.Boot.plist from the selected volume
 		// and use its contents to override default bootConfig.
 
@@ -1382,8 +1385,9 @@ int processBootOptions()
 	}
 
 	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
-	if ( MacOSVerCurrent == MacOSVer2Int("10.10") ) // OS X is 10.10
+	if ( (gMacOSVersion[3] == '1') && (gMacOSVersion[4] == '0') ) // OS X is 10.10
 	{
+		verbose("Added: kext-dev-mode=1\n");
 		addBootArg("kext-dev-mode=1");
 	}
 

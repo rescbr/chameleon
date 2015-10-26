@@ -441,7 +441,7 @@ static const char CPU_Frequency_prop[] = "CPUFrequency";
  */
 
 /* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const  gEfiSmbiosTableGuid = SMBIOS_TABLE_GUID;
+EFI_GUID const  gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
 #define SMBIOS_RANGE_START		0x000F0000
 #define SMBIOS_RANGE_END		0x000FFFFF
@@ -449,8 +449,8 @@ EFI_GUID const  gEfiSmbiosTableGuid = SMBIOS_TABLE_GUID;
 /* '_SM_' in little endian: */
 #define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
 
-EFI_GUID gEfiAcpiTableGuid = ACPI_TABLE_GUID;
-EFI_GUID gEfiAcpi20TableGuid = ACPI_20_TABLE_GUID;
+EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
+EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
 
 
 /*==========================================================================
@@ -661,7 +661,6 @@ void setupBoardId()
 /*
  * Populate the chosen node
  */
-
 void setupChosenNode()
 {
 	Node *chosenNode;

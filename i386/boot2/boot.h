@@ -179,6 +179,7 @@
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
 #define kIntelBdwFB			"IntelBdwFB"			/* gma.c */
+#define kIntelSklFB			"IntelSklFB"			/* gma.c */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
@@ -235,7 +236,7 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-extern bool checkOSVersion(const char * version);
+extern bool checkOSVersion(const char *version);
 extern uint32_t getMacOSVerCurrent();
 
 /*
