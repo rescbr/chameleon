@@ -565,7 +565,12 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_INTELIP2, 0,        "Ibex Peak" },
 	{ HDA_CODEC_INTELCPT, 0,        "Cougar Point" },
 	{ HDA_CODEC_INTELPPT, 0,        "Panther Point" },
-	{ HDA_CODEC_INTELLLP, 0,        "Lynx Point" },
+	{ HDA_CODEC_INTELLLP, 0,        "Haswell" },
+	{ HDA_CODEC_INTELBRW, 0,        "Broadwell" },
+	{ HDA_CODEC_INTELSKL, 0,        "Skylake" },
+	{ HDA_CODEC_INTELCDT, 0,        "CedarTrail" },
+	{ HDA_CODEC_INTELVLV, 0,        "Valleyview2" },
+	{ HDA_CODEC_INTELBSW, 0,        "Braswell" },
 	{ HDA_CODEC_INTELCL, 0,         "Crestline" },
 
 	{ HDA_CODEC_SII1390, 0,         "SiI1390 HDMi" },

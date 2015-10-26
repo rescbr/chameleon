@@ -44,3 +44,4 @@ Text@IntelBroadwellx15:IntelBdwFB=15
 Text@IntelBroadwellx16:IntelBdwFB=16
 Text@IntelBroadwellx17:IntelBdwFB=17
 Text@IntelBroadwellx18:IntelBdwFB=18
+Text@IntelBroadwellx19:IntelBdwFB=19

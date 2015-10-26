@@ -188,7 +188,7 @@ PARTITION_ACTIVE_IF() {
             else
                 echo "Setting ${choicedVolume} partition active."
                 if [[ $( /usr/libexec/PlistBuddy -c "Print SkipActivePartition" ${configFile} 2> /dev/null ) == "true" ]];then
-                    # Skip writing activation (user wants this)
+                    # Skip writing Stage 0 (user wants this)
                     echo "user chose to skip activation, partition not activated!"
                     else
                         # BadAxe requires EFI partition to be flagged active.

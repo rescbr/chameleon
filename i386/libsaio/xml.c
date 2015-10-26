@@ -79,7 +79,7 @@ void SaveRefInteger(int integer, int id)
 		}
 		tmp = tmp->next;
 	}
-	
+
 	string_ref *new_ref = malloc(sizeof(string_ref));
 	new_ref->string = (char*)integer;
 	new_ref->id = id;
@@ -110,7 +110,6 @@ int GetRefInteger(int id)
 	//verbose("Unable to locate Ref String %d\n", id);
 	return 0;
 }
-
 
 struct Module {
 	struct Module *nextModule;
@@ -168,10 +167,8 @@ static char *NewSymbol(char *string);
 static void FreeSymbol(char *string);
 #endif
 
-
 //==========================================================================
 // XMLGetProperty
-
 TagPtr XMLGetProperty(TagPtr dict, const char *key)
 {
 	TagPtr tagList, tag;
@@ -202,7 +199,6 @@ TagPtr XMLGetProperty(TagPtr dict, const char *key)
 
 //==========================================================================
 // XMLGetProperty
-
 TagPtr XMLGetKey( TagPtr dict, int id )
 {
 	TagPtr tagList, tag;
@@ -244,7 +240,6 @@ TagPtr XMLGetValueForKey(TagPtr key)
 
 	return key->tag;
 }
-
 
 // XMLGetTag(int index)
 
@@ -671,7 +666,6 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagList
-
 static long ParseTagList( char *buffer, TagPtr *tag, long type, long empty )
 {
 	long		pos = 0;
@@ -728,7 +722,6 @@ static long ParseTagList( char *buffer, TagPtr *tag, long type, long empty )
 
 //==========================================================================
 // ParseTagKey
-
 static long ParseTagKey( char *buffer, TagPtr *tag )
 {
 	long		length = 0;
@@ -777,7 +770,6 @@ static long ParseTagKey( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagString
-
 static long ParseTagString( char *buffer, TagPtr *tag )
 {
 	long		length = 0;
@@ -814,7 +806,6 @@ static long ParseTagString( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagInteger
-
 static long ParseTagInteger( char *buffer, TagPtr *tag )
 {
 	long   length, integer;
@@ -921,7 +912,6 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagData
-
 static long ParseTagData( char *buffer, TagPtr *tag )
 {
 	int		actuallen = 0;
@@ -961,7 +951,6 @@ static long ParseTagData( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagDate
-
 static long ParseTagDate( char *buffer, TagPtr *tag )
 {
 	long		length = 0;
@@ -995,7 +984,6 @@ static long ParseTagDate( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagBoolean
-
 long ParseTagBoolean( char *buffer, TagPtr *tag, long type )
 {
 	TagPtr tmpTag;
@@ -1020,7 +1008,6 @@ long ParseTagBoolean( char *buffer, TagPtr *tag, long type )
 
 //==========================================================================
 // GetNextTag
-
 static long GetNextTag( char *buffer, char **tag, long *start )
 {
 	long	cnt;
@@ -1070,7 +1057,6 @@ static long GetNextTag( char *buffer, char **tag, long *start )
 // Modifies 'buffer' to add a '\0' at the end of the tag matching 'tag'.
 // Returns the length of the data found, counting the end tag,
 // or -1 if the end tag was not found.
-
 static long FixDataMatchingTag( char *buffer, char *tag )
 {
 	long	length;
@@ -1102,7 +1088,6 @@ static long FixDataMatchingTag( char *buffer, char *tag )
 
 //==========================================================================
 // NewTag
-
 #define kTagsPerBlock (0x1000)
 
 static TagPtr    gTagsFree	= NULL;
@@ -1140,7 +1125,6 @@ static TagPtr NewTag( void )
 
 //==========================================================================
 // XMLFreeTag
-
 void XMLFreeTag( TagPtr tag )
 {
 #if DOFREE
@@ -1171,7 +1155,6 @@ void XMLFreeTag( TagPtr tag )
 
 //==========================================================================
 // Symbol object.
-
 struct Symbol
 {
 	long          refCount;
@@ -1186,7 +1169,6 @@ static SymbolPtr gSymbolsHead	= NULL;
 
 //==========================================================================
 // NewSymbol
-
 static char *NewSymbol( char *string )
 {
 	static SymbolPtr lastGuy = 0;
@@ -1227,7 +1209,6 @@ static char *NewSymbol( char *string )
 
 //==========================================================================
 // FreeSymbol
-
 #if DOFREE
 static void FreeSymbol( char *string )
 {
@@ -1266,7 +1247,6 @@ static void FreeSymbol( char *string )
 
 //==========================================================================
 // FindSymbol
-
 static SymbolPtr FindSymbol( char *string, SymbolPtr *prevSymbol )
 {
 	SymbolPtr symbol, prev;
