@@ -54,6 +54,7 @@ enum {
 	iDeviceGeneric_o,
 	iDeviceHFS,
 	iDeviceHFS_o,
+
 	iDeviceHFS_cap,
 	iDeviceHFS_cap_o,
 	iDeviceHFS_yos,
@@ -148,6 +149,7 @@ image_t images[] = {
 	{.name = "device_generic_o",            .image = NULL},
 	{.name = "device_hfsplus",              .image = NULL},
 	{.name = "device_hfsplus_o",            .image = NULL},
+
 	{.name = "device_hfsplus_cap",          .image = NULL},
 	{.name = "device_hfsplus_cap_o",        .image = NULL},
 	{.name = "device_hfsplus_yos",          .image = NULL},
@@ -394,6 +396,7 @@ static int loadGraphics(void)
 	LOADPNG(device_generic_o,               iDeviceGeneric);
 	LOADPNG(device_hfsplus,                 iDeviceGeneric);
 	LOADPNG(device_hfsplus_o,               iDeviceHFS);
+
 	LOADPNG(device_hfsplus_cap,             iDeviceHFS);
 	LOADPNG(device_hfsplus_cap_o,           iDeviceHFS_cap);
 	LOADPNG(device_hfsplus_yos,             iDeviceHFS);

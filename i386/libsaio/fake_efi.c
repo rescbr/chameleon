@@ -665,6 +665,8 @@ void setupChosenNode()
 {
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
+	unsigned long adler32 = 0;
+
 	if (chosenNode == NULL)
 	{
 		stop("setupChosenNode: Couldn't get '/chosen' node");
@@ -685,7 +687,7 @@ void setupChosenNode()
 
 //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
 
-//	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
+	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &adler32);
 
 	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
