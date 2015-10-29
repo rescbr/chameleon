@@ -156,6 +156,9 @@ typedef struct {
 #define EFI_ACPI_20_TABLE_GUID \
     {0x8868E871, 0xE4f1, 0x11D3, {0xBC, 0x22, 0x0, 0x80, 0xC7, 0x3C, 0x88, 0x81} }
 
+// ACPI 3.0 Table GUID in EFI System Table
+#define EFI_ACPI_30_TABLE_GUID EFI_ACPI_20_TABLE_GUID
+
 typedef union {
   EFI_GUID  Guid;
   EFI_UINT8 Raw[16];

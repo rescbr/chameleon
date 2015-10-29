@@ -1663,6 +1663,13 @@ void showTextFile(const char * filename)
 		size = MAX_TEXT_FILE_SIZE;
 	}
         buf = malloc(size);
+
+	if (!buf)
+	{
+		printf("Couldn't allocate memory for the buf in showTextFile\n");
+		return;
+	}
+
         read(fd, buf, size);
         close(fd);
 	showTextBuffer(buf, size);

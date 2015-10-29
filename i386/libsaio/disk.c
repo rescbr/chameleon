@@ -1697,7 +1697,7 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int *countPtr)
 //==============================================================================
 static bool getOSVersion(BVRef bvr, char *str)
 {
-	bool valid = false;	
+	bool valid = false;
 	config_file_t systemVersion;
 	char  dirSpec[512];
 

@@ -208,7 +208,7 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 					case CPUID_MODEL_PRESLER:
-					case CPUID_MODEL_CELERON:
+					case CPUID_MODEL_CONROE:
 					case CPUID_MODEL_YONAH:				// 0x0E - Intel Mobile Core Solo, Duo
 						value->word = 0x201;			// 513
 						return true;
@@ -384,6 +384,7 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 						case CPUID_MODEL_HASWELL_U5:		// 0x3D -
+						case CPUID_MODEL_SKYLAKE_S:		// 0x5E
 
 						if (strstr(Platform.CPU.BrandString, CORE_M))
 						{
@@ -428,6 +429,7 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPUID_MODEL_HASWELL_SVR:			// 0x3F -
 					case CPUID_MODEL_HASWELL_ULT:			// 0x45 -
 					case CPUID_MODEL_HASWELL_ULX:			// 0x46 -
+					case CPUID_MODEL_BROADWELL_HQ:			// 0x47
 
 						if (strstr(Platform.CPU.BrandString, XEON))
 						{

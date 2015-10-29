@@ -410,7 +410,7 @@ char* readEDID()
 	return ret;
 }
 
-int getEDID( void * edidBlock, UInt8 block)
+int getEDID( void *edidBlock, UInt8 block)
 {
 	biosBuf_t bb;
 	bzero(&bb, sizeof(bb));

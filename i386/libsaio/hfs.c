@@ -255,6 +255,7 @@ long HFSInitPartition(CICell ih)
 	{
 		verbose("HFS signature was not present.\n");
 		gCurrentIH = 0;
+
 		return -1;
 	}
 

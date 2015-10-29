@@ -298,6 +298,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 					case CPUID_MODEL_HASWELL_SVR:		//
 					case CPUID_MODEL_HASWELL_ULT:		//
 					case CPUID_MODEL_HASWELL_ULX:		//
+					case CPUID_MODEL_BROADWELL_HQ:
+					case CPUID_MODEL_SKYLAKE_S:
 					case CPUID_MODEL_ATOM_3700:
 
 					{
