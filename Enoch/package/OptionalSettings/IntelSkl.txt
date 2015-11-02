@@ -25,23 +25,15 @@ Exclusive=True
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
-Text@IntelBroadwellx00:IntelBdwFB=0
-Text@IntelBroadwellx01:IntelBdwFB=1
-Text@IntelBroadwellx02:IntelBdwFB=2
-Text@IntelBroadwellx03:IntelBdwFB=3
-Text@IntelBroadwellx04:IntelBdwFB=4
-Text@IntelBroadwellx05:IntelBdwFB=5
-Text@IntelBroadwellx06:IntelBdwFB=6
-Text@IntelBroadwellx07:IntelBdwFB=7
-Text@IntelBroadwellx08:IntelBdwFB=8
-Text@IntelBroadwellx09:IntelBdwFB=9
-Text@IntelBroadwellx10:IntelBdwFB=10
-Text@IntelBroadwellx11:IntelBdwFB=11
-Text@IntelBroadwellx12:IntelBdwFB=12
-Text@IntelBroadwellx13:IntelBdwFB=13
-Text@IntelBroadwellx14:IntelBdwFB=14
-Text@IntelBroadwellx15:IntelBdwFB=15
-Text@IntelBroadwellx16:IntelBdwFB=16
-Text@IntelBroadwellx17:IntelBdwFB=17
-Text@IntelBroadwellx18:IntelBdwFB=18
-Text@IntelBroadwellx19:IntelBdwFB=19
+Text@IntelSkylakex00:IntelSklFB=0
+Text@IntelSkylakex01:IntelSklFB=1
+Text@IntelSkylakex02:IntelSklFB=2
+Text@IntelSkylakex03:IntelSklFB=3
+Text@IntelSkylakex04:IntelSklFB=4
+Text@IntelSkylakex05:IntelSklFB=5
+Text@IntelSkylakex06:IntelSklFB=6
+Text@IntelSkylakex07:IntelSklFB=7
+Text@IntelSkylakex08:IntelSklFB=8
+Text@IntelSkylakex09:IntelSklFB=9
+Text@IntelSkylakex10:IntelSklFB=10
+Text@IntelSkylakex11:IntelSklFB=11

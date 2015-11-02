@@ -66,7 +66,7 @@ declare -r CHAMELEON_VERSION=$( cat version )
 # stage
 CHAMELEON_STAGE=${CHAMELEON_VERSION##*-}
 CHAMELEON_STAGE=${CHAMELEON_STAGE/RC/Release Candidate }
-CHAMELEON_STAGE=${CHAMELEON_STAGE/FINAL/2.1 Final}
+CHAMELEON_STAGE=${CHAMELEON_STAGE/FINAL/2.3 Final}
 declare -r CHAMELEON_STAGE
 
 declare -r CHAMELEON_REVISION=$( grep I386BOOT_CHAMELEONREVISION vers.h | awk '{ print $3 }' | tr -d '\"' )
@@ -77,11 +77,13 @@ declare -r CHAMELEON_TIMESTAMP=$( date -j -f "%Y-%m-%d %H:%M:%S" "${CHAMELEON_BU
 declare -r CHAMELEON_DEVELOP=$(awk "NR==6{print;exit}"  ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_CREDITS=$(awk "NR==10{print;exit}" ${PKGROOT}/../CREDITS)
 declare -r CHAMELEON_PKGDEV=$(awk "NR==14{print;exit}"  ${PKGROOT}/../CREDITS)
-declare -r CHAMELEON_CPRYEAR=$(awk "NR==18{print;exit}"  ${PKGROOT}/../CREDITS)"-"$( date +"%Y" )
-if [[ $(whoami | awk '{print $1}' | cut -d ":" -f3) == "admin" ]];then
+declare -r CHAMELEON_CPRYEAR=$(awk "NR==18{print;exit}" ${PKGROOT}/../CREDITS)"-"$( date +"%Y" )
+
+whoami=$(whoami | awk '{print $1}' | cut -d ":" -f3)
+if [[ "$whoami" == "admin" ]];then
     declare -r CHAMELEON_WHOBUILD="VoodooLabs BuildBot"
 else
-    declare -r CHAMELEON_WHOBUILD=$(whoami | awk '{print $1}' | cut -d ":" -f3)
+    declare -r CHAMELEON_WHOBUILD="$whoami"
 fi
 
 # ====== GLOBAL VARIABLES ======
@@ -94,6 +96,10 @@ declare -a chameleonOptionValues
 declare -a pkgrefs
 declare -a choice_key
 declare -a choice_options
+declare -a choice_selected
+declare -a choice_force_selected
+declare -a choice_title
+declare -a choive_description
 declare -a choice_pkgrefs
 declare -a choice_parent_group_index
 declare -a choice_group_items
@@ -102,6 +108,8 @@ declare -a choice_group_exclusive
 # Init Main Group
 choice_key[0]=""
 choice_options[0]=""
+choice_title[0]=""
+choice_description[0]=""
 choices_pkgrefs[0]=""
 choice_group_items[0]=""
 choice_group_exclusive[0]=""
@@ -262,6 +270,8 @@ getChoiceIndex () {
 # Add a new choice
 addChoice () {
     # Optional arguments:
+    #    --title=<title> : Force the title
+    #    --description=<description> : Force the description
     #    --group=<group> : Group Choice Id
     #    --start-selected=<javascript code> : Specifies whether this choice is initially selected or unselected
     #    --start-enabled=<javascript code>  : Specifies the initial enabled state of this choice
@@ -271,27 +281,39 @@ addChoice () {
     # $1 Choice Id
 
     local option
+    local title=""
+    local description=""
     local groupChoice=""
     local choiceOptions=""
+    local choiceSelected=""
+    local choiceForceSelected=""
     local pkgrefs=""
 
     # Check the arguments.
     for option in "${@}";do
         case "$option" in
+            --title=*)
+                       shift; title="${option#*=}" ;;
+            --description=*)
+                       shift; description="${option#*=}" ;;
             --group=*)
                        shift; groupChoice=${option#*=} ;;
-            --selected=*)
-                         shift; choiceOptions="$choiceOptions selected=\"${option#*=}\"" ;;
-            --enabled=*)
-                         shift; choiceOptions="$choiceOptions enabled=\"${option#*=}\"" ;;
             --start-selected=*)
-                         shift; choiceOptions="$choiceOptions start_selected=\"${option#*=}\"" ;;
+                       shift; choiceOptions="$choiceOptions start_selected=\"${option#*=}\"" ;;
             --start-enabled=*)
-                         shift; choiceOptions="$choiceOptions start_enabled=\"${option#*=}\"" ;;
+                       shift; choiceOptions="$choiceOptions start_enabled=\"${option#*=}\"" ;;
             --start-visible=*)
-                         shift; choiceOptions="$choiceOptions start_visible=\"${option#*=}\"" ;;
+                       shift; choiceOptions="$choiceOptions start_visible=\"${option#*=}\"" ;;
+            --enabled=*)
+                       shift; choiceOptions="$choiceOptions enabled=\"${option#*=}\"" ;;
+            --selected=*)
+                       shift; choiceSelected="${option#*=}" ;;
+            --force-selected=*)
+                       shift; choiceForceSelected="${option#*=}" ;;
+            --visible=*)
+                       shift; choiceOptions="$choiceOptions visible=\"${option#*=}\"" ;;
             --pkg-refs=*)
-                          shift; pkgrefs=${option#*=} ;;
+                       shift; pkgrefs=${option#*=} ;;
             -*)
                 echo "Unrecognized addChoice option '$option'" >&2
                 exit 1
@@ -330,7 +352,11 @@ addChoice () {
 
     # Record new node
     choice_key[$idx]="$choiceId"
+    choice_title[$idx]="${title:-${choiceId}_title}"
+    choice_description[$idx]="${description:-${choiceId}_description}"
     choice_options[$idx]=$(trim "${choiceOptions}") # Removing leading and trailing whitespace(s)
+    choice_selected[$idx]=$(trim "${choiceSelected}") # Removing leading and trailing whitespace(s)
+    choice_force_selected[$idx]=$(trim "${choiceForceSelected}") # Removing leading and trailing whitespace(s)
     choice_parent_group_index[$idx]=$idx_group
     choice_pkgrefs[$idx]="$pkgrefs"
 
@@ -340,6 +366,8 @@ addChoice () {
 # Add a group choice
 addGroupChoices() {
     # Optional arguments:
+    #    --title=<title> : Force the title
+    #    --description=<description> : Force the description
     #    --parent=<parent> : parent group choice id
     #    --exclusive_zero_or_one_choice : only zero or one choice can be selected in the group
     #    --exclusive_one_choice : only one choice can be selected in the group
@@ -347,18 +375,35 @@ addGroupChoices() {
     # $1 Choice Id
 
     local option
+    local title=""
+    local description=""
     local groupChoice=""
     local exclusive_function=""
+    local choiceOptions=
 
     for option in "${@}";do
         case "$option" in
+            --title=*)
+                       shift; title="${option#*=}" ;;
+            --description=*)
+                       shift; description="${option#*=}" ;;
             --exclusive_zero_or_one_choice)
                        shift; exclusive_function="exclusive_zero_or_one_choice" ;;
             --exclusive_one_choice)
                        shift; exclusive_function="exclusive_one_choice" ;;
             --parent=*)
                        shift; groupChoice=${option#*=} ;;
-            -*)
+            --start-selected=*)
+                       shift; choiceOptions+=("--start-selected=${option#*=}") ;;
+            --start-enabled=*)
+                       shift; choiceOptions+=("--start-enabled=${option#*=}") ;;
+            --start-visible=*)
+                       shift; choiceOptions+=("--start-visible=${option#*=}") ;;
+            --enabled=*)
+                       shift; choiceOptions+=("--enabled=${option#*=}") ;;
+            --selected=*)
+                       shift; choiceOptions+=("--selected=${option#*=}") ;;
+           -*)
                 echo "Unrecognized addGroupChoices option '$option'" >&2
                 exit 1
                 ;;
@@ -371,7 +416,7 @@ addGroupChoices() {
         exit 1
     fi
 
-    addChoice --group="$groupChoice" "${1}"
+    addChoice --group="$groupChoice" --title="$title" --description="$description" ${choiceOptions[*]} "${1}"
     local idx=$? # index of the new created choice
 
     choice_group_exclusive[$idx]="$exclusive_function"
@@ -390,6 +435,8 @@ exclusive_one_choice () {
     done
     if [[ -n "$result" ]];then
         echo "!(${result%$separator})"
+    else
+        echo "choices['$myChoice'].selected"
     fi
 }
 
@@ -398,6 +445,7 @@ exclusive_zero_or_one_choice () {
     # $2..$n Others choice(s) (ie: "test2" "test3"). Current can or can't be in the others choices
     local myChoice="${1}"
     local result;
+    local exclusive_one_choice_code="$(exclusive_one_choice ${@})"
     echo "(my.choice.selected &amp;&amp; $(exclusive_one_choice ${@}))"
 }
 
@@ -563,6 +611,87 @@ main ()
 # End build SkipActivePartition choice package
 
 # End build Chameleon package
+
+# build Patches packages
+
+    addGroupChoices "Patches"
+
+    # ------------------------------------------------------
+    # parse Patches folder to find files of patches options.
+    # ------------------------------------------------------
+    KernelSettingsFolder="${PKGROOT}/Patches"
+
+    while IFS= read -r -d '' OptionsFile; do
+
+        # Take filename and strip .txt from end and path from front
+        builtKPsList=${OptionsFile%.txt}
+        builtKPsList=${builtKPsList##*/}
+        packagesidentity="${chameleon_package_identity}.kernel.$builtKPsList"
+
+        echo "================= $builtKPsList ================="
+
+        # ------------------------------------------------------
+        # Read kernel patcher option file into an array.
+        # ------------------------------------------------------
+        availableOptions=() # array to hold the list of patches options, per 'section'.
+        exclusiveFlag=""    # used to indicate list has exclusive options
+        while read textLine; do
+            # ignore lines in the file beginning with a #
+            [[ $textLine = \#* ]] && continue
+            local optionName="" key="" value=""
+            case "$textLine" in
+                Exclusive=[Tt][Rr][Uu][Ee]) exclusiveFlag="--exclusive_zero_or_one_choice" ;;
+                Exclusive=*) continue ;;
+                *@*:*=*)
+                   availableOptions[${#availableOptions[*]}]="$textLine" ;;
+                *) echo "Error: invalid line '$textLine' in file '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+        done < "$OptionsFile"
+
+        addGroupChoices  --parent="Patches" $exclusiveFlag "${builtKPsList}"
+
+        # ------------------------------------------------------
+        # Loop through options in array and process each in turn
+        # ------------------------------------------------------
+        for textLine in "${availableOptions[@]}"; do
+            # split line - taking all before ':' as option name
+            # and all after ':' as key/value
+            type=$( echo "${textLine%%@*}" | tr '[:upper:]' '[:lower:]' )
+            tmp=${textLine#*@}
+            optionName=${tmp%%:*}
+            keyValue=${tmp##*:}
+            key=${keyValue%%=*}
+            value=${keyValue#*=}
+
+            # create folders required for each boot option
+            mkdir -p "${PKG_BUILD_DIR}/$optionName/Root/"
+
+            case "$type" in
+                bool) startSelected="check_kernel_bool_option('$key','$value')" ;;
+                text) startSelected="check_kernel_text_option('$key','$value')" ;;
+                list) startSelected="check_kernel_list_option('$key','$value')" ;;
+                *) echo "Error: invalid type '$type' in line '$textLine' in '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+            recordChameleonOption "$type" "$key" "$value"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/$optionName" \
+                               --subst="optionType=$type"                   \
+                               --subst="optionKey=$key"                     \
+                               --subst="optionValue=$value"                 \
+                               AddKernelOption
+            packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
+            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
+            addChoice --group="${builtKPsList}"  \
+                --start-selected="$startSelected"    \
+                --pkg-refs="$packageRefId" "${optionName}"
+        done
+
+    done < <( find "${KernelSettingsFolder}" -depth 1 -type f -name '*.txt' -print0 )
+
+# End build Patches packages
 
 if [[ "${CONFIG_MODULES}" == 'y' ]];then
 # build Modules package
@@ -1116,7 +1245,7 @@ buildpackage ()
 
         echo -e "\t[BUILD] ${packageName}"
 
-        find "${packagePath}" -name '.DS_Store' -delete
+        find "${packagePath}" \( -name '.DS_Store' -o -name '.svn' \) -print0 | xargs -0 rm -rf
         local filecount=$( find "${packagePath}/Root" | wc -l )
         if [ "${packageSize}" ]; then
             local installedsize="${packageSize}"
@@ -1203,9 +1332,13 @@ generateChoices() {
 
     for (( idx=1; idx < ${#choice_key[*]} ; idx++)); do
         local choiceId=${choice_key[$idx]}
+        local choiceTitle=${choice_title[$idx]}
+        local choiceDescription=${choice_description[$idx]}
         local choiceOptions=${choice_options[$idx]}
         local choiceParentGroupIndex=${choice_parent_group_index[$idx]}
         set +u; local group_exclusive=${choice_group_exclusive[$choiceParentGroupIndex]}; set -u
+        local selected_option="${choice_selected[$idx]}"
+        local exclusive_option=""
 
         # Create the node and standard attributes
         local choiceNode="\t<choice\n\t\tid=\"${choiceId}\"\n\t\ttitle=\"${choiceId}_title\"\n\t\tdescription=\"${choiceId}_description\""
@@ -1267,6 +1400,7 @@ makedistribution ()
 
 #   Create the Distribution file
     ditto --noextattr --noqtn "${PKGROOT}/Distribution" "${PKG_BUILD_DIR}/${packagename}/Distribution"
+    makeSubstitutions "${PKG_BUILD_DIR}/${packagename}/Distribution"
 
     local start_indent_level=2
     echo -e "\n\t<choices-outline>" >> "${PKG_BUILD_DIR}/${packagename}/Distribution"
@@ -1294,7 +1428,7 @@ makedistribution ()
         bin/po4a/po4a                                                     \
         --package-name 'Chameleon'                                        \
         --package-version "${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}"   \
-        --msgmerge-opt '--lang=$lang'                                     \
+        --msgmerge-opt '--lang=$lang --previous --width=79'               \
         --variable PODIR="po"                                             \
         --variable TEMPLATES_DIR="Resources/templates"                    \
         --variable OUTPUT_DIR="${PKG_BUILD_DIR}/${packagename}/Resources" \
@@ -1304,8 +1438,7 @@ makedistribution ()
     ditto --noextattr --noqtn "${PKGROOT}/Resources/common" "${PKG_BUILD_DIR}/${packagename}/Resources/en.lproj"
 
     # CleanUp the directory
-    find "${PKG_BUILD_DIR}/${packagename}" -name .svn -print0 | xargs -0 rm -rf
-    find "${PKG_BUILD_DIR}/${packagename}" -name '*.DS_Store' -type f -delete
+    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -depth -exec rm -rf {} \;
     find "${PKG_BUILD_DIR}/${packagename}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
 
     # Make substitutions for version, revision, stage, developers, credits, etc..
@@ -1353,3 +1486,7 @@ main
 
 # build meta package
 makedistribution
+
+#   Remove package stuff
+    rm -rf "${SYMROOT}/package"
+#   End

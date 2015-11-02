@@ -130,6 +130,17 @@ enum {
     kIOFBNotifyDisplayDimsChange = 50,
 
     kIOFBNotifyProbed           = 60,
+
+    kIOFBNotifyVRAMReady        = 70,
+
+    kIOFBNotifyWillNotify       = 80,
+    kIOFBNotifyDidNotify        = 81,
+};
+
+struct IOFramebufferNotificationNotify
+{
+	IOIndex event;
+	void *  info;
 };
 
 enum {
@@ -142,6 +153,7 @@ enum {
 
 struct StdFBShmem_t;
 class IOFramebufferUserClient;
+class IODisplay;
 
 /*! @class IOFramebuffer : public IOGraphicsDevice
     @abstract The base class for graphics devices to be made available as part of the desktop.
@@ -156,6 +168,7 @@ class IOFramebuffer : public IOGraphicsDevice
 {
     friend class IOFramebufferUserClient;
     friend class IOFramebufferSharedUserClient;
+    friend class IOFramebufferParameterHandler;
     friend class IODisplay;
 
     OSDeclareDefaultStructors(IOFramebuffer)
@@ -217,7 +230,8 @@ protected:
     unsigned int                        captured:1;
     unsigned int                        sleepConnectCheck:1;
     unsigned int                        messaged:1;
-    unsigned int                        _IOFramebuffer_reservedC:28;
+    unsigned int                        cursorEnable:1;
+    unsigned int                        _IOFramebuffer_reservedC:27;
     IOFramebuffer *                     nextDependent;
     OSSet *                             fbNotifications;
 
@@ -810,6 +824,11 @@ public:
 
     virtual IOReturn getNotificationSemaphore( IOSelect interruptType,
                                                semaphore_t * semaphore );
+
+	IOReturn setBackingFramebuffer(const IOPixelInformation * info,
+									uint32_t bufferCount,
+									void * mappedAddress[]);
+	IOReturn switchBackingFramebuffer(uint32_t bufferIndex);
 
 /*  non WL clients apis
 */
