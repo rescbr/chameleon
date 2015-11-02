@@ -1314,7 +1314,7 @@ int processBootOptions()
 	}
 
 	// Save a version of mac os we're booting.
-	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSFullVer);
 	// so copy it and trim
 	gMacOSVersion[0] = 0;
 	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") )

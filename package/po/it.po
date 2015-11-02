@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-12 19:02+0200\n"
+"POT-Creation-Date: 2015-11-02 15:03+0000\n"
 "PO-Revision-Date: 2015-05-23 13:54-0000\n"
 "Last-Translator: Gianfranco <gianfrancominischetti@gmail.com>\n"
 "Language-Team: it <it@li.org>\n"
@@ -66,7 +66,9 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr "Pacchetto compilato da: %WHOBUILD%, tradotto in Italiano da: ErmaC, scrax, Micky1979, Marchrius, Gianfranco Minischetti"
+msgstr ""
+"Pacchetto compilato da: %WHOBUILD%, tradotto in Italiano da: ErmaC, scrax, "
+"Micky1979, Marchrius, Gianfranco Minischetti"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -75,8 +77,14 @@ msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
-msgstr "Chameleon è un boot loader costruito utilizzando una combinazione di componenti che si sono evoluti dallo sviluppo dell'implementazione del falso EFI aggiunto al progetto boot-123 di Apple da parte di David Elliott."
+msgid ""
+"Chameleon is a boot loader built using a combination of components which "
+"evolved from the development of David Elliott's fake EFI implementation "
+"added to Apple's boot-132 project."
+msgstr ""
+"Chameleon è un boot loader costruito utilizzando una combinazione di "
+"componenti che si sono evoluti dallo sviluppo dell'implementazione del falso "
+"EFI aggiunto al progetto boot-123 di Apple da parte di David Elliott."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
@@ -86,17 +94,24 @@ msgstr "La versione 2 di Chameleon presenta nuove caratteristiche. Ad esempio:"
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr "- Interfaccia grafica completamente personalizzabile per dare maggiori colori al Darwin Bootloader."
+msgstr ""
+"- Interfaccia grafica completamente personalizzabile per dare maggiori "
+"colori al Darwin Bootloader."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr "- Avviare DVD retail semplicemente caricando una immagine ramdisk senza l'utilizzo di programmi aggiuntivi."
+msgid ""
+"- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr ""
+"- Avviare DVD retail semplicemente caricando una immagine ramdisk senza "
+"l'utilizzo di programmi aggiuntivi."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
-msgstr "- Ibernazione. Godetevi nel risvegliare il vostro Mac OS X con un'immagine di anteprima."
+msgstr ""
+"- Ibernazione. Godetevi nel risvegliare il vostro Mac OS X con un'immagine "
+"di anteprima."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
@@ -105,13 +120,18 @@ msgstr "- Sovrascrittura del SMBIOS per personalizzare i valori dell'SMBIOS."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr "- Sovrascrittura della tabella DSDT, potendo selezionare una ottimizzata che risolve svariate problematiche."
+msgid ""
+"- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr ""
+"- Sovrascrittura della tabella DSDT, potendo selezionare una ottimizzata che "
+"risolve svariate problematiche."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
 msgid "- Device Property Injection via device-properties string."
-msgstr "- Iniezione delle Proprità delle Periferiche con stringhe EFI in device-properties."
+msgstr ""
+"- Iniezione delle Proprità delle Periferiche con stringhe EFI in device-"
+"properties."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
@@ -121,7 +141,8 @@ msgstr "- boot0 / boot1h ibrido per dischi partizionati in MBR e GPT."
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:29
 msgid "- Automatic FSB detection code even for recent AMD CPUs."
-msgstr "- Riconoscimento automatico della frequenza anche sui recenti processori AMD."
+msgstr ""
+"- Riconoscimento automatico della frequenza anche sui recenti processori AMD."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:30
@@ -145,7 +166,8 @@ msgstr "- Rivelamento memoria adattato da memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid "- Automatic P-State &amp; C-State generation for native power management."
+msgid ""
+"- Automatic P-State &amp; C-State generation for native power management."
 msgstr "- Generazione automatica dei P-State e C-State."
 
 #. type: Content of: <html><body><p>
@@ -190,8 +212,12 @@ msgstr "leggilo"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
-msgstr "&nbspper vedere se l'installazione é avvenuta con successo e vedere le operazioni che sono state eseguite."
+msgid ""
+"&nbsp;to find out if the installation was successful and keep it for a "
+"record of what was done."
+msgstr ""
+"&nbspper vedere se l'installazione é avvenuta con successo e vedere le "
+"operazioni che sono state eseguite."
 
 # 80%
 #. type: Content of: <html><body><div><p>
@@ -442,7 +468,8 @@ msgstr ""
 "Dipendenze: nessuna"
 
 #. type: "Resolution_title"
-#: Resources/templates/Localizable.strings:81 Resources/templates/Localizable.strings:899
+#: Resources/templates/Localizable.strings:81
+#: Resources/templates/Localizable.strings:899
 #, no-wrap
 msgid "Resolution"
 msgstr "Risoluzioni"
@@ -1247,7 +1274,7 @@ msgstr "Setta il Graphics Mode a 1920x1200x32"
 #. type: "Crs1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
+msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
 msgstr ""
 
 #. type: "Crs1_description"
@@ -1259,7 +1286,7 @@ msgstr ""
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_FS"
+msgid "CRS_ALLOW_UNRESTRICTED_FS"
 msgstr ""
 
 #. type: "Crs2_description"
@@ -1271,77 +1298,78 @@ msgstr ""
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CSR_ALLOW_TASK_FOR_PID"
+msgid "CRS_ALLOW_TASK_FOR_PID"
 msgstr ""
 
 #. type: "Crs4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CSR_ALLOW_TASK_FOR_PID"
+msgid "Disable CRS_ALLOW_TASK_FOR_PID"
 msgstr ""
 
 #. type: "Crs8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CSR_ALLOW_KERNEL_DEBUGGER"
+msgid "CRS_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
 #. type: "Crs8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
+msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
 #. type: "Crs16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CSR_ALLOW_APPLE_INTERNAL"
+msgid "CRS_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
 #. type: "Crs16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
+msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
 #. type: "Crs32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
 #. type: "Crs32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
 #. type: "Crs64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
 #. type: "Crs64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
 #. type: "Crs128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
+msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "Crs128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
+msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "HDAULayoutIDx01_title"
-#: Resources/templates/Localizable.strings:324 Resources/templates/Localizable.strings:430
+#: Resources/templates/Localizable.strings:324
+#: Resources/templates/Localizable.strings:430
 #, no-wrap
 msgid "LayoutID=1"
 msgstr "LayoutID=1"
@@ -1357,7 +1385,8 @@ msgstr ""
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
-#: Resources/templates/Localizable.strings:328 Resources/templates/Localizable.strings:434
+#: Resources/templates/Localizable.strings:328
+#: Resources/templates/Localizable.strings:434
 #, no-wrap
 msgid "LayoutID=2"
 msgstr "LayoutID=2"
@@ -1373,7 +1402,8 @@ msgstr ""
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
-#: Resources/templates/Localizable.strings:332 Resources/templates/Localizable.strings:438
+#: Resources/templates/Localizable.strings:332
+#: Resources/templates/Localizable.strings:438
 #, no-wrap
 msgid "LayoutID=3"
 msgstr "LayoutID=3"
@@ -1389,7 +1419,8 @@ msgstr ""
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
-#: Resources/templates/Localizable.strings:336 Resources/templates/Localizable.strings:442
+#: Resources/templates/Localizable.strings:336
+#: Resources/templates/Localizable.strings:442
 #, no-wrap
 msgid "LayoutID=5"
 msgstr "LayoutID=5"
@@ -1405,7 +1436,8 @@ msgstr ""
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
-#: Resources/templates/Localizable.strings:340 Resources/templates/Localizable.strings:446
+#: Resources/templates/Localizable.strings:340
+#: Resources/templates/Localizable.strings:446
 #, no-wrap
 msgid "LayoutID=7"
 msgstr "LayoutID=7"
@@ -1421,7 +1453,8 @@ msgstr ""
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
-#: Resources/templates/Localizable.strings:344 Resources/templates/Localizable.strings:450
+#: Resources/templates/Localizable.strings:344
+#: Resources/templates/Localizable.strings:450
 #, no-wrap
 msgid "LayoutID=12"
 msgstr "LayoutID=12"
@@ -1437,7 +1470,8 @@ msgstr ""
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
-#: Resources/templates/Localizable.strings:348 Resources/templates/Localizable.strings:454
+#: Resources/templates/Localizable.strings:348
+#: Resources/templates/Localizable.strings:454
 #, no-wrap
 msgid "LayoutID=32"
 msgstr "LayoutID=32"
@@ -1453,7 +1487,8 @@ msgstr ""
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
-#: Resources/templates/Localizable.strings:352 Resources/templates/Localizable.strings:458
+#: Resources/templates/Localizable.strings:352
+#: Resources/templates/Localizable.strings:458
 #, no-wrap
 msgid "LayoutID=40"
 msgstr "LayoutID=40"
@@ -1469,7 +1504,8 @@ msgstr ""
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
-#: Resources/templates/Localizable.strings:356 Resources/templates/Localizable.strings:462
+#: Resources/templates/Localizable.strings:356
+#: Resources/templates/Localizable.strings:462
 #, no-wrap
 msgid "LayoutID=65"
 msgstr "LayoutID=65"
@@ -1485,7 +1521,8 @@ msgstr ""
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
-#: Resources/templates/Localizable.strings:360 Resources/templates/Localizable.strings:466
+#: Resources/templates/Localizable.strings:360
+#: Resources/templates/Localizable.strings:466
 #, no-wrap
 msgid "LayoutID=99"
 msgstr "LayoutID=99"
@@ -1501,7 +1538,8 @@ msgstr ""
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
-#: Resources/templates/Localizable.strings:364 Resources/templates/Localizable.strings:470
+#: Resources/templates/Localizable.strings:364
+#: Resources/templates/Localizable.strings:470
 #, no-wrap
 msgid "LayoutID=269"
 msgstr "LayoutID=269"
@@ -1517,7 +1555,8 @@ msgstr ""
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
-#: Resources/templates/Localizable.strings:368 Resources/templates/Localizable.strings:474
+#: Resources/templates/Localizable.strings:368
+#: Resources/templates/Localizable.strings:474
 #, no-wrap
 msgid "LayoutID=387"
 msgstr "LayoutID=387"
@@ -1533,7 +1572,8 @@ msgstr ""
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
-#: Resources/templates/Localizable.strings:372 Resources/templates/Localizable.strings:478
+#: Resources/templates/Localizable.strings:372
+#: Resources/templates/Localizable.strings:478
 #, no-wrap
 msgid "LayoutID=388"
 msgstr "LayoutID=388"
@@ -1549,7 +1589,8 @@ msgstr ""
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
-#: Resources/templates/Localizable.strings:376 Resources/templates/Localizable.strings:482
+#: Resources/templates/Localizable.strings:376
+#: Resources/templates/Localizable.strings:482
 #, no-wrap
 msgid "LayoutID=389"
 msgstr "LayoutID=389"
@@ -1565,7 +1606,8 @@ msgstr ""
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
-#: Resources/templates/Localizable.strings:380 Resources/templates/Localizable.strings:486
+#: Resources/templates/Localizable.strings:380
+#: Resources/templates/Localizable.strings:486
 #, no-wrap
 msgid "LayoutID=392"
 msgstr "LayoutID=392"
@@ -1581,7 +1623,8 @@ msgstr ""
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
-#: Resources/templates/Localizable.strings:384 Resources/templates/Localizable.strings:490
+#: Resources/templates/Localizable.strings:384
+#: Resources/templates/Localizable.strings:490
 #, no-wrap
 msgid "LayoutID=398"
 msgstr "LayoutID=398"
@@ -1597,7 +1640,8 @@ msgstr ""
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
-#: Resources/templates/Localizable.strings:388 Resources/templates/Localizable.strings:494
+#: Resources/templates/Localizable.strings:388
+#: Resources/templates/Localizable.strings:494
 #, no-wrap
 msgid "LayoutID=662"
 msgstr "LayoutID=662"
@@ -1613,7 +1657,8 @@ msgstr ""
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
-#: Resources/templates/Localizable.strings:392 Resources/templates/Localizable.strings:498
+#: Resources/templates/Localizable.strings:392
+#: Resources/templates/Localizable.strings:498
 #, no-wrap
 msgid "LayoutID=663"
 msgstr "LayoutID=663"
@@ -1629,7 +1674,8 @@ msgstr ""
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
-#: Resources/templates/Localizable.strings:396 Resources/templates/Localizable.strings:502
+#: Resources/templates/Localizable.strings:396
+#: Resources/templates/Localizable.strings:502
 #, no-wrap
 msgid "LayoutID=664"
 msgstr "LayoutID=664"
@@ -1645,7 +1691,8 @@ msgstr ""
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
-#: Resources/templates/Localizable.strings:400 Resources/templates/Localizable.strings:506
+#: Resources/templates/Localizable.strings:400
+#: Resources/templates/Localizable.strings:506
 #, no-wrap
 msgid "LayoutID=885"
 msgstr "LayoutID=885"
@@ -1661,7 +1708,8 @@ msgstr ""
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
-#: Resources/templates/Localizable.strings:404 Resources/templates/Localizable.strings:510
+#: Resources/templates/Localizable.strings:404
+#: Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "LayoutID=887"
 msgstr "LayoutID=887"
@@ -1677,7 +1725,8 @@ msgstr ""
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
-#: Resources/templates/Localizable.strings:408 Resources/templates/Localizable.strings:514
+#: Resources/templates/Localizable.strings:408
+#: Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "LayoutID=888"
 msgstr "LayoutID=888"
@@ -1693,7 +1742,8 @@ msgstr ""
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
-#: Resources/templates/Localizable.strings:412 Resources/templates/Localizable.strings:518
+#: Resources/templates/Localizable.strings:412
+#: Resources/templates/Localizable.strings:518
 #, no-wrap
 msgid "LayoutID=889"
 msgstr "LayoutID=889"
@@ -1709,7 +1759,8 @@ msgstr ""
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
-#: Resources/templates/Localizable.strings:416 Resources/templates/Localizable.strings:522
+#: Resources/templates/Localizable.strings:416
+#: Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "LayoutID=892"
 msgstr "LayoutID=892"
@@ -1725,7 +1776,8 @@ msgstr ""
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
-#: Resources/templates/Localizable.strings:420 Resources/templates/Localizable.strings:526
+#: Resources/templates/Localizable.strings:420
+#: Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "LayoutID=898"
 msgstr "LayoutID=898"
@@ -1741,7 +1793,8 @@ msgstr ""
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
-#: Resources/templates/Localizable.strings:424 Resources/templates/Localizable.strings:530
+#: Resources/templates/Localizable.strings:424
+#: Resources/templates/Localizable.strings:530
 #, no-wrap
 msgid "LayoutID=1981"
 msgstr "LayoutID=1981"
@@ -3565,34 +3618,60 @@ msgstr ""
 #~ msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 5000."
 
 #~ msgid "Set 0000260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-#~ msgstr "Imposta l'AAPL,ig-platform-id a 0000260c per schede grafiche Intel HD5000 (Mobile)."
+#~ msgstr ""
+#~ "Imposta l'AAPL,ig-platform-id a 0000260c per schede grafiche Intel HD5000 "
+#~ "(Mobile)."
 
 #~ msgid "Install Type"
 #~ msgstr "Tipo di installazione"
 
-#~ msgid "Choose to perform a new installation or upgrade an existing installation."
-#~ msgstr "Scegli se fare una nuova installazione o aggiornare una già esistente."
+#~ msgid ""
+#~ "Choose to perform a new installation or upgrade an existing installation."
+#~ msgstr ""
+#~ "Scegli se fare una nuova installazione o aggiornare una già esistente."
 
 #~ msgid "New Installation"
 #~ msgstr "Nuova Installazione"
 
-#~ msgid "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader."
-#~ msgstr "Salva una cartella /Extra, se trovata sulla partizione destinazione. Una nuova verrà creata se scegliete una opzione dall'installer, oltre che al Bootloader."
+#~ msgid ""
+#~ "Backup an existing /Extra folder, if found on the target partition. A new "
+#~ "one will be created if any options are chosen from the installer, other "
+#~ "than the Bootloader."
+#~ msgstr ""
+#~ "Salva una cartella /Extra, se trovata sulla partizione destinazione. Una "
+#~ "nuova verrà creata se scegliete una opzione dall'installer, oltre che al "
+#~ "Bootloader."
 
 #~ msgid "Upgrade"
 #~ msgstr "Aggiornamento"
 
-#~ msgid "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up."
-#~ msgstr "Fonde una cartella /Extra esistente, se trovata sulla partizione destinazione, con qualsiasi opzione scelta nell'installer, oltre al Bootloader."
+#~ msgid ""
+#~ "Merge an existing /Extra folder, if found on the target, with any options "
+#~ "chosen from the installer, other than the Bootloader. The original /Extra "
+#~ "folder will be backed up."
+#~ msgstr ""
+#~ "Fonde una cartella /Extra esistente, se trovata sulla partizione "
+#~ "destinazione, con qualsiasi opzione scelta nell'installer, oltre al "
+#~ "Bootloader."
 
 #~ msgid "EFI"
 #~ msgstr "Partizione EFI"
 
-#~ msgid "Install Chameleon's files to the normally hidden EFI system partition using either boot0 or boot0md depending on your system and without destroying any existing Windows installation if you have one."
-#~ msgstr "Installa Chameleon nella partizione EFI (Normalmente nascosta), usando boot0 o boot0md dipende dal vostro sistema e senza compromettere pre-esistenti installazioni di Windows(Se voi ne possedete una)."
+#~ msgid ""
+#~ "Install Chameleon's files to the normally hidden EFI system partition "
+#~ "using either boot0 or boot0md depending on your system and without "
+#~ "destroying any existing Windows installation if you have one."
+#~ msgstr ""
+#~ "Installa Chameleon nella partizione EFI (Normalmente nascosta), usando "
+#~ "boot0 o boot0md dipende dal vostro sistema e senza compromettere pre-"
+#~ "esistenti installazioni di Windows(Se voi ne possedete una)."
 
-#~ msgid "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default."
-#~ msgstr "Questo modulo permette all'utente di definire la mappatura della propria tastiera."
+#~ msgid ""
+#~ "This module permits the user to define the keyboard key mappings. This "
+#~ "module and associated keymaps are installed by default."
+#~ msgstr ""
+#~ "Questo modulo permette all'utente di definire la mappatura della propria "
+#~ "tastiera."
 
 #~ msgid "Utilities"
 #~ msgstr "Utilitá"
@@ -3607,7 +3686,9 @@ msgstr ""
 #~ msgstr "Installa il Pannello preferenze di Chameleon."
 
 #~ msgid "Copies an example smbios.plist in /Extra/Configuration."
-#~ msgstr "Copia o sovrascrive il file smbios.plist in /Extra/Configuration con uno di esempio"
+#~ msgstr ""
+#~ "Copia o sovrascrive il file smbios.plist in /Extra/Configuration con uno "
+#~ "di esempio"
 
 #~ msgid "Documentation"
 #~ msgstr "Documentazione"

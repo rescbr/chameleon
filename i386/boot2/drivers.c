@@ -198,6 +198,8 @@ long LoadDrivers( char *dirSpec )
 			strcpy(dirSpecExtra, "rd(0,0)/Extra/");
 			FileLoadDrivers(dirSpecExtra, 0);
 		}
+		verbose("Attempting to loading drivers from \"Extra\" repository:\n");
+
 
 		// Next try to load Extra extensions from the selected root partition.
 		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
@@ -250,13 +252,18 @@ long LoadDrivers( char *dirSpec )
 			}
 			else
 			{
-				if ( MAVERICKS || YOSEMITE || ELCAPITAN ) // issue 352
+				verbose("Attempting to loading drivers from standard repositories:\n");
+
+				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || gMacOSVersion[4] == '1' ) )) // issue 352
 				{
-					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
+					verbose("\t- Third party extensions search path: /Library/Extensions\n");
+					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
 				}
-				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/") */
+
+				verbose("\t- Apple extensions search path: /System/Library/Extensions\n");
+				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/")  mean 4096 -16 = 4080 */
 				strcat(gExtensionsSpec, "System/Library/");
 				FileLoadDrivers(gExtensionsSpec, 0);
 			}
@@ -670,7 +677,7 @@ long LoadMatchedModules( void )
 				length = 0;
 			}
 
-			if (length != -1)
+			if ((length != -1) && executableAddr)
 			{
 //				driverModuleAddr = (void *)kLoadAddr;
 //				if (length != 0)

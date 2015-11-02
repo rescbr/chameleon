@@ -282,7 +282,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	else
 	{
 		// Leopard prelink kernel cache file
-		if ( TIGER || LEOPARD ) // OSX is 10.4 or 10.5
+		if ( MacOSVerCurrent >= MacOSVer2Int("10.4") && MacOSVerCurrent <= MacOSVer2Int("10.5") ) // OSX is 10.4 or 10.5
 		{
 			// Reset cache name.
 			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
@@ -293,7 +293,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 
 		}
 		// Snow Leopard prelink kernel cache file
-		else if ( SNOW_LEOPARD )
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.6") && MacOSVerCurrent < MacOSVer2Int("10.7") )
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
@@ -316,7 +316,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCachePath);
+				verbose("Kernel Cache file path (Mac OS X 10.6): %s\n", kernelCacheFile);
 			}
 			closedir(cacheDir);
 		}
@@ -325,7 +325,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
 			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
-			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCachePath);
+			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
 		}
 	}

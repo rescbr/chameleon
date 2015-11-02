@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-12 19:02+0200\n"
+"POT-Creation-Date: 2015-11-02 15:03+0000\n"
 "PO-Revision-Date: 2015-02-13 18:21-0000\n"
 "Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: de <de@li.org>\n"
@@ -1277,7 +1277,7 @@ msgstr "Setzt die Bildschirmauflösung auf 1920x1200x32"
 #. type: "Crs1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
+msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
 msgstr ""
 
 #. type: "Crs1_description"
@@ -1289,7 +1289,7 @@ msgstr ""
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_FS"
+msgid "CRS_ALLOW_UNRESTRICTED_FS"
 msgstr ""
 
 #. type: "Crs2_description"
@@ -1301,73 +1301,73 @@ msgstr ""
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CSR_ALLOW_TASK_FOR_PID"
+msgid "CRS_ALLOW_TASK_FOR_PID"
 msgstr ""
 
 #. type: "Crs4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CSR_ALLOW_TASK_FOR_PID"
+msgid "Disable CRS_ALLOW_TASK_FOR_PID"
 msgstr ""
 
 #. type: "Crs8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CSR_ALLOW_KERNEL_DEBUGGER"
+msgid "CRS_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
 #. type: "Crs8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
+msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
 #. type: "Crs16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CSR_ALLOW_APPLE_INTERNAL"
+msgid "CRS_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
 #. type: "Crs16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
+msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
 #. type: "Crs32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
 #. type: "Crs32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
 #. type: "Crs64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
 #. type: "Crs64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
 #. type: "Crs128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
+msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "Crs128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
+msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "HDAULayoutIDx01_title"

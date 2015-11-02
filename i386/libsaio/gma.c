@@ -999,20 +999,20 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		/* HD Graphics */
 		case GMA_SKYLAKE_ULT_GT1:	// 1906
 		case GMA_SKYLAKE_ULT_GT15:	// 1913
-		case GMA_SKYLAKE_ULT_GT2:	// 1916 *
+		case GMA_SKYLAKE_ULT_GT2:	// 1916
 		case GMA_SKYLAKE_ULX_GT1:	// 190E
-		case GMA_SKYLAKE_ULX_GT2:	// 191E *
-		case GMA_SKYLAKE_DT_GT2:	// 1912 *
+		case GMA_SKYLAKE_ULX_GT2:	// 191E
+		case GMA_SKYLAKE_DT_GT2:	// 1912
 		case GMA_SKYLAKE_1921:		// 1921
-		case GMA_SKYLAKE_ULT_GT3_E:	// 1926 *
+		case GMA_SKYLAKE_ULT_GT3_E:	// 1926
 		case GMA_SKYLAKE_ULT_GT3:	// 1923
 		case GMA_SKYLAKE_ULT_GT3_28W:	// 1927
-		case GMA_SKYLAKE_DT_GT15:	// 1917 *
-		case GMA_SKYLAKE_DT_GT1:	// 1902 *
+		case GMA_SKYLAKE_DT_GT15:	// 1917
+		case GMA_SKYLAKE_DT_GT1:	// 1902
 		case GMA_SKYLAKE_DT_GT4:	// 1932
 		case GMA_SKYLAKE_GT4:		// 193B
 		case GMA_SKYLAKE_GT3_FE:	// 192B
-		case GMA_SKYLAKE_GT2:		// 191B *
+		case GMA_SKYLAKE_GT2:		// 191B
 		case GMA_SKYLAKE_192A:		// 192A
 		case GMA_SKYLAKE_SRW_GT4:	// 193A
 		case GMA_SKYLAKE_WS_GT2:	// 191D

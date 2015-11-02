@@ -292,7 +292,8 @@ EXTRA() {
     else
         echo "Extra folder already exist on ${choicedVolume}, copying to the Ram Disk.."
         cp -R "${choicedVolume}/Extra" "${v_mntpt}"/
-        ./clean_bootplist.pl "${v_mntpt}"
+        ./clean_bootplist.pl "${v_mntpt}" org.chameleon.Boot.plist
+        ./clean_bootplist.pl "${v_mntpt}" kernel.plist
     fi
 }
 # --------------------------------------------------------------------------------------------------------

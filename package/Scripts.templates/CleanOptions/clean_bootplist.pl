@@ -4,18 +4,22 @@ use strict;
 use YAML::Syck;
 
 our $target_volume;
-our $boot_plist_filepath;
+our $config_file;
+our $plist_filepath;
+
+
 
 our $yaml_file="@YAML_FILE@";
 
-if ($#ARGV < 0) {
-   print stderr "A target volume is needed\n";
+if ($#ARGV < 1) {
+   print stderr "A target volume and the plist file are needed\n";
 } else {
-   $target_volume=$ARGV[0];
+    $target_volume=$ARGV[0];
+    $config_file=$ARGV[1];
 }
 
-$boot_plist_filepath = "${target_volume}/Extra/org.chameleon.Boot.plist";
-if ( -f "$boot_plist_filepath" ) {
+$plist_filepath = "${target_volume}/Extra/${config_file}";
+if ( -f "$plist_filepath" ) {
     main("$yaml_file");
 }
 
@@ -27,7 +31,7 @@ sub _do_cmd {
     $value =~ s/([\s"])/\\$1/g; # Escape characters in value (space & ")
     my $plistbuddy_command="$cmd :$key $value";
 
-    open ( OUTPUT, "-|", '/usr/libexec/PlistBuddy', "-c", "$plistbuddy_command", "$boot_plist_filepath" );
+    open ( OUTPUT, "-|", '/usr/libexec/PlistBuddy', "-c", "$plistbuddy_command", "$plist_filepath" );
     my $exit_code = $?;
     chomp($out = <OUTPUT>);
     close OUTPUT;

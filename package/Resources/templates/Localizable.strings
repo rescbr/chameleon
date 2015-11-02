@@ -295,29 +295,29 @@ Dependencies: none";
 
 // ----------------------------------------------------------------------------
 
-"Crs1_title" = "CSR_ALLOW_UNTRUSTED_KEXTS";
+"Crs1_title" = "CRS_ALLOW_UNTRUSTED_KEXTS";
 "Crs1_description" = "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP).";
 
-"Crs2_title" = "CSR_ALLOW_UNRESTRICTED_FS";
+"Crs2_title" = "CRS_ALLOW_UNRESTRICTED_FS";
 "Crs2_description" = "Filesystem protection: Important system files are protected and cannot be modified.";
 
-"Crs4_title" = "CSR_ALLOW_TASK_FOR_PID";
-"Crs4_description" = "Disable CSR_ALLOW_TASK_FOR_PID";
+"Crs4_title" = "CRS_ALLOW_TASK_FOR_PID";
+"Crs4_description" = "Disable CRS_ALLOW_TASK_FOR_PID";
 
-"Crs8_title" = "CSR_ALLOW_KERNEL_DEBUGGER";
-"Crs8_description" = "Disable CSR_ALLOW_KERNEL_DEBUGGER";
+"Crs8_title" = "CRS_ALLOW_KERNEL_DEBUGGER";
+"Crs8_description" = "Disable CRS_ALLOW_KERNEL_DEBUGGER";
 
-"Crs16_title" = "CSR_ALLOW_APPLE_INTERNAL";
-"Crs16_description" = "Disable CSR_ALLOW_APPLE_INTERNAL";
+"Crs16_title" = "CRS_ALLOW_APPLE_INTERNAL";
+"Crs16_description" = "Disable CRS_ALLOW_APPLE_INTERNAL";
 
-"Crs32_title" = "CSR_ALLOW_UNRESTRICTED_DTRACE";
-"Crs32_description" = "Disable CSR_ALLOW_UNRESTRICTED_DTRACE";
+"Crs32_title" = "CRS_ALLOW_UNRESTRICTED_DTRACE";
+"Crs32_description" = "Disable CRS_ALLOW_UNRESTRICTED_DTRACE";
 
-"Crs64_title" = "CSR_ALLOW_UNRESTRICTED_NVRAM";
-"Crs64_description" = "Disable CSR_ALLOW_UNRESTRICTED_NVRAM";
+"Crs64_title" = "CRS_ALLOW_UNRESTRICTED_NVRAM";
+"Crs64_description" = "Disable CRS_ALLOW_UNRESTRICTED_NVRAM";
 
-"Crs128_title" = "CSR_ALLOW_DEVICE_CONFIGURATION";
-"Crs128_description" = "Disable CSR_ALLOW_DEVICE_CONFIGURATION";
+"Crs128_title" = "CRS_ALLOW_DEVICE_CONFIGURATION";
+"Crs128_description" = "Disable CRS_ALLOW_DEVICE_CONFIGURATION";
 
 // ----------------------------------------------------------------------------
 

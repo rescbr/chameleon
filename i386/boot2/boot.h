@@ -62,6 +62,7 @@
 /*
  * Keys used in system Boot.plist
  */
+
 #define kGraphicsModeKey		"Graphics Mode"
 #define kTextModeKey			"Text Mode"
 #define kQuietBootKey			"Quiet Boot"
@@ -169,9 +170,10 @@
 #define kEnableHDMIAudio		"EnableHDMIAudio"		/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
+#define kEnableHiDPI			"EnableHiDPI"			// enable High resolution display (aka Retina)
 
 /* ErmaC: added these keys */
-#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c*/
+#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
 #define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
@@ -184,6 +186,9 @@
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
 #define kHDAULayoutID			"HDAULayoutID"			/* hda.c */
+
+/* Pike R. Alpha: added this key */
+#define kBlackMode			"BlackMode"
 
 /* Karas: added this key */
 #define kMemFullInfo			"ForceFullMemInfo"		/* smbios.c */

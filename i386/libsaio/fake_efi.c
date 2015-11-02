@@ -104,10 +104,9 @@ EFI_UINT32 getCPUTick(void)
 
 /* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','3', 0};
-// Bungo
-//static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
+
 static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
-// Bungo
+
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
  */
@@ -651,7 +650,7 @@ void setupBoardId()
 	{
 		stop("Couldn't get root '/' node");
 	}
-	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig); // SMboardserial
 	if (boardid)
 	{
 		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
