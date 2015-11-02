@@ -8,17 +8,17 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-02 15:03+0000\n"
-"PO-Revision-Date: 2015-02-13 18:35-0000\n"
+"PO-Revision-Date: 2015-11-02 15:28+0000\n"
 "Last-Translator: SergeNu <konovalov_serj@mail.ru>\n"
 "Language-Team: ru <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%"
+"10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1414012891.0\n"
+"X-POOTLE-MTIME: 1446478127.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -290,10 +290,10 @@ msgstr "Полезно, если необходимо установить то�
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
-msgstr "Пакет начального загрузчика Chameleon"
+msgstr "Этапы загрузчика"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -304,12 +304,19 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"Здесь вы можете полностью или частично пропустить установку загрузчика.\n"
+"Это может быть полезно, если вы хотите записать файлы в Extra, или "
+"пропустить какой-либо этап (0,1 и активация целевого раздела).\n"
+"Пропуск всех этапов разрешает вам оставить все, как уже рабочие загрузочные "
+"сектора, особенно полезно с 4k дисками.\n"
+"загрузка всегда копируется на целевой раздел когда вы пропускаете один или "
+"несколько этапов."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "Пропустить Этап 0"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -318,12 +325,14 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Отменяет копирование этапа 0 на целевой диск.\n"
+"Этап 2 всегда копируется\\перемещается."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "Пропустить Этап 1"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -332,12 +341,14 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Отменяет копирование этапа 1 на раздел бутсектора.\n"
+"Этап 2 всегда копируется/перемещается."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "Пропустить Активацию"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -347,33 +358,42 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Предотвращает активацию целевого раздела.\n"
+"На некоторых старых материнских платах плохая реализация GPT в биосе, и они "
+"не могут определить разделы, помеченные как Guid Partition Table.\n"
+"Этап 2 всегда копируется/перемещается."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;был записан в корневой каталог выбранного Вами раздела."
+msgstr "Установить Chameleon в указанный раздел."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Установка файлов Chameleon в корень выбранного раздела используя boot0 или boot0md и основываясь на вашей системе, без уничтожения любой установленной копии Windows, если таковая имеется."
+msgstr ""
+"Установка файлов Chameleon в корень выбранного раздела используя boot0, "
+"boot0md или boot0hfs основываясь на вашей системе, без уничтожения любой "
+"установленной копии Windows, если таковая имеется."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "Установить Chameleon в раздел ESP"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "Установка файлов Chameleon в корень выбранного раздела используя boot0 или boot0md и основываясь на вашей системе, без уничтожения любой установленной копии Windows, если таковая имеется."
+msgstr ""
+"Установка файлов Chameleon в ESP (системный раздел EFI) целевого тома "
+"используя boot0, boot0md или boot0hfs основываясь на вашей системе."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -641,39 +661,41 @@ msgstr "Использовать стандартное 'серое' изобр�
 #: Resources/templates/Localizable.strings:137
 #, no-wrap
 msgid "RebootOnPanic=No"
-msgstr ""
+msgstr "RebootOnPanic=No"
 
 #. type: "RebootOnPanic_description"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr ""
+msgstr "Перезагрузка при панике ядра."
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "EnableHDMIAudio=Yes"
 msgid "EnableHiDPI=Yes"
-msgstr "EnableHDMIAudio=Yes"
+msgstr "EnableHiDPI=Yes"
 
 #. type: "EnableHiDPI_description"
 #: Resources/templates/Localizable.strings:141
 #, no-wrap
 msgid "Enable High resolution display (aka retina)."
-msgstr ""
+msgstr "Включить режим высокого разрешения (aka retina)."
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Wake=Yes"
 msgid "BlackMode=Yes"
-msgstr "Wake=Yes"
+msgstr "BlackMode=Yes"
 
 #. type: "BlackMode_description"
 #: Resources/templates/Localizable.strings:144
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
 msgstr ""
+"Новый режим BlackMode загружает белый логотип Apple, вместо серого логотипа "
+"Apple на черном фоне."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -734,6 +756,8 @@ msgstr "PrivateData=No"
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
 msgstr ""
+"Показать скрытую информацию (серийный номер) в логе bdmesg (по умолчанию "
+"включено)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:163
@@ -745,7 +769,7 @@ msgstr "USBBusFix=Yes"
 #: Resources/templates/Localizable.strings:164
 #, no-wrap
 msgid "Enable the XHCI, EHCI and UHCI fixes (disabled by default)."
-msgstr ""
+msgstr "Включить фиксы XHCI, EHCI и UHCI (отключено по умолчанию)."
 
 #. type: "USBLegacyOff_title"
 #: Resources/templates/Localizable.strings:166
@@ -757,7 +781,7 @@ msgstr "USBLegacyOff=Yes"
 #: Resources/templates/Localizable.strings:167
 #, no-wrap
 msgid "Force USB Legacy off for XHCI and EHCI (disabled by default)."
-msgstr ""
+msgstr "Отключить USB Legacy для XHCI и EHCI (отключено по умолчанию)."
 
 #. type: "XHCILegacyOff_title"
 #: Resources/templates/Localizable.strings:169
@@ -769,7 +793,7 @@ msgstr "XHCILegacyOff=Yes"
 #: Resources/templates/Localizable.strings:170
 #, no-wrap
 msgid "Force USB Legacy off for XHCI (disabled by default)."
-msgstr ""
+msgstr "Отключить USB Legacy для XHCI (отключено по умолчанию)."
 
 #. type: "UHCIreset_title"
 #: Resources/templates/Localizable.strings:172
@@ -2409,36 +2433,36 @@ msgstr "Установить 00002b16 в качестве Intel Broadwell (Mobil
 
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:645
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "00002216"
-msgstr "00002604"
+msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:646
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 00002216 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx07_title"
 #: Resources/templates/Localizable.strings:648
 #, no-wrap
 msgid "01000e16"
-msgstr ""
+msgstr "01000e16"
 
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:649
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 01000e16 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx08_title"
 #: Resources/templates/Localizable.strings:651
 #, no-wrap
 msgid "01001e16"
-msgstr ""
+msgstr "01001e16"
 
 #. type: "IntelBroadwellx08_description"
 #: Resources/templates/Localizable.strings:652
@@ -2502,65 +2526,69 @@ msgstr "02002b16"
 
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:667
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 02001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 02002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:669
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0300220d"
 msgid "03001216"
-msgstr "0300220d"
+msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:670
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 03001216 в качестве Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx15_title"
 #: Resources/templates/Localizable.strings:672
 #, no-wrap
 msgid "04002b16"
-msgstr ""
+msgstr "04002b16"
 
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:673
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 04002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:675
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "04002616"
-msgstr "00002604"
+msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:676
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 04002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:678
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0500260a"
 msgid "05002616"
-msgstr "0500260a"
+msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:679
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 0500260a в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 05002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:681
@@ -2861,6 +2889,10 @@ msgstr "UseIntelHDMI=Yes"
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
 msgstr ""
+"Если \"Да\", hda-gfx=onboard-1 будет инжектировано в устройства GFX0 и HDEF. "
+"Также, если присуствует устройство HDMI от ATI или Nvidia, они будут "
+"назначены в onboard-2. Если \"Нет\", тогда устройства от ATI или Nvidia "
+"получат onboard-1, также как и устройство HDAU, если имеется."
 
 #. type: "UseAtiROM_title"
 #: Resources/templates/Localizable.strings:756
@@ -2974,13 +3006,15 @@ msgstr "Использовать классическое название Nvidi
 #: Resources/templates/Localizable.strings:783
 #, no-wrap
 msgid "NvidiaSingle=No"
-msgstr ""
+msgstr "NvidiaSingle=No"
 
 #. type: "NvidiaSingle_description"
 #: Resources/templates/Localizable.strings:784
 #, no-wrap
 msgid "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default)."
 msgstr ""
+"Если у вас две карты Nvidia и вы хотите инжектировать только первую, тогда "
+"установите данный параметр (включен по умолчанию)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:790
@@ -3105,13 +3139,17 @@ msgstr "В версиях Yosemite для разработчиков, непод
 #: Resources/templates/Localizable.strings:822
 #, no-wrap
 msgid "rootless=0"
-msgstr ""
+msgstr "rootless=0"
 
 #. type: "rootless0_description"
 #: Resources/templates/Localizable.strings:823
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
 msgstr ""
+"Rootless - новая возможность представленная в OS X 10.11 (El Capitan). Она "
+"не позволяет модифицировать системные файлы. Чтобы обойти это ограничение, "
+"эту обязательную возможность можно отключить, добавив флаг 'rootless=0' "
+"('rootless=1' включает её)."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:825
@@ -3437,119 +3475,123 @@ msgstr "Выберите основную раскладку клавиатур�
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kext Patcher"
 msgid "Patches"
-msgstr "Kext Patcher"
+msgstr "Патчи"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
-msgstr "Выбор параметров отображения видео."
+msgstr "Выбор параметров патча ядра."
 
 #. type: "kernelPatcher_title"
 #: Resources/templates/Localizable.strings:948
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "kernel Patcher"
-msgstr "Kernel Patcher"
+msgstr "Патч ядра"
 
 #. type: "kernelPatcher_description"
 #: Resources/templates/Localizable.strings:949
 #, no-wrap
 msgid "Select one patch for your kernel."
-msgstr ""
+msgstr "Выберите один патч для вашего ядра."
 
 #. type: "KernelBooter_kexts_title"
 #: Resources/templates/Localizable.strings:952
 #, no-wrap
 msgid "KernelBooter_kexts"
-msgstr ""
+msgstr "KernelBooter_kexts"
 
 #. type: "KernelBooter_kexts_description"
 #: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
-msgstr ""
+msgstr "Заново включить кексты /Extra/Extensions на новых OS."
 
 #. type: "KernelPm_title"
 #: Resources/templates/Localizable.strings:956
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelPm"
-msgstr "Kernel Patcher"
+msgstr "KernelPm"
 
 #. type: "KernelPm_description"
 #: Resources/templates/Localizable.strings:957
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Power Management"
 msgid "Kernel Power Management patch."
-msgstr "Управление питанием"
+msgstr "Патч ядра управления питанием."
 
 #. type: "KernelLapicError_title"
 #: Resources/templates/Localizable.strings:960
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicError"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicError"
 
 #. type: "KernelLapicError_description"
 #: Resources/templates/Localizable.strings:961
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
-msgstr ""
+msgstr "Убрать панику Local Apic Error."
 
 #. type: "KernelLapicVersion_title"
 #: Resources/templates/Localizable.strings:964
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicVersion"
 
 #. type: "KernelLapicVersion_description"
 #: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
-msgstr ""
+msgstr "Убрать панику Local Apic Version."
 
 #. type: "KernelHaswell_title"
 #: Resources/templates/Localizable.strings:968
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Flags"
 msgid "KernelHaswell"
-msgstr "Параметры, передаваемые ядру"
+msgstr "KernelHaswell"
 
 #. type: "KernelHaswell_description"
 #: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
-msgstr ""
+msgstr "Патч для поддержки Haswell \\\"E\\\" и \\\"ULT\\\" на старых OS."
 
 #. type: "KernelcpuFamily_title"
 #: Resources/templates/Localizable.strings:972
 #, no-wrap
 msgid "KernelcpuFamily"
-msgstr ""
+msgstr "KernelcpuFamily"
 
 #. type: "KernelcpuFamily_description"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr ""
+"Патч cpuid_family, что убрать паники the _cpuid_set_info _panic и _tsc_init "
+"_panic. Для неподдерживаемых CPU."
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
 #, no-wrap
 msgid "KernelSSE3"
-msgstr ""
+msgstr "KernelSSE3"
 
 #. type: "KernelSSE3_description"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr ""
+"Патч для включения дополнительных инструкций SSE3 на старых CPU для запуска "
+"новых OS."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982
