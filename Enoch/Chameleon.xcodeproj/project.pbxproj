@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXFileReference section */
@@ -1413,6 +1413,9 @@
 		B4B3DE7A15B8E914002FAA73 /* zh_CN */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = zh_CN; path = Welcome.rtfd; sourceTree = "<group>"; };
 		B4B3DE7D15B8E914002FAA73 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = zh_TW; path = Conclusion.rtfd; sourceTree = "<group>"; };
 		B4B3DE7F15B8E914002FAA73 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = zh_TW; path = Welcome.rtfd; sourceTree = "<group>"; };
+		E51057BF1BD174E0002FC0A7 /* IntelBdw.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelBdw.txt; path = OptionalSettings/IntelBdw.txt; sourceTree = "<group>"; };
+		E51057C01BD174FE002FC0A7 /* IntelSkl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelSkl.txt; path = OptionalSettings/IntelSkl.txt; sourceTree = "<group>"; };
+		E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CrsActiveConfig.txt; path = OptionalSettings/CrsActiveConfig.txt; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1604,11 +1607,14 @@
 			children = (
 				36B83692167832FC00314162 /* Audio.txt */,
 				36AB75E514BD095E005B8045 /* Control.txt */,
+				E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */,
 				36AB75E614BD095E005B8045 /* General.txt */,
-				36C9C9841739EF9900B28C9B /* IntelCapri.txt */,
-				361DAA8F177D152200CFBF68 /* IntelAzul.txt */,
-				36B836941678330900314162 /* HDEFLayout.txt */,
 				36CF786716A0DD3D00EE5DC1 /* HDAULayout.txt */,
+				36B836941678330900314162 /* HDEFLayout.txt */,
+				361DAA8F177D152200CFBF68 /* IntelAzul.txt */,
+				E51057BF1BD174E0002FC0A7 /* IntelBdw.txt */,
+				36C9C9841739EF9900B28C9B /* IntelCapri.txt */,
+				E51057C01BD174FE002FC0A7 /* IntelSkl.txt */,
 				36AB75E714BD095E005B8045 /* KernelFlags.txt */,
 				36AB75E814BD095E005B8045 /* PowerManagement.txt */,
 				36AB75E914BD095E005B8045 /* Resolution.txt */,
@@ -4105,7 +4111,7 @@
 				LastUpgradeCheck = 0620;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (

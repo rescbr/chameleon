@@ -70,6 +70,8 @@ Options useful in the org.chameleon.Boot.plist file:
                             "Boot Banner"=No will also disable this info.
   "Legacy Logo"=Yes|No    Use the legacy grey apple logo (enabled by default).
 
+  RebootOnPanic=Yes|No    (disabled by default).
+
   EnableHiDPI=Yes|No      Enable High resolution display (disabled by default).
 
   BlackMode=Yes|No        The new BlackMode loads the white Apple logo,
@@ -108,7 +110,7 @@ Options useful in the org.chameleon.Boot.plist file:
     display_1=<value>       Inject alternate value of display-cfg into NVDA,Display-B@1 (HEX).
     IntelCapriFB=<value>    For Intel Ivy Bridge, range 0-11.
     IntelAzulFB=<value>     For Intel Haswell, range 0-16.
-    IntelBdwFB=<value>      For Intel Broadwell, range 0-18.
+    IntelBdwFB=<value>      For Intel Broadwell, range 0-19.
     IntelSklFB=<value>      For Intel Skylake, range 0-12.
     InjectIntel-ig=<value>  Inject alternate value into AAPL,ig-platform-id (HEX).
 
@@ -186,6 +188,11 @@ Options useful in the org.chameleon.Boot.plist file:
   SMBIOSdefaults=No         Don't use the Default values for SMBIOS overriding
                               if smbios.plist doesn't exist, factory
                               values are kept.
+
+
+  KERNELPlist=<file>        Use an alternate kernel.plist file
+                              (default path: /Extra/Kernel.plist
+                               bt(0,0)/Extra/kernel.plist).
 
   "Scan Single Drive"       Scan the drive only where the booter got loaded from.
     =Yes|No                 Fix rescan issues when using a DVD reader in AHCI mode. 
