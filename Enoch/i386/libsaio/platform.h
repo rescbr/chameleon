@@ -54,7 +54,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_JAKETOWN		0x2D			// Sandy Bridge-E, Sandy Bridge-EP
 #define CPUID_MODEL_NEHALEM_EX		0x2E			// Nehalem-EX Xeon - Beckton
 #define CPUID_MODEL_WESTMERE_EX		0x2F			// Westmere-EX Xeon - Eagleton
-#define CPUID_MODEL_CLOVERVIEW      0x35			// Atom Family Bonnell, cloverview
+#define CPUID_MODEL_CLOVERVIEW		0x35			// Atom Family Bonnell, cloverview
 #define CPUID_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
 #define CPUID_MODEL_ATOM_3700		0x37			// Atom E3000, Z3000 Atom Silvermont **BYT
 #define CPUID_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
@@ -274,7 +274,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 // Sandy Bridge (SNB) adds support for additional MSRs
 #define MSR_PKG_C7_RESIDENCY		0x3FA
-#define MSR_CORE_C7_RESIDENCY       0x3FE
+#define MSR_CORE_C7_RESIDENCY		0x3FE
 #define MSR_PKG_C2_RESIDENCY		0x60D		// same as TSC but in C2 only
 
 #define MSR_PKG_RAPL_POWER_LIMIT	0x610		//MSR 00000610  0000-A580-0000-8960
@@ -283,7 +283,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 // Sandy Bridge IA (Core) domain MSR's.
 #define MSR_PP0_POWER_LIMIT		0x638
-#define MSR_PP0_ENERGY_STATUS	0x639
+#define MSR_PP0_ENERGY_STATUS		0x639
 #define MSR_PP0_POLICY			0x63A
 #define MSR_PP0_PERF_STATUS		0x63B
 

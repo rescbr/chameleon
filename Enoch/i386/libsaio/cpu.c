@@ -532,6 +532,14 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.NoCores		= 4;
 				p->CPU.NoThreads	= 4;
 			}
+
+			//workaround for Xeon Harpertown
+
+			if ( strstr(p->CPU.BrandString, "E5405") )
+			{
+				p->CPU.NoCores		= 4;
+				p->CPU.NoThreads	= 4;
+			}
 		}
 
 		break;
