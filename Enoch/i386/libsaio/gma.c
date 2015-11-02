@@ -138,7 +138,7 @@ uint8_t haswell_ig_vals[17][4] = {
 	//0x0d260009
 };
 
-uint8_t broadwell_ig_vals[19][4] = {
+uint8_t broadwell_ig_vals[20][4] = {
 	{ 0x00,0x00,0x06,0x16 },	// 0  - 16060000 Broadwell GT1 (Intel HD Graphics)
 	{ 0x00,0x00,0x0e,0x16 },	// 1  - 160e0000 Broadwell GT1 (Intel HD Graphics)
 	{ 0x00,0x00,0x16,0x16 },	// 2  - 16160000 Broadwell GT2 (Intel HD Graphics 5500)
@@ -157,7 +157,8 @@ uint8_t broadwell_ig_vals[19][4] = {
 	{ 0x04,0x00,0x2b,0x16 },	// 15 - 162b0004 Broadwell GT3 (MacBook Pro) (Intel Iris Graphics 6100)
 	{ 0x04,0x00,0x26,0x16 },	// 16 - 16260004 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
 	{ 0x05,0x00,0x26,0x16 },	// 17 - 16260005 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
-	{ 0x06,0x00,0x26,0x16 }		// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x06,0x00,0x26,0x16 },	// 18 - 16260006 Broadwell GT3 (MacBook Air) (Intel HD Graphics 6000)
+	{ 0x07,0x00,0x22,0x16 }		// 19 - 16260006 Broadwell GT3 (iMac Retina 21") (Intel Iris Pro 6200)
 };
 
 uint8_t skylake_ig_vals[12][4] = {
@@ -714,7 +715,8 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			devprop_add_value(device, "class-code",			ClassFix, 4);
 
 			// patch by ikunikun for i3-2125 and i5-2500K to enable HD3000.
-			if(((device_id << 16) | vendor_id) != GMA_SANDYBRIDGE_GT2) {
+			if(((device_id << 16) | vendor_id) != GMA_SANDYBRIDGE_GT2)
+			{
 				devprop_add_value(device, "vendor-id",	(uint8_t *)INTEL_VENDORID, 4);
 			}
 			else
@@ -934,7 +936,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 		case GMA_BROADWELL_BDW_161A:    // 161a
 		case GMA_BROADWELL_BDW_161D:    // 161d
 		case GMA_BROADWELL_BDW_Y_GT2:   // 161e (MacBook) Intel HD Graphics 5300
-		case GMA_BROADWELL_BDW_1622:    // 1622
+		case GMA_BROADWELL_BDW_1622:    // 1622 (iMac 21") Intel Iris Pro 6200
 		case GMA_BROADWELL_BDW_U_GT3:   // 1626 (MacBook Air) Intel HD Graphics 6000
 		case GMA_BROADWELL_BDW_162A:    // 162a
 		case GMA_BROADWELL_BDW_U_GT3_2: // 162b (MacBook Pro) Intel Iris Graphics 6100
@@ -963,19 +965,27 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 			}
 			else if (getIntForKey(kIntelBdwFB, &n_igs, &bootInfo->chameleonConfig))
 			{
-				if ((n_igs >= 0) || (n_igs <= 19))
+				if ((n_igs >= 0) || (n_igs <= 20))
 				{
 					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with value %d\n", n_igs);
 					devprop_add_value(device, "AAPL,ig-platform-id", broadwell_ig_vals[n_igs], 4);
 				}
 				else
 				{
-					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 18.\n");
+					verbose("\tAAPL,ig-platform-id was set in org.chameleon.Boot.plist with bad value please choose a number between 0 and 19.\n");
 				}
 			}
 			else
 			{
-				uint32_t ig_platform_id = 0x16160000; // set the default platform ig
+				uint32_t ig_platform_id;
+				if ( ( (device_id << 16) | vendor_id ) == GMA_BROADWELL_BDW_1622 )
+				{
+					ig_platform_id = 0x16220007; // Iris Pro 6200 (i5 5675C & i7 5775C)
+				}
+				else
+				{
+					ig_platform_id = 0x16160000; // set the default platform ig
+				}
 				devprop_add_value(device, "AAPL,ig-platform-id", (uint8_t *)&ig_platform_id, 4);
 			}
 

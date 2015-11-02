@@ -196,6 +196,7 @@ typedef enum {
 	kExmoor,
 	kBasset,
 	kGreyhound,
+	kLabrador,
 	kCfgEnd
 } config_name_t;
 
