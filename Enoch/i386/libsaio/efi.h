@@ -159,6 +159,14 @@ typedef struct {
 // ACPI 3.0 Table GUID in EFI System Table
 #define EFI_ACPI_30_TABLE_GUID EFI_ACPI_20_TABLE_GUID
 
+// The EFI variable GUID for the 'FirmwareFeatures' and friends. Also known as AppleFirmwareVariableGuid in other sources.
+#define APPLE_FIRMWARE_VARIABLE_GUID \
+    {0x4D1EDE05, 0x38C7, 0x4A6A, {0x9C, 0xC6, 0x4B, 0xCC, 0xA8, 0xB3, 0x8C, 0x14 } }
+
+// The EFI variable GUID for the 'boot-args' variable and others. Also known as AppleNVRAMVariableGuid in other sources.
+#define APPLE_NVRAM_VARIABLE_GUID \
+    {0x7C436110, 0xAB2A, 0x4BBB, {0xA8, 0x80, 0xFE, 0x41, 0x99, 0x5C, 0x9F, 0x82 } }
+
 typedef union {
   EFI_GUID  Guid;
   EFI_UINT8 Raw[16];

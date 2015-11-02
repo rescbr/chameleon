@@ -150,8 +150,8 @@ void finalizeBootStruct(void)
 	void *addr;
 	int i;
 
-	EfiMemoryRange *memoryMap	= NULL;
-	MemoryRange *range		= NULL;
+	EfiMemoryRange	*memoryMap	= NULL;
+	MemoryRange	*range		= NULL;
 	int memoryMapCount = bootInfo->memoryMapCount;
 
 	if (memoryMapCount == 0)

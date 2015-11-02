@@ -135,6 +135,7 @@ typedef struct PrivateBootInfo {
 	config_file_t    smbiosConfig;		// smbios.plist
 	config_file_t    helperConfig;		// boot helper partition's boot.plist
 	config_file_t    ramdiskConfig;		// RAMDisk.plist
+	config_file_t    kernelConfig;		// kernel.plist
 
 	bool             memDetect;
 } PrivateBootInfo_t;

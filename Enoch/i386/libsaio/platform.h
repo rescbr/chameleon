@@ -65,16 +65,19 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 //#define CPUID_MODEL_HASWELL_H		0x??			// Haswell H
 #define CPUID_MODEL_HASWELL_ULT		0x45			// Haswell ULT, 4th gen Core, Xeon E3-12xx v3 C8/C9/C10
 #define CPUID_MODEL_HASWELL_ULX		0x46			// Crystal Well, 4th gen Core, Xeon E3-12xx v3
-#define CPUID_MODEL_BROADWELL_HQ	0x47            // Broadwell BDW
+#define CPUID_MODEL_BROADWELL_HQ	0x47			// Broadwell BDW
 #define CPUID_MODEL_MERRIFIELD		0x4A			// Future Atom E3000, Z3000 silvermont / atom (Marrifield)
-#define CPUID_MODEL_BRASWELL    0x4C            // Atom (Braswell)
+#define CPUID_MODEL_BRASWELL		0x4C			// Atom (Braswell)
 #define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000 **AVN
 #define CPUID_MODEL_SKYLAKE		0x4E			// Future Core **SKL
 #define CPUID_MODEL_BRODWELL_SVR	0x4F			// Broadwell Server **BDX
 #define CPUID_MODEL_BRODWELL_MSVR	0x56			// Broadwell Micro Server, Future Xeon **BDX-DE
+//#define CPUID_MODEL_KNIGHT		0x57
 #define CPUID_MODEL_ANNIDALE		0x5A			// Silvermont, Future Atom E3000, Z3000 (Annidale)
-#define CPUID_MODEL_VALLEYVIEW      0x5D			// Silvermont, Future Atom E3000, Z3000
-#define CPUID_MODEL_SKYLAKE_S     0x5E          // Skylake **SKL
+//#define CPUID_MODEL_GOLDMONT		0x5C
+#define CPUID_MODEL_VALLEYVIEW		0x5D			// Silvermont, Future Atom E3000, Z3000
+#define CPUID_MODEL_SKYLAKE_S		0x5E			// Skylake **SKL
+//#define CPUID_MODEL_CANNONLAKE	0x66
 
 /* CPUID Vendor */
 #define	CPUID_VID_INTEL			"GenuineIntel"
