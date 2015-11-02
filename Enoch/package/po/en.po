@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
-"PO-Revision-Date: 2015-10-16 19:45+0100\n"
+"POT-Creation-Date: 2015-07-12 19:02+0200\n"
+"PO-Revision-Date: 2015-11-02 15:30+0000\n"
 "Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: en <en@li.org>\n"
 "Language: en\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1388319263.0\n"
+"X-POOTLE-MTIME: 1446478230.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -2646,17 +2646,17 @@ msgstr "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002216"
 msgid "07002216"
-msgstr "00002216"
+msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
+msgstr "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex00_title"
 #: Resources/templates/Localizable.strings:689
@@ -3332,7 +3332,7 @@ msgstr "CrsActiveConfig"
 
 #. type: "CrsActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "System Integrity Protection."
 msgid "System Integrity Protection (SIP)."
 msgstr "System Integrity Protection (SIP)."

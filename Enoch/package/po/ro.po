@@ -7,16 +7,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
-"PO-Revision-Date: 2015-02-13 18:35-0000\n"
-"Last-Translator: arsradu <arsradu@yahoo.com>\n"
+"POT-Creation-Date: 2015-11-02 15:03+0000\n"
+"PO-Revision-Date: 2015-11-02 15:22+0000\n"
+"Last-Translator: arsradu <arsradu@gmail.com>\n"
 "Language-Team: ro <ro@li.org>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1368280430.0\n"
+"X-POOTLE-MTIME: 1446477770.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -3518,17 +3520,17 @@ msgstr "Selectati o limba a tastaturii, aceasta va instala si modulul pentru div
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kext Patcher"
 msgid "Patches"
-msgstr "Kext Patcher"
+msgstr "Patch-uri"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
-msgstr "O selectie de optiuni care au de aface cu functionarea video."
+msgstr "O selectie de optiuni pentru a petici kernel-ul."
 
 #. type: "kernelPatcher_title"
 #: Resources/templates/Localizable.strings:948
