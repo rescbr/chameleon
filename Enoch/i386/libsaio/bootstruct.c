@@ -157,11 +157,17 @@ void finalizeBootStruct(void)
 	if (memoryMapCount == 0)
 	{
 		// XXX could make a two-part map here
-		stop("Unable to convert memory map into proper format\n");
+		stop("No memory map found!\n");
+		return;
 	}
 
 	// convert memory map to boot_args memory map
 	memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
+	if (memoryMap == NULL)
+	{
+		stop("Unable to allocate kernel space for the memory map!\n");
+		return;
+	}
 
 	bootArgs->MemoryMap			= (uint32_t)memoryMap;
 	bootArgs->MemoryMapSize			= sizeof(EfiMemoryRange) * memoryMapCount;
@@ -171,6 +177,12 @@ void finalizeBootStruct(void)
 	for (i = 0; i < memoryMapCount; i++, memoryMap++)
 	{
 		range = &bootInfo->memoryMap[i];
+
+		if (!range || !memoryMap)
+		{
+			stop("Error while computing kernel memory map\n");
+			return;
+		}
 
 		switch(range->type)
 		{
@@ -211,6 +223,7 @@ void finalizeBootStruct(void)
 	if (addr == 0)
 	{
 		stop("Couldn't allocate device tree\n");
+		return;
 	}
 
 	DT__FlattenDeviceTree((void **)&addr, &size);

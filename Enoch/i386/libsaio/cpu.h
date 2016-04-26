@@ -93,6 +93,47 @@ typedef struct mach_timebase_info	mach_timebase_info_data_t;
 #define CALIBRATE_TIME_MSEC	30		/* 30 msecs */
 #define CALIBRATE_LATCH		((CLKNUM * CALIBRATE_TIME_MSEC + 1000/2)/1000)
 
+#define MSR_AMD_INT_PENDING_CMP_HALT 0xC0010055
+#define AMD_ACTONCMPHALT_SHIFT 27
+#define AMD_ACTONCMPHALT_MASK 3
+
+/*
+ * Control register 0
+ */
+
+typedef struct _cr0 {
+    unsigned int	pe	:1,
+    			mp	:1,
+			em	:1,
+			ts	:1,
+				:1,
+			ne	:1,
+				:10,
+			wp	:1,
+				:1,
+			am	:1,
+				:10,
+			nw	:1,
+			cd	:1,
+			pg	:1;
+} cr0_t;
+
+/*
+ * Debugging register 6
+ */
+
+typedef struct _dr6 {
+    unsigned int	b0	:1,
+    			b1	:1,
+			b2	:1,
+			b3	:1,
+				:9,
+			bd	:1,
+			bs	:1,
+			bt	:1,
+				:16;
+} dr6_t;
+
 static inline uint64_t rdtsc64(void)
 {
 	uint64_t ret;

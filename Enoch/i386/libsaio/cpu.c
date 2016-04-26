@@ -250,6 +250,27 @@ static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
 	return(rtc_cyc_per_sec);
 }
 
+// Bronya C1E fix
+void post_startup_cpu_fixups(void)
+{
+	/*
+	 * Some AMD processors support C1E state. Entering this state will
+	 * cause the local APIC timer to stop, which we can't deal with at
+	 * this time.
+	 */
+
+	uint64_t reg;
+	verbose("\tLooking to disable C1E if is already enabled by the BIOS:\n");
+	reg = rdmsr64(MSR_AMD_INT_PENDING_CMP_HALT);
+	/* Disable C1E state if it is enabled by the BIOS */
+	if ((reg >> AMD_ACTONCMPHALT_SHIFT) & AMD_ACTONCMPHALT_MASK)
+	{
+		reg &= ~(AMD_ACTONCMPHALT_MASK << AMD_ACTONCMPHALT_SHIFT);
+		wrmsr64(MSR_AMD_INT_PENDING_CMP_HALT, reg);
+		verbose("\tC1E disabled!\n");
+	}
+}
+
 /*
  * Calculates the FSB and CPU frequencies using specific MSRs for each CPU
  * - multi. is read from a specific MSR. In the case of Intel, there is:
@@ -478,9 +499,9 @@ void scan_cpu(PlatformInfo_t *p)
 
 			switch (p->CPU.Model)
 			{
-				case CPUID_MODEL_NEHALEM:
-				case CPUID_MODEL_FIELDS:
-				case CPUID_MODEL_CLARKDALE:
+				case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+				case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+				case CPUID_MODEL_CLARKDALE: // Intel Core i3, i5, i7 LGA1156 (32nm)
 				case CPUID_MODEL_NEHALEM_EX:
 				case CPUID_MODEL_JAKETOWN:
 				case CPUID_MODEL_SANDYBRIDGE:
@@ -492,6 +513,7 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_HASWELL_ULT:
 				case CPUID_MODEL_HASWELL_ULX:
 				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_BRODWELL_SVR:
 				case CPUID_MODEL_SKYLAKE_S:
 				//case CPUID_MODEL_:
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
@@ -507,8 +529,12 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 					break;
 				case CPUID_MODEL_ATOM_3700:
-					p->CPU.NoCores		= 4;
-					p->CPU.NoThreads	= 4;
+				case CPUID_MODEL_ATOM:
+					p->CPU.NoCores		= 2;
+					p->CPU.NoThreads	= 2;
+					break;
+				default:
+					p->CPU.NoCores		= 0;
 					break;
 			}
 
@@ -519,23 +545,41 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 
 			// MSR is *NOT* available on the Intel Atom CPU
-			//workaround for N270. I don't know why it detected wrong
+			// workaround for N270. I don't know why it detected wrong
 			if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
 			{
 				p->CPU.NoCores		= 1;
 				p->CPU.NoThreads	= 2;
 			}
 
-			//workaround for Quad
-			if ( strstr(p->CPU.BrandString, "Quad") )
+
+			// workaround for Xeon Harpertown and Yorkfield
+			if ((p->CPU.Model == CPUID_MODEL_PENRYN) &&
+				(p->CPU.NoCores	== 0))
 			{
-				p->CPU.NoCores		= 4;
-				p->CPU.NoThreads	= 4;
+				if ((strstr(p->CPU.BrandString, "X54")) ||
+					(strstr(p->CPU.BrandString, "E54")) ||
+					(strstr(p->CPU.BrandString, "W35")) ||
+					(strstr(p->CPU.BrandString, "X34")) ||
+					(strstr(p->CPU.BrandString, "X33")) ||
+					(strstr(p->CPU.BrandString, "L33")) ||
+					(strstr(p->CPU.BrandString, "X32")) ||
+					(strstr(p->CPU.BrandString, "L3426")) ||
+					(strstr(p->CPU.BrandString, "L54")))
+				{
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
+				} else if (strstr(p->CPU.BrandString, "W36")) {
+					p->CPU.NoCores		= 6;
+					p->CPU.NoThreads	= 6;
+				} else { //other Penryn and Wolfdale
+					p->CPU.NoCores		= 0;
+					p->CPU.NoThreads	= 0;
+				}
 			}
 
-			//workaround for Xeon Harpertown
-
-			if ( strstr(p->CPU.BrandString, "E5405") )
+			// workaround for Quad
+			if ( strstr(p->CPU.BrandString, "Quad") )
 			{
 				p->CPU.NoCores		= 4;
 				p->CPU.NoThreads	= 4;
@@ -546,7 +590,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 		case CPUID_VENDOR_AMD:
 		{
-
+			post_startup_cpu_fixups();
 			cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
 			threads_per_core = cores_per_package;
 

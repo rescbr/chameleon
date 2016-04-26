@@ -658,6 +658,7 @@ int loadConfigFile (const char *configFile, config_file_t *config)
  */
 int loadSystemConfig(config_file_t *config)
 {
+	// Micky1979, the order is important
 	char *dirspec[] = {
 		"/com.apple.recovery.boot/com.apple.Boot.plist",			// OS X Recovery
 		"/OS X Install Data/com.apple.Boot.plist",				// OS X Upgrade (10.8+)

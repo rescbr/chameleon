@@ -430,6 +430,8 @@ bool getSMBOemProcessorType(returnType *value)
 					case CPUID_MODEL_HASWELL_ULT:			// 0x45 -
 					case CPUID_MODEL_HASWELL_ULX:			// 0x46 -
 					case CPUID_MODEL_BROADWELL_HQ:			// 0x47
+					case CPUID_MODEL_SKYLAKE:
+					case CPUID_MODEL_SKYLAKE_AVX:
 
 						if (strstr(Platform.CPU.BrandString, XEON))
 						{
