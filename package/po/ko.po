@@ -7,8 +7,8 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-02 15:03+0000\n"
-"PO-Revision-Date: 2015-02-13 18:31-0000\n"
-"Last-Translator: Mill <ceruns@ymail.com>\n"
+"PO-Revision-Date: 2016-04-26 17:18+0000\n"
+"Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: ko <ko@li.org>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
@@ -16,7 +16,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1418150892.0\n"
+"X-POOTLE-MTIME: 1461691091.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -277,10 +277,10 @@ msgstr "이미 부트로더가 설치되있을 경우 사용자가 기타 옵션
 
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
-msgstr "카멜레온 부트로더"
+msgstr "부트로더 단계"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -291,12 +291,16 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"여기서 부트로더 설치 전체 또는 부분을 건너 뛰기 하도록 설정할 수 있습니다. \n"
+"이는 Extra 를 쓰기 원하시거나, (0, 1과 타겟 파티션 활성화와 같은) 몇몇 설치 단계를 건너뛰기 원하실 경우 유용합니다. \n"
+"모든 단계를 건너뛰면 이미 작동하는 부트 섹터를 갖고 있는 경우, 특히 4k 드라이브일 경우 유용합니다.\n"
+"부트(boot)는 하나 이상의 단계를 건너뛸 때 항상 타겟 파티션으로 복사됩니다."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
 #, no-wrap
 msgid "Skip Stage 0"
-msgstr ""
+msgstr "단계 0 건너 뛰기"
 
 #. type: "SkipStage0_description"
 #: Resources/templates/Localizable.strings:35
@@ -305,12 +309,14 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"타겟 디스크에 단계 0 쓰기 건너뛰기.\n"
+"단계 2는 복사/덮어쓰기 됩니다."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
 #, no-wrap
 msgid "Skip Stage 1"
-msgstr ""
+msgstr "단계 1 건너 뛰기"
 
 #. type: "SkipStage1_description"
 #: Resources/templates/Localizable.strings:39
@@ -319,12 +325,14 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"파티션 부트 섹터에 단계 1 쓰기를 건너 뜁니다.\n"
+"단계 2는 항상 복사/덮어 쓰기 됩니다."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
 #, no-wrap
 msgid "Skip Activation"
-msgstr ""
+msgstr "활성화 건너 뛰기"
 
 #. type: "SkipActivePartition_description"
 #: Resources/templates/Localizable.strings:43
@@ -334,33 +342,40 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"타겟 파티션의 활성화를 방지합니다.\n"
+"몇몇 오래된 메인보드는 바이오스상 GPT에 대한 구현이 엉망이어서, 활성화된 GPT 내 활성화된 파티션을 찾지 못하곤 합니다.\n"
+"단계 2는 항상 복사/덮어쓰기 됩니다."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
-msgstr "&nbsp;를 생성하였습니다."
+msgstr "선택된 파티션에 카멜레온을 설치합니다."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "선택된 파티션의 루트 디렉토리에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0 또는 boot0md를 이용하여 설치합니다. 윈도우가 설치되있더라도 영향을 주지 않습니다."
+msgstr ""
+"선택된 파티션의 루트 디렉토리에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0, boot0md 또는 boot0hfs 를 "
+"이용하여 설치합니다. 윈도우즈가 설치되있더라도 영향을 주지 않습니다."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
 #, no-wrap
 msgid "Install Chameleon in the ESP"
-msgstr ""
+msgstr "ESP에 카멜레온 설치"
 
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "평상 시 숨겨져있는 EFI 시스템 파티션에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0 또는 boot0md를 이용하여 설치합니다. 윈도우가 설치되있더라도 영향을 주지 않습니다."
+msgstr ""
+"평상 시 숨겨져있는 EFI (EFI System Partition) 시스템 파티션에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 "
+"boot0, boot0md 또는 boot0hfs 를 이용하여 설치합니다."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -650,20 +665,20 @@ msgstr "선택 시 오리지널 맥과 같은 짙은 회색 애플 로고밑에 
 #: Resources/templates/Localizable.strings:137
 #, no-wrap
 msgid "RebootOnPanic=No"
-msgstr ""
+msgstr "RebootOnPanic=No"
 
 #. type: "RebootOnPanic_description"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr ""
+msgstr "(커널) 패닉 시 재시동"
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "EnableHDMIAudio=Yes"
 msgid "EnableHiDPI=Yes"
-msgstr "HDMIAudio활성화(EnableHDMIAudio=Yes)"
+msgstr "EnableHiDPI=Yes"
 
 #. type: "EnableHiDPI_description"
 #: Resources/templates/Localizable.strings:141
