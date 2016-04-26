@@ -71,6 +71,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_AVOTON		0x4D			// Silvermont/Avoton Atom C2000 **AVN
 #define CPUID_MODEL_SKYLAKE		0x4E			// Future Core **SKL
 #define CPUID_MODEL_BRODWELL_SVR	0x4F			// Broadwell Server **BDX
+#define CPUID_MODEL_SKYLAKE_AVX		0x55			// Skylake with AVX-512 support.
 #define CPUID_MODEL_BRODWELL_MSVR	0x56			// Broadwell Micro Server, Future Xeon **BDX-DE
 //#define CPUID_MODEL_KNIGHT		0x57
 #define CPUID_MODEL_ANNIDALE		0x5A			// Silvermont, Future Atom E3000, Z3000 (Annidale)
