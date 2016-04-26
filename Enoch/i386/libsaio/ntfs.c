@@ -155,7 +155,8 @@ void NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 	int mftRecordSize;
 	u_int64_t totalClusters;
 	u_int64_t cluster, mftCluster;
-	size_t mftOffset;
+ //	size_t mftOffset;
+	long long mftOffset;
 	void *nameAttr;
 	size_t nameSize;
 	char *buf;
