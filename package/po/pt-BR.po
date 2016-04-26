@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-02 15:03+0000\n"
-"PO-Revision-Date: 2015-08-12 13:38+0000\n"
+"PO-Revision-Date: 2016-04-26 17:30+0000\n"
 "Last-Translator: FurtiF <msntchat@hotmail.fr>\n"
 "Language-Team: pt-BR <pt-BR@li.org>\n"
 "Language: pt-BR\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0-rc1\n"
-"X-POOTLE-MTIME: 1439386683.0\n"
+"X-POOTLE-MTIME: 1461691845.0\n"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:22
@@ -68,8 +68,7 @@ msgstr "%PKGDEV%"
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
 msgstr ""
-"Pacote construída por:% WHOBUILD%, língua traduzida por: oldnapalm, kyndder "
-"e FurtiF"
+"Pacote construída por:% WHOBUILD%, língua traduzida por: artur-pt e FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -294,7 +293,7 @@ msgstr "Útil se você quer instalar apenas os extras."
 #: Resources/templates/Localizable.strings:28
 #, no-wrap
 msgid "Bootloader Stages"
-msgstr "Gerenciador de inicialização Chameleon"
+msgstr "Fases de arranque do Bootloader"
 
 #. type: "Stages_description"
 #: Resources/templates/Localizable.strings:29
@@ -682,7 +681,7 @@ msgstr "RebootOnPanic=No"
 #: Resources/templates/Localizable.strings:138
 #, no-wrap
 msgid "Reboot On Panic."
-msgstr "Reinicie Em Pânico."
+msgstr "Reinicialização em Pânico"
 
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
@@ -694,7 +693,7 @@ msgstr "EnableHiDPI=Yes"
 #: Resources/templates/Localizable.strings:141
 #, no-wrap
 msgid "Enable High resolution display (aka retina)."
-msgstr "Ativar modo de exibição de alta resolução (aka retina)."
+msgstr "Ativar exibição de Alta Resolução (Retina)"
 
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
@@ -1288,97 +1287,102 @@ msgstr "Seleciona Modo Gráfico 1920x1200x32"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
 msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
-msgstr ""
+msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 
 #. type: "Crs1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
 msgstr ""
+"Kext assinatura: Introduzido em 10,9, reforçada em 10,10 (assinatura kext "
+"necessária para todas as kexts), agora se tornou parte de desenraizada "
+"(SIP)."
 
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_FS"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 
 #. type: "Crs2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
 msgstr ""
+"Proteção do sistema de arquivos: arquivos de sistema importantes são "
+"protegidos e não pode ser modificado."
 
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
 msgid "CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgstr "CRS_ALLOW_TASK_FOR_PID"
 
 #. type: "Crs4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
 msgid "Disable CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgstr "Desativar CRS_ALLOW_TASK_FOR_PID"
 
 #. type: "Crs8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid "CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgstr "CRS_ALLOW_KERNEL_DEBUGGER"
 
 #. type: "Crs8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
 msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgstr "Desativar CRS_ALLOW_KERNEL_DEBUGGER"
 
 #. type: "Crs16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
 msgid "CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgstr "CRS_ALLOW_APPLE_INTERNAL"
 
 #. type: "Crs16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
 msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgstr "Desativar CRS_ALLOW_APPLE_INTERNAL"
 
 #. type: "Crs32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_DTRACE"
 
 #. type: "Crs32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
 msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgstr "Desactivar CRS_ALLOW_UNRESTRICTED_DTRACE"
 
 #. type: "Crs64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_NVRAM"
 
 #. type: "Crs64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
 msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgstr "Desactivar CRS_ALLOW_UNRESTRICTED_NVRAM"
 
 #. type: "Crs128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgstr "CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "Crs128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
 msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgstr "Desactivar CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "HDAULayoutIDx01_title"
 #: Resources/templates/Localizable.strings:324
@@ -2660,185 +2664,185 @@ msgstr "Injeta 06002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002216"
 msgid "07002216"
-msgstr "00002216"
+msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Injeta 00002216 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 07002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex00_title"
 #: Resources/templates/Localizable.strings:689
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000e16"
 msgid "0000e019"
-msgstr "00000e16"
+msgstr "0000e019"
 
 #. type: "IntelSkylakex00_description"
 #: Resources/templates/Localizable.strings:690
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 0000e019 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 00000e16 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 0000e019 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex01_title"
 #: Resources/templates/Localizable.strings:692
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001619"
-msgstr "00001616"
+msgstr "00001619"
 
 #. type: "IntelSkylakex01_description"
 #: Resources/templates/Localizable.strings:693
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 00001619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 00001616 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 00001619 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex02_title"
 #: Resources/templates/Localizable.strings:695
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002616"
 msgid "00002619"
-msgstr "00002616"
+msgstr "00002619"
 
 #. type: "IntelSkylakex02_description"
 #: Resources/templates/Localizable.strings:696
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 00002619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 00002216 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 00002619 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex03_title"
 #: Resources/templates/Localizable.strings:698
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001b19"
-msgstr "00001616"
+msgstr "00001b19"
 
 #. type: "IntelSkylakex03_description"
 #: Resources/templates/Localizable.strings:699
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001b19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Injeta 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Injeta 00001b19 para Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex04_title"
 #: Resources/templates/Localizable.strings:701
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001219"
-msgstr "00001616"
+msgstr "00001219"
 
 #. type: "IntelSkylakex04_description"
 #: Resources/templates/Localizable.strings:702
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Injeta 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Injeta 00001219 para Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex05_title"
 #: Resources/templates/Localizable.strings:704
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01000e16"
 msgid "01000219"
-msgstr "01000e16"
+msgstr "01000219"
 
 #. type: "IntelSkylakex05_description"
 #: Resources/templates/Localizable.strings:705
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Injeta 00002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Injeta 01000219 para Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex06_title"
 #: Resources/templates/Localizable.strings:707
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01001e16"
 msgid "01001719"
-msgstr "01001e16"
+msgstr "01001719"
 
 #. type: "IntelSkylakex06_description"
 #: Resources/templates/Localizable.strings:708
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 01001719 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 01000e16 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 01001719 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex07_title"
 #: Resources/templates/Localizable.strings:710
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01001e16"
 msgid "01001219"
-msgstr "01001e16"
+msgstr "01001219"
 
 #. type: "IntelSkylakex07_description"
 #: Resources/templates/Localizable.strings:711
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 01001219 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 03001216 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 01001219 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex08_title"
 #: Resources/templates/Localizable.strings:713
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01000e16"
 msgid "01003219"
-msgstr "01000e16"
+msgstr "01003219"
 
 #. type: "IntelSkylakex08_description"
 #: Resources/templates/Localizable.strings:714
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01003219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Injeta 01001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Injeta 01003219 para Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex09_title"
 #: Resources/templates/Localizable.strings:716
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001616"
 msgid "02001619"
-msgstr "02001616"
+msgstr "02001619"
 
 #. type: "IntelSkylakex09_description"
 #: Resources/templates/Localizable.strings:717
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02001619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 02001616 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 02001619 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex10_title"
 #: Resources/templates/Localizable.strings:719
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02002616"
 msgid "02002619"
-msgstr "02002616"
+msgstr "02002619"
 
 #. type: "IntelSkylakex10_description"
 #: Resources/templates/Localizable.strings:720
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02002619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Injeta 02002216 para Intel Broadwell AAPL,ig-platform-id."
+msgstr "Injeta 02002619 para Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex11_title"
 #: Resources/templates/Localizable.strings:722
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001e16"
 msgid "03001e19"
-msgstr "00001e16"
+msgstr "03001e19"
 
 #. type: "IntelSkylakex11_description"
 #: Resources/templates/Localizable.strings:723
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001e19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Injeta 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr "Injeta 03001e19 para Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:727
@@ -3200,7 +3204,11 @@ msgstr "rootless=0"
 #: Resources/templates/Localizable.strings:823
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
-msgstr "Rootless é um novo recurso introduzido no OS X 10.11 (El Capitan), e ele não permite que modificam arquivos do sistema. Para contornando esta restrição, esse recurso pode ser desativado estrita adicionando ‘rootless=0’ aos parâmetros de arranque. (‘rootless=1’ habilitá-lo)"
+msgstr ""
+"Rootless é um novo recurso introduzido no OS X 10.11 (El Capitan), e ele não "
+"permite modificações nos arquivos do sistema. Para contornar esta "
+"restrição, esse recurso pode ser desativado adicionando um 'rootless = 0' "
+"boot arg. ('rootless = 1' habilitá-lo)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:825
@@ -3366,13 +3374,13 @@ msgstr "Preferências de controle do Chameleon."
 #: Resources/templates/Localizable.strings:883
 #, no-wrap
 msgid "CrsActiveConfig"
-msgstr ""
+msgstr "CrsActiveConfig"
 
 #. type: "CrsActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
 msgid "System Integrity Protection (SIP)."
-msgstr ""
+msgstr "Sistema de Proteção da Integridade (SIP)."
 
 #. type: "General_title"
 #: Resources/templates/Localizable.strings:887
@@ -3478,17 +3486,17 @@ msgstr "Injeta um AAPL,ig-platform-id para usar na sua Intel Broadwell."
 
 #. type: "IntelSkl_title"
 #: Resources/templates/Localizable.strings:923
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Skl AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Skl AAPL,ig-platform-id"
 
 #. type: "IntelSkl_description"
 #: Resources/templates/Localizable.strings:924
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Skylake."
-msgstr "Injeta um AAPL,ig-platform-id para usar na sua Intel Haswell."
+msgstr "Injeta um AAPL,ig-platform-id para usar na sua Intel Skylake."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:927
@@ -3528,119 +3536,125 @@ msgstr "Select one keylayout to use. This will also install the Keylayout module
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kext Patcher"
 msgid "Patches"
-msgstr "Kext Patcher"
+msgstr "Patches"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
-msgstr "Preferências de Video."
+msgstr "Selecione um patch para o kernel."
 
 #. type: "kernelPatcher_title"
 #: Resources/templates/Localizable.strings:948
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "kernel Patcher"
-msgstr "Kernel Patcher"
+msgstr "kernel Patcher"
 
 #. type: "kernelPatcher_description"
 #: Resources/templates/Localizable.strings:949
 #, no-wrap
 msgid "Select one patch for your kernel."
-msgstr ""
+msgstr "Selecione um patch para o kernel."
 
 #. type: "KernelBooter_kexts_title"
 #: Resources/templates/Localizable.strings:952
 #, no-wrap
 msgid "KernelBooter_kexts"
-msgstr ""
+msgstr "KernelBooter_kexts"
 
 #. type: "KernelBooter_kexts_description"
 #: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
-msgstr ""
+msgstr "Reativa /Extra/Extensions kexts em sistemas operacionais mais recentes."
 
 #. type: "KernelPm_title"
 #: Resources/templates/Localizable.strings:956
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelPm"
-msgstr "Kernel Patcher"
+msgstr "KernelPm"
 
 #. type: "KernelPm_description"
 #: Resources/templates/Localizable.strings:957
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Power Management"
 msgid "Kernel Power Management patch."
-msgstr "Gestão Energia"
+msgstr "Kernel Power Management patch."
 
 #. type: "KernelLapicError_title"
 #: Resources/templates/Localizable.strings:960
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicError"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicError"
 
 #. type: "KernelLapicError_description"
 #: Resources/templates/Localizable.strings:961
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
-msgstr ""
+msgstr "Remova a APIC Local Erro pânico."
 
 #. type: "KernelLapicVersion_title"
 #: Resources/templates/Localizable.strings:964
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicVersion"
 
 #. type: "KernelLapicVersion_description"
 #: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
-msgstr ""
+msgstr "Retire o local pânico Apic Version."
 
 #. type: "KernelHaswell_title"
 #: Resources/templates/Localizable.strings:968
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Kernel Flags"
 msgid "KernelHaswell"
-msgstr "Kernel Flags"
+msgstr "KernelHaswell"
 
 #. type: "KernelHaswell_description"
 #: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr ""
+"Patch para Haswell  \\\"E\\\"  e support \\\"ULT\\ em sistemas operacionais mais "
+"antigos."
 
 #. type: "KernelcpuFamily_title"
 #: Resources/templates/Localizable.strings:972
 #, no-wrap
 msgid "KernelcpuFamily"
-msgstr ""
+msgstr "KernelcpuFamily"
 
 #. type: "KernelcpuFamily_description"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr ""
+"Corrigir o endereço cpuid_family para remover o _cpuid_set_info _panic e "
+"_tsc_init _panic. Para CPUs sem suporte"
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
 #, no-wrap
 msgid "KernelSSE3"
-msgstr ""
+msgstr "KernelSSE3"
 
 #. type: "KernelSSE3_description"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr ""
+"Patch para permitir mais instruções SSE3 em CPUs mais velhos para executar "
+"sistemas operacionais mais recentes."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982
