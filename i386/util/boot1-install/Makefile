@@ -11,15 +11,16 @@ DIR = boot1-install
 
 include ${SRCROOT}/Make.rules
 
-LDFLAGS := $(LDFALGS) -mmacosx-version-min=10.5 \
+LDFLAGS := $(LDFLAGS) -mmacosx-version-min=10.5 \
 -framework CoreFoundation \
 -framework DiskArbitration \
 -Wl,-no_source_version \
 -Wl,-no_function_starts \
 -Wl,-no_data_in_code_info \
 -Wl,-no_version_load_command \
--Wl,-no_uuid \
--Wl,-no_dependent_dr_info
+-Wl,-no_uuid
+
+CFLAGS := $(CFLAGS) -mmacosx-version-min=10.5
 
 OBJS =  boot1-install.o32 \
         boot1-install.o64

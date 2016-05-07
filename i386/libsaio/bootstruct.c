@@ -40,6 +40,8 @@
 	#define DBG(x...)	msglog(x)
 #endif
 
+#define MEG		(1024*1024)
+
 /*==========================================================================
  * Initialize the structure of parameters passed to
  * the kernel by the booter.
@@ -150,8 +152,11 @@ void finalizeBootStruct(void)
 	void *addr;
 	int i;
 
-	EfiMemoryRange	*memoryMap	= NULL;
-	MemoryRange	*range		= NULL;
+	/* Memory size to use for defaults calculations (cparm) */
+	uint64_t	sane_size = 0;
+
+	EfiMemoryRange *memoryMap	= NULL;
+	MemoryRange *range		= NULL;
 	int memoryMapCount = bootInfo->memoryMapCount;
 
 	if (memoryMapCount == 0)
@@ -209,6 +214,52 @@ void finalizeBootStruct(void)
 		memoryMap->VirtualStart		= range->base;
 		memoryMap->NumberOfPages	= range->length >> I386_PGSHIFT;
 		memoryMap->Attribute		= 0;
+
+		switch (memoryMap->Type)
+		{
+			case kEfiLoaderCode:
+			case kEfiLoaderData:
+			case kEfiBootServicesCode:
+			case kEfiBootServicesData:
+			case kEfiConventionalMemory:
+				/*
+				 * Consolidate usable memory types into one (cparm).
+				 */
+				sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+				break;
+
+			case kEfiRuntimeServicesCode:
+			case kEfiRuntimeServicesData:
+			case kEfiACPIReclaimMemory:
+			case kEfiACPIMemoryNVS:
+			case kEfiPalCode:
+				/*
+				 * sane_size should reflect the total amount of physical ram
+				 * in the system, not just the amount that is available for
+				 * the OS to use (cparm)
+				 */
+				sane_size += (uint64_t)(memoryMap->NumberOfPages << I386_PGSHIFT);
+				break;
+			default:
+				break;
+		}
+
+		if (sane_size == 0)
+		{
+
+			// I Guess that if sane_size == 0 we've got a big problem here,
+			// and it means that the memory map was not converted properly (cparm)
+			stop("Unable to convert memory map into proper format\n");
+			return;
+		}
+
+		/*
+		 * For user visible memory size, round up to 128 Mb - accounting for the various stolen memory
+		 * not reported by EFI. (cparm)
+		 */
+
+		sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
+		bootArgs->PhysicalMemorySize = sane_size;
 	}
 
 	// copy bootFile into device tree
