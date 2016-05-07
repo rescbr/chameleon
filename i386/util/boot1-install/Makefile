@@ -18,8 +18,7 @@ LDFLAGS := $(LDFLAGS) -mmacosx-version-min=10.5 \
 -Wl,-no_function_starts \
 -Wl,-no_data_in_code_info \
 -Wl,-no_version_load_command \
--Wl,-no_uuid \
--Wl,-no_dependent_dr_info
+-Wl,-no_uuid
 
 CFLAGS := $(CFLAGS) -mmacosx-version-min=10.5
 
