@@ -17,14 +17,14 @@
 
 #ifndef DEBUG_ACPI
 #define DEBUG_ACPI 0
-#endif
+	#endif
 
 #if DEBUG_ACPI==2
-#define DBG(x...)  {printf(x); sleep(1);}
+	#define DBG(x...)  {printf(x); sleep(1);}
 #elif DEBUG_ACPI==1
-#define DBG(x...)  printf(x)
+	#define DBG(x...)  printf(x)
 #else
-#define DBG(x...)  msglog(x)
+	#define DBG(x...)  msglog(x)
 #endif
 
 // Slice: New signature compare function
@@ -33,7 +33,7 @@ boolean_t tableSign(char *table, const char *sgn)
 	int i;
 	for (i = 0; i < 4; i++)
 	{
-		if ((table[i] &~0x20) != (sgn[i] &~0x20))
+		if ((table[i] & ~0x20) != (sgn[i] & ~0x20))
 		{
 			return false;
 		}
@@ -53,7 +53,7 @@ static struct acpi_2_rsdp *getAddressOfAcpiTable()
 		if(*(uint64_t *)acpi_addr == ACPI_SIGNATURE_UINT64_LE)
 		{
 			uint8_t csum = checksum8(acpi_addr, 20);
-			if(csum == 0)
+			if (csum == 0)
 			{
 			// Only return the table if it is a true version 1.0 table (Revision 0)
 				if(((struct acpi_2_rsdp*)acpi_addr)->Revision == 0)
@@ -117,7 +117,7 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 			if (fd < 0)
 			{
 				// NOT FOUND:
-				DBG("ACPI Table not found: %s\n", filename);
+				DBG("\tACPI Table not found: %s\n", filename);
 				*dirSpec = '\0';
 			}
 		}
@@ -135,84 +135,26 @@ void *loadACPITable (const char *filename)
 
 	if (fd >= 0)
 	{
-		void *tableAddr = (void*)AllocateKernelMemory(file_size(fd));
+		void *tableAddr = (void *)AllocateKernelMemory(file_size(fd));
 		if (tableAddr)
 		{
 			if (read(fd, tableAddr, file_size(fd)) != file_size(fd))
 			{
-				DBG("Couldn't read table %s\n",dirspec);
+				DBG("\tCouldn't read table %s\n", dirspec);
 				free(tableAddr);
 				close(fd);
 				return NULL;
 			}
 
-			DBG("Table %s read and stored at: %x\n", dirspec, tableAddr);
+			DBG("\tTable %s read and stored at: %x\n", dirspec, tableAddr);
 			close(fd);
 			return tableAddr;
 		}
 		close(fd);
-		DBG("Couldn't allocate memory for table \n", dirspec);
-	}  
+		DBG("\tCouldn't allocate memory for table: %s.\n", dirspec);
+	}
 	//printf("Couldn't find table %s\n", filename);
 	return NULL;
-}
-
-uint8_t acpi_cpu_count	= 0;
-uint32_t acpi_cpu_p_blk	= 0;
-char *acpi_cpu_name[32];
-
-void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
-{
-	uint32_t i;
-
-	DBG("ACPIpatcher: start finding cpu names. Length %d\n", length);
-
-	for (i=0; i<length-7; i++)
-	{
-		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
-		{
-			DBG("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
-
-			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
-
-			bool add_name = true;
-
-			uint8_t j;
-
-			for (j=0; j<4; j++)
-			{
-				char c = dsdt[offset+j];
-
-				if (!aml_isvalidchar(c))
-				{
-					add_name = false;
-					DBG("ACPIpatcher: invalid character found in ProcessorOP '0x%X'!\n", c);
-					break;
-				}
-			}
-
-			if (add_name)
-			{
-				acpi_cpu_name[acpi_cpu_count] = malloc(4);
-				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
-				i = offset + 5;
-
-				if (acpi_cpu_count == 0)
-				{
-					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
-				}
-
-				DBG("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
-
-				if (++acpi_cpu_count == 32)
-				{
-					return;
-				}
-			}
-		}
-	}
-
-	DBG("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
 }
 
 struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new_dsdt)
@@ -241,7 +183,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	}
 	else
 	{
-		DBG("Not an Intel platform: Restart Fix not applied !!!\n");
+		DBG("\tNot an Intel platform, FACP Restart Fix will not be applied!\n");
 		fix_restart = false;
 	}
 
@@ -251,12 +193,12 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	}
 
 	// Allocate new fadt table
-	if (fadt->Length < 0x84 && fadt_rev2_needed)
+	if ((fadt->Length < 0x84) && fadt_rev2_needed)
 	{
 		fadt_mod = (struct acpi_2_fadt *)AllocateKernelMemory(0x84);
 		memcpy(fadt_mod, fadt, fadt->Length);
 		fadt_mod->Length   = 0x84;
-		fadt_mod->Revision = 0x02; // FADT rev 2 (ACPI 1.0B MS extensions)
+		fadt_mod->Revision = 0x02; // FACP rev 2 (ACPI 1.0B MS extensions)
 	}
 	else
 	{
@@ -276,7 +218,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			{
 				Platform.Type = 1;		/* Set a fixed value (Desktop) */
 			}
-			DBG("Error: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
+			DBG("\tError: system-type must be 0..6. Defaulting to %d !\n", Platform.Type);
 		}
 		else
 		{
@@ -289,7 +231,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		if (value)
 		{
 			// user has overriden the SystemType so take care of it in FACP
-			DBG("FADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
+			DBG("\tFADT: changing PM_Profile from 0x%02x to 0x%02x\n", fadt_mod->PM_Profile, Platform.Type);
 			fadt_mod->PM_Profile = Platform.Type;
 		}
 		else
@@ -302,7 +244,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	// because we need to take care of FACP original content, if it is correct.
 	setupSystemType();
 
-	// Patch FADT to fix restart
+	// Patch FACP to fix restart
 	if (fix_restart)
 	{
 		if (fix_restart_ps2)
@@ -314,7 +256,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 			fadt_mod->Reset_Address		= 0x64;   // Address of the register
 			fadt_mod->Reset_Value		= 0xfe;   // Value to write to reset the system
-			DBG("FADT: PS2 Restart Fix applied!\n");
+			DBG("\tFACP PS2 Restart Fix applied!\n");
 		}
 		else
 		{
@@ -325,25 +267,37 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			fadt_mod->Reset_AccessWidth	= 0x01;   // Byte access
 			fadt_mod->Reset_Address		= 0x0cf9; // Address of the register
 			fadt_mod->Reset_Value		= 0x06;   // Value to write to reset the system
-			DBG("FADT: ACPI Restart Fix applied!\n");
+			DBG("\tFACP Restart Fix applied!\n");
 		}
 
 	}
 
-	// Patch DSDT Address if we have loaded DSDT.aml
-	if(new_dsdt)
+	// Bungo: Save Hardware Signature (machine-signature)
+	if ((fadt_mod->FACS > 0) && (fadt_mod->FACS < 0xFFFFFFFF) && (((struct acpi_2_facs *)fadt_mod->FACS)->Length >= 64))
 	{
-		DBG("DSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
+		Platform.HWSignature = ((struct acpi_2_facs *)fadt_mod->FACS)->HWSignature;
+		DBG("\tHardware Signature=0x%08X: using.\n", Platform.HWSignature);
+	}
+	else
+	{
+		Platform.HWSignature = 0;
+		DBG("\tFixing Hardware Signature=0x%08X.\n", Platform.HWSignature);
+	}
 
-		fadt_mod->DSDT=(uint32_t)new_dsdt;
-		if ((uint32_t)(&(fadt_mod->X_DSDT))-(uint32_t)fadt_mod+8<=fadt_mod->Length)
+	// Patch DSDT address if we have loaded DSDT.aml
+	if (new_dsdt)
+	{
+		DBG("\tDSDT: Old @%x,%x, ",fadt_mod->DSDT,fadt_mod->X_DSDT);
+
+		fadt_mod->DSDT = (uint32_t)new_dsdt;
+		if ((uint32_t)(&(fadt_mod->X_DSDT)) - (uint32_t)fadt_mod + 8<=fadt_mod->Length)
 		{
-			fadt_mod->X_DSDT=(uint32_t)new_dsdt;
+			fadt_mod->X_DSDT = (uint32_t)new_dsdt;
 		}
 
-		DBG("New @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
+		DBG("\tNew @%x,%x\n",fadt_mod->DSDT,fadt_mod->X_DSDT);
 
-		DBG("FADT: Using custom DSDT!\n");
+		DBG("\tFADT: Using custom DSDT!\n");
 	}
 
 	// Correct the checksum
@@ -368,7 +322,7 @@ int setupAcpiNoMod()
 	}
 	else
 	{
-		DBG("No ACPI 2.\n");
+		DBG("\tNo ACPI 2.\n");
 	}
 	return 1;
 }
@@ -376,6 +330,7 @@ int setupAcpiNoMod()
 /* Setup ACPI. Replace DSDT if DSDT.aml is found */
 int setupAcpi(void)
 {
+	verbose("[ ACPI PATCHER ]\n");
 	int version;
 	void *new_dsdt = NULL;
 
@@ -417,9 +372,11 @@ int setupAcpi(void)
 	getBoolForKey(kDropSSDT, &drop_ssdt, &bootInfo->chameleonConfig);
 	getBoolForKey(kGeneratePStates, &generate_pstates, &bootInfo->chameleonConfig);
 	getBoolForKey(kGenerateCStates, &generate_cstates, &bootInfo->chameleonConfig);
+	//getBoolForKey(kGenerateTStates, &generate_tstates, &bootInfo->chameleonConfig);
 
-	DBG("Generating P-States config: %s\n", generate_pstates ? "YES" : "NO");
-	DBG("Generating C-States config: %s\n", generate_cstates ? "YES" : "NO");
+	DBG("\tGenerating P-States config: %s\n", generate_pstates ? "Yes" : "No");
+	DBG("\tGenerating C-States config: %s\n", generate_cstates ? "Yes" : "No");
+	//DBG("Generating T-States config: %s\n", generate_tstates ? "Yes" : "No");
 
 	{
 		int i;
@@ -459,7 +416,7 @@ int setupAcpi(void)
 		rsdp = (struct acpi_2_rsdp *)(version ? getAddressOfAcpi20Table() : getAddressOfAcpiTable());
 		if (!rsdp)
 		{
-			DBG("No ACPI version %d found. Ignoring\n", version+1);
+			DBG("\tNo ACPI version %d found. Ignoring\n", version+1);
 			if (version)
 			{
 				addConfigurationTable(&gEfiAcpi20TableGuid, NULL, "ACPI_20");
@@ -472,7 +429,7 @@ int setupAcpi(void)
 		}
 		rsdplength = version ? rsdp->Length : 20;
 
-		DBG("RSDP version %d found @%x. Length=%d\n",version+1,rsdp,rsdplength);
+		DBG("\tRSDP version %d found @%x. Length=%d\n",version+1,rsdp,rsdplength);
 
 		/* FIXME: no check that memory allocation succeeded 
 		 * Copy and patch RSDP,RSDT, XSDT and FADT
@@ -484,13 +441,13 @@ int setupAcpi(void)
 
 		rsdt = (struct acpi_2_rsdt *)rsdp->RsdtAddress;
 
-		DBG("RSDT @%x, Length %d\n",rsdt, rsdt ? rsdt->Length : 0);
+		DBG("\tRSDT @%x, Length %d\n",rsdt, rsdt ? rsdt->Length : 0);
 
 		if (rsdt && (uint32_t)rsdt !=0xffffffff && rsdt->Length < 0x10000)
 		{
 			uint32_t *rsdt_entries;
 			int rsdt_entries_num;
-			int dropoffset=0, i;
+			int dropoffset = 0, i;
 
 			// mozo: using malloc cos I didn't found how to free already allocated kernel memory
 			rsdt_mod = (struct acpi_2_rsdt *)malloc(rsdt->Length);
@@ -498,7 +455,7 @@ int setupAcpi(void)
 			rsdp_mod->RsdtAddress = (uint32_t)rsdt_mod;
 			rsdt_entries_num = (rsdt_mod->Length - sizeof(struct acpi_2_rsdt)) / 4;
 			rsdt_entries = (uint32_t *)(rsdt_mod + 1);
-			for (i = 0;i < rsdt_entries_num;i++)
+			for (i = 0; i < rsdt_entries_num; i++)
 			{
 				char *table=(char *)(rsdt_entries[i]);
 				if (!table)
@@ -506,24 +463,24 @@ int setupAcpi(void)
 					continue;
 				}
 
-				DBG("TABLE %c%c%c%c,",table[0],table[1],table[2],table[3]);
+				DBG("\tTABLE %c%c%c%c,",table[0],table[1],table[2],table[3]);
 
 				rsdt_entries[i-dropoffset]=rsdt_entries[i];
 
 				if (drop_ssdt && tableSign(table, "SSDT"))
 				{
-					DBG("OEM SSDT tables was dropped\n");
+					DBG("\tOEM SSDT tables was dropped\n");
 					dropoffset++;
 					continue;
 				}
 
 				if (tableSign(table, "DSDT"))
 				{
-					DBG("DSDT found\n");
-					verbose("Custom DSDT table was found\n");
+					DBG("\tDSDT found\n");
+					DBG("\tCustom DSDT table was found\n");
 					if(new_dsdt)
 					{
-						rsdt_entries[i-dropoffset]=(uint32_t)new_dsdt;
+						rsdt_entries[i-dropoffset] = (uint32_t)new_dsdt;
 					}
 
 					continue;
@@ -534,11 +491,11 @@ int setupAcpi(void)
 					struct acpi_2_fadt *fadt, *fadt_mod;
 					fadt=(struct acpi_2_fadt *)rsdt_entries[i];
 
-					DBG("FADT found @%x, Length %d\n",fadt, fadt->Length);
+					DBG("\tFADT found @%x, Length %d\n",fadt, fadt->Length);
 
 					if (!fadt || (uint32_t)fadt == 0xffffffff || fadt->Length>0x10000)
 					{
-						DBG("FADT incorrect. Not modified\n");
+						DBG("\tFADT incorrect. Not modified\n");
 						continue;
 					}
 					
@@ -548,7 +505,7 @@ int setupAcpi(void)
 					// Generate _CST SSDT
 					if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 					{
-						DBG("C-States generated\n");
+						DBG("\tC-States generated.\n");
 						generate_cstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -556,7 +513,7 @@ int setupAcpi(void)
 					// Generating _PSS SSDT
 					if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 					{
-						DBG("P-States generated\n");
+						DBG("\tP-States generated.\n");
 						generate_pstates = false; // Generate SSDT only once!
 						ssdt_count++;
 					}
@@ -582,25 +539,25 @@ int setupAcpi(void)
 
 				for (j=0; j<ssdt_count; j++)
 				{
-					rsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
+					rsdt_entries[i-dropoffset+j] = (uint32_t)new_ssdt[j];
 				}
 
-				DBG("RSDT: Added %d SSDT table(s)\n", ssdt_count);
+				DBG("\tRSDT: Added %d SSDT table(s)\n", ssdt_count);
 
 			}
 
 			// Correct the checksum of RSDT
-			DBG("RSDT: Original checksum %d, ", rsdt_mod->Checksum);
+			DBG("\tRSDT: Original checksum %d, ", rsdt_mod->Checksum);
 
 			rsdt_mod->Checksum=0;
 			rsdt_mod->Checksum=256-checksum8(rsdt_mod,rsdt_mod->Length);
 
-			DBG("New checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
+			DBG("\tNew checksum %d at %x\n", rsdt_mod->Checksum,rsdt_mod);
 		}
 		else
 		{
 			rsdp_mod->RsdtAddress=0;
-			DBG("RSDT not found or RSDT incorrect\n");
+			DBG("\tRSDT not found or RSDT incorrect\n");
 		}
 		DBG("\n");
 
@@ -611,22 +568,22 @@ int setupAcpi(void)
 			// FIXME: handle 64-bit address correctly
 
 			xsdt=(struct acpi_2_xsdt*) ((uint32_t)rsdp->XsdtAddress);
-			DBG("XSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt->Length);
+			DBG("\tXSDT @%x;%x, Length=%d\n", (uint32_t)(rsdp->XsdtAddress>>32),(uint32_t)rsdp->XsdtAddress, xsdt->Length);
 
 			if (xsdt && (uint64_t)rsdp->XsdtAddress<0xffffffff && xsdt->Length<0x10000)
 			{
 				uint64_t *xsdt_entries;
 				int xsdt_entries_num, i;
-				int dropoffset=0;
+				int dropoffset = 0;
 
 				// mozo: using malloc cos I didn't found how to free already allocated kernel memory
-				xsdt_mod=(struct acpi_2_xsdt*)malloc(xsdt->Length);
+				xsdt_mod = (struct acpi_2_xsdt *)malloc(xsdt->Length);
 				memcpy(xsdt_mod, xsdt, xsdt->Length);
 
 				rsdp_mod->XsdtAddress = (uint32_t)xsdt_mod;
 				xsdt_entries_num = (xsdt_mod->Length - sizeof(struct acpi_2_xsdt)) / 8;
 				xsdt_entries = (uint64_t *)(xsdt_mod + 1);
-				for (i = 0;i < xsdt_entries_num;i++)
+				for (i = 0;i < xsdt_entries_num; i++)
 				{
 					char *table = (char *)((uint32_t)(xsdt_entries[i]));
 					if (!table)
@@ -637,21 +594,21 @@ int setupAcpi(void)
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
-						DBG("dropped (OEM)\n");
+						DBG("\tOEM SSDT tables was dropped\n");
 						dropoffset++;
 						continue;
 					}
 					if (tableSign(table, "DSDT"))
 					{
-						DBG("DSDT found\n");
+						DBG("\tDSDT found\n");
 
 						if (new_dsdt)
 						{
 							xsdt_entries[i-dropoffset] = (uint32_t)new_dsdt;
-							DBG("custom table added\n");
+							DBG("\tcustom table added.\n");
 						}
 
-						DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
+						DBG("\tTABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 
 						continue;
 					}
@@ -660,24 +617,24 @@ int setupAcpi(void)
 						struct acpi_2_fadt *fadt, *fadt_mod;
 						fadt=(struct acpi_2_fadt *)(uint32_t)xsdt_entries[i];
 
-						DBG("FADT found @%x%x, Length %d\n",(uint32_t)(xsdt_entries[i]>>32),fadt, 
+						DBG("\tFADT found @%x%x, Length %d\n",(uint32_t)(xsdt_entries[i]>>32),fadt, 
 							fadt->Length);
 
 						if (!fadt || (uint64_t)xsdt_entries[i] >= 0xffffffff || fadt->Length>0x10000)
 						{
-							DBG("FADT incorrect or after 4GB. Dropping XSDT\n");
+							DBG("\tFADT incorrect or after 4GB. Dropping XSDT\n");
 							goto drop_xsdt;
 						}
 
 						fadt_mod = patch_fadt(fadt, new_dsdt);
-						xsdt_entries[i-dropoffset]=(uint32_t)fadt_mod;
+						xsdt_entries[i - dropoffset] = (uint32_t)fadt_mod;
 
-						// DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
+						// DBG("\tTABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 
 						// Generate _CST SSDT
 						if (generate_cstates && (new_ssdt[ssdt_count] = generate_cst_ssdt(fadt_mod)))
 						{
-							DBG("C-States generated\n");
+							DBG("\tC-States generated.\n");
 							generate_cstates = false; // Generate SSDT only once!
 							ssdt_count++;
 						}
@@ -685,15 +642,21 @@ int setupAcpi(void)
 						// Generating _PSS SSDT
 						if (generate_pstates && (new_ssdt[ssdt_count] = generate_pss_ssdt((void*)fadt_mod->DSDT)))
 						{
-							DBG("P-States generated\n");
+							DBG("\tP-States generated.\n");
 							generate_pstates = false; // Generate SSDT only once!
 							ssdt_count++;
 						}
 
+						// Generating _TSS SSDT
+						/*if (generate_tstates && (new_ssdt[ssdt_count] = generate_tss_ssdt((void*)fadt_mod->DSDT)))
+						{
+							generate_tstates = false; // Generate SSDT only once!
+							ssdt_count++;
+						}*/
 						continue;
 					}
-					DBG("copied (OEM)\n");
-					// DBG("TABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
+					DBG("\tcopied (OEM)\n");
+					// DBG("\tTABLE %c%c%c%c@%x \n", table[0],table[1],table[2],table[3],xsdt_entries[i]);
 				}
 
 				// Allocate xsdt in Kernel memory area
@@ -713,10 +676,10 @@ int setupAcpi(void)
 
 					for (j=0; j<ssdt_count; j++)
 					{
-						xsdt_entries[i-dropoffset+j]=(uint32_t)new_ssdt[j];
+						xsdt_entries[i - dropoffset + j] = (uint32_t)new_ssdt[j];
 					}
 
-					verbose("Added %d SSDT table(s) into XSDT\n", ssdt_count);
+					verbose("\tAdded %d SSDT table(s) into XSDT\n", ssdt_count);
 
 				}
 
@@ -728,35 +691,35 @@ int setupAcpi(void)
 			{
 			drop_xsdt:
 
-				DBG("About to drop XSDT\n");
+				DBG("\tAbout to drop XSDT\n");
 
 				/*FIXME: Now we just hope that if MacOS doesn't find XSDT it reverts to RSDT. 
 				 * A Better strategy would be to generate
 				 */
 
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
-				verbose("XSDT not found or XSDT incorrect\n");
+				verbose("\tXSDT not found or XSDT incorrect\n");
 			}
 		}
 		DBG("\n");
 
 		// Correct the checksum of RSDP
 
-		DBG("RSDP: Original checksum %d, ", rsdp_mod->Checksum);
+		DBG("\tRSDP: Original checksum %d, ", rsdp_mod->Checksum);
 
 		rsdp_mod->Checksum=0;
 		rsdp_mod->Checksum=256-checksum8(rsdp_mod,20);
 
-		DBG("New checksum %d\n", rsdp_mod->Checksum);
+		DBG("\tNew checksum %d\n", rsdp_mod->Checksum);
 
 		if (version)
 		{
-			DBG("RSDP: Original extended checksum %d, ", rsdp_mod->ExtendedChecksum);
+			DBG("\tRSDP: Original extended checksum %d, ", rsdp_mod->ExtendedChecksum);
 
 			rsdp_mod->ExtendedChecksum=0;
 			rsdp_mod->ExtendedChecksum=256-checksum8(rsdp_mod,rsdp_mod->Length);
 
-			DBG("New extended checksum %d\n", rsdp_mod->ExtendedChecksum);
+			DBG("\tNew extended checksum %d\n", rsdp_mod->ExtendedChecksum);
 
 		}
 
@@ -772,7 +735,7 @@ int setupAcpi(void)
 			acpi10_p = (uint64_t)(uint32_t)rsdp_mod;
 			addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI");
 		}
-		DBG("ACPI version %d patching finished\n\n", version+1);
+		DBG("\tACPI version %d patching finished\n\n", version + 1);
 	}
 #if DEBUG_ACPI
 	printf("Press a key to continue... (DEBUG_ACPI)\n");

@@ -16,13 +16,13 @@
 #include "memvendors.h"
 
 #ifndef DEBUG_SPD
-#define DEBUG_SPD 0
+	#define DEBUG_SPD 0
 #endif
 
 #if DEBUG_SPD
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 static const char *spd_memory_types[] =
@@ -33,7 +33,7 @@ static const char *spd_memory_types[] =
 	"PIPE NIBBLE",			/* 03h  PIPELINE NIBBLE */
 	"SDRAM",			/* 04h  SDRAM */
 	"ROM",				/* 05h  MULTIPLEXED ROM */
-	"DDR SGRAM"			/* 06h  SGRAM DDR */
+	"DDR SGRAM",			/* 06h  SGRAM DDR */
 	"DDR SDRAM",			/* 07h  SDRAM DDR */
 	"DDR2 SDRAM",			/* 08h  SDRAM DDR 2 */
 	"DDR2 SDRAM FB-DIMM",		/* 09h  Undefined */
@@ -56,7 +56,8 @@ static uint8_t spd_mem_to_smbios[] =
 	SMB_MEM_TYPE_DDR2,		/* 08h  SDRAM DDR 2 */
 	UNKNOWN_MEM_TYPE,		/* 09h  Undefined */
 	UNKNOWN_MEM_TYPE,		/* 0Ah  Undefined */
-	SMB_MEM_TYPE_DDR3		/* 0Bh  SDRAM DDR 3 */
+	SMB_MEM_TYPE_DDR3,		/* 0Bh  SDRAM DDR 3 */
+	SMB_MEM_TYPE_DDR4		/* 0Ch  SDRAM DDR 4 */
 };
 #define SPD_TO_SMBIOS_SIZE (sizeof(spd_mem_to_smbios)/sizeof(uint8_t))
 
@@ -137,12 +138,12 @@ static void init_spd(char *spd, uint32_t base, int slot)
 
 // Get Vendor Name from spd, 2 cases handled DDR3 and DDR2,
 // have different formats, always return a valid ptr.
-const char * getVendorName(RamSlotInfo_t* slot, uint32_t base, int slot_num)
+const char *getVendorName(RamSlotInfo_t *slot, uint32_t base, int slot_num)
 {
 	uint8_t bank = 0;
 	uint8_t code = 0;
 	int i = 0;
-	uint8_t * spd = (uint8_t *) slot->spd;
+	uint8_t *spd = (uint8_t *) slot->spd;
 
 	if (spd[SPD_MEMORY_TYPE]==SPD_MEMORY_TYPE_SDRAM_DDR3) // DDR3
 	{
@@ -400,9 +401,10 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 					case 99:	freq++; break;
 				}
 				slot->Frequency = freq;
+				DBG("RAM speed %dMHz \n", freq);
 			}
 
-			verbose("Slot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n      PartNo=%s SerialNo=%s\n",
+			verbose("\tSlot: %d Type %d %dMB (%s) %dMHz Vendor=%s\n\t\tPartNo=%s SerialNo=%s\n",
 				i,
 				(int)slot->Type,
 				slot->ModuleSize, 
@@ -411,7 +413,7 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 				slot->Vendor,
 				slot->PartNo,
 				slot->SerialNo);
-				slot->InUse = true;
+			slot->InUse = true;
 		}
 
 		// laptops sometimes show slot 0 and 2 with slot 1 empty when only 2 slots are presents so:
@@ -425,34 +427,39 @@ static void read_smb_intel(pci_dt_t *smbus_dev)
 
 static struct smbus_controllers_t smbus_controllers[] = {
 
-	{0x8086, 0x1C22, "P67", read_smb_intel }, // Z68, Q67
-	{0x8086, 0x1D22, "X79", read_smb_intel },
-	{0x8086, 0x1D70, "X79", read_smb_intel },
-	{0x8086, 0x1D71, "X79", read_smb_intel },
-	{0x8086, 0x1D72, "C608", read_smb_intel },
-	{0x8086, 0x1E22, "Z77", read_smb_intel }, // H77, Q77
-	{0x8086, 0x2330, "DH89xxCC", read_smb_intel },
-	{0x8086, 0x2413, "82801AA", read_smb_intel },
-	{0x8086, 0x2423, "BAM", read_smb_intel },
-	{0x8086, 0x2443, "BAM", read_smb_intel },
-	{0x8086, 0x2483, "CAM", read_smb_intel },
-	{0x8086, 0x24C3, "ICH4", read_smb_intel },
-	{0x8086, 0x24D3, "ICH5", read_smb_intel },
-	{0x8086, 0x25A4, "6300ESB", read_smb_intel },
-	{0x8086, 0x266A, "ICH6", read_smb_intel },
-	{0x8086, 0x269B, "ESB", read_smb_intel },
-	{0x8086, 0x27DA, "ICH7", read_smb_intel },
-	{0x8086, 0x283E, "ICH8", read_smb_intel },
-	{0x8086, 0x2930, "ICH9", read_smb_intel },
-	{0x8086, 0x3A30, "ICH10", read_smb_intel },
-	{0x8086, 0x3A60, "ICH10", read_smb_intel },
-	{0x8086, 0x3B30, "P55", read_smb_intel },
-	{0x8086, 0x5032, "EP80579", read_smb_intel },
-	{0x8086, 0x8119, "US15W", read_smb_intel },
-	{0x8086, 0x8C22, "HSW", read_smb_intel }, // Z87, H87, Q87, H81
-	{0x8086, 0x8CA2, "Z97/H97", read_smb_intel }, // new
-	{0x8086, 0x8D22, "X99", read_smb_intel }, // new
-	{0x8086, 0x9C22, "HSW-ULT", read_smb_intel }
+	// Intel
+	{0x8086, 0x1C22, "P67",			read_smb_intel },
+	{0x8086, 0x1D22, "X79",			read_smb_intel },
+	{0x8086, 0x1D70, "X79",			read_smb_intel },
+	{0x8086, 0x1D71, "X79",			read_smb_intel },
+	{0x8086, 0x1D72, "C608",		read_smb_intel },
+	{0x8086, 0x1E22, "Z77",			read_smb_intel },
+	{0x8086, 0x2330, "DH89xxCC",		read_smb_intel },
+	{0x8086, 0x2413, "82801AA",		read_smb_intel },
+	{0x8086, 0x2423, "BAM",			read_smb_intel },
+	{0x8086, 0x2443, "BAM",			read_smb_intel },
+	{0x8086, 0x2483, "CAM",			read_smb_intel },
+	{0x8086, 0x24C3, "ICH4",		read_smb_intel },
+	{0x8086, 0x24D3, "ICH5",		read_smb_intel },
+	{0x8086, 0x25A4, "6300ESB",		read_smb_intel },
+	{0x8086, 0x266A, "ICH6",		read_smb_intel },
+	{0x8086, 0x269B, "ESB",			read_smb_intel },
+	{0x8086, 0x27DA, "ICH7",		read_smb_intel },
+	{0x8086, 0x283E, "ICH8",		read_smb_intel },
+	{0x8086, 0x2930, "ICH9",		read_smb_intel },
+	{0x8086, 0x3A30, "ICH10",		read_smb_intel },
+	{0x8086, 0x3A60, "ICH10",		read_smb_intel },
+	{0x8086, 0x3B30, "P55",			read_smb_intel },
+	{0x8086, 0x5032, "EP80579",		read_smb_intel },
+	{0x8086, 0x8119, "US15W",		read_smb_intel },
+	{0x8086, 0x8C22, "HSW",			read_smb_intel },
+	{0x8086, 0x8CA2, "Z97/H97",		read_smb_intel },
+	{0x8086, 0x8D22, "X99",			read_smb_intel },
+	{0x8086, 0x9C22, "HSW-ULT",		read_smb_intel }
+
+	// AMD
+//	{0x1002, 0x4385, "AMD SB600/700",	... },
+//	{0x1022, 0x780B, "AMD SB800/900",	... }
 
 };
 

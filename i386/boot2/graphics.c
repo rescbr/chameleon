@@ -108,8 +108,7 @@ char *getVBEInfoString()
 //==========================================================================
 //
 
-void 
-printVBEModeInfo()
+void printVBEModeInfo()
 {
 	VBEInfoBlock     vbeInfo;
 	unsigned short * modePtr;
@@ -233,8 +232,7 @@ char *getVBEModeInfoString()
 // Return the VESA mode that matches the properties specified.
 // If a mode is not found, then return the "best" available mode.
 
-static unsigned short
-getVESAModeWithProperties( unsigned short	width,
+static unsigned short getVESAModeWithProperties( unsigned short	width,
                            unsigned short	height,
                            unsigned char	bitsPerPixel,
                            unsigned short	attributesSet,
@@ -273,8 +271,7 @@ getVESAModeWithProperties( unsigned short	width,
 
 	// Loop through the mode list, and find the matching mode.
 
-	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr );
-		*modePtr != modeEndOfList; modePtr++ )
+	for ( modePtr = VBEDecodeFP( unsigned short *, vbeInfo.VideoModePtr ); *modePtr != modeEndOfList; modePtr++ )
 	{
 		// Get mode information.
 
@@ -288,15 +285,14 @@ getVESAModeWithProperties( unsigned short	width,
 
 #if DEBUG
 		printf("Mode %x: %dx%dx%d mm:%d attr:%x\n",
-               *modePtr, modeInfo.XResolution, modeInfo.YResolution,
-               modeInfo.BitsPerPixel, modeInfo.MemoryModel,
-               modeInfo.ModeAttributes);
+			*modePtr, modeInfo.XResolution, modeInfo.YResolution,
+			modeInfo.BitsPerPixel, modeInfo.MemoryModel,
+			modeInfo.ModeAttributes);
 #endif
 
 		// Filter out unwanted modes based on mode attributes.
 
-		if ( ( ( modeInfo.ModeAttributes & attributesSet ) != attributesSet )
-        ||   ( ( modeInfo.ModeAttributes & attributesClear ) != 0 ) )
+		if (((modeInfo.ModeAttributes & attributesSet) != attributesSet) || ((modeInfo.ModeAttributes & attributesClear) != 0))
 		{
 			continue;
 		}
@@ -305,73 +301,62 @@ getVESAModeWithProperties( unsigned short	width,
 
 		modeBitsPerPixel = modeInfo.BitsPerPixel;
 
-		if ( ( modeBitsPerPixel == 4 ) && ( modeInfo.MemoryModel == 0 ) )
+		if ((modeBitsPerPixel == 4) && (modeInfo.MemoryModel == 0))
 		{
 			// Text mode, 16 colors.
 		}
-		else if ( ( modeBitsPerPixel == 8 ) && ( modeInfo.MemoryModel == 4 ) )
+			else if ((modeBitsPerPixel == 8) && (modeInfo.MemoryModel == 4))
 		{
 			// Packed pixel, 256 colors.
 		}
-		else if ( ( ( modeBitsPerPixel == 16 ) || ( modeBitsPerPixel == 15 ) )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 5 )
-			&&   ( modeInfo.GreenMaskSize == 5 )
-			&&   ( modeInfo.BlueMaskSize  == 5 ) )
+		else if (((modeBitsPerPixel == 16) || (modeBitsPerPixel == 15)) && (modeInfo.MemoryModel == 6) && (modeInfo.RedMaskSize == 5) &&
+			(modeInfo.GreenMaskSize == 5) && (modeInfo.BlueMaskSize  == 5))
 		{
 			// Direct color, 16 bpp (1:5:5:5).
 			modeInfo.BitsPerPixel = modeBitsPerPixel = 16;
 		}
-		else if ( ( modeBitsPerPixel == 32 )
-			&&   ( modeInfo.MemoryModel   == 6 )
-			&&   ( modeInfo.RedMaskSize   == 8 )
-			&&   ( modeInfo.GreenMaskSize == 8 )
-			&&   ( modeInfo.BlueMaskSize  == 8 ) )
+		else if ((modeBitsPerPixel == 32) && (modeInfo.MemoryModel == 6) && (modeInfo.RedMaskSize == 8) &&
+			(modeInfo.GreenMaskSize == 8) && (modeInfo.BlueMaskSize  == 8))
 		{
 			// Direct color, 32 bpp (8:8:8:8).
 		}
 		else
 		{
-			continue; // Not a supported mode.
+			continue;	// Not a supported mode.
 		}
 
 		// Modes larger than the specified dimensions are skipped.
 
-		if ( ( modeInfo.XResolution > width  ) ||
-			( modeInfo.YResolution > height ) )
+		if ((modeInfo.XResolution > width) || (modeInfo.YResolution > height))
 		{
 			continue;
 		}
 
 		// Perfect match, we're done looking.
 
-		if ( ( modeInfo.XResolution == width  ) &&
-			( modeInfo.YResolution == height ) &&
-			( modeBitsPerPixel     == bitsPerPixel ) )
+		if (modeInfo.XResolution == width && modeInfo.YResolution == height && modeBitsPerPixel == bitsPerPixel)
 		{
 			matchedMode = *modePtr;
-			bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+			bcopy(&modeInfo, outModeInfo, sizeof(modeInfo));
 			break;
 		}
 
 		// Save the next "best" mode in case a perfect match is not found.
 
-		if ( modeInfo.XResolution == outModeInfo->XResolution &&
-			modeInfo.YResolution == outModeInfo->YResolution &&
-			modeBitsPerPixel     <= outModeInfo->BitsPerPixel )
+		if (modeInfo.XResolution == outModeInfo->XResolution && modeInfo.YResolution == outModeInfo->YResolution &&
+			modeBitsPerPixel <= outModeInfo->BitsPerPixel)
 		{
-			continue;  // Saved mode has more depth.
+			continue;	// Saved mode has more depth.
 		}
 
-		if ( modeInfo.XResolution < outModeInfo->XResolution ||
-			modeInfo.YResolution < outModeInfo->YResolution ||
-			modeBitsPerPixel     < outModeInfo->BitsPerPixel )
+		if (modeInfo.XResolution < outModeInfo->XResolution || modeInfo.YResolution < outModeInfo->YResolution ||
+			modeBitsPerPixel < outModeInfo->BitsPerPixel)
 		{
-			continue;  // Saved mode has more resolution.
+			continue;	// Saved mode has more resolution.
 		}
 
 		matchedMode = *modePtr;
-		bcopy( &modeInfo, outModeInfo, sizeof(modeInfo) );
+		bcopy(&modeInfo, outModeInfo, sizeof(modeInfo));
 	}
 
 	return matchedMode;
@@ -380,7 +365,7 @@ getVESAModeWithProperties( unsigned short	width,
 //==========================================================================
 // setupPalette
 
-static void setupPalette( VBEPalette * p, const unsigned char * g )
+static void setupPalette( VBEPalette *p, const unsigned char *g )
 {
     int             i;
     unsigned char * source = (unsigned char *) g;
@@ -397,7 +382,7 @@ static void setupPalette( VBEPalette * p, const unsigned char * g )
 //==========================================================================
 // Simple decompressor for boot images encoded in RLE format.
 
-char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
+char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 {
     char *out, *cp;
 
@@ -422,11 +407,7 @@ char * decodeRLE( const void * rleData, int rleBlocks, int outBytes )
 //==========================================================================
 // setVESAGraphicsMode
 
-static int
-setVESAGraphicsMode( unsigned short width,
-                     unsigned short height,
-                     unsigned char  bitsPerPixel,
-                     unsigned short refreshRate )
+static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
 {
 	VBEModeInfoBlock  minfo;
 	unsigned short    mode;
@@ -485,12 +466,12 @@ setVESAGraphicsMode( unsigned short width,
 
         // Set the mode with default refresh rate.
 
-        err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
+		err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
 
-        if (err != errSuccess)
-        {
-            break;
-        }
+		if (err != errSuccess)
+		{
+			break;
+		}
 
         // Set 8-bit color palette.
 
@@ -504,26 +485,27 @@ setVESAGraphicsMode( unsigned short width,
             }
         }
 
-        // Is this required for buggy Video BIOS implementations?
-        // On which adapter?
+		// Is this required for buggy Video BIOS implementations?
+		// On which adapter?
 
-        if ( minfo.BytesPerScanline == 0 )
-             minfo.BytesPerScanline = ( minfo.XResolution *
-                                        minfo.BitsPerPixel ) >> 3;
+		if ( minfo.BytesPerScanline == 0 )
+		{
+	             minfo.BytesPerScanline = ( minfo.XResolution * minfo.BitsPerPixel ) >> 3;
+		}
 
-        // Update KernBootStruct using info provided by the selected
-        // VESA mode.
+		// Update KernBootStruct using info provided by the selected
+		// VESA mode.
 
-        bootArgs->Video.v_display  = GRAPHICS_MODE;
-        bootArgs->Video.v_width    = minfo.XResolution;
-        bootArgs->Video.v_height   = minfo.YResolution;
-        bootArgs->Video.v_depth    = minfo.BitsPerPixel;
-        bootArgs->Video.v_rowBytes = minfo.BytesPerScanline;
-        bootArgs->Video.v_baseAddr = VBEMakeUInt32(minfo.PhysBasePtr);
+		bootArgs->Video.v_display	= GRAPHICS_MODE;
+		bootArgs->Video.v_width		= minfo.XResolution;		/* 1920 or 1600 */
+		bootArgs->Video.v_height	= minfo.YResolution;		/* 1200 or 900 */
+		bootArgs->Video.v_depth		= minfo.BitsPerPixel;		/* 32 */
+		bootArgs->Video.v_rowBytes	= minfo.BytesPerScanline;	/* 7680 or 6400 */
+		bootArgs->Video.v_baseAddr	= VBEMakeUInt32(minfo.PhysBasePtr);
 
 	} while ( 0 );
 
-    return err;
+	return err;
 }
 
 //==============================================================================
@@ -563,8 +545,7 @@ int convertImage( unsigned short width, unsigned short height, const unsigned ch
 
 //==============================================================================
 
-int loadPngImage(const char *filename, uint16_t *width, uint16_t *height,
-        uint8_t **imageData)
+int loadPngImage(const char *filename, uint16_t *width, uint16_t *height, uint8_t **imageData)
 {
     uint8_t *pngData = NULL;
     int pngFile = 0, pngSize;
@@ -617,7 +598,8 @@ failed:
 
 //==============================================================================
 
-int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData) {
+int loadEmbeddedPngImage(uint8_t *pngData, int pngSize, uint16_t *width, uint16_t *height, uint8_t **imageData)
+{
     PNG_info_t *info;
     int error = 0;
 	
@@ -647,8 +629,7 @@ failed:
 
 //==============================================================================
 
-void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height,
-        uint8_t *data)
+void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t *data)
 {
     uint16_t drawWidth;
     uint8_t *vram = (uint8_t *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + 4 * x;
@@ -780,37 +761,39 @@ void drawCheckerBoard()
 
 unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
 {
-    long result, red, green, blue;
-  
-    red   = appleClut8[index * 3 + 0];
-    green = appleClut8[index * 3 + 1];
-    blue  = appleClut8[index * 3 + 2];
+	long result;
 
-    switch (depth) {
-        case 16 :
-            result = ((red   & 0xF8) << 7) | 
-                     ((green & 0xF8) << 2) |
-                     ((blue  & 0xF8) >> 3);
-            result |= (result << 16);
-            break;
+	long colorIndex = (index * 3);
+	long red   = appleClut8[ colorIndex   ];
+	long green = appleClut8[ colorIndex++ ];
+	long blue  = appleClut8[ colorIndex++ ];
 
-        case 32 :
-            result = (red << 16) | (green << 8) | blue;
-            break;
+	switch (depth)
+	{
+		case 16 :
+			result = ((red   & 0xF8) << 7) | 
+				((green & 0xF8) << 2) |
+				((blue  & 0xF8) >> 3);
+			result |= (result << 16);
+			break;
 
-        default :
-            result = index | (index << 8);
-            result |= (result << 16);
-            break;
-    }
+		case 32 :
+			result = (red << 16) | (green << 8) | blue;
+			break;
 
-    return result;
+		default :
+			result = index | (index << 8);
+			result |= (result << 16);
+			break;
+	}
+
+	return result;
 }
 
 //==========================================================================
 // drawColorRectangle
 
-void * stosl(void * dst, long val, long len)
+void *stosl(void *dst, long val, long len)
 {
 	asm volatile ( "rep; stosl"
 				  : "=c" (len), "=D" (dst)
@@ -828,9 +811,9 @@ void drawColorRectangle( unsigned short x,
                                 unsigned short height,
                                 unsigned char  colorIndex )
 {
-	long   pixelBytes;
-	long   color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
-	char * vram;
+	long	pixelBytes;
+	long	color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
+	char	*vram;
 
 	pixelBytes = VIDEO(depth) / 8;
 	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
@@ -854,18 +837,17 @@ void drawColorRectangle( unsigned short x,
 //==========================================================================
 // drawDataRectangle
 
-void drawDataRectangle( unsigned short  x,
-                        unsigned short  y,
-                        unsigned short  width,
-                        unsigned short  height,
-                        unsigned char * data )
+void drawDataRectangle( unsigned short  x, unsigned short  y, unsigned short  width, unsigned short  height, unsigned char   *data )
 {
 	unsigned short drawWidth;
+
 	long   pixelBytes = VIDEO(depth) / 8;
+
 	unsigned char * vram   = (unsigned char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
 
 	drawWidth = MIN(width, VIDEO(width) - x);
 	height = MIN(height, VIDEO(height) - y);
+
 	while ( height-- )
 	{
 		bcopy( data, vram, drawWidth * pixelBytes );
@@ -878,12 +860,12 @@ void drawDataRectangle( unsigned short  x,
 
 void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, int oh, int op, int or)
 {
-	int x,y, off;
-	int red=0x7f, green=0x7f, blue=0x7f;
-	for (x=0;x<ow;x++)
-		for (y=0;y<oh;y++)
+	int x, y, off;
+	int red = 0x7f, green = 0x7f, blue = 0x7f;
+	for ( x = 0; x < ow; x++)
+		for ( y = 0; y < oh; y++ )
 		{
-			off=(x*iw)/ow+((y*ih)/oh)*iw;
+			off = ( x * iw ) / ow +( ( y * ih ) / oh ) * iw;
 			switch (ip)
 			{
 				case 16:
@@ -924,15 +906,15 @@ void loadImageScale (void *input, int iw, int ih, int ip, void *output, int ow, 
 
 DECLARE_IOHIBERNATEPROGRESSALPHA
 
-void drawPreview(void *src, uint8_t * saveunder)
+void drawPreview(void *src, uint8_t *saveunder)
 {
-	uint8_t *  screen;
+	uint8_t    *screen;
 	uint32_t   rowBytes, pixelShift;
 	uint32_t   x, y;
 	int32_t    blob;
 	uint32_t   alpha, in, color, result;
-	uint8_t *  out;
-	void *uncomp;
+	uint8_t    *out;
+	void       *uncomp;
 	int origwidth, origheight, origbpx;
 	uint32_t   saveindex[kIOHibernateProgressCount] = { 0 };
 
@@ -957,6 +939,7 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
+
 		// Set the screen to 75% grey.
 		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
 	}
@@ -1018,14 +1001,14 @@ void drawPreview(void *src, uint8_t * saveunder)
 
 //==============================================================================
 
-void updateProgressBar(uint8_t * saveunder, int32_t firstBlob, int32_t select)
+void updateProgressBar(uint8_t *saveunder, int32_t firstBlob, int32_t select)
 {
-	uint8_t * screen;
-	uint32_t  rowBytes, pixelShift;
-	uint32_t  x, y;
-	int32_t   blob, lastBlob;
-	uint32_t  alpha, in, color, result;
-	uint8_t * out;
+	uint8_t		*screen;
+	uint32_t	rowBytes, pixelShift;
+	uint32_t	x, y;
+	int32_t		blob, lastBlob;
+	uint32_t	alpha, in, color, result;
+	uint8_t		*out;
 	uint32_t  saveindex[kIOHibernateProgressCount] = { 0 };
 
 	pixelShift = VIDEO(depth) >> 4;
@@ -1116,7 +1099,7 @@ static int setVESATextMode( unsigned short cols, unsigned short rows, unsigned c
 //==========================================================================
 // getNumberArrayFromProperty
 
-static int getNumberArrayFromProperty( const char *  propKey,
+static int getNumberArrayFromProperty( const char *propKey,
                             unsigned long numbers[],
                             unsigned long maxArrayCount )
 {

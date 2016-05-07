@@ -145,7 +145,7 @@ USER_modify(disk, tt, offset, reloff)
 	static int editlevel;
 	mbr_t *mbr;
 	cmd_t cmd;
-	int i, st, fd;
+	int i, st = CMD_EXIT, fd;
 	int modified = 0;	
 
 	/* One level deeper */
@@ -156,7 +156,10 @@ USER_modify(disk, tt, offset, reloff)
 
 	/* Read MBR & partition */
 	mbr = MBR_alloc(NULL);
+	if (!mbr) errx(1, "out of memory");
 	fd = DISK_open(disk->name, O_RDONLY);
+	if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
 	MBR_read(disk, fd, offset, mbr);
 	DISK_close(fd);
 
@@ -166,9 +169,9 @@ USER_modify(disk, tt, offset, reloff)
 	if (mbr->signature != MBR_SIGNATURE) {
 	    int yn = ask_yn("The signature for this MBR is invalid.\nWould you like to initialize the partition table?", 1);
 	    if (yn) {
-	      strcpy(cmd.cmd, "erase");
+	      strlcpy(cmd.cmd, "erase", sizeof(cmd.cmd));
 	      cmd.args[0] = '\0';
-	      st = Xerase(&cmd, disk, mbr, tt, offset);
+	      Xerase(&cmd, disk, mbr, tt, offset);
 	      modified = 1;
 	    }
 	}
@@ -189,7 +192,7 @@ again:
 				break;
 
 		/* Quick hack to put in '?' == 'help' */
-		if (!strcmp(cmd.cmd, "?"))
+		if (!strncmp(cmd.cmd, "?", sizeof("?")))
 			i = 0;
 
 		/* Check for valid command */
@@ -197,7 +200,7 @@ again:
 			printf("Invalid command '%s'.  Try 'help'.\n", cmd.cmd);
 			continue;
 		} else
-			strcpy(cmd.cmd, cmd_table[i].cmd);
+			strlcpy(cmd.cmd, cmd_table[i].cmd, sizeof(cmd.cmd));
 
 		/* Call function */
 		st = cmd_table[i].fcn(&cmd, disk, mbr, tt, offset);
@@ -252,11 +255,13 @@ USER_print_disk(disk, do_dump)
 	disk_t *disk;
 	int do_dump;
 {
-	int fd, offset, firstoff;
+	int fd /*, offset, firstoff*/;
 	mbr_t *mbr;
 
 	fd = DISK_open(disk->name, O_RDONLY);
-	offset = firstoff = 0;
+	if (fd == -1) 
+		err(1, "Could not open %s", disk->name);
+	/*offset = firstoff = 0;*/
 
 	if (!do_dump)
 	  DISK_printmetrics(disk);

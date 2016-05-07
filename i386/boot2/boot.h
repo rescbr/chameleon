@@ -30,7 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
-//#define GALA            checkOSVersion("10.11") // Gala
+#define ELCAPITAN       checkOSVersion("10.11") // El Capitan
 #define YOSEMITE        checkOSVersion("10.10") // Yosemite
 #define MAVERICKS       checkOSVersion("10.9")  // Mavericks
 #define MOUNTAIN_LION   checkOSVersion("10.8")  // Mountain Lion
@@ -57,11 +57,12 @@
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
-#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and newer
+#define kDefaultKernelPathForYos	"/System/Library/Kernels/"  //for Yosemite and El Capitan
 
 /*
  * Keys used in system Boot.plist
  */
+
 #define kGraphicsModeKey		"Graphics Mode"
 #define kTextModeKey			"Text Mode"
 #define kQuietBootKey			"Quiet Boot"
@@ -85,7 +86,7 @@
 #define kScanSingleDriveKey		"Scan Single Drive"
 #define kInstantMenuKey			"Instant Menu"
 #define kDefaultKernel			"mach_kernel"
-#define kOSXKernel			"kernel"		// Yosemite
+#define kOSXKernel			"kernel"		// Yosemite+
 #define kGUIKey				"GUI"
 #define kBootBannerKey			"Boot Banner"
 #define kShowInfoKey			"ShowInfo"		// gui.c
@@ -109,7 +110,7 @@
 #define kUseNvidiaROM			"UseNvidiaROM"		/* nvidia.c */
 #define kVBIOS				"VBIOS"			/* nvidia.c && ati.c */
 #define kPCIRootUID			"PCIRootUID"		/* pci_root.c */
-#define kEthernetBuiltIn		"EthernetBuiltIn"	/* pci_setup.c */
+#define kEthernetBuiltIn		"EthernetBuiltIn"	/* networking.c */
 #define kGraphicsEnabler		"GraphicsEnabler"	/* pci_setup.c */
 #define kForceHPET			"ForceHPET"		/* pci_setup.c */
 #define kUseMemDetect			"UseMemDetect"		/* platform.c */
@@ -129,14 +130,16 @@
 /* Slice: added these keys */
 #define kPS2RestartFix			"PS2RestartFix"		/* acpi_patcher.c */
 #define kUseIntelHDMI			"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
+#define kNvidiaSingle			"NvidiaSingle"		/* nvidia.c */
 
 /* Signal64: added this key */
 #define kLegacyOff			"USBLegacyOff"		/* usb.c */
 
 /* Lebidou: added this key */
 
-/* Meklort: added this key */
+/* Meklort: added these keys */
 #define kMD0Image			"md0"			/* ramdisk.h */
+#define kEnableWifi			"EnableWifi"		/* networking.c */
 
 /* Andyvand: added these keys */
 
@@ -167,19 +170,25 @@
 #define kEnableHDMIAudio		"EnableHDMIAudio"		/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
+#define kEnableHiDPI			"EnableHiDPI"			// enable High resolution display (aka Retina)
 
 /* ErmaC: added these keys */
-#define kEnableDualLink			"EnableDualLink"		/* nvidia.c && gma.c*/
+#define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
 #define kSkipIntelGfx			"SkipIntelGfx"			/* pci_setup.c */
 #define kSkipNvidiaGfx			"SkipNvidiaGfx"			/* pci_setup.c */
 #define kSkipAtiGfx			"SkipAtiGfx"			/* pci_setup.c */
 #define kIntelCapriFB			"IntelCapriFB"			/* gma.c was HD4K-ig */
 #define kIntelAzulFB			"IntelAzulFB"			/* gma.c was HD5K-ig */
+#define kIntelBdwFB			"IntelBdwFB"			/* gma.c */
+#define kIntelSklFB			"IntelSklFB"			/* gma.c */
 #define kAAPLCustomIG			"InjectIntel-ig"		/* gma.c */
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
 #define kHDAULayoutID			"HDAULayoutID"			/* hda.c */
+
+/* Pike R. Alpha: added this key */
+#define kBlackMode			"BlackMode"
 
 /* Karas: added this key */
 #define kMemFullInfo			"ForceFullMemInfo"		/* smbios.c */
@@ -232,7 +241,7 @@ enum {
 
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
-extern bool checkOSVersion(const char * version);
+extern bool checkOSVersion(const char *version);
 extern uint32_t getMacOSVerCurrent();
 
 /*
@@ -267,7 +276,7 @@ convertImage( unsigned short width,
               unsigned short height,
               const unsigned char *imageData,
               unsigned char **newImageData );
-extern char * decodeRLE( const void * rleData, int rleBlocks, int outBytes );
+extern char *decodeRLE( const void *rleData, int rleBlocks, int outBytes );
 extern void drawBootGraphics(void);
 extern void drawPreview(void *src, uint8_t *saveunder);
 extern int getVideoMode(void);

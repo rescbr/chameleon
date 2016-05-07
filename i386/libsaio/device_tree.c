@@ -27,14 +27,16 @@
 
 #define kPropNameLength 32
 
-typedef struct DeviceTreeNodeProperty {
+typedef struct DeviceTreeNodeProperty
+{
 	char                name[kPropNameLength];  // NUL terminated property name
 	unsigned long       length;         // Length (bytes) of folloing prop value
                                         //  unsigned long       value[1];       // Variable length value of property
                                         // Padded to a multiple of a longword?
 } DeviceTreeNodeProperty;
 
-typedef struct OpaqueDTEntry {
+typedef struct OpaqueDTEntry
+{
 	unsigned long       nProperties;    // Number of props[] elements (0 => end)
 	unsigned long       nChildren;      // Number of children[] elements
                                         //  DeviceTreeNodeProperty      props[];// array size == nProperties
@@ -66,7 +68,8 @@ DT__PrintTree(Node *node);
 
 #define RoundToLong(x)	(((x) + 3) & ~3)
 
-static struct _DTSizeInfo {
+static struct _DTSizeInfo
+{
 	uint32_t	numNodes;
 	uint32_t	numProperties;
 	uint32_t	totalPropertySize;
@@ -122,9 +125,12 @@ Property *DT__AddProperty(Node *node, const char *name, uint32_t length, void *v
 	prop->value = value;
 
 	// Always add to end of list
-	if (node->properties == 0) {
+	if (node->properties == 0)
+	{
 		node->properties = prop;
-	} else {
+	}
+	else
+	{
 		node->last_prop->next = prop;
 	}
 
@@ -196,6 +202,7 @@ Node *DT__AddChild(Node *parent, const char *name)
 	}
 
 	DTInfo.numNodes++;
+
 	DT__AddProperty(node, "name", strlen(name) + 1, (void *) name);
 
 	return node;
@@ -281,7 +288,8 @@ static void *FlattenNodes(Node *node, void *buffer)
 	DeviceTreeNodeProperty *flatProp;
 	int count;
 
-	if (node == 0) {
+	if (node == 0)
+	{
 		return buffer;
 	}
 
@@ -326,7 +334,8 @@ void DT__FlattenDeviceTree(void **buffer_p, uint32_t *length)
 	DPRINTF("DT__FlattenDeviceTree(0x%x, 0x%x)\n", buffer_p, length);
 
 #if DEBUG
-	if (buffer_p) {
+	if (buffer_p)
+	{
 		DT__PrintTree(rootNode);
 	}
 #endif
@@ -421,7 +430,7 @@ Node *DT__FindNode(const char *path, bool createIfMissing)
 	int i;
 
 	DPRINTF("DT__FindNode('%s', %d)\n", path, createIfMissing);
-    
+
 	// Start at root
 	node = rootNode;
 
@@ -547,20 +556,28 @@ void DT__PrintFlattenedNode(DTEntry entry, int level)
 	void *prop;
 	int propSize;
 
-	if (level > 9) level = 9;
-	while (level--) *cp++ = ' ';
-		*cp = '\0';
+	if (level > 9)
+	{
+		level = 9;
+	}
+	while (level--)
+	{
+		*cp++ = ' ';
+	}
+	*cp = '\0';
 
 	printf("%s===Entry %p===\n", spaces, entry);
-		if (kSuccess != DTCreatePropertyIterator(entry, &propIter))
+	if (kSuccess != DTCreatePropertyIterator(entry, &propIter))
+	{
+		printf("Couldn't create property iterator\n");
+		return;
+	}
+	while( kSuccess == DTIterateProperties( propIter, &name))
+	{
+		if(  kSuccess != DTGetProperty( entry, name, &prop, &propSize ))
 		{
-			printf("Couldn't create property iterator\n");
-			return;
+			continue;
 		}
-		while( kSuccess == DTIterateProperties( propIter, &name))
-		{
-			if(  kSuccess != DTGetProperty( entry, name, &prop, &propSize ))
-				continue;
 		printf("%s Property %s = %s\n", spaces, name, prop);
 	}
 	DTDisposePropertyIterator(propIter);

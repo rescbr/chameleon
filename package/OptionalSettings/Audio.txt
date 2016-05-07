@@ -25,6 +25,6 @@ Exclusive=False
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
-#Bool@HDAEnabler:HDAEnabler=Yes
+Bool@HDAEnabler:HDAEnabler=Yes
 Bool@UseIntelHDMI:UseIntelHDMI=Yes
 Bool@EnableHDMIAudio:EnableHDMIAudio=Yes

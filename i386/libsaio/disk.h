@@ -9,6 +9,6 @@
 #ifndef __LIBSAIO_DISK_H
 #define __LIBSAIO_DISK_H
 
-bool matchVolumeToString( BVRef bvr, const char* match, long strMaxLen);
+bool matchVolumeToString( BVRef bvr, const char *match, long strMaxLen);
 
 #endif /* __LIBSAIO_DISK_H */

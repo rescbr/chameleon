@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --------------------------------------------------------------------------------------------------------
-# Install.sh v1.5, script to install Chameleon
+# Install.sh v1.6, script to install Chameleon
 # Created by Miky1979 on December 8th, 2014
 # --------------------------------------------------------------------------------------------------------
 targetVolume="${3}"
@@ -187,8 +187,12 @@ PARTITION_ACTIVE_IF() {
                 echo "${targetDiskRaw#/dev/r}, slice "${targetSlice}" is already set active. No need to change it."
             else
                 echo "Setting ${choicedVolume} partition active."
-                # BadAxe requires EFI partition to be flagged active.
-                # but it doesn't' hurt to do it for any non-windows partition.
+                if [[ $( /usr/libexec/PlistBuddy -c "Print SkipActivePartition" ${configFile} 2> /dev/null ) == "true" ]];then
+                    # Skip writing Stage 0 (user wants this)
+                    echo "user chose to skip activation, partition not activated!"
+                    else
+                        # BadAxe requires EFI partition to be flagged active.
+                        # but it doesn't' hurt to do it for any non-windows partition.
 
 # leave left aligned the follow code:
 fdisk -e ${targetDiskRaw} <<-MAKEACTIVE
@@ -198,6 +202,7 @@ write
 y
 quit
 MAKEACTIVE
+                fi
             fi
         else
             echo "Partition will not activate when Windows is detected or stage 0 is boot0hfs"
@@ -220,8 +225,13 @@ CHECK_WINDOWS() {
 WRITE_STAGE0() {
     if  [ $InstallBootloader = "1" ];then
         echo -e "${mainLine}\nWRITING STAGE 0:"
-        "${usrLocalBin}/fdisk440" -u -f "${i386Dir}/${stage0Loader}" -y ${targetDisk}
-        echo "${stage0Loader} writed to ${targetDisk}"
+        if [[ $( /usr/libexec/PlistBuddy -c "Print SkipStage0" ${configFile} 2> /dev/null ) == "true" ]];then
+            # Skip writing Stage 0 (user wants this)
+            echo "user chose to skip stage0, not written!"
+        else
+            "${usrLocalBin}/fdisk440" -u -f "${i386Dir}/${1}" -y ${targetDisk}
+            echo "${1} written to ${targetDisk}"
+        fi
     fi
 }
 # --------------------------------------------------------------------------------------------------------
@@ -229,10 +239,15 @@ WRITE_STAGE0() {
 WRITE_STAGE1() {
     if  [ $InstallBootloader = "1" ];then
         echo -e "${mainLine}\nWRITING STAGE 1 ${2}:"
-        cp -R "${usrLocalBin}/boot1-install" "${v_mntpt}"/
-        cp -R "${i386Dir}/${1}" "${v_mntpt}"/
-        "${v_mntpt}/boot1-install" -y "-${3}" -f "${v_mntpt}/${1}" ${targetDeviceRaw}
-        echo "${stage1Loader} (${2}) writed to ${targetDeviceRaw}."
+        if [[ $( /usr/libexec/PlistBuddy -c "Print SkipStage1" ${configFile} 2> /dev/null ) == "true" ]];then
+            # Skip writing Stage 0 (user wants this)
+            echo "user chose to skip stage1, not written!"
+        else
+            cp -R "${usrLocalBin}/boot1-install" "${v_mntpt}"/
+            cp -R "${i386Dir}/${1}" "${v_mntpt}"/
+            "${v_mntpt}/boot1-install" -y "-${3}" -f "${v_mntpt}/${1}" ${targetDeviceRaw}
+            echo "${stage1Loader} (${2}) written to ${targetDeviceRaw}."
+        fi
     fi
 }
 # --------------------------------------------------------------------------------------------------------
@@ -242,7 +257,7 @@ WRITE_STAGE2() {
         echo -e "${mainLine}\nWRITING STAGE 2:"
         cp -R "${i386Dir}/${stage2Loader}" "${choicedVolume}/"
         chflags hidden "${choicedVolume}/${stage2Loader}"
-        echo "Stage 2 (boot) writed to ${choicedVolume}."
+        echo "Stage 2 (${stage2Loader}) written to ${choicedVolume}."
     fi
 }
 # --------------------------------------------------------------------------------------------------------
@@ -277,7 +292,8 @@ EXTRA() {
     else
         echo "Extra folder already exist on ${choicedVolume}, copying to the Ram Disk.."
         cp -R "${choicedVolume}/Extra" "${v_mntpt}"/
-        ./clean_bootplist.pl "${v_mntpt}"
+        ./clean_bootplist.pl "${v_mntpt}" org.chameleon.Boot.plist
+        ./clean_bootplist.pl "${v_mntpt}" kernel.plist
     fi
 }
 # --------------------------------------------------------------------------------------------------------

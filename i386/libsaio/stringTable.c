@@ -41,8 +41,7 @@ bool sysConfigValid;
 /*
  * Compare a string to a key with quoted characters
  */
-static inline int
-keyncmp(const char *str, const char *key, int n)
+static inline int keyncmp(const char *str, const char *key, int n)
 {
     int c;
     while (n--) {
@@ -90,9 +89,7 @@ static void eatThru(char val, const char **table_p)
 }
 
 /* Remove key and its associated value from the table. */
-
-bool
-removeKeyFromTable(const char *key, char *table)
+bool removeKeyFromTable(const char *key, char *table)
 {
     register int len;
     register char *tab;
@@ -102,7 +99,7 @@ removeKeyFromTable(const char *key, char *table)
     tab = (char *)table;
     buf = (char *)malloc(len + 3);
 
-    sprintf(buf, "\"%s\"", key);
+    snprintf(buf, len + 3,"\"%s\"", key);
     len = strlen(buf);
 
     while(*tab) {
@@ -156,6 +153,10 @@ char *newStringFromList(char **list, int *size)
 	}
 	bufsize = end - begin + 1;
 	newstr = malloc(bufsize);
+	if (!newstr)
+	{
+		return 0;
+	}
 	strlcpy(newstr, begin, bufsize);
 	*list = end;
 	*size = newsize;
@@ -175,8 +176,11 @@ int stringLength(const char *table, int compress)
 		if (*table == '\\') {
 			table += 2;
 			ret += 1 + (compress ? 0 : 1);
-		} else {
-			if (*table == '\"') {
+		}
+		else
+		{
+			if (*table == '\"')
+			{
 				return ret;
 			}
 			ret++;
@@ -224,8 +228,13 @@ char *newStringForStringTableKey(char *table, char *key, config_file_t *config)
 	char *newstr, *p;
 	int size;
     
-	if (getValueForConfigTableKey(config, key, &val, &size)) {
+	if (getValueForConfigTableKey(config, key, &val, &size))
+	{
 		newstr = (char *)malloc(size+1);
+		if (!newstr)
+		{
+			return 0;
+		}
 		for (p = newstr; size; size--, p++, val++) {
 			if ((*p = *val) == '\\') {
 				switch (*++val) {
@@ -254,8 +263,7 @@ char *newStringForStringTableKey(char *table, char *key, config_file_t *config)
 
 #endif
 
-char *
-newStringForKey(char *key, config_file_t *config)
+char *newStringForKey(char *key, config_file_t *config)
 {
 	const char *val;
 	char *newstr;
@@ -263,6 +271,10 @@ newStringForKey(char *key, config_file_t *config)
     
 	if (getValueForKey(key, &val, &size, config) && size) {
 		newstr = (char *)malloc(size + 1);
+		if (!newstr)
+		{
+			return 0;
+		}
 		strlcpy(newstr, val, size + 1);
 		return newstr;
 	} else {
@@ -275,7 +287,6 @@ newStringForKey(char *key, config_file_t *config)
  * both <option> and <value> must be either composed of
  * non-whitespace characters, or enclosed in quotes.
  */
-
 static const char *getToken(const char *line, const char **begin, int *len)
 {
 	if (*line == '\"') {
@@ -302,7 +313,8 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
     
 	while (*line) {
 		/* look for keyword or argument */
-		while (isspace(*line)) {
+		while (isspace(*line))
+		{
 			line++;
 		}
 
@@ -315,12 +327,13 @@ bool getValueForBootKey(const char *line, const char *match, const char **matchv
 			value = line;
 			value_len = 0;
 		}
-		if ((strlen(match) == key_len) && strncmp(match, key, key_len) == 0) {
+		if ((strlen(match) == key_len) && strncmp(match, key, key_len) == 0)
+		{
 			// create a new string
 			char* newstr = malloc(value_len + 1);
 			strncpy(newstr, value, value_len);
 			newstr[value_len] = 0;
-		
+
 			*matchval = newstr;
 			*len = value_len;
 			retval = true;
@@ -343,11 +356,9 @@ const char *getStringForKey(const char *key,  config_file_t *config)
 	return value;
 }
 
-
 /* Returns TRUE if a value was found, FALSE otherwise.
  * The boolean value of the key is stored in 'val'.
  */
-
 bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 {
     const char *key_val;
@@ -374,23 +385,29 @@ bool getIntForKey(const char *key, int *value, config_file_t *config)
 	int size, sum;
 	bool negative = false;
     
-	if (getValueForKey(key, &val, &size, config)) {
-		if (size) {
-			if (*val == '-') {
+	if (getValueForKey(key, &val, &size, config))
+	{
+		if (size)
+		{
+			if (*val == '-')
+			{
 				negative = true;
 				val++;
 				size--;
 			}
 			
-			for (sum = 0; size > 0; size--) {
-				if (*val < '0' || *val > '9') {
+			for (sum = 0; size > 0; size--)
+			{
+				if (*val < '0' || *val > '9')
+				{
 					return false;
 				}
 				
 				sum = (sum * 10) + (*val++ - '0');
 			}
 			
-			if (negative) {
+			if (negative)
+			{
 				sum = -sum;
 			}
 			*value = sum;
@@ -399,11 +416,9 @@ bool getIntForKey(const char *key, int *value, config_file_t *config)
 	}
 	return false;
 }
-
 /*
  *
  */
-
 bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *config, unsigned int dimension_max, unsigned int object_size )
 {
 	const char *val;
@@ -414,38 +429,48 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 	bool negative = false;
 	bool percentage = false;
 
-	if (getValueForKey(key, &val, &size, config)) {
-		if ( size ) {
-			if (*val == '-') {
+	if (getValueForKey(key, &val, &size, config))
+	{
+		if ( size )
+		{
+			if (*val == '-')
+			{
 				negative = true;
 				val++;
 				size--;
 			}
 
-			if (val[size-1] == '%') {
+			if (val[size-1] == '%')
+			{
 				percentage = true;
 				size--;
 			}
 
 			// convert string to integer
-			for (sum = 0; size > 0; size--) {
-				if (*val < '0' || *val > '9') {
+			for (sum = 0; size > 0; size--)
+			{
+				if (*val < '0' || *val > '9')
+				{
 					return false;
 				}
 
 				sum = (sum * 10) + (*val++ - '0');
 			}
 
-			if (percentage) {
+			if (percentage)
+			{
 				sum = ( dimension_max * sum ) / 100;
 			}
 
 			// calculate offset from opposite origin
-			if (negative) {
+			if (negative)
+			{
 				sum =  ( ( dimension_max - object_size ) - sum );
 			}
 
-		} else {
+		}
+		else
+		{
 
 			// null value calculate center
 			sum = ( dimension_max - object_size ) / 2;
@@ -463,7 +488,6 @@ bool getDimensionForKey( const char *key, unsigned int *value, config_file_t *co
 /*
  *	get color value from plist format #RRGGBB
  */
-
 bool getColorForKey( const char *key, unsigned int *value, config_file_t *config )
 {
 	const char *val;
@@ -486,7 +510,8 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 	int overrideSize;
 	bool override, ret;
 
-	if (getValueForBootKey(bootArgs->CommandLine, key, val, size)) {
+	if (getValueForBootKey(bootArgs->CommandLine, key, val, size))
+	{
 		return true;
 	}
 
@@ -496,21 +521,26 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 	// and prefer its values with the exceptions for
 	// "Kernel"="mach_kernel" and "Kernel Flags"="".
 
-	if (config->canOverride) {
-		if (getValueForConfigTableKey(&bootInfo->chameleonConfig, key, &overrideVal, &overrideSize)) {
+	if (config->canOverride)
+	{
+		if (getValueForConfigTableKey(&bootInfo->chameleonConfig, key, &overrideVal, &overrideSize))
+		{
 			override = true;
 
 			// NOTE: Values are defined by apple as being in com.apple.Boot.plist
 			//        kHelperRootUUIDKey, kKernelArchKey, kMKextCacheKey, kKernelCacheKey, kKernelNameKey, kKernelFlagsKey
-			if (ret && (strcmp(key, kKernelNameKey) == 0) && (overrideSize == 0)) {
+			if (ret && (strcmp(key, kKernelNameKey) == 0) && (overrideSize == 0))
+			{
 				override = false;
 			}
 
-			if (ret && (strcmp(key, kKernelFlagsKey) == 0) && (overrideSize == 0)) {
+			if (ret && (strcmp(key, kKernelFlagsKey) == 0) && (overrideSize == 0))
+			{
 				override = false;
 			}
 
-			if (override) {
+			if (override)
+			{
 				*val = overrideVal;
 				*size = overrideSize;
 				ret = true;
@@ -520,22 +550,23 @@ bool getValueForKey( const char *key, const char **val, int *size, config_file_t
 	return ret;
 }
 
-
 #if UNUSED
-void
-printSystemConfig(char *p1)
+void printSystemConfig(char *p1)
 {
 	char *p2 = p1, tmp;
 
-	while (*p1 != '\0') {
-		while (*p2 != '\0' && *p2 != '\n') {
+	while (*p1 != '\0')
+	{
+		while (*p2 != '\0' && *p2 != '\n')
+		{
 			p2++;
 		}
 	tmp = *p2;
 	*p2 = '\0';
 	printf("%s\n", p1);
 	*p2 = tmp;
-	if (tmp == '\0') {
+	if (tmp == '\0')
+	{
 		break;
 	}
 	p1 = ++p2;
@@ -555,25 +586,35 @@ printSystemConfig(char *p1)
 int ParseXMLFile( char *buffer, TagPtr *dict )
 {
 	long       length, pos;
-	TagPtr     tag;
+	TagPtr     tag = 0;
 	pos = 0;
 	char       *configBuffer;
+
+	length = strlen(buffer) + 1;
   
 	configBuffer = malloc(strlen(buffer)+1);
-	strcpy(configBuffer, buffer);
+	if (!configBuffer)
+	{
+		return -1;
+	}
+	strlcpy(configBuffer, buffer, length );
 
-	while (1) {
+	while (1)
+	{
 		length = XMLParseNextTag(configBuffer + pos, &tag);
-			if (length == -1) {
+			if (length == -1)
+			{
 				break;
 			}
 
 		pos += length;
 
-		if (tag == 0) {
+		if (tag == 0)
+		{
 			continue;
 		}
-		if (tag->type == kTagTypeDict) {
+		if (tag->type == kTagTypeDict)
+		{
 			break;
 		}
 
@@ -610,7 +651,6 @@ int loadConfigFile (const char *configFile, config_file_t *config)
 	return 0;
 }
 
-
 /* loadSystemConfig
  *
  * Returns 0 - successful.
@@ -618,12 +658,13 @@ int loadConfigFile (const char *configFile, config_file_t *config)
  */
 int loadSystemConfig(config_file_t *config)
 {
+	// Micky1979, the order is important
 	char *dirspec[] = {
-		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Installer (Lion 10.7)
-		"/OS X Install Data/com.apple.Boot.plist",				// OS X Installer (10.8+)
+		"/com.apple.recovery.boot/com.apple.Boot.plist",			// OS X Recovery
+		"/OS X Install Data/com.apple.Boot.plist",				// OS X Upgrade (10.8+)
+		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Upgrade (Lion 10.7)
 		//"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer
-		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",	// com.apple.Boot.plist
-		"/com.apple.recovery.boot/com.apple.Boot.plist"				// OS X Recovery
+		"/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"		// (Installed System or Installer)
 	};
 
 	int i, fd, count, ret=-1;
@@ -738,33 +779,114 @@ int loadChameleonConfigForDevice(config_file_t *config, const char *device, cons
  */
 int loadHelperConfig(config_file_t *config)
 {
+	int rfd, pfd, sfd, count, ret=-1, fixedsize;
+
 	char *dirspec[] = {
 		"/com.apple.boot.P/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.R/Library/Preferences/SystemConfiguration/com.apple.Boot.plist",
 		"/com.apple.boot.S/Library/Preferences/SystemConfiguration/com.apple.Boot.plist"
 	};
 
-	int i, fd, count, ret=-1;
+	// This is a simple rock - paper scissors algo. R beats S, P beats R, S beats P
+	// If all three, S is used for now. This should be changed to something else (say, timestamp?)
 
-	for(i = 0; i< sizeof(dirspec)/sizeof(dirspec[0]); i++)
+	pfd = open(dirspec[0], 0);
+	if(pfd >= 0)	// com.apple.boot.P exists
 	{
-		if ((fd = open(dirspec[i], 0)) >= 0)
+
+		sfd = open(dirspec[2], 0); // com.apple.boot.S takes precidence if it also exists
+		if(sfd >= 0)
 		{
-			// read file
-			count = read(fd, config->plist, IO_CONFIG_DATA_SIZE);
-			close(fd);
-			
+			// Use sfd
+			fixedsize = MIN(file_size(sfd), IO_CONFIG_DATA_SIZE);
+			count = read(sfd, config->plist, fixedsize);
+			close(sfd);
+			close(pfd);
+			if (count != fixedsize) return -1;
+
 			// build xml dictionary
 			ParseXMLFile(config->plist, &config->dictionary);
-			sysConfigValid = true;	
+			sysConfigValid = true;
 			ret=0;
-			break;
+
 		}
+		else
+		{
+			// used pfd
+			fixedsize = MIN(file_size(pfd), IO_CONFIG_DATA_SIZE);
+			count = read(pfd, config->plist, fixedsize);
+			close(pfd);
+			if (count != fixedsize) return -1;
+
+			// build xml dictionary
+			ParseXMLFile(config->plist, &config->dictionary);
+			sysConfigValid = true;
+			ret = 0;
+		}
+
 	}
+	else
+	{
+		rfd = open(dirspec[1], 0); // com.apple.boot.R exists
+		if(rfd >= 0)
+		{
+			pfd = open(dirspec[2], 0); // com.apple.boot.P takes recidence if it exists
+			if(pfd >= 0)
+			{
+				// use sfd
+				fixedsize = MIN(file_size(pfd), IO_CONFIG_DATA_SIZE);
+				count = read(pfd, config->plist, fixedsize);
+				close(pfd);
+				close(rfd);
+				if (count != fixedsize) return -1;
+
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;
+				ret = 0;
+
+			}
+			else
+			{
+				// use rfd
+                		fixedsize = MIN(file_size(rfd), IO_CONFIG_DATA_SIZE);
+				count = read(rfd, config->plist, fixedsize);
+				close(rfd);
+				if (count != fixedsize) return -1;
+				
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;
+				ret = 0;
+
+			}
+
+		}
+		else
+		{
+			sfd = open(dirspec[2], 0); // com.apple.boot.S exists, but nothing else does
+			if(sfd >= 0)
+			{
+				// use sfd
+				fixedsize = MIN(file_size(sfd), IO_CONFIG_DATA_SIZE);
+				count = read(sfd, config->plist, fixedsize);
+				close(sfd);
+				if (count != fixedsize) return -1;
+
+				// build xml dictionary
+				ParseXMLFile(config->plist, &config->dictionary);
+				sysConfigValid = true;
+				ret = 0;
+
+			}
+		}
+
+	}
+
 	return ret;
 }
 
-char * newString(const char * oldString)
+char *newString(const char *oldString)
 {
 	if ( oldString )
 	{
@@ -779,7 +901,7 @@ char * newString(const char * oldString)
 /*
  * Extracts the next argument from the command line, double quotes are allowed here.
  */
-char * getNextArg(char ** argPtr, char * val)
+char *getNextArg(char **argPtr, char *val)
 {
 	char * ptr = *argPtr;
 	const char * strStart;

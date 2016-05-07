@@ -34,9 +34,9 @@
 #include "bootargs.h"
 
 #if DEBUG
-#define DEBUG_DISK(x)    printf x
+	#define DEBUG_DISK(x)    printf x
 #else
-#define DEBUG_DISK(x)
+	#define DEBUG_DISK(x)
 #endif
 
 typedef unsigned long entry_t;
@@ -57,21 +57,22 @@ struct driveParameters
 	int totalDrives;
 };
 
-struct Tag {
+typedef struct Tag
+{
 	long		type;
 	char	   *string;
 	long		offset;
 	struct Tag *tag;
 	struct Tag *tagNext;
-};
-typedef struct Tag Tag, *TagPtr;
+} Tag, *TagPtr;
 
 /*
  * Max size fo config data array, in bytes.
  */
 #define IO_CONFIG_DATA_SIZE		40960 // was 4096 // was 163840
 
-typedef struct {
+typedef struct
+{
 	char	plist[IO_CONFIG_DATA_SIZE];	// buffer for plist
 	TagPtr	dictionary;			// buffer for xml dictionary
 	bool	canOverride;			// flag to mark a dictionary can be overriden
@@ -80,7 +81,7 @@ typedef struct {
 /*
  * BIOS drive information.
  */
-struct boot_drive_info
+typedef struct boot_drive_info
 {
 	struct drive_params
 	{
@@ -103,7 +104,7 @@ struct boot_drive_info
 		unsigned char  dev_path[16];
 		unsigned char  reserved3;
 		unsigned char  checksum;
-	} params;
+	} params __attribute__((packed));
 
 	struct drive_dpte
 	{
@@ -122,9 +123,8 @@ struct boot_drive_info
 		unsigned short reserved;
 		unsigned char  revision;
 		unsigned char  checksum;
-    } dpte;
-} __attribute__((packed));
-typedef struct boot_drive_info boot_drive_info_t;
+    } dpte __attribute__((packed));
+} __attribute__((packed)) boot_drive_info_t;
 
 
 struct driveInfo
@@ -149,12 +149,12 @@ typedef struct	BootVolume *BVRef;
 typedef struct	BootVolume *CICell;
 
 typedef long (*FSInit)(CICell ih);
-typedef long (*FSLoadFile)(CICell ih, char * filePath);
+typedef long (*FSLoadFile)(CICell ih, char *filePath);
 typedef long (*FSReadFile)(CICell ih, char *filePath, void *base, uint64_t offset, uint64_t length);
 typedef long (*FSGetFileBlock)(CICell ih, char *filePath, unsigned long long *firstBlock);
-typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long * dirIndex,
-							  char ** name, long * flags, u_int32_t * time,
-							  FinderInfo * finderInfo, long * infoValid);
+typedef long (*FSGetDirEntry)(CICell ih, char * dirPath, long long *dirIndex,
+							  char **name, long * flags, u_int32_t *time,
+							  FinderInfo *finderInfo, long *infoValid);
 typedef long (*FSGetUUID)(CICell ih, char *uuidStr);
 typedef void (*BVGetDescription)(CICell ih, char * str, long strMaxLen);
 // Can be just pointed to free or a special free function
@@ -211,6 +211,8 @@ struct BootVolume {
 	bool			filtered;		/* newFilteredBVChain() will set to TRUE */
 	bool			visible;		/* will shown in the device list */
 	char			OSVersion[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' e.g. "10.10.10" - hope will not reach e.g. 111.222.333 soon:) If so, OSVERSTRLEN 9 change to 12 */
+	char			OSFullVer[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' */
+	char			OSBuildVer[OSVERSTRLEN];/* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductBuildVersion' */
 	bool			OSisServer;		/* 1 = OS X server , 0 = OS X client */
 	bool			OSisInstaller;		/* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
 
@@ -218,6 +220,7 @@ struct BootVolume {
 
 enum
 {
+	kBVFlagZero			= 0x00,
 	kBVFlagPrimary			= 0x01,
 	kBVFlagNativeBoot		= 0x02,
 	kBVFlagForeignBoot		= 0x04,

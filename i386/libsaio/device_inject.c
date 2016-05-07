@@ -14,19 +14,20 @@
 #include "convert.h"
 
 #ifndef DEBUG_INJECT
-#define DEBUG_INJECT 0
+	#define DEBUG_INJECT 0
 #endif
 
 #if DEBUG_INJECT
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
-uint32_t	devices_number	= 1;
-uint32_t	builtin_set	= 0;
-DevPropString	*string		= 0;
-uint8_t		*stringdata	= 0;
+uint32_t	devices_number	= 1; // nvidia.c
+uint32_t	location_number	= 1; // networking.c
+
+DevPropString	*string		= NULL;
+uint8_t		*stringdata	= NULL;
 uint32_t	stringlength	= 0;
 
 char *efi_inject_get_devprop_string(uint32_t *len)
@@ -57,7 +58,7 @@ void setupDeviceProperties(Node *node)
    */  
 	if (!getValueForKey(kDeviceProperties, &val, &cnt, &bootInfo->chameleonConfig) && string)
 	{
-		val = (const char*)string;
+		val = (const char *)string;
 		cnt = strlength * 2;
 	}
 
@@ -67,7 +68,7 @@ void setupDeviceProperties(Node *node)
 		if (cnt2 > 0)
 		{
 			DT__AddProperty(node, DEVICE_PROPERTIES_PROP, cnt2, binStr);
-			DBG("Adding device-properties string to DT");
+			DBG("Adding device-properties string to DT\n");
 		}
 	}
 }
@@ -230,7 +231,7 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 
 	memset(data, 0, length);
 	uint32_t off = 0;
-	data[off+1] = ((strlen(nm) * 2) + 6) >> 8;
+	data[off+1] = (uint8_t)(((strlen(nm) * 2) + 6) >> 8);
 	data[off] =   ((strlen(nm) * 2) + 6) & 0x00FF;
 
 	off += 4;
@@ -290,8 +291,8 @@ int devprop_add_value(DevPropDevice *device, char *nm, uint8_t *vl, uint32_t len
 // devprop_generate_string optimized by cparm
 char *devprop_generate_string(DevPropString *string)
 {
-	int len = string->length * 2;
-	char *buffer = (char*)malloc(len);
+	int len = ((string->length * 2) + 1);
+	char *buffer = (char *)malloc(len);
 	char *ptr = buffer;
 
 	if(!buffer)
@@ -400,89 +401,6 @@ void devprop_free_string(DevPropString *string)
 
 /* ======================================================= */
 
-
-/*******************************************************************
- * Decodes a sequence of 'len' hexadecimal chars from 'hex' into   *
- * a binary. returns -1 in case of error (i.e. badly formed chars) *
- *******************************************************************/
-int hex2bin(const char *hex, uint8_t *bin, int len)
-{
-	char	*p;
-	int	i;
-	char	buf[3];
-
-	if (hex == NULL || bin == NULL || len <= 0 || strlen(hex) != len * 2)
-	{
-		printf("[ERROR] bin2hex input error\n");
-		return -1;
-	}
-
-	buf[2] = '\0';
-	p = (char *) hex;
-
-	for (i = 0; i < len; i++)
-	{
-		if (p[0] == '\0' || p[1] == '\0' || !isxdigit(p[0]) || !isxdigit(p[1]))
-		{
-			printf("[ERROR] bin2hex '%s' syntax error\n", hex);
-			return -2;
-		}
-		buf[0] = *p++;
-		buf[1] = *p++;
-		bin[i] = (unsigned char) strtoul(buf, NULL, 16);
-	}
-	return 0;
-}
-
-/* ======================================================= */
-
 /* a fine place for this code */
 
-int devprop_add_network_template(DevPropDevice *device, uint16_t vendor_id)
-{
-	if(!device)
-	{
-		return 0;
-	}
-
-	uint8_t builtin = 0x0;
-	if((vendor_id != 0x168c) && (builtin_set == 0)) 
-	{
-		builtin_set = 1;
-		builtin = 0x01;
-	}
-
-	if(!devprop_add_value(device, "built-in", (uint8_t*)&builtin, 1))
-	{
-		return 0;
-	}
-
-	devices_number++;
-	return 1;
-}
-
-void set_eth_builtin(pci_dt_t *eth_dev)
-{
-	char *devicepath = get_pci_dev_path(eth_dev);
-	DevPropDevice *device = NULL;
-
-	verbose("LAN Controller [%04x:%04x] :: %s\n", eth_dev->vendor_id, eth_dev->device_id, devicepath);
-
-	if(!string)
-	{
-		string = devprop_create_string();
-	}
-
-	device = devprop_add_device(string, devicepath);
-	if(device)
-	{
-		verbose("Setting up lan keys\n");
-		devprop_add_network_template(device, eth_dev->vendor_id);
-		stringdata = (uint8_t*)malloc(sizeof(uint8_t) * string->length);
-		if(stringdata)
-		{
-			memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
-			stringlength = string->length;
-		}
-	}
-}
+// (devprop_add_network_template) and (setup_eth_builtin) moved to i386/libsaio/networking.c

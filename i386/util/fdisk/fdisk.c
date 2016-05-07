@@ -239,6 +239,8 @@ main(argc, argv)
 	}
 
 	mbr_binary = (char *)malloc(MBR_CODE_SIZE);
+	if (!mbr_binary) errx(1, "out of memory");
+
 	if ((fd = open(mbrfile, O_RDONLY)) == -1) {
 	  warn("could not open MBR file %s", mbrfile);
 	  bzero(mbr_binary, MBR_CODE_SIZE);
@@ -259,6 +261,7 @@ main(argc, argv)
 	} else if (i_flag) {
 	  /* If they didn't specify -a, they'll get the default auto style */
 	  mp = MBR_alloc(NULL);
+	  if (!mp) errx(1, "out of memory");
 	  if (AUTO_init(&disk, auto_style, mp) != AUTO_OK) {
 	    errx(1, "error initializing disk");
 	  }

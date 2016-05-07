@@ -21,7 +21,6 @@
  * 
  * @APPLE_LICENSE_HEADER_END@
  */
-/* libsaio.h */
 
 #ifndef __LIBSAIO_LIBSAIO_H
 #define __LIBSAIO_LIBSAIO_H

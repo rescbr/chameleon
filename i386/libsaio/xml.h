@@ -83,12 +83,12 @@ int XMLTagCount( TagPtr dict );
 bool XMLIsType(TagPtr dict, enum xmltype type);
 
 bool XMLCastBoolean( TagPtr dict );
-char* XMLCastString( TagPtr dict );
+char *XMLCastString( TagPtr dict );
 long XMLCastStringOffset(TagPtr dict);
 int XMLCastInteger ( TagPtr dict );
 TagPtr XMLCastDict ( TagPtr dict );
 TagPtr XMLCastArray( TagPtr dict );
-char* XMLCastData( TagPtr dict, int *length );
+char *XMLCastData( TagPtr dict, int *length );
 
 bool XMLIsBoolean(TagPtr entry);
 bool XMLIsString (TagPtr entry);
@@ -102,7 +102,7 @@ bool XMLAddTagToDictionary(TagPtr dict, char *key, TagPtr value);
 
 long XMLParseNextTag(char *buffer, TagPtr *tag);
 void XMLFreeTag(TagPtr tag);
-char* XMLDecode(const char *in);
+char *XMLDecode(const char *in);
 //==========================================================================
 // XMLParseFile
 // Expects to see one dictionary in the XML file.

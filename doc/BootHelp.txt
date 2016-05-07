@@ -68,7 +68,14 @@ Options useful in the org.chameleon.Boot.plist file:
   "Boot Banner"=Yes|No    Show boot banner in GUI mode (disabled by default).
   ShowInfo=No             Disables display of partition and resolution details.
                             "Boot Banner"=No will also disable this info.
-  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (disabled by default).
+  "Legacy Logo"=Yes|No    Use the legacy grey apple logo (enabled by default).
+
+  RebootOnPanic=Yes|No    (disabled by default).
+
+  EnableHiDPI=Yes|No      Enable High resolution display (disabled by default).
+
+  BlackMode=Yes|No        The new BlackMode loads the white Apple logo,
+                             instead of the gray Apple logo, on a black background (disabled by default).
 
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
 
@@ -89,6 +96,8 @@ Options useful in the org.chameleon.Boot.plist file:
     SkipAtiGfx=Yes|No       Skip the Automatic device-properties generation for Ati cards.
 
     NvidiaGeneric =Yes|No   Use the classic Nvidia name for the SystemProfiler (disabled by default).
+    NvidiaSingle =Yes|No    If you have two cards Nvidia and wants to inject only
+                              first one then you can set this parameter (enbaled by default).
 
     AtiConfig=<cardcfg>   Use a different card config, e.g. AtiConfig=Megalodon.
     AtiPorts=<value>      Specify the number of ports, e.g. AtiPorts=2.
@@ -97,11 +106,13 @@ Options useful in the org.chameleon.Boot.plist file:
     UseNvidiaROM=Yes|No   Use an alternate Nvidia ROM image
                             (default path:  /Extra/<vendorid>_<devid>.rom)
     VBIOS=Yes|No            Inject VBIOS to device-properties.
-    display_0=<value>     Inject alternate value of display-cfg into NVDA,Display-A@0 (HEX).
-    display_1=<value>     Inject alternate value of display-cfg into NVDA,Display-B@1 (HEX).
-    IntelCapriFB=<value>       For Intel HD 4xxx, range 0-11.
-    IntelAzulFB=<value>        For Intel HD 5xxx/IRIS, range 0-15.
-    InjectIntel-ig=<value>     Inject alternate value into AAPL,ig-platform-id (HEX).
+    display_0=<value>       Inject alternate value of display-cfg into NVDA,Display-A@0 (HEX).
+    display_1=<value>       Inject alternate value of display-cfg into NVDA,Display-B@1 (HEX).
+    IntelCapriFB=<value>    For Intel Ivy Bridge, range 0-11.
+    IntelAzulFB=<value>     For Intel Haswell, range 0-16.
+    IntelBdwFB=<value>      For Intel Broadwell, range 0-19.
+    IntelSklFB=<value>      For Intel Skylake, range 0-12.
+    InjectIntel-ig=<value>  Inject alternate value into AAPL,ig-platform-id (HEX).
 
     EnableBacklight=Yes	  Enable Back light option for NVIDIA and ATI
     EnableDualLink=Yes	  Enable DualLink option for NVIDIA and ATI
@@ -151,6 +162,11 @@ Options useful in the org.chameleon.Boot.plist file:
   SMBIOSdefaults=No         Don't use the Default values for SMBIOS overriding
                               if smbios.plist doesn't exist, factory
                               values are kept.
+
+
+  KERNELPlist=<file>        Use an alternate kernel.plist file
+                              (default path: /Extra/Kernel.plist
+                               bt(0,0)/Extra/kernel.plist).
 
   "Scan Single Drive"       Scan the drive only where the booter got loaded from.
     =Yes|No                 Fix rescan issues when using a DVD reader in AHCI mode. 

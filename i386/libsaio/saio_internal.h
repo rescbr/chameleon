@@ -48,7 +48,7 @@ extern int    ebiosread(int dev, unsigned long long sec, int count);
 extern int    ebioswrite(int dev, long sec, int count);
 extern int    get_drive_info(int drive, struct driveInfo *dp);
 extern int    ebiosEjectMedia(int biosdev);
-extern void	  bios_putchar(int ch);
+extern void   bios_putchar(int ch);
 extern void   putca(int ch, int attr, int repeat);
 extern int    readKeyboardStatus(void);
 extern int    readKeyboardShiftFlags(void);
@@ -140,22 +140,22 @@ long AllocateMemoryRange(char *rangeName, long start, long length, long type);
 /* misc.c */
 extern int    checkForSupportedHardware();
 extern int	  isLaptop();
-extern void   getPlatformName(char *nameBuf);
+extern void   getPlatformName(char *nameBuf, int size);
 
 /* nbp.c */
 extern UInt32 nbpUnloadBaseCode();
 extern BVRef  nbpScanBootVolumes(int biosdev, int *count);
 
 /* stringTable.c */
-extern char * newStringFromList(char **list, int *size);
+extern char *newStringFromList(char **list, int *size);
 extern int    stringLength(const char *table, int compress);
 extern bool   getValueForConfigTableKey(config_file_t *config, const char *key, const char **val, int *size);
 extern bool   removeKeyFromTable(const char *key, char *table);
-extern char * newStringForStringTableKey(config_file_t *config, char *key);
-extern char * newStringForKey(char *key, config_file_t *configBuff);
+extern char *newStringForStringTableKey(config_file_t *config, char *key);
+extern char *newStringForKey(char *key, config_file_t *configBuff);
 extern bool   getValueForBootKey(const char *line, const char *match, const char **matchval, int *len);
 extern bool   getValueForKey(const char *key, const char **val, int *size, config_file_t *configBuff);
-extern const char * getStringForKey(const char * key,  config_file_t *config);
+extern const char *getStringForKey(const char * key,  config_file_t *config);
 extern bool   getBoolForKey(const char *key, bool *val, config_file_t *configBuff);
 extern bool   getIntForKey(const char *key, int *val, config_file_t *configBuff);
 extern bool   getColorForKey(const char *key, unsigned int *val, config_file_t *configBuff);
@@ -165,9 +165,9 @@ extern int    loadSystemConfig(config_file_t *configBuff);
 extern int    loadHelperConfig(config_file_t *configBuff);
 extern int    loadChameleonConfig(config_file_t *configBuff, BVRef chain);
 extern int    loadChameleonConfigForDevice(config_file_t *configBuff, const char *device, const char *path);
-extern char * newString(const char *oldString);
-extern char * getNextArg(char ** ptr, char * val);
-extern int	  ParseXMLFile( char * buffer, TagPtr * dict );
+extern char *newString(const char *oldString);
+extern char *getNextArg(char **ptr, char *val);
+extern int	ParseXMLFile( char *buffer, TagPtr * dict );
 
 /* sys.c */
 extern BVRef  getBootVolumeRef( const char * path, const char ** outPath );
@@ -202,6 +202,7 @@ extern int    readdir_ext(struct dirstuff * dirp, const char ** name, long * fla
                           u_int32_t * time, FinderInfo *finderInfo, long *infoValid);
 extern void   flushdev(void);
 extern void   scanBootVolumes(int biosdev, int *count);
+
 extern void   scanDisks(int biosdev, int *count);
 extern BVRef  selectBootVolume(BVRef chain);
 extern void   getBootVolumeDescription(BVRef bvr, char *str, long strMaxLen, bool verbose);

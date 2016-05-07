@@ -44,6 +44,16 @@
 #include "libsaio.h"
 
 
+#ifndef MEMRANGE
+	#define MEMRANGE 0
+#endif
+
+#if MEMRANGE
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)	msglog(x)
+#endif
+
 #define MAX_DRIVES 8
 
 static biosBuf_t bb;
@@ -126,7 +136,7 @@ unsigned int time18(void)
 #endif
 }
 
-#if 0
+#if MEMRANGE
 
 static unsigned long rerangeMemoryMap(unsigned long count);
 static unsigned long rerangeMemoryMap(unsigned long count)
@@ -197,7 +207,9 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 	MemoryRange *	range = (MemoryRange *)BIOS_ADDR;
 	unsigned long	count = 0;
-	//    unsigned long	rerangedCount;
+#if MEMRANGE
+	unsigned long	rerangedCount;
+#endif
 	unsigned long long	conMemSize = 0;
 	unsigned long long	extMemSize = 0;
 
@@ -230,9 +242,8 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 		// Check for errors.
 
-		if ( bb.flags.cf
-			||   bb.eax.rx != kMemoryMapSignature
-			||   bb.ecx.rx != kDescriptorSizeMin ) {
+		if ( bb.flags.cf || bb.eax.rx != kMemoryMapSignature || bb.ecx.rx != kDescriptorSizeMin )
+		{
 			//printf("Got an error %x %x %x\n", bb.flags.cf,
 			//       bb.eax.rx, bb.ecx.rx);
 			break;
@@ -240,16 +251,16 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 		// Tally up the conventional/extended memory sizes.
 
-		if ( range->type == kMemoryRangeUsable ||
-			range->type == kMemoryRangeACPI   ||
-			range->type == kMemoryRangeNVS ) {
+		if ( range->type == kMemoryRangeUsable || range->type == kMemoryRangeACPI || range->type == kMemoryRangeNVS ) {
 			// Tally the conventional memory ranges.
-			if ( range->base + range->length <= 0xa0000 ) {
+			if ( range->base + range->length <= 0xa0000 )
+			{
 				conMemSize += range->length;
 			}
 
 			// Record the top of extended memory.
-			if (range->base >= EXTENDED_ADDR) {
+			if (range->base >= EXTENDED_ADDR)
+			{
 				extMemSize += range->length;
 			}
 		}
@@ -259,15 +270,17 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 		// Is this the last address range?
 
-		if ( bb.ebx.rx == 0 ) {
+		if ( bb.ebx.rx == 0 )
+		{
 			//printf("last range\n");
 			break;
 		}
 	}
-	*conMemSizePtr = conMemSize / 1024;  // size in KB
-	*extMemSizePtr = extMemSize / 1024;  // size in KB
 
-#if 0
+	*conMemSizePtr = (conMemSize / 1024);  // size in KB
+	*extMemSizePtr = (extMemSize / 1024);  // size in KB
+
+#if MEMRANGE
 	rerangedCount = rerangeMemoryMap(count);
 	range += rerangedCount - count;
 #endif
@@ -282,7 +295,8 @@ unsigned long getMemoryMap( MemoryRange *   rangeArray,
 
 		getchar();
 
-		for (i = 0, range = rangeArray; i<count; i++, range++) {
+		for (i = 0, range = rangeArray; i<count; i++, range++)
+		{
 			printf("range: type %d, base 0x%x, length 0x%x\n",
 			range->type, (unsigned int)range->base, (unsigned int)range->length);
 			getchar();
@@ -324,7 +338,8 @@ unsigned long getExtendedMemorySize()
 
 	// Return the size of memory above 1MB (extended memory) in kilobytes.
 
-	if (bb.flags.cf == 0) {
+	if (bb.flags.cf == 0)
+	{
 		return (bb.ebx.rr * 64 + bb.eax.rr);
 	}
 
@@ -384,7 +399,8 @@ int biosread(int dev, int cyl, int head, int sec, int num)
 	bb.intno = 0x13;
 	sec += 1;  // sector numbers start at 1.
     
-	for (i = 0; ;) {
+	for (i = 0; ;)
+	{
 		bb.ecx.r.h = cyl;
 		bb.ecx.r.l = ((cyl & 0x300) >> 2) | (sec & 0x3F);
 		bb.edx.r.h = head;
@@ -397,12 +413,14 @@ int biosread(int dev, int cyl, int head, int sec, int num)
 		bios(&bb);
 
 		// In case of a successful call, make sure we set AH (return code) to zero.
-		if (bb.flags.cf == 0) {
+		if (bb.flags.cf == 0)
+		{
 			bb.eax.r.h = 0;
 		}
 
 		// Now we can really check for the return code (AH) value.
-		if ((bb.eax.r.h == 0x00) || (i++ >= 5)) {
+		if ((bb.eax.r.h == 0x00) || (i++ >= 5))
+		{
 			break;
 		}
 
@@ -410,6 +428,7 @@ int biosread(int dev, int cyl, int head, int sec, int num)
 		bb.eax.r.h = 0x00;
 		bios(&bb);
 	}
+
 	return bb.eax.r.h;
 }
 
@@ -420,7 +439,8 @@ int ebiosread(int dev, unsigned long long sec, int count)
 {
 	int i;
 
-	static struct {
+	static struct
+	{
 		unsigned char  size;
 		unsigned char  reserved;
 		unsigned char  numblocks;
@@ -431,7 +451,8 @@ int ebiosread(int dev, unsigned long long sec, int count)
 	} addrpacket __attribute__((aligned(16))) = {0};
 	addrpacket.size = sizeof(addrpacket);
 
-	for (i = 0; ;) {
+	for (i = 0; ;)
+	{
 		bb.intno   = 0x13;
 		bb.eax.r.h = 0x42;
 		bb.edx.r.l = dev;
@@ -445,12 +466,14 @@ int ebiosread(int dev, unsigned long long sec, int count)
 		bios(&bb);
 
 		// In case of a successful call, make sure we set AH (return code) to zero.
-		if (bb.flags.cf == 0) {
+		if (bb.flags.cf == 0)
+		{
 			bb.eax.r.h = 0;
 		}
-
+		
 		// Now we can really check for the return code (AH) value.
-		if ((bb.eax.r.h == 0x00) || (i++ >= 5)) {
+		if ((bb.eax.r.h == 0x00) || (i++ >= 5))
+		{
 			break;
 		}
 
@@ -509,11 +532,11 @@ int ebioswrite(int dev, long sec, int count)
 
 void bios_putchar(int ch)
 {
-	bb.intno = 0x10;
-	bb.ebx.r.h = 0x00;  /* background black */
-	bb.ebx.r.l = 0x0F;  /* foreground white */
-	bb.eax.r.h = 0x0e;
-	bb.eax.r.l = ch;
+	bb.intno	= 0x10;
+	bb.ebx.r.h	= 0x00;  /* background black */
+	bb.ebx.r.l	= 0x0F;  /* foreground white */
+	bb.eax.r.h	= 0x0e;
+	bb.eax.r.l	= ch;
 	bios(&bb);
 }
 
@@ -537,7 +560,8 @@ void putca(int ch, int attr, int repeat)
 
 int is_no_emulation(int drive)
 {
-	struct packet {
+	struct packet
+	{
 		unsigned char packet_size;
 		unsigned char media_type;
 		unsigned char drive_num;
@@ -579,12 +603,11 @@ int is_no_emulation(int drive)
 
 	/* Some BIOSes erroneously return cf = 1 */
 	/* Just check to see if the drive number is the same. */
-	if (pkt.drive_num == drive) {
-		if ((pkt.media_type & 0x0F) == 0) {
-			/* We are in no-emulation mode. */
-			return 1;
-		}
+	if (pkt.drive_num == drive && (pkt.media_type & 0x0F) == 0)
+	{
+		return 1; // We are in no-emulation mode.
 	}
+
 	return 0;
 }
 
@@ -671,12 +694,14 @@ int get_drive_info(int drive, struct driveInfo *dp)
 	bb.ebx.rr = 0x55aa;
 	bios(&bb);
 	
-	if ((bb.ebx.rr == 0xaa55) && (bb.flags.cf == 0)) {
+	if ((bb.ebx.rr == 0xaa55) && (bb.flags.cf == 0))
+	{
 		/* Get flags for supported operations. */
 		dp->uses_ebios = bb.ecx.r.l;
 	}
-	
-	if (dp->uses_ebios & (EBIOS_ENHANCED_DRIVE_INFO | EBIOS_LOCKING_ACCESS | EBIOS_FIXED_DISK_ACCESS)) {
+
+	if (dp->uses_ebios & (EBIOS_ENHANCED_DRIVE_INFO | EBIOS_LOCKING_ACCESS | EBIOS_FIXED_DISK_ACCESS))
+	{
 		/* Get EBIOS drive info. */
 		static struct drive_params params;
 		
@@ -688,16 +713,20 @@ int get_drive_info(int drive, struct driveInfo *dp)
 		bb.ds	  = NORMALIZED_SEGMENT((unsigned)&params);
 		bios(&bb);
 		
-		if (bb.flags.cf != 0 /* || params.phys_sectors < 2097152 */) {
+		if (bb.flags.cf != 0 /* || params.phys_sectors < 2097152 */)
+		{
 			dp->uses_ebios = 0;
 			di->params.buf_size = 1;
-		} else {
+		}
+		else
+		{
 			bcopy(&params, &di->params, sizeof(params));
 			
 			if (drive >= BASE_HD_DRIVE &&
 				(dp->uses_ebios & EBIOS_ENHANCED_DRIVE_INFO) &&
 				di->params.buf_size >= 30 &&
-				!(di->params.dpte_offset == 0xFFFF && di->params.dpte_segment == 0xFFFF)) {
+				!(di->params.dpte_offset == 0xFFFF && di->params.dpte_segment == 0xFFFF))
+			{
 					void *ptr = (void *)(di->params.dpte_offset + ((unsigned int)di->params.dpte_segment << 4));
 					bcopy(ptr, &di->dpte, sizeof(di->dpte));
 			}
@@ -717,7 +746,7 @@ int get_drive_info(int drive, struct driveInfo *dp)
 //			unsigned long cyl;
 //			unsigned long sec;
 //			unsigned long hds;
-//		
+//
 //			hds = bb.edx.r.h;
 //			sec = bb.ecx.r.l & 0x3F;
 //			if ((dp->uses_ebios & EBIOS_ENHANCED_DRIVE_INFO) && (sec != 0)) {
@@ -733,7 +762,8 @@ int get_drive_info(int drive, struct driveInfo *dp)
 //		}
 //	}
 
-	if (dp->no_emulation) {
+	if (dp->no_emulation)
+	{
 		/* Some BIOSes give us erroneous EBIOS support information.
 	 	 * Assume that if you're on a CD, then you can use
 	 	 * EBIOS disk calls.
@@ -747,7 +777,8 @@ int get_drive_info(int drive, struct driveInfo *dp)
 	pause();
 #endif
 
-	if (ret == 0) {
+	if (ret == 0)
+	{
 		dp->valid = 1;
 	}
 	return ret;
@@ -1040,7 +1071,7 @@ void delay(int us)
     bb.edx.rr = us & 0xFFFF;
     bios(&bb);
 }
-
+/* // reverted from commit 2602
 void enableA20(void)
 {
     bzero(&bb, sizeof bb);  // Note: may be called before BSS section is initialized
@@ -1048,3 +1079,4 @@ void enableA20(void)
     bb.eax.rr = 0x2401;
     bios(&bb);
 }
+*/

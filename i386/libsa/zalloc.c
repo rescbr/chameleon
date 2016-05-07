@@ -75,7 +75,7 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 	zalloc_base         = start ? start : (char *)ZALLOC_ADDR;
 	totalNodes          = nodes ? nodes : ZALLOC_NODES;
 	zalloced            = (zmem *) zalloc_base;
-	zavailable          = (zmem *) (zalloc_base + sizeof(zmem) * totalNodes);
+	zavailable          = (zmem *) zalloc_base + sizeof(zmem) * totalNodes;
 	zavailable[0].start = (char *)zavailable + sizeof(zmem) * totalNodes;
 
 	if (size == 0)
@@ -109,12 +109,9 @@ void * safe_malloc(size_t size, const char *file, int line)
 
 	size = ((size + 0xf) & ~0xf);
 
-	if (size == 0)
+	if (size == 0 && zerror)
 	{
-		if (zerror)
-		{
-			(*zerror)((char *)0xdeadbeef, 0, file, line);
-        	}
+		(*zerror)((char *)0xdeadbeef, 0, file, line);
         }
 #if BEST_FIT
 	smallestSize = 0;

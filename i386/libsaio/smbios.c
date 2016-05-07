@@ -368,9 +368,10 @@ SMBValueSetter SMBSetters[] =
 	{kSMBTypeMemoryDevice,	kSMBString,	getFieldOffset(SMBMemoryDevice, partNumber),
 		kSMBMemoryDevicePartNumberKey, getSMBMemoryDevicePartNumber, NULL},
 
-	//-------------------------------------------------------------------------------------------------------------------------
-	// Apple Specific
-	//-------------------------------------------------------------------------------------------------------------------------
+	/* ============
+	 Apple Specific
+	 ============== */
+
 	// OEM Processor Type (Apple Specific - Type 131)
 	{kSMBTypeOemProcessorType,	kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),	kSMBOemProcessorTypeKey,		
 		getSMBOemProcessorType,			NULL},
@@ -562,7 +563,7 @@ static SMBWord structureCount	= 0;
 //=========== MacPro ===========
 #define kDefaultMacProFamily				"MacPro" // MacPro's family = "MacPro" not "Mac Pro"
 //#define KDefauktMacProBoardAssetTagNumber		"Pro-Enclosure"
-//#define kDefaultMacProBoardType			"0xB" // 11
+//#define kDefaultMacProBoardType			"0x0B" // 11
 
 #define kDefaultMacPro					"MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
@@ -696,8 +697,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						switch (Platform.CPU.Model)
 						{
 							case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-							case CPUID_MODEL_DALES:
-							case CPUID_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+							case CPUID_MODEL_CLARKDALE:
+							case CPUID_MODEL_DALES:		// Intel Core i3, i5 LGA1156 (32nm)
 								defaultBIOSInfo.version			= kDefaultiMacNehalemBIOSVersion;
 								defaultBIOSInfo.releaseDate		= kDefaultiMacNehalemBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacNehalem;
@@ -1042,8 +1043,8 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 			{
 				case 0x19:			// Intel Core i5 650 @3.20 Ghz
 				case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-				case CPUID_MODEL_DALES:
-				case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
+				case CPUID_MODEL_CLARKDALE:
+				case CPUID_MODEL_DALES:	// Intel Core i3, i5 LGA1156 (32nm)
 				case CPUID_MODEL_NEHALEM:	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 				case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 				case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
@@ -1055,7 +1056,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPUID_MODEL_HASWELL:
 				case CPUID_MODEL_HASWELL_SVR:
 				case CPUID_MODEL_HASWELL_ULT:
-				case CPUID_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULX:
 
 					break;
 
@@ -1096,9 +1097,10 @@ void addSMBOemPlatformFeature(SMBStructPtrs *structPtr)
  }
 */
 
-//-------------------------------------------------------------------------------------------------------------------------
-// EndOfTable
-//-------------------------------------------------------------------------------------------------------------------------
+
+/* ==============================================
+ EndOfTable
+ ================================================ */
 void addSMBEndOfTable(SMBStructPtrs *structPtr)
 {
 	structPtr->new->type	= kSMBTypeEndOfTable;
@@ -1238,6 +1240,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 			case kSMBTypeMemorySPD:
 			case kSMBTypeOemProcessorType:
 			case kSMBTypeOemProcessorBusSpeed:
+//			case kSMBTypeOemPlatformFeature:
 				/* And this one too, to be added at the end */
 			case kSMBTypeEndOfTable:
 				break;
@@ -1265,7 +1268,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 	addSMBMemorySPD(structPtr);
 	addSMBOemProcessorType(structPtr);
 	addSMBOemProcessorBusSpeed(structPtr);
-
+//	addSMBOemPlatformFeature(structPtr);
 	addSMBEndOfTable(structPtr);
 }
 
@@ -1274,10 +1277,11 @@ uint8_t *fixSystemUUID()
 {
 	uint8_t *ptr = (uint8_t *)neweps->dmi.tableAddress;
 	SMBStructHeader *structHeader = (SMBStructHeader *)ptr;
+	uint8_t *ret = NULL;
 	int i, isZero, isOnes;
 	uint8_t fixedUUID[UUID_LEN] = {0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF};
 	const char *sysId = getStringForKey(kSMBSystemInformationUUIDKey, SMBPlist); // try to get user's uuid from smbios.plist
-	uint8_t *ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
+	ret = (uint8_t *)getUUIDFromString(sysId); // convert user's uuid from string
 
 	for (;(structHeader->type != kSMBTypeSystemInformation);) // find System Information Table (Type 1) in patched SMBIOS
 	{

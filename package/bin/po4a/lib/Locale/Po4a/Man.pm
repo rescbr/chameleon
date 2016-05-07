@@ -1968,12 +1968,8 @@ $macro{'IP'}=sub {
 #         corresponding UE  command.
 #         When generating HTML this should translate into the HTML command
 #         <A  NAME="u" id="u">&nbsp;</A>
-$macro{'UR'}=sub {
-    return untranslated(@_)
-	if (defined($_[2]) && $_[2] eq ':');
-    return translate_joined(@_);
-};
-$macro{'UE'}=\&noarg;
+$inline{'UR'}=1;
+$inline{'UE'}=1;
 $macro{'UN'}=\&translate_joined;
 
 # Miscellaneous Macros
@@ -2481,10 +2477,6 @@ sub define_mdoc_macros {
     $macro{'In'} = \&translate_mdoc;
     # NetBSD Macro
     $inline{'Nx'} = 1;
-    # Curly brackets
-    $inline{'Brq'} = 1;
-    # Corporate name
-    $inline{'%Q'} = 1;
     # Math symbol
     $inline{'Ms'} = 1;
     # Prints 'under development'

@@ -35,7 +35,9 @@ endif
 
 OBJS := $(addprefix $(OBJROOT)/, $(OBJS))
 
-LDFLAGS := $(LDFALGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5
+LDFLAGS := $(LDFLAGS) -framework IOKit -framework CoreFoundation -mmacosx-version-min=10.5
+
+CFLAGS := $(CFLAGS) -mmacosx-version-min=10.5
 
 SYMPROG = $(addprefix $(SYMROOT)/, $(PROGRAMS))
 

@@ -41,9 +41,9 @@
 #include "modules.h"
 
 #if DEBUG
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 // extern char gMacOSVersion[8];
@@ -119,8 +119,7 @@ static char	*gFileName;
 // Bungo:
 char gDarwinBuildVerStr[256] = "Darwin Kernel Version";
 
-/*static*/ unsigned long
-Adler32( unsigned char *buffer, long length )
+/*static*/ unsigned long Adler32( unsigned char *buffer, long length )
 {
 	long          cnt;
 	unsigned long result, lowHalf, highHalf;
@@ -150,7 +149,6 @@ Adler32( unsigned char *buffer, long length )
 
 //==========================================================================
 // InitDriverSupport
-
 static long InitDriverSupport( void )
 {
 	gExtensionsSpec = malloc( 4096 );
@@ -169,8 +167,7 @@ static long InitDriverSupport( void )
 
 //==========================================================================
 // LoadDrivers
-
-long LoadDrivers( char * dirSpec )
+long LoadDrivers( char *dirSpec )
 {
 	char dirSpecExtra[1024];
 
@@ -201,6 +198,8 @@ long LoadDrivers( char * dirSpec )
 			strcpy(dirSpecExtra, "rd(0,0)/Extra/");
 			FileLoadDrivers(dirSpecExtra, 0);
 		}
+		verbose("Attempting to loading drivers from \"Extra\" repository:\n");
+
 
 		// Next try to load Extra extensions from the selected root partition.
 		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
@@ -253,13 +252,18 @@ long LoadDrivers( char * dirSpec )
 			}
 			else
 			{
-				if ( MAVERICKS || YOSEMITE ) // issue 352
+				verbose("Attempting to loading drivers from standard repositories:\n");
+
+				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || gMacOSVersion[4] == '1' ) )) // issue 352
 				{
-					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") */
+					verbose("\t- Third party extensions search path: /Library/Extensions\n");
+					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */
 					strcat(gExtensionsSpec, "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
 				}
-				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/") */
+
+				verbose("\t- Apple extensions search path: /System/Library/Extensions\n");
+				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/")  mean 4096 -16 = 4080 */
 				strcat(gExtensionsSpec, "System/Library/");
 				FileLoadDrivers(gExtensionsSpec, 0);
 			}
@@ -282,8 +286,7 @@ long LoadDrivers( char * dirSpec )
 
 //==========================================================================
 // FileLoadMKext
-
-static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
+static long FileLoadMKext( const char *dirSpec, const char *extDirSpec )
 {
 	long		ret, flags;
 	u_int32_t	time, time2;
@@ -314,8 +317,7 @@ static long FileLoadMKext( const char * dirSpec, const char * extDirSpec )
 
 //==========================================================================
 // FileLoadDrivers
-
-long FileLoadDrivers( char * dirSpec, long plugin )
+long FileLoadDrivers( char *dirSpec, long plugin )
 {
 	long long	index;
 	long		ret, length, flags, bundleType;
@@ -355,7 +357,7 @@ long FileLoadDrivers( char * dirSpec, long plugin )
 
 		// Make sure this is a kext.
 		length = strlen(name);
-		if (strncmp(name + length - 5, ".kext", 5))
+		if (strncmp(name + length - 5, ".kext", sizeof(".kext") ))
 		{
 			continue;
 		}
@@ -396,11 +398,9 @@ long FileLoadDrivers( char * dirSpec, long plugin )
 	return result;
 }
 
-
 //==========================================================================
 // 
-
-long NetLoadDrivers( char * dirSpec )
+long NetLoadDrivers( char *dirSpec )
 {
 	long tries;
 
@@ -441,13 +441,12 @@ long NetLoadDrivers( char * dirSpec )
 
 //==========================================================================
 // loadDriverMKext
-
-long LoadDriverMKext( char * fileSpec )
+long LoadDriverMKext( char *fileSpec )
 {
-	unsigned long    driversAddr, driversLength;
-	long             length;
-	char             segName[32];
-	DriversPackage * package;
+	unsigned long	driversAddr, driversLength;
+	long		length;
+	char		segName[32];
+	DriversPackage	*package;
 
 #define GetPackageElement(e)     OSSwapBigToHostInt32(package->e)
 
@@ -459,7 +458,7 @@ long LoadDriverMKext( char * fileSpec )
 	}
 
 	// call hook to notify modules that the mkext has been loaded
-	execute_hook("LoadDriverMKext", (void*)fileSpec, (void*)package, (void*) &length, NULL);
+	execute_hook("LoadDriverMKext", (void *)fileSpec, (void *)package, (void *) &length, NULL);
 
 	
 	// Verify the MKext.
@@ -488,9 +487,7 @@ long LoadDriverMKext( char * fileSpec )
 
 //==========================================================================
 // LoadDriverPList
-
-long
-LoadDriverPList( char * dirSpec, char * name, long bundleType )
+long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 {
 	long      length, executablePathLength, bundlePathLength;
 	ModulePtr module;
@@ -643,12 +640,9 @@ LoadDriverPList( char * dirSpec, char * name, long bundleType )
 	return ret;
 }
 
-
 //==========================================================================
 // LoadMatchedModules
-
-long
-LoadMatchedModules( void )
+long LoadMatchedModules( void )
 {
 	TagPtr		  prop;
 	ModulePtr	  module;
@@ -669,6 +663,7 @@ LoadMatchedModules( void )
 			{
 				fileName = prop->string;
 				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
+
 				length = LoadThinFatFile(gFileSpec, &executableAddr);
 				if (length == 0)
 				{
@@ -678,9 +673,11 @@ LoadMatchedModules( void )
 //				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
 			}
 			else
+			{
 				length = 0;
+			}
 
-			if (length != -1)
+			if ((length != -1) && executableAddr)
 			{
 //				driverModuleAddr = (void *)kLoadAddr;
 //				if (length != 0)
@@ -699,6 +696,7 @@ LoadMatchedModules( void )
 				driver = (DriverInfoPtr)driverAddr;
 				driver->plistAddr = (char *)(driverAddr + sizeof(DriverInfo));
 				driver->plistLength = module->plistLength;
+
 				if (length != 0)
 				{
 					driver->executableAddr = (void *)(driverAddr + sizeof(DriverInfo) +
@@ -710,16 +708,19 @@ LoadMatchedModules( void )
 					driver->executableAddr	 = 0;
 					driver->executableLength = 0;
 				}
+
 				driver->bundlePathAddr = (void *)(driverAddr + sizeof(DriverInfo) +
 									 module->plistLength + driver->executableLength);
 				driver->bundlePathLength = module->bundlePathLength;
 
 				// Save the plist, module and bundle.
-				strlcpy(driver->plistAddr, module->plistAddr,driver->plistLength);
+				strlcpy(driver->plistAddr, module->plistAddr, driver->plistLength);
+
 				if (length != 0)
 				{
 					memcpy(driver->executableAddr, executableAddr, length);
 				}
+
 				strlcpy(driver->bundlePathAddr, module->bundlePath, module->bundlePathLength);
 
 				// Add an entry to the memory map.
@@ -736,9 +737,7 @@ LoadMatchedModules( void )
 
 //==========================================================================
 // MatchPersonalities
-
-static long
-MatchPersonalities( void )
+static long MatchPersonalities( void )
 {
 	/* IONameMatch support not implemented */
 	return 0;
@@ -746,7 +745,6 @@ MatchPersonalities( void )
 
 //==========================================================================
 // MatchLibraries
-
 static long MatchLibraries( void )
 {
 	TagPtr     prop;
@@ -801,7 +799,6 @@ static long MatchLibraries( void )
 	return 0;
 }
 
-
 //==========================================================================
 // FindModule
 
@@ -831,7 +828,6 @@ static ModulePtr FindModule( char *name )
 
 //==========================================================================
 // ParseXML
-
 static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
 {
 	long		length;
@@ -868,7 +864,7 @@ static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
 
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
 
-	if ( (required == 0) || (required->type != kTagTypeString) || !strcmp(required->string, "Safe Boot"))
+	if ( (required == 0) || (required->type != kTagTypeString) || !strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
 	{
 		XMLFreeTag(moduleDict);
 		return -2;
@@ -906,7 +902,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	u_int32_t uncompressed_size = 0, size = 0, adler32 = 0;
 	void *buffer = NULL;
 	unsigned long len = 0;
-	
+
 /*#if 0
 	printf("kernel header:\n");
 	printf("signature: 0x%x\n", kernel_header->signature);
@@ -919,23 +915,23 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	if (kernel_header->signature == OSSwapBigToHostConstInt32('comp'))
 	{
-		DBG("Decompressing Kernel Cache");
+		DBG("Decompressing Kernel Cache:\n");
 
 		if ((kernel_header->compress_type != OSSwapBigToHostConstInt32('lzss')) &&
 			(kernel_header->compress_type != OSSwapBigToHostConstInt32('lzvn')))
 		{
-			error("ERROR: kernel compression is bad!\n");
+			error("\tERROR: kernel compression is bad!\n");
 			return -1;
 		}
 
 		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzss'))
 		{
-			verbose ("Decompressing Kernel Using lzss\n");
+			verbose ("\t- Decompressing Kernel Using lzss\n");
 		}
 
 		if (kernel_header->compress_type == OSSwapBigToHostConstInt32('lzvn'))
 		{
-			verbose ("Decompressing Kernel Using lzvn\n");
+			verbose ("\t- Decompressing Kernel Using lzvn\n");
 		}
 
 #if NOTDEF
@@ -991,7 +987,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			return -1;
 		}
 
-		DBG("OK.\n");
+		DBG("\n");
 	}
 	
 	ret = ThinFatFile(&binary, &len);
@@ -1004,6 +1000,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	// Bungo: scan binary for Darwin Kernel Version string
 	uint32_t offset = 0;
 	strncpy(gDarwinBuildVerStr, "Darwin Kernel Version", sizeof(gDarwinBuildVerStr));
+
 	while ((offset < 0xFFFFFFFF - (uint32_t)binary - 256) && memcmp(binary + offset, gDarwinBuildVerStr, 21))
 	{
 		offset++;
@@ -1019,6 +1016,12 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void *)binary, NULL, NULL, NULL);
+
+/* ================================================================ */
+
+	// Entry point
+
+/* ================================================================ */
 
 	ret = DecodeMachO(binary, rentry, raddr, rsize);
 	if (ret < 0 && archCpuType == CPU_TYPE_X86_64)

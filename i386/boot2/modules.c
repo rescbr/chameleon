@@ -528,7 +528,7 @@ void* parse_mach(void* binary,
 				// =	dylibCommand->dylib.compatibility_version;
 				if(dylib_loader)
 				{
-					char* name = malloc(strlen(module) + strlen(".dylib") + 1);
+					char *name = malloc(strlen(module) + strlen(".dylib") + 1);
 					sprintf(name, "%s.dylib", module);
 
 					if (!dylib_loader(name))

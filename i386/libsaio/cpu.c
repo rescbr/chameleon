@@ -1,6 +1,7 @@
 /*
  * Copyright 2008 Islam Ahmed Zaid. All rights reserved. <azismed@gmail.com>
  * AsereBLN: 2009: cleanup and bugfix
+ * Bronya:   2015 Improve AMD support, cleanup and bugfix
  */
 
 #include "libsaio.h"
@@ -10,14 +11,26 @@
 #include "boot.h"
 
 #ifndef DEBUG_CPU
-#define DEBUG_CPU 0
+	#define DEBUG_CPU 0
 #endif
 
 #if DEBUG_CPU
-#define DBG(x...)		printf(x)
+	#define DBG(x...)		printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
+
+
+#define UI_CPUFREQ_ROUNDING_FACTOR	10000000
+
+clock_frequency_info_t gPEClockFrequencyInfo;
+
+static __unused uint64_t rdtsc32(void)
+{
+	unsigned int lo,hi;
+	__asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+	return ((uint64_t)hi << 32) | lo;
+}
 
 /*
  * timeRDTSC()
@@ -28,7 +41,7 @@
 static uint64_t timeRDTSC(void)
 {
 	int		attempts = 0;
-	uint64_t    	latchTime;
+	uint32_t    	latchTime;
 	uint64_t	saveTime,intermediate;
 	unsigned int	timerValue, lastValue;
 	//boolean_t	int_enabled;
@@ -54,18 +67,18 @@ static uint64_t timeRDTSC(void)
 	//int_enabled = ml_set_interrupts_enabled(false);
 
 restart:
-	if (attempts >= 9) // increase to up to 9 attempts.
+	if (attempts >= 3) // increase to up to 9 attempts.
 	{
 		// This will flash-reboot. TODO: Use tscPanic instead.
-		printf("Timestamp counter calibation failed with %d attempts\n", attempts);
+		//printf("Timestamp counter calibation failed with %d attempts\n", attempts);
 	}
 	attempts++;
 	enable_PIT2();		// turn on PIT2
 	set_PIT2(0);		// reset timer 2 to be zero
-	latchTime = rdtsc64();	// get the time stamp to time
+	latchTime = rdtsc32();	// get the time stamp to time
 	latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
 	set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
-	saveTime = rdtsc64();	// now time how long a 20th a second is...
+	saveTime = rdtsc32();	// now time how long a 20th a second is...
 	get_PIT2(&lastValue);
 	get_PIT2(&lastValue);	// read twice, first value may be unreliable
 	do {
@@ -79,9 +92,9 @@ restart:
 		}
 		lastValue = timerValue;
 	} while (timerValue > 5);
-	printf("timerValue	  %d\n",timerValue);
-	printf("intermediate  0x%016llX\n",intermediate);
-	printf("saveTime	  0x%016llX\n",saveTime);
+	//printf("timerValue	  %d\n",timerValue);
+	//printf("intermediate  0x%016llX\n",intermediate);
+	//printf("saveTime	  0x%016llX\n",saveTime);
     
 	intermediate -= saveTime;		// raw count for about 1/20 second
 	intermediate *= scale[timerValue];	// rescale measured time spent
@@ -98,7 +111,7 @@ restart:
 /*
  * DFE: Measures the TSC frequency in Hz (64-bit) using the ACPI PM timer
  */
-static uint64_t measure_tsc_frequency(void)
+static uint64_t __unused measure_tsc_frequency(void)
 {
 	uint64_t tscStart;
 	uint64_t tscEnd;
@@ -167,69 +180,95 @@ static uint64_t measure_tsc_frequency(void)
 	return retval;
 }
 
-/*
- * Original comment/code:
- *  "DFE: Measures the Max Performance Frequency in Hz (64-bit)"
- *
- * Measures the Actual Performance Frequency in Hz (64-bit)
- *  (just a naming change, mperf --> aperf )
- */
-static uint64_t measure_aperf_frequency(void)
+static uint64_t	rtc_set_cyc_per_sec(uint64_t cycles);
+#define RTC_FAST_DENOM	0xFFFFFFFF
+
+inline static uint32_t
+create_mul_quant_GHZ(int shift, uint32_t quant)
 {
-	uint64_t aperfStart;
-	uint64_t aperfEnd;
-	uint64_t aperfDelta = 0xffffffffffffffffULL;
-	unsigned long pollCount;
-	uint64_t retval = 0;
-	int i;
+	return (uint32_t)((((uint64_t)NSEC_PER_SEC/20) << shift) / quant);
+}
 
-	/* Time how many APERF ticks elapse in 30 msec using the 8254 PIT
-	 * counter 2. We run this loop 3 times to make sure the cache
-	 * is hot and we take the minimum delta from all of the runs.
-	 * That is to say that we're biased towards measuring the minimum
-	 * number of APERF ticks that occur while waiting for the timer to
-	 * expire.
-	 */
-	for(i = 0; i < 10; ++i)
-	{
-		enable_PIT2();
-		set_PIT2_mode0(CALIBRATE_LATCH);
-		aperfStart = rdmsr64(MSR_AMD_APERF);
-		pollCount = poll_PIT2_gate();
-		aperfEnd = rdmsr64(MSR_AMD_APERF);
-		/* The poll loop must have run at least a few times for accuracy */
-		if (pollCount <= 1)
-		{
-			continue;
-		}
-		/* The TSC must increment at LEAST once every millisecond.
-		 * We should have waited exactly 30 msec so the APERF delta should
-		 * be >= 30. Anything less and the processor is way too slow.
-		 */
-		if ((aperfEnd - aperfStart) <= CALIBRATE_TIME_MSEC)
-		{
-			continue;
-		}
-		// tscDelta = MIN(tscDelta, (tscEnd - tscStart))
-		if ( (aperfEnd - aperfStart) < aperfDelta )
-		{
-			aperfDelta = aperfEnd - aperfStart;
-		}
-	}
-	/* mperfDelta is now the least number of MPERF ticks the processor made in
-	 * a timespan of 0.03 s (e.g. 30 milliseconds)
-	 */
+struct	{
+	mach_timespec_t			calend_offset;
+	boolean_t			calend_is_set;
 
-	if (aperfDelta > (1ULL<<32))
+	int64_t				calend_adjtotal;
+	int32_t				calend_adjdelta;
+
+	uint32_t			boottime;
+
+	mach_timebase_info_data_t	timebase_const;
+
+	decl_simple_lock_data(,lock)	/* real-time clock device lock */
+} rtclock;
+
+uint32_t		rtc_quant_shift;	/* clock to nanos right shift */
+uint32_t		rtc_quant_scale;	/* clock to nanos multiplier */
+uint64_t		rtc_cyc_per_sec;	/* processor cycles per sec */
+uint64_t		rtc_cycle_count;	/* clocks in 1/20th second */
+
+static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
+{
+
+	if (cycles > (NSEC_PER_SEC/20))
 	{
-		retval = 0;
+		// we can use just a "fast" multiply to get nanos
+		rtc_quant_shift = 32;
+		rtc_quant_scale = create_mul_quant_GHZ(rtc_quant_shift, (uint32_t)cycles);
+		rtclock.timebase_const.numer = rtc_quant_scale; // timeRDTSC is 1/20
+		rtclock.timebase_const.denom = (uint32_t)RTC_FAST_DENOM;
 	}
 	else
 	{
-		retval = aperfDelta * 1000 / 30;
+		rtc_quant_shift = 26;
+		rtc_quant_scale = create_mul_quant_GHZ(rtc_quant_shift, (uint32_t)cycles);
+		rtclock.timebase_const.numer = NSEC_PER_SEC/20; // timeRDTSC is 1/20
+		rtclock.timebase_const.denom = (uint32_t)cycles;
 	}
-	disable_PIT2();
-	return retval;
+	rtc_cyc_per_sec = cycles*20;	// multiply it by 20 and we are done..
+	// BUT we also want to calculate...
+
+	cycles = ((rtc_cyc_per_sec + (UI_CPUFREQ_ROUNDING_FACTOR/2))
+              / UI_CPUFREQ_ROUNDING_FACTOR)
+	* UI_CPUFREQ_ROUNDING_FACTOR;
+
+	/*
+	 * Set current measured speed.
+	 */
+	if (cycles >= 0x100000000ULL)
+	{
+		gPEClockFrequencyInfo.cpu_clock_rate_hz = 0xFFFFFFFFUL;
+	}
+	else
+	{
+		gPEClockFrequencyInfo.cpu_clock_rate_hz = (unsigned long)cycles;
+	}
+	gPEClockFrequencyInfo.cpu_frequency_hz = cycles;
+
+	//printf("[RTCLOCK_1] frequency %llu (%llu) %llu\n", cycles, rtc_cyc_per_sec,timeRDTSC() * 20);
+	return(rtc_cyc_per_sec);
+}
+
+// Bronya C1E fix
+void post_startup_cpu_fixups(void)
+{
+	/*
+	 * Some AMD processors support C1E state. Entering this state will
+	 * cause the local APIC timer to stop, which we can't deal with at
+	 * this time.
+	 */
+
+	uint64_t reg;
+	verbose("\tLooking to disable C1E if is already enabled by the BIOS:\n");
+	reg = rdmsr64(MSR_AMD_INT_PENDING_CMP_HALT);
+	/* Disable C1E state if it is enabled by the BIOS */
+	if ((reg >> AMD_ACTONCMPHALT_SHIFT) & AMD_ACTONCMPHALT_MASK)
+	{
+		reg &= ~(AMD_ACTONCMPHALT_MASK << AMD_ACTONCMPHALT_SHIFT);
+		wrmsr64(MSR_AMD_INT_PENDING_CMP_HALT, reg);
+		verbose("\tC1E disabled!\n");
+	}
 }
 
 /*
@@ -237,93 +276,33 @@ static uint64_t measure_aperf_frequency(void)
  * - multi. is read from a specific MSR. In the case of Intel, there is:
  *	   a max multi. (used to calculate the FSB freq.),
  *	   and a current multi. (used to calculate the CPU freq.)
- * - fsbFrequency = tscFrequency / multi
- * - cpuFrequency = fsbFrequency * multi
+ * - busFrequency = tscFrequency / multi
+ * - cpuFrequency = busFrequency * multi
  */
-void scan_cpu(PlatformInfo_t *p)
+
+/* Decimal powers: */
+#define kilo (1000ULL)
+#define Mega (kilo * kilo)
+#define Giga (kilo * Mega)
+#define Tera (kilo * Giga)
+#define Peta (kilo * Tera)
+
+#define quad(hi,lo)	(((uint64_t)(hi)) << 32 | (lo))
+
+void get_cpuid(PlatformInfo_t *p)
 {
-	uint64_t	tscFrequency		= 0;
-	uint64_t	fsbFrequency		= 0;
-	uint64_t	cpuFrequency		= 0;
-	uint64_t	msr			= 0;
-	uint64_t	flex_ratio		= 0;
 
-	uint32_t	max_ratio		= 0;
-	uint32_t	min_ratio		= 0;
-	uint32_t	reg[4]; //		= {0, 0, 0, 0};
-	uint32_t	cores_per_package	= 0;
-	uint32_t	logical_per_package	= 1;
-	uint32_t	threads_per_core	= 1;
-
-	uint8_t		bus_ratio_max		= 0;
-	uint8_t		bus_ratio_min		= 0;
-	uint8_t		currdiv			= 0;
-	uint8_t		currcoef		= 0;
-	uint8_t		maxdiv			= 0;
-	uint8_t		maxcoef			= 0;
-	uint8_t		pic0_mask;
-
-	const char	*newratio;
 	char		str[128];
+	uint32_t	reg[4];
 	char		*s			= 0;
 
-	int		len			= 0;
-	int		myfsb			= 0;
-	int		i			= 0;
 
-	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
-	p->CPU.Vendor = p->CPU.CPUID[CPUID_0][ebx];
-
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
-
-	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((bit(28) & p->CPU.CPUID[CPUID_1][edx]) != 0)) // Intel && HTT/Multicore
-	{
-		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
-	}
-
 	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
 
 	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
-
-	/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
-	if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
-	{
-		for (i = 0; i < 0xFF; i++) // safe loop
-		{
-			do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
-			if (bitfield(reg[eax], 4, 0) == 0)
-			{
-				break;
-			}
-			//cores_per_package = bitfield(reg[eax], 31, 26) + 1;
-		}
-	}
-
-	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
-
-	if (i > 0)
-	{
-		cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
-		threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
-	}
-
-	if (cores_per_package == 0)
-	{
-		cores_per_package = 1;
-	}
-
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
-	{
-		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
-	}
-
-	if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
-	{
-		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
-	}
-
-	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]); // Get the max extended cpuid
 
 	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
 	{
@@ -335,30 +314,7 @@ void scan_cpu(PlatformInfo_t *p)
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
-/*  http://www.flounder.com/cpuid_explorer2.htm
-    EAX (Intel):
-    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
-    +--------+----------------+--------+----+----+--------+--------+--------+
-    |########|Extended family |Extmodel|####|type|familyid|  model |stepping|
-    +--------+----------------+--------+----+----+--------+--------+--------+
-
-    EAX (AMD):
-    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
-    +--------+----------------+--------+----+----+--------+--------+--------+
-    |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
-    +--------+----------------+--------+----+----+--------+--------+--------+
-*/
-
-	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
-	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
-	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
-	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);	// model = (cpu_feat_eax >> 4) & 0xF;
-	p->CPU.Family		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);	// family = (cpu_feat_eax >> 8) & 0xF;
-	//p->CPU.Type		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
-	p->CPU.ExtModel		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);	// ext_model = (cpu_feat_eax >> 16) & 0xF;
-	p->CPU.ExtFamily	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
-
-	p->CPU.Model += (p->CPU.ExtModel << 4);
+// ==============================================================
 
 	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
@@ -393,43 +349,192 @@ void scan_cpu(PlatformInfo_t *p)
 			p->CPU.BrandString[0] = '\0';
 		}
 		p->CPU.BrandString[47] = '\0';
-//		DBG("Brandstring = %s\n", p->CPU.BrandString);
+//		DBG("\tBrandstring = %s\n", p->CPU.BrandString);
 	}
 
-	/*
-	 * Find the number of enabled cores and threads
-	 * (which determines whether SMT/Hyperthreading is active).
-	 */
+// ==============================================================
+
+	switch(p->CPU.BrandString[0])
+	{
+		case 'A':
+			/* AMD Processors */
+			// The cache information is only in ecx and edx so only save
+			// those registers
+
+			do_cpuid(5,  p->CPU.CPUID[CPUID_5]); // Monitor/Mwait
+
+			do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
+			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+
+			break;
+
+		case 'G':
+			/* Intel Processors */
+			do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]); // Cache Index for Inte
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 0x5)	// Monitor/Mwait
+			{
+				do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
+			}
+
+			if (p->CPU.CPUID[CPUID_0][0] >= 6)	// Thermal/Power
+			{
+				do_cpuid(6, p->CPU.CPUID[CPUID_6]);
+			}
+
+			break;
+	}
+}
+void scan_cpu(PlatformInfo_t *p)
+{
+	verbose("[ CPU INFO ]\n");
+	get_cpuid(p);
+
+	uint64_t	busFCvtt2n;
+	uint64_t	tscFCvtt2n;
+	uint64_t	tscFreq			= 0;
+	uint64_t	busFrequency		= 0;
+	uint64_t	cpuFrequency		= 0;
+	uint64_t	msr			= 0;
+	uint64_t	flex_ratio		= 0;
+	uint64_t	cpuid_features;
+
+	uint32_t	max_ratio		= 0;
+	uint32_t	min_ratio		= 0;
+	uint32_t	reg[4];
+	uint32_t	cores_per_package	= 0;
+	uint32_t	logical_per_package	= 1;
+	uint32_t	threads_per_core	= 1;
+
+	uint8_t		bus_ratio_max		= 0;
+	uint8_t		bus_ratio_min		= 0;
+	uint8_t		currdiv			= 0;
+	uint8_t		currcoef		= 0;
+	uint8_t		maxdiv			= 0;
+	uint8_t		maxcoef			= 0;
+	uint8_t		pic0_mask;
+	uint8_t		cpuMultN2		= 0;
+
+	const char	*newratio;
+
+	int		len			= 0;
+	int		myfsb			= 0;
+	int		i			= 0;
+
+
+/*  http://www.flounder.com/cpuid_explorer2.htm
+    EAX (Intel):
+    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
+    +--------+----------------+--------+----+----+--------+--------+--------+
+    |########|Extended family |Extmodel|####|type|familyid|  model |stepping|
+    +--------+----------------+--------+----+----+--------+--------+--------+
+
+    EAX (AMD):
+    31    28 27            20 19    16 1514 1312 11     8 7      4 3      0
+    +--------+----------------+--------+----+----+--------+--------+--------+
+    |########|Extended family |Extmodel|####|####|familyid|  model |stepping|
+    +--------+----------------+--------+----+----+--------+--------+--------+
+*/
+	///////////////////-- MaxFn,Vendor --////////////////////////
+	p->CPU.Vendor		= p->CPU.CPUID[CPUID_0][1];
+
+	///////////////////-- Signature, stepping, features -- //////
+	cpuid_features = quad(p->CPU.CPUID[CPUID_1][ecx], p->CPU.CPUID[CPUID_1][edx]);
+	if (bit(28) & p->CPU.CPUID[CPUID_1][edx]) // HTT/Multicore
+	{
+		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
+	}
+	else
+	{
+		logical_per_package = 1;
+	}
+
+	p->CPU.Signature	= p->CPU.CPUID[CPUID_1][0];
+	p->CPU.Stepping		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 3, 0);	// stepping = cpu_feat_eax & 0xF;
+	p->CPU.Model		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 7, 4);	// model = (cpu_feat_eax >> 4) & 0xF;
+	p->CPU.Family		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 11, 8);	// family = (cpu_feat_eax >> 8) & 0xF;
+	//p->CPU.Type		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 13, 12);	// type = (cpu_feat_eax >> 12) & 0x3;
+	p->CPU.ExtModel		= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 19, 16);	// ext_model = (cpu_feat_eax >> 16) & 0xF;
+	p->CPU.ExtFamily	= (uint8_t)bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);	// ext_family = (cpu_feat_eax >> 20) & 0xFF;
+
+	if (p->CPU.Family == 0x0f)
+	{
+		p->CPU.Family += p->CPU.ExtFamily;
+	}
+
+	if (p->CPU.Family == 0x0f || p->CPU.Family == 0x06)
+	{
+		p->CPU.Model += (p->CPU.ExtModel << 4);
+	}
+
 	switch (p->CPU.Vendor)
 	{
 		case CPUID_VENDOR_INTEL:
+		{
+			/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
+			if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
+			{
+				for (i = 0; i < 0xFF; i++) // safe loop
+				{
+					do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
+					if (bitfield(reg[eax], 4, 0) == 0)
+					{
+						break;
+					}
+					cores_per_package = bitfield(reg[eax], 31, 26) + 1;
+				}
+			}
+
+			if (i > 0)
+			{
+				cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
+				threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
+			}
+
+			if (cores_per_package == 0)
+			{
+				cores_per_package = 1;
+			}
+
 			switch (p->CPU.Model)
 			{
-				case CPUID_MODEL_NEHALEM:
-				case CPUID_MODEL_FIELDS:
-				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_NEHALEM: // Intel Core i7 LGA1366 (45nm)
+				case CPUID_MODEL_FIELDS: // Intel Core i5, i7 LGA1156 (45nm)
+				case CPUID_MODEL_CLARKDALE: // Intel Core i3, i5, i7 LGA1156 (32nm)
 				case CPUID_MODEL_NEHALEM_EX:
 				case CPUID_MODEL_JAKETOWN:
 				case CPUID_MODEL_SANDYBRIDGE:
 				case CPUID_MODEL_IVYBRIDGE:
-
+				case CPUID_MODEL_HASWELL_U5:
 				case CPUID_MODEL_HASWELL:
 				case CPUID_MODEL_HASWELL_SVR:
 				//case CPUID_MODEL_HASWELL_H:
 				case CPUID_MODEL_HASWELL_ULT:
-				case CPUID_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULX:
+				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_BRODWELL_SVR:
+				case CPUID_MODEL_SKYLAKE_S:
 				//case CPUID_MODEL_:
-					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 					break;
 
-				case CPUID_MODEL_DALES_32NM:
-				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_WESTMERE: // Intel Core i7 LGA1366 (32nm) 6 Core
 				case CPUID_MODEL_WESTMERE_EX:
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+					break;
+				case CPUID_MODEL_ATOM_3700:
+				case CPUID_MODEL_ATOM:
+					p->CPU.NoCores		= 2;
+					p->CPU.NoThreads	= 2;
+					break;
+				default:
+					p->CPU.NoCores		= 0;
 					break;
 			}
 
@@ -438,33 +543,75 @@ void scan_cpu(PlatformInfo_t *p)
 				p->CPU.NoCores		= cores_per_package;
 				p->CPU.NoThreads	= logical_per_package;
 			}
-			break;
+
+			// MSR is *NOT* available on the Intel Atom CPU
+			// workaround for N270. I don't know why it detected wrong
+			if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+			{
+				p->CPU.NoCores		= 1;
+				p->CPU.NoThreads	= 2;
+			}
+
+
+			// workaround for Xeon Harpertown and Yorkfield
+			if ((p->CPU.Model == CPUID_MODEL_PENRYN) &&
+				(p->CPU.NoCores	== 0))
+			{
+				if ((strstr(p->CPU.BrandString, "X54")) ||
+					(strstr(p->CPU.BrandString, "E54")) ||
+					(strstr(p->CPU.BrandString, "W35")) ||
+					(strstr(p->CPU.BrandString, "X34")) ||
+					(strstr(p->CPU.BrandString, "X33")) ||
+					(strstr(p->CPU.BrandString, "L33")) ||
+					(strstr(p->CPU.BrandString, "X32")) ||
+					(strstr(p->CPU.BrandString, "L3426")) ||
+					(strstr(p->CPU.BrandString, "L54")))
+				{
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
+				} else if (strstr(p->CPU.BrandString, "W36")) {
+					p->CPU.NoCores		= 6;
+					p->CPU.NoThreads	= 6;
+				} else { //other Penryn and Wolfdale
+					p->CPU.NoCores		= 0;
+					p->CPU.NoThreads	= 0;
+				}
+			}
+
+			// workaround for Quad
+			if ( strstr(p->CPU.BrandString, "Quad") )
+			{
+				p->CPU.NoCores		= 4;
+				p->CPU.NoThreads	= 4;
+			}
+		}
+
+		break;
 
 		case CPUID_VENDOR_AMD:
-			p->CPU.NoCores		= (uint32_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
-			p->CPU.NoThreads	= (uint32_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+		{
+			post_startup_cpu_fixups();
+			cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
+			threads_per_core = cores_per_package;
+
+			if (cores_per_package == 0)
+			{
+				cores_per_package = 1;
+			}
+
+			p->CPU.NoCores		= cores_per_package;
+			p->CPU.NoThreads	= logical_per_package;
+
 			if (p->CPU.NoCores == 0)
 			{
 				p->CPU.NoCores = 1;
+				p->CPU.NoThreads	= 1;
 			}
+		}
+		break;
 
-			if (p->CPU.NoThreads < p->CPU.NoCores)
-			{
-				p->CPU.NoThreads = p->CPU.NoCores;
-			}
-
-			break;
-
-		default:
+		default :
 			stop("Unsupported CPU detected! System halted.");
-	}
-
-	//workaround for N270. I don't know why it detected wrong
-	// MSR is *NOT* available on the Intel Atom CPU
-	if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
-	{
-		p->CPU.NoCores		= 1;
-		p->CPU.NoThreads	= 2;
 	}
 
 	/* setup features */
@@ -508,7 +655,7 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Features |= CPU_FEATURE_MSR;
 	}
 
-	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && (p->CPU.NoThreads > p->CPU.NoCores))
+	if ((p->CPU.NoThreads > p->CPU.NoCores))
 	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
 	}
@@ -516,23 +663,18 @@ void scan_cpu(PlatformInfo_t *p)
 	pic0_mask = inb(0x21U);
 	outb(0x21U, 0xFFU);     // mask PIC0 interrupts for duration of timing tests
 
-	tscFrequency = measure_tsc_frequency();
-	DBG("cpu freq classic = 0x%016llx\n", tscFrequency);
+	uint64_t cycles;
+	cycles = timeRDTSC();
+	tscFreq = rtc_set_cyc_per_sec(cycles);
+	DBG("cpu freq classic = 0x%016llx\n", tscFreq);
 	// if usual method failed
-	if ( tscFrequency < 1000 )	//TEST
+	if ( tscFreq < 1000 )	//TEST
 	{
-		tscFrequency = timeRDTSC() * 20;//measure_tsc_frequency();
+		tscFreq = measure_tsc_frequency();//timeRDTSC() * 20;//measure_tsc_frequency();
 		// DBG("cpu freq timeRDTSC = 0x%016llx\n", tscFrequency);
 	}
-	else
-	{
-		// DBG("cpu freq timeRDTSC = 0x%016llxn", timeRDTSC() * 20);
-	}
 
-	fsbFrequency = 0;
-	cpuFrequency = 0;
-
-	if (p->CPU.Vendor == CPUID_VENDOR_INTEL && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)))
+	if (p->CPU.Vendor==CPUID_VENDOR_INTEL && ((p->CPU.Family == 0x06 && p->CPU.Model >= 0x0c) || (p->CPU.Family == 0x0f && p->CPU.Model >= 0x03)))
 	{
 		int intelCPU = p->CPU.Model;
 		if (p->CPU.Family == 0x06)
@@ -542,8 +684,8 @@ void scan_cpu(PlatformInfo_t *p)
 			{
 				case CPUID_MODEL_NEHALEM:
 				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_CLARKDALE:
 				case CPUID_MODEL_DALES:
-				case CPUID_MODEL_DALES_32NM:
 				case CPUID_MODEL_WESTMERE:
 				case CPUID_MODEL_NEHALEM_EX:
 				case CPUID_MODEL_WESTMERE_EX:
@@ -552,11 +694,15 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_JAKETOWN:
 				case CPUID_MODEL_IVYBRIDGE_XEON:
 				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_ATOM_3700:
 				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_U5:
 				case CPUID_MODEL_HASWELL_SVR:
 
 				case CPUID_MODEL_HASWELL_ULT:
-				case CPUID_MODEL_CRYSTALWELL:
+				case CPUID_MODEL_HASWELL_ULX:
+				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_SKYLAKE_S:
 /* --------------------------------------------------------- */
 					msr = rdmsr64(MSR_PLATFORM_INFO);
 					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
@@ -593,7 +739,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 					if (bus_ratio_max)
 					{
-						fsbFrequency = (tscFrequency / bus_ratio_max);
+						busFrequency = (tscFreq / bus_ratio_max);
 					}
 
 					//valv: Turbo Ratio Limit
@@ -601,13 +747,14 @@ void scan_cpu(PlatformInfo_t *p)
 					{
 						msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
 
-						cpuFrequency = bus_ratio_max * fsbFrequency;
+						cpuFrequency = bus_ratio_max * busFrequency;
 						max_ratio = bus_ratio_max * 10;
 					}
 					else
 					{
-						cpuFrequency = tscFrequency;
+						cpuFrequency = tscFreq;
 					}
+
 					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
 					{
 						max_ratio = atoi(newratio);
@@ -617,12 +764,12 @@ void scan_cpu(PlatformInfo_t *p)
 							max_ratio = (max_ratio + 5);
 						}
 
-						verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
+						verbose("\tBus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 						// extreme overclockers may love 320 ;)
 						if ((max_ratio >= min_ratio) && (max_ratio <= 320))
 						{
-							cpuFrequency = (fsbFrequency * max_ratio) / 10;
+							cpuFrequency = (busFrequency * max_ratio) / 10;
 							if (len >= 3)
 							{
 								maxdiv = 1;
@@ -642,8 +789,8 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.MaxRatio = max_ratio;
 					p->CPU.MinRatio = min_ratio;
 
-				myfsb = fsbFrequency / 1000000;
-				verbose("Sticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);  // Bungo: fixed wrong Bus-Ratio readout
+				myfsb = busFrequency / 1000000;
+				verbose("\tSticking with [BCLK: %dMhz, Bus-Ratio: %d]\n", myfsb, max_ratio/10);  // Bungo: fixed wrong Bus-Ratio readout
 				currcoef = bus_ratio_max;
 
 				break;
@@ -679,20 +826,20 @@ void scan_cpu(PlatformInfo_t *p)
 				{
 					if (maxdiv)
 					{
-						fsbFrequency = ((tscFrequency * 2) / ((maxcoef * 2) + 1));
+						busFrequency = ((tscFreq * 2) / ((maxcoef * 2) + 1));
 					}
 					else
 					{
-						fsbFrequency = (tscFrequency / maxcoef);
+						busFrequency = (tscFreq / maxcoef);
 					}
 
 					if (currdiv)
 					{
-						cpuFrequency = (fsbFrequency * ((currcoef * 2) + 1) / 2);
+						cpuFrequency = (busFrequency * ((currcoef * 2) + 1) / 2);
 					}
 					else
 					{
-						cpuFrequency = (fsbFrequency * currcoef);
+						cpuFrequency = (busFrequency * currcoef);
 					}
 
 					DBG("max: %d%s current: %d%s\n", maxcoef, maxdiv ? ".5" : "",currcoef, currdiv ? ".5" : "");
@@ -706,167 +853,297 @@ void scan_cpu(PlatformInfo_t *p)
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
 		}
 	}
-	else if ((p->CPU.Vendor == CPUID_VENDOR_AMD) && (p->CPU.Family == 0x0f))
+
+	else if (p->CPU.Vendor==CPUID_VENDOR_AMD)
 	{
-		switch(p->CPU.ExtFamily)
+		switch(p->CPU.Family)
 		{
-			case 0x00: //* K8 *//
-				msr = rdmsr64(K8_FIDVID_STATUS);
-				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
-				currcoef = bitfield(msr, 5, 0) / 2 + 4;
+			case 0xF: /* K8 */
+			{
+				uint64_t fidvid = 0;
+				uint64_t cpuMult;
+				uint64_t fid;
+
+				fidvid = rdmsr64(K8_FIDVID_STATUS);
+				fid = bitfield(fidvid, 5, 0);
+
+				cpuMult = (fid + 8) / 2;
+				currcoef = cpuMult;
+
+				cpuMultN2 = (fidvid & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+				/****** Addon END ******/
+			}
 				break;
 
-			case 0x01: //* K10 *//
-				msr = rdmsr64(K10_COFVID_STATUS);
-				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
-				// EffFreq: effective frequency interface
-				if (bitfield(p->CPU.CPUID[CPUID_6][2], 0, 0) == 1)
+			case 0x10: /*** AMD Family 10h ***/
+			{
+				uint64_t cofvid = 0;
+				uint64_t cpuMult;
+				uint64_t divisor = 0;
+				uint64_t did;
+				uint64_t fid;
+
+				cofvid  = rdmsr64(K10_COFVID_STATUS);
+				did = bitfield(cofvid, 8, 6);
+				fid = bitfield(cofvid, 5, 0);
+				if (did == 0) divisor = 2;
+				else if (did == 1) divisor = 4;
+				else if (did == 2) divisor = 8;
+				else if (did == 3) divisor = 16;
+				else if (did == 4) divisor = 32;
+
+				cpuMult = (fid + 16) / divisor;
+				currcoef = cpuMult;
+
+				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+
+				/****** Addon END ******/
+			}
+			break;
+
+			case 0x11: /*** AMD Family 11h ***/
+			{
+				uint64_t cofvid = 0;
+				uint64_t cpuMult;
+				uint64_t divisor = 0;
+				uint64_t did;
+				uint64_t fid;
+
+				cofvid  = rdmsr64(K10_COFVID_STATUS);
+				did = bitfield(cofvid, 8, 6);
+				fid = bitfield(cofvid, 5, 0);
+				if (did == 0) divisor = 2;
+				else if (did == 1) divisor = 4;
+				else if (did == 2) divisor = 8;
+				else if (did == 3) divisor = 16;
+				else if (did == 4) divisor = 32;
+
+				cpuMult = (fid + 8) / divisor;
+				currcoef = cpuMult;
+
+				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+
+				/****** Addon END ******/
+			}
+                break;
+
+			case 0x12: /*** AMD Family 12h ***/
+			{
+				// 8:4 CpuFid: current CPU core frequency ID
+				// 3:0 CpuDid: current CPU core divisor ID
+				uint64_t prfsts,CpuFid,CpuDid;
+				prfsts = rdmsr64(K10_COFVID_STATUS);
+
+				CpuDid = bitfield(prfsts, 3, 0) ;
+				CpuFid = bitfield(prfsts, 8, 4) ;
+				uint64_t divisor;
+				switch (CpuDid)
 				{
-					//uint64_t mperf = measure_mperf_frequency();
-					uint64_t aperf = measure_aperf_frequency();
-					cpuFrequency = aperf;
+					case 0: divisor = 1; break;
+					case 1: divisor = (3/2); break;
+					case 2: divisor = 2; break;
+					case 3: divisor = 3; break;
+					case 4: divisor = 4; break;
+					case 5: divisor = 6; break;
+					case 6: divisor = 8; break;
+					case 7: divisor = 12; break;
+					case 8: divisor = 16; break;
+					default: divisor = 1; break;
 				}
-				// NOTE: tsc runs at the maccoeff (non turbo)
-				//			*not* at the turbo frequency.
-				maxcoef	 = bitfield(msr, 54, 49) / 2 + 4;
-				currcoef = bitfield(msr, 5, 0) + 0x10;
-				currdiv = 2 << bitfield(msr, 8, 6);
+				currcoef = (CpuFid + 0x10) / divisor;
 
+				cpuMultN2 = (prfsts & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+
+			}
 				break;
 
-			case 0x05: //* K14 *//
-				msr = rdmsr64(K10_COFVID_STATUS);
-				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
-				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
+			case 0x14: /* K14 */
+
+			{
+				// 8:4: current CPU core divisor ID most significant digit
+				// 3:0: current CPU core divisor ID least significant digit
+				uint64_t prfsts;
+				prfsts = rdmsr64(K10_COFVID_STATUS);
+
+				uint64_t CpuDidMSD,CpuDidLSD;
+				CpuDidMSD = bitfield(prfsts, 8, 4) ;
+				CpuDidLSD  = bitfield(prfsts, 3, 0) ;
+
+				uint64_t frequencyId = 0x10;
+				currcoef = (frequencyId + 0x10) /
+					(CpuDidMSD + (CpuDidLSD  * 0.25) + 1);
+				currdiv = ((CpuDidMSD) + 1) << 2;
 				currdiv += bitfield(msr, 3, 0);
 
+				cpuMultN2 = (prfsts & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+			}
+
 				break;
 
-			case 0x02: //* K11 *//
-				// not implimented
+			case 0x15: /*** AMD Family 15h ***/
+			case 0x06: /*** AMD Family 06h ***/
+			{
+
+				uint64_t cofvid = 0;
+				uint64_t cpuMult;
+				uint64_t divisor = 0;
+				uint64_t did;
+				uint64_t fid;
+
+				cofvid  = rdmsr64(K10_COFVID_STATUS);
+				did = bitfield(cofvid, 8, 6);
+				fid = bitfield(cofvid, 5, 0);
+				if (did == 0) divisor = 2;
+				else if (did == 1) divisor = 4;
+				else if (did == 2) divisor = 8;
+				else if (did == 3) divisor = 16;
+				else if (did == 4) divisor = 32;
+
+				cpuMult = (fid + 16) / divisor;
+				currcoef = cpuMult;
+
+				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+			}
 				break;
+
+			case 0x16: /*** AMD Family 16h kabini ***/
+			{
+				uint64_t cofvid = 0;
+				uint64_t cpuMult;
+				uint64_t divisor = 0;
+				uint64_t did;
+				uint64_t fid;
+
+				cofvid  = rdmsr64(K10_COFVID_STATUS);
+				did = bitfield(cofvid, 8, 6);
+				fid = bitfield(cofvid, 5, 0);
+				if (did == 0) divisor = 1;
+				else if (did == 1) divisor = 2;
+				else if (did == 2) divisor = 4;
+				else if (did == 3) divisor = 8;
+				else if (did == 4) divisor = 16;
+
+				cpuMult = (fid + 16) / divisor;
+				currcoef = cpuMult;
+
+				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+				/****** Addon END ******/
+			}
+				break;
+
+			default:
+			{
+				typedef unsigned long long vlong;
+				uint64_t prfsts;
+				prfsts = rdmsr64(K10_COFVID_STATUS);
+				uint64_t r;
+				vlong hz;
+				r = (prfsts>>6) & 0x07;
+				hz = (((prfsts & 0x3f)+0x10)*100000000ll)/(1<<r);
+
+				currcoef = hz / (200 * Mega);
+			}
 		}
 
-		if (maxcoef)
+		if (currcoef)
 		{
 			if (currdiv)
 			{
-				if (!currcoef)
-				{
-					currcoef = maxcoef;
-				}
+				busFrequency = ((tscFreq * 2) / ((currcoef * 2) + 1));
+				busFCvtt2n = ((1 * Giga) << 32) / busFrequency;
+				tscFCvtt2n = busFCvtt2n * 2 / (1 + (2 * currcoef));
+				cpuFrequency = ((1 * Giga)  << 32) / tscFCvtt2n;
 
-				if (!cpuFrequency)
-				{
-					fsbFrequency = ((tscFrequency * currdiv) / currcoef);
-				}
-				else
-				{
-					fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
-				}
 				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
 			}
 			else
 			{
-				if (!cpuFrequency)
-				{
-					fsbFrequency = (tscFrequency / maxcoef);
-				}
-				else
-				{
-					fsbFrequency = (cpuFrequency / maxcoef);
-				}
+				busFrequency = (tscFreq / currcoef);
+				busFCvtt2n = ((1 * Giga) << 32) / busFrequency;
+				tscFCvtt2n = busFCvtt2n / currcoef;
+				cpuFrequency = ((1 * Giga)  << 32) / tscFCvtt2n;
 				DBG("%d\n", currcoef);
 			}
 		}
-		else if (currcoef)
+		else if (!cpuFrequency)
 		{
-			if (currdiv)
-			{
-				fsbFrequency = ((tscFrequency * currdiv) / currcoef);
-				DBG("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			}
-			else
-			{
-				fsbFrequency = (tscFrequency / currcoef);
-				DBG("%d\n", currcoef);
-			}
-		}
-		if (!cpuFrequency)
-		{
-			cpuFrequency = tscFrequency;
+			cpuFrequency = tscFreq;
 		}
 	}
 
 #if 0
-	if (!fsbFrequency)
+	if (!busFrequency)
 	{
-		fsbFrequency = (DEFAULT_FSB * 1000);
-		DBG("CPU: fsbFrequency = 0! using the default value for FSB!\n");
-		cpuFrequency = tscFrequency;
+		busFrequency = (DEFAULT_FSB * 1000);
+		DBG("\tCPU: busFrequency = 0! using the default value for FSB!\n");
+		cpuFrequency = tscFreq;
 	}
 
-	DBG("cpu freq = 0x%016llxn", timeRDTSC() * 20);
+	DBG("\tcpu freq = 0x%016llxn", timeRDTSC() * 20);
 
 #endif
 
 	outb(0x21U, pic0_mask);     // restore PIC0 interrupts
 
-	p->CPU.MaxCoef = maxcoef;
-	p->CPU.MaxDiv = maxdiv;
+	p->CPU.MaxCoef = maxcoef = currcoef;
+	p->CPU.MaxDiv = maxdiv = currdiv;
 	p->CPU.CurrCoef = currcoef;
 	p->CPU.CurrDiv = currdiv;
-	p->CPU.TSCFrequency = tscFrequency;
-	p->CPU.FSBFrequency = fsbFrequency;
+	p->CPU.TSCFrequency = tscFreq;
+	p->CPU.FSBFrequency = busFrequency;
 	p->CPU.CPUFrequency = cpuFrequency;
 
 	// keep formatted with spaces instead of tabs
-	DBG("\n------------------------------\n");
-   	DBG("\tCPU INFO\n");
-	DBG("------------------------------\n");
 
-	DBG("CPUID Raw Values:\n");
+	DBG("\tCPUID Raw Values:\n");
 	for (i = 0; i < CPUID_MAX; i++)
 	{
-		DBG("%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
+		DBG("\t%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
 	}
 	DBG("\n");
-	DBG("Brand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
-	DBG("Vendor:                  0x%X\n",		p->CPU.Vendor);			// Vendor ex: GenuineIntel
-	DBG("Family:                  0x%X\n",		p->CPU.Family);			// Family ex: 6 (06h)
-	DBG("ExtFamily:               0x%X\n",		p->CPU.ExtFamily);
-	DBG("Signature:               0x%08X\n",	p->CPU.Signature);		// CPUID signature
+	DBG("\tBrand String:            %s\n",		p->CPU.BrandString);		// Processor name (BIOS)
+	DBG("\tVendor:                  0x%X\n",	p->CPU.Vendor);			// Vendor ex: GenuineIntel
+	DBG("\tFamily:                  0x%X\n",	p->CPU.Family);			// Family ex: 6 (06h)
+	DBG("\tExtFamily:               0x%X\n",	p->CPU.ExtFamily);
+	DBG("\tSignature:               0x%08X\n",	p->CPU.Signature);		// CPUID signature
 	/*switch (p->CPU.Type) {
 		case PT_OEM:
-			DBG("Processor type:          Intel Original OEM Processor\n");
+			DBG("\tProcessor type:          Intel Original OEM Processor\n");
 			break;
 		case PT_OD:
-			DBG("Processor type:          Intel Over Drive Processor\n");
+			DBG("\tProcessor type:          Intel Over Drive Processor\n");
 			break;
 		case PT_DUAL:
-			DBG("Processor type:          Intel Dual Processor\n");
+			DBG("\tProcessor type:          Intel Dual Processor\n");
 			break;
 		case PT_RES:
-			DBG("Processor type:          Intel Reserved\n");
+			DBG("\tProcessor type:          Intel Reserved\n");
 			break;
 		default:
 			break;
 	}*/
-	DBG("Model:                   0x%X\n",		p->CPU.Model);			// Model ex: 37 (025h)
-	DBG("ExtModel:                0x%X\n",		p->CPU.ExtModel);
-	DBG("Stepping:                0x%X\n",		p->CPU.Stepping);		// Stepping ex: 5 (05h)
-	DBG("MaxCoef:                 %d\n",		p->CPU.MaxCoef);
-	DBG("CurrCoef:                %d\n",		p->CPU.CurrCoef);
-	DBG("MaxDiv:                  %d\n",		p->CPU.MaxDiv);
-	DBG("CurrDiv:                 %d\n",		p->CPU.CurrDiv);
-	DBG("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
-	DBG("FSBFreq:                 %dMHz\n",		p->CPU.FSBFrequency / 1000000);
-	DBG("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
-	DBG("Cores:                   %d\n",		p->CPU.NoCores);		// Cores
-	DBG("Logical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
-	DBG("Features:                0x%08x\n",	p->CPU.Features);
+	DBG("\tModel:                   0x%X\n",	p->CPU.Model);			// Model ex: 37 (025h)
+	DBG("\tExtModel:                0x%X\n",	p->CPU.ExtModel);
+	DBG("\tStepping:                0x%X\n",	p->CPU.Stepping);		// Stepping ex: 5 (05h)
+	DBG("\tMaxCoef:                 %d\n",		p->CPU.MaxCoef);
+	DBG("\tCurrCoef:                %d\n",		p->CPU.CurrCoef);
+	DBG("\tMaxDiv:                  %d\n",		p->CPU.MaxDiv);
+	DBG("\tCurrDiv:                 %d\n",		p->CPU.CurrDiv);
+	DBG("\tTSCFreq:                 %dMHz\n",	p->CPU.TSCFrequency / 1000000);
+	DBG("\tFSBFreq:                 %dMHz\n",	p->CPU.FSBFrequency / 1000000);
+	DBG("\tCPUFreq:                 %dMHz\n",	p->CPU.CPUFrequency / 1000000);
+	DBG("\tCores:                   %d\n",		p->CPU.NoCores);		// Cores
+	DBG("\tLogical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
+	DBG("\tFeatures:                0x%08x\n",	p->CPU.Features);
 
-	DBG("\n---------------------------------------------\n");
+	verbose("\n");
 #if DEBUG_CPU
 	pause();
 #endif

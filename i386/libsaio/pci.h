@@ -889,7 +889,7 @@ typedef struct {
 // values for the class_sub field for class_base = 0x0c (serial bus controller)
 #define PCI_BASE_CLASS_SERIAL					0x0c
 #define PCI_CLASS_SERIAL_FIREWIRE				0x0c00   /* FireWire (IEEE 1394) */
-#define PCI_CLASS_SERIAL_FIREWIRE_OHCI				0x0c10
+#define PCI_CLASS_SERIAL_FIREWIRE_OHCI				0x0c0010
 #define PCI_CLASS_SERIAL_ACCESS					0x0c01
 #define PCI_CLASS_SERIAL_SSA					0x0c02
 #define PCI_CLASS_SERIAL_USB					0x0c03  /* Universal Serial Bus */
@@ -940,13 +940,20 @@ typedef struct {
 #define PCI_CLASS_OTHERS					0xff
 
 /* Several ID's we need in the library */
+#define PCI_VENDOR_ID_TEXAS_INSTRUMENTS				0x104c
+#define PCI_VENDOR_ID_ATI					0x1002
+#define PCI_VENDOR_ID_MOTOROLA					0x1057
 #define PCI_VENDOR_ID_APPLE					0x106b
 #define PCI_VENDOR_ID_AMD					0x1022
-#define PCI_VENDOR_ID_ATI					0x1002
-#define PCI_VENDOR_ID_INTEL					0x8086
 #define PCI_VENDOR_ID_NVIDIA					0x10de
 #define PCI_VENDOR_ID_REALTEK					0x10ec
-#define PCI_VENDOR_ID_TEXAS_INSTRUMENTS				0x104c
 #define PCI_VENDOR_ID_VIA					0x1106
+#define PCI_VENDOR_ID_MARVELL					0x11ab
+
+#define PCI_VENDOR_ID_BROADCOM					0x14e4
+#define PCI_VENDOR_ID_ATHEROS					0x168c
+#define PCI_VENDOR_ID_QUALCOMM					0x1969
+#define PCI_VENDOR_ID_JMICRON					0x197B
+#define PCI_VENDOR_ID_INTEL					0x8086
 
 #endif /* !__LIBSAIO_PCI_H */

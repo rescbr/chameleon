@@ -31,7 +31,7 @@
 extern "C" {
 #endif
 
-#define IOGRAPHICSTYPES_REV     24
+#define IOGRAPHICSTYPES_REV     42
 
 typedef SInt32  IOIndex;
 typedef UInt32  IOSelect;
@@ -138,6 +138,8 @@ typedef UInt32  IOAppleTimingID;
  *   kDisplayModeSimulscanFlag mode is available on multiple display connections. <br>
  *   kDisplayModeNotPresetFlag mode is not a factory preset for the display (geometry may need correction). <br>
  *   kDisplayModeStretchedFlag mode is stretched/distorted to match the display aspect ratio. <br>
+ * @field imageWidth Physical width of active image if known, in millimeters, otherwise zero. <br>
+ * @field imageHeight Physical height of active image if known, in millimeters, otherwise zero. <br>
  * @field reserved Set to zero.
  */
 
@@ -147,7 +149,9 @@ struct IODisplayModeInformation {
     IOFixed1616                 refreshRate;
     IOIndex                     maxDepthIndex;
     UInt32                      flags;
-    UInt32                      reserved[ 4 ];
+    UInt16			imageWidth;
+    UInt16			imageHeight;
+    UInt32                      reserved[ 3 ];
 };
 typedef struct IODisplayModeInformation IODisplayModeInformation;
 
@@ -169,7 +173,11 @@ enum {
     kDisplayModeNotGraphicsQualityFlag  = 0x00001000,
     kDisplayModeValidateAgainstDisplay  = 0x00002000,
     kDisplayModeTelevisionFlag          = 0x00100000,
-    kDisplayModeValidForMirroringFlag   = 0x00200000
+    kDisplayModeValidForMirroringFlag   = 0x00200000,
+    kDisplayModeAcceleratorBackedFlag   = 0x00400000,
+    kDisplayModeValidForHiResFlag       = 0x00800000,
+    kDisplayModeValidForAirPlayFlag     = 0x01000000,
+    kDisplayModeNativeFlag              = 0x02000000
 };
 enum {
     kDisplayModeValidFlag               = 0x00000001,
@@ -253,16 +261,20 @@ enum {
     kIOCursorControlAttribute           = 'crsc',
 
     kIOSystemPowerAttribute             = 'spwr',
+    kIOWindowServerActiveAttribute      = 'wsrv',
     kIOVRAMSaveAttribute                = 'vrsv',
     kIODeferCLUTSetAttribute            = 'vclt',
 
-    kIOClamshellStateAttribute          = 'clam'
+    kIOClamshellStateAttribute          = 'clam',
+
+	kIOFBDisplayPortTrainingAttribute   = 'dpta',
 };
 
 // values for kIOMirrorAttribute
 enum {
     kIOMirrorIsPrimary                  = 0x80000000,
-    kIOMirrorHWClipped                  = 0x40000000
+    kIOMirrorHWClipped                  = 0x40000000,
+    kIOMirrorIsMirrored                 = 0x20000000
 };
 
 // values for kIOMirrorDefaultAttribute
@@ -696,6 +708,10 @@ enum {
     kConnectionRedGammaScale            = 'rgsc',
     kConnectionGreenGammaScale          = 'ggsc',
     kConnectionBlueGammaScale           = 'bgsc',
+    kConnectionGammaScale               = 'gsc ',
+    kConnectionFlushParameters          = 'flus',
+
+    kConnectionVBLMultiplier            = 'vblm',
 
     kConnectionHandleDisplayPortEvent   = 'dpir',
 
@@ -710,6 +726,9 @@ enum {
     kConnectionControllerDitherControl   = '\0gdc',
 
     kConnectionDisplayFlags              = 'dflg',
+
+    kConnectionEnableAudio               = 'aud ',
+    kConnectionAudioStreaming            = 'auds',
 };
 
 // kConnectionFlags values
@@ -750,10 +769,11 @@ enum {
 #define kIODisplaySupportsBasicAudioKey "IODisplaySupportsBasicAudio"
 #define kIODisplaySupportsYCbCr444Key   "IODisplaySupportsYCbCr444"
 #define kIODisplaySupportsYCbCr422Key   "IODisplaySupportsYCbCr422"
+#define kIODisplaySelectedColorModeKey  "cmod"
 
 enum
 { 
-    kIODisplayColorMode = kConnectionColorMode,
+    kIODisplayColorMode         = kConnectionColorMode,
 };
 
 #if 0
@@ -817,6 +837,12 @@ enum
     kIODisplayNeedsCEAUnderscan      = 0x00000001,
 };
 
+enum
+{
+	kIODisplayPowerStateOff       =	0,
+	kIODisplayPowerStateMinUsable =	1,
+	kIODisplayPowerStateOn        = 2,
+};
 
 #define IO_DISPLAY_CAN_FILL             0x00000040
 #define IO_DISPLAY_CAN_BLIT             0x00000020
@@ -985,7 +1011,9 @@ enum {
     // DisplayPort link event
     kIOFBDisplayPortLinkChangeInterruptType = 'dplk',
     // MCCS
-    kIOFBMCCSInterruptType                  = 'mccs'
+    kIOFBMCCSInterruptType                  = 'mccs',
+    // early vram notification
+    kIOFBWakeInterruptType                  = 'vwak'
 };
 
 // IOAppleTimingID's
@@ -1014,6 +1042,7 @@ enum {
     kIOTimingIDVESA_1024x768_75hz    = 204,     /* 1024x768  (75 Hz) VESA 1K-75Hz timing (very similar to kIOTimingIDApple_1024x768_75hz). */
     kIOTimingIDVESA_1024x768_85hz    = 208,     /* 1024x768  (85 Hz) VESA timing. */
     kIOTimingIDApple_1024x768_75hz   = 210,     /* 1024x768  (75 Hz) Apple 19" RGB. */
+    kIOTimingIDVESA_1152x864_75hz    = 215,     /* 1152x864  (75 Hz) VESA timing. */
     kIOTimingIDApple_1152x870_75hz   = 220,     /* 1152x870  (75 Hz) Apple 21" RGB. */
     kIOTimingIDAppleNTSC_ST          = 230,     /*  512x384  (60 Hz, interlaced, non-convolved). */
     kIOTimingIDAppleNTSC_FF          = 232,     /*  640x480  (60 Hz, interlaced, non-convolved). */
@@ -1070,16 +1099,21 @@ enum {
 #define kIOFBTimingRangeKey             "IOFBTimingRange"
 #define kIOFBScalerInfoKey              "IOFBScalerInfo"
 #define kIOFBCursorInfoKey              "IOFBCursorInfo"
+#define kIOFBHDMIDongleROMKey           "IOFBHDMIDongleROM"
 
 #define kIOFBHostAccessFlagsKey         "IOFBHostAccessFlags"
 
 #define kIOFBMemorySizeKey              "IOFBMemorySize"
+
+#define kIOFBNeedsRefreshKey            "IOFBNeedsRefresh"
 
 #define kIOFBProbeOptionsKey            "IOFBProbeOptions"
 
 #define kIOFBGammaWidthKey              "IOFBGammaWidth"
 #define kIOFBGammaCountKey              "IOFBGammaCount"
 #define kIOFBCLUTDeferKey               "IOFBCLUTDefer"
+
+#define kIOFBDisplayPortConfigurationDataKey    "dpcd-registers"
         
 // exists on the hibernate progress display device
 #ifndef kIOHibernatePreviewActiveKey
@@ -1091,6 +1125,8 @@ enum {
 };
 #endif
 
+#define kIOHibernateEFIGfxStatusKey    "IOHibernateEFIGfxStatus"
+
 // CFNumber/CFData
 #define kIOFBAVSignalTypeKey            "av-signal-type"
 enum {
@@ -1099,6 +1135,63 @@ enum {
     kIOFBAVSignalTypeDVI     = 0x00000002,
     kIOFBAVSignalTypeHDMI    = 0x00000008,
     kIOFBAVSignalTypeDP      = 0x00000010,
+};
+
+// kIOFBDisplayPortTrainingAttribute data
+
+struct IOFBDPLinkConfig
+{
+    uint16_t version;		 // 8 bit high (major); 8 bit low (minor)
+    uint8_t  bitRate;		 // same encoding as the spec
+    uint8_t  __reservedA[1]; // reserved set to zero
+	uint16_t t1Time;		 // minimum duration of the t1 pattern (microseconds)
+	uint16_t t2Time;		 // minimum duration of the t2 pattern
+	uint16_t t3Time;		 // minimum duration of the t3 pattern
+	uint8_t  idlePatterns;   // minimum number of idle patterns
+	uint8_t  laneCount;		 // number of lanes in the link
+	uint8_t  voltage;
+	uint8_t  preEmphasis;
+	uint8_t  downspread;
+	uint8_t  scrambler;
+	uint8_t  maxBitRate;	 // same encoding as the bitRate field
+	uint8_t  maxLaneCount;	 // an integer
+	uint8_t  maxDownspread;	 // 0 = Off. 1 = 0.5
+	uint8_t  __reservedB[9];	// reserved set to zero - fix align and provide 8 bytes of padding.
+};
+typedef struct IOFBDPLinkConfig IOFBDPLinkConfig;
+
+enum
+{
+    kIOFBBitRateRBR		= 0x06,		// 1.62 Gbps per lane
+    kIOFBBitRateHBR		= 0x0A,		// 2.70 Gbps per lane
+    kIOFBBitRateHBR2	= 0x14,		// 5.40 Gbps per lane
+};
+
+enum {
+    kIOFBLinkVoltageLevel0	= 0x00,
+    kIOFBLinkVoltageLevel1	= 0x01,
+    kIOFBLinkVoltageLevel2	= 0x02,
+    kIOFBLinkVoltageLevel3	= 0x03
+};
+
+enum
+{
+    kIOFBLinkPreEmphasisLevel0 = 0x00,
+    kIOFBLinkPreEmphasisLevel1 = 0x01,
+    kIOFBLinkPreEmphasisLevel2 = 0x02,
+    kIOFBLinkPreEmphasisLevel3 = 0x03
+};
+
+enum
+{
+    kIOFBLinkDownspreadNone  = 0x0,
+    kIOFBLinkDownspreadMax   = 0x1
+};
+
+enum
+{
+    kIOFBLinkScramblerNormal    = 0x0, // for external displays
+    kIOFBLinkScramblerAlternate = 0x1  // used for eDP
 };
 
 // diagnostic keys
@@ -1110,10 +1203,12 @@ enum {
 #define kIOFBModeTMKey                  "TM"
 #define kIOFBModeAIDKey                 "AID"
 #define kIOFBModeDFKey                  "DF"
+#define kIOFBModePIKey                  "PI"
 
 // display property keys
 
 #define kIODisplayEDIDKey               "IODisplayEDID"
+#define kIODisplayEDIDOriginalKey       "IODisplayEDIDOriginal"
 #define kIODisplayLocationKey           "IODisplayLocation"             // CFString
 #define kIODisplayConnectFlagsKey       "IODisplayConnectFlags"         // CFNumber
 #define kIODisplayHasBacklightKey       "IODisplayHasBacklight"         // CFBoolean
@@ -1217,20 +1312,23 @@ enum {
 #define kIODisplayMinValueKey           "min"
 #define kIODisplayMaxValueKey           "max"
 
-#define kIODisplayBrightnessKey         "brightness"
-#define kIODisplayContrastKey           "contrast"
-#define kIODisplayHorizontalPositionKey "horizontal-position"
-#define kIODisplayHorizontalSizeKey     "horizontal-size"
-#define kIODisplayVerticalPositionKey   "vertical-position"
-#define kIODisplayVerticalSizeKey       "vertical-size"
-#define kIODisplayTrapezoidKey          "trapezoid"
-#define kIODisplayPincushionKey         "pincushion"
-#define kIODisplayParallelogramKey      "parallelogram"
-#define kIODisplayRotationKey           "rotation"
-#define kIODisplayTheatreModeKey        "theatre-mode"
-#define kIODisplayTheatreModeWindowKey  "theatre-mode-window"
-#define kIODisplayOverscanKey           "oscn"
-#define kIODisplayVideoBestKey          "vbst"
+#define kIODisplayBrightnessKey             "brightness"
+#define kIODisplayLinearBrightnessKey       "linear-brightness"
+#define kIODisplayUsableLinearBrightnessKey "usable-linear-brightness"
+#define kIODisplayBrightnessFadeKey         "brightness-fade"
+#define kIODisplayContrastKey               "contrast"
+#define kIODisplayHorizontalPositionKey     "horizontal-position"
+#define kIODisplayHorizontalSizeKey     	"horizontal-size"
+#define kIODisplayVerticalPositionKey   	"vertical-position"
+#define kIODisplayVerticalSizeKey           "vertical-size"
+#define kIODisplayTrapezoidKey              "trapezoid"
+#define kIODisplayPincushionKey             "pincushion"
+#define kIODisplayParallelogramKey          "parallelogram"
+#define kIODisplayRotationKey               "rotation"
+#define kIODisplayTheatreModeKey            "theatre-mode"
+#define kIODisplayTheatreModeWindowKey      "theatre-mode-window"
+#define kIODisplayOverscanKey               "oscn"
+#define kIODisplayVideoBestKey              "vbst"
 
 #define kIODisplaySpeakerVolumeKey              "speaker-volume"
 #define kIODisplaySpeakerSelectKey              "speaker-select"
@@ -1244,10 +1342,15 @@ enum {
 #define kIODisplayPowerModeKey                  "power-mode"
 #define kIODisplayManufacturerSpecificKey       "manufacturer-specific"
 
+#define kIODisplayPowerStateKey       			"dsyp"
+
+#define kIODisplayControllerIDKey				"IODisplayControllerID"
+#define kIODisplayCapabilityStringKey       	"IODisplayCapabilityString"
 
 #define kIODisplayRedGammaScaleKey      "rgsc"
 #define kIODisplayGreenGammaScaleKey    "ggsc"
 #define kIODisplayBlueGammaScaleKey     "bgsc"
+#define kIODisplayGammaScaleKey         "gsc "
 
 #define kIODisplayParametersCommitKey   "commit"
 #define kIODisplayParametersDefaultKey  "defaults"

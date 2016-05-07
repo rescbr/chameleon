@@ -24,12 +24,13 @@
  */
 
 /*
- Original patch by Nawcom
- http://forum.voodooprojects.org/index.php/topic,1029.0.html
- 
- Original Intel HDx000 code from valv
- Intel HD4xx and HD5xx code by ErmaC http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
- */
+	Original patch by Nawcom
+	http://forum.voodooprojects.org/index.php/topic,1029.0.html
+
+	Original Intel HDx000 code from valv
+	Intel Ivy Bridge, Haswell and Broadwell code from ErmaC:
+	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
+*/
 
 #ifndef __LIBSAIO_GMA_H
 #define __LIBSAIO_GMA_H
@@ -70,10 +71,22 @@ typedef struct{
 #define HD_GRAPHICS_5500    "HD Graphics 5500"
 #define HD_GRAPHICS_5600    "HD Graphics 5600"
 #define HD_GRAPHICS_6000    "HD Graphics 6000"
-#define IRIS_6100           "Iris graphics 6100"
+#define IRIS_6100           "Iris Graphics 6100"
 #define IRIS_6200           "Iris Pro Graphics 6200"
 #define IRIS_6300           "Iris Pro Graphics P6300"
-#define INTEL_VENDORID		0x8086
+#define HD_GRAPHICS_510     "HD Graphics 510"
+#define HD_GRAPHICS_515     "HD Graphics 515"
+#define HD_GRAPHICS_520     "HD Graphics 520"
+#define HD_GRAPHICS_P530    "HD Graphics P530"
+#define HD_GRAPHICS_530     "HD Graphics 530"
+#define HD_GRAPHICS_535     "HD Graphics 535"
+#define HD_GRAPHICS_550     "HD Graphics 550"
+#define IRIS_540            "Iris(TM) Graphics 540"
+#define IRIS_570_580        "Iris(TM) Pro Graphics 570/580"
+#define IRIS_580            "Iris(TM) Pro Graphics 580"
+#define IRIS                "Iris(TM) Graphics"
+#define IRIS_P580           "Iris(TM) Pro Graphics P580"
+#define INTEL_VENDORID      PCI_VENDOR_ID_INTEL
 
 /* http://cgit.freedesktop.org/xorg/driver/xf86-video-intel/tree/src/intel_driver.h */
 /* http://people.redhat.com/agk/patches/linux/patches-3.6/git-update1.patch */
@@ -82,6 +95,13 @@ typedef struct{
 #define GMA_I810_DC100             GFX_MODEL_CONSTRUCT(INTEL, 0x7123)
 #define GMA_I810_E                 GFX_MODEL_CONSTRUCT(INTEL, 0x7125)
 #define GMA_I815                   GFX_MODEL_CONSTRUCT(INTEL, 0x1132)
+/* ==================================== */
+// Cherryview (Braswell, Cherry Trail)
+// #define GMA_ GFX_MODEL_CONSTRUCT(INTEL, 0x22B0) // Intel(R) HD Graphics
+// #define GMA_ GFX_MODEL_CONSTRUCT(INTEL, 0x22B1) // Intel(R) HD Graphics
+// #define GMA_ GFX_MODEL_CONSTRUCT(INTEL, 0x22B2) // Intel(R) HD Graphics
+// #define GMA_ GFX_MODEL_CONSTRUCT(INTEL, 0x22B3) // Intel(R) HD Graphics
+
 /* ==================================== */
 
 #define GMA_I830_M                 GFX_MODEL_CONSTRUCT(INTEL, 0x3577)
@@ -170,15 +190,15 @@ typedef struct{
 #define GMA_IVYBRIDGE_S_GT5        GFX_MODEL_CONSTRUCT(INTEL, 0x0176) // HD Graphics 2500 Mobile // 3rd Gen Core processor Graphics Controller
 /* ==================================== */
 
-/* ======  Valleyview (Baytail) ======= */
+/* ======  Valleyview (Bay Trail) ======= */
 
-//#define GMA_VALLEYVIEW_HB          GFX_MODEL_CONSTRUCT(INTEL, 0x0F00) /* VLV1 */
-//#define GMA_VALLEYVIEW_IG          GFX_MODEL_CONSTRUCT(INTEL, 0x0F30) /* "HD Graphics" */
-//#define GMA_VALLEYVIEW_??          GFX_MODEL_CONSTRUCT(INTEL, 0x0F31) /* "HD Graphics" */
-//#define GMA_VALLEYVIEW_??          GFX_MODEL_CONSTRUCT(INTEL, 0x0F32) /* "HD Graphics" */
-//#define GMA_VALLEYVIEW_??          GFX_MODEL_CONSTRUCT(INTEL, 0x0F33) /* "HD Graphics" */
-//#define GMA_VALLEYVIEW_??          GFX_MODEL_CONSTRUCT(INTEL, 0x0155) /* "HD Graphics" */
-//#define GMA_VALLEYVIEW_??          GFX_MODEL_CONSTRUCT(INTEL, 0x0157) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0F00          GFX_MODEL_CONSTRUCT(INTEL, 0x0F00) /* VLV1 */
+//#define GMA_VALLEYVIEW_0F30          GFX_MODEL_CONSTRUCT(INTEL, 0x0F30) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0F31          GFX_MODEL_CONSTRUCT(INTEL, 0x0F31) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0F32          GFX_MODEL_CONSTRUCT(INTEL, 0x0F32) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0F33          GFX_MODEL_CONSTRUCT(INTEL, 0x0F33) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0155          GFX_MODEL_CONSTRUCT(INTEL, 0x0155) /* "HD Graphics" */
+//#define GMA_VALLEYVIEW_0157          GFX_MODEL_CONSTRUCT(INTEL, 0x0157) /* "HD Graphics" */
 /* ==================================== */
 
 /* ============ Haswell =============== */
@@ -216,6 +236,7 @@ typedef struct{
 #define GMA_HASWELL_ULT_B_GT1      GFX_MODEL_CONSTRUCT(INTEL, 0x0A0B)
 #define GMA_HASWELL_ULT_B_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x0A1B)
 #define GMA_HASWELL_ULT_B_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x0A2B)
+
 #define GMA_HASWELL_ULT_E_GT1      GFX_MODEL_CONSTRUCT(INTEL, 0x0A0E) // Intel(R) HD Graphics
 #define GMA_HASWELL_ULT_E_GT2      GFX_MODEL_CONSTRUCT(INTEL, 0x0A1E) // Intel(R) HD Graphics 4400
 #define GMA_HASWELL_ULT_E_GT3      GFX_MODEL_CONSTRUCT(INTEL, 0x0A2E) // Haswell ULT E GT3
@@ -250,60 +271,58 @@ typedef struct{
 #define GMA_HASWELL_CRW_M_GT2_PLUS_IG    GFX_MODEL_CONSTRUCT(INTEL, 0x0D36) // Crystal Well Integrated Graphics Controller
 #define GMA_HASWELL_CRW_S_GT2_PLUS_IG    GFX_MODEL_CONSTRUCT(INTEL, 0x0D3A)
 
-/* Brodwell */
-#define GMA_BRODWELL_BDW_1602      GFX_MODEL_CONSTRUCT(INTEL, 0x1602) // Intel(R) HD Graphics Drivers
-#define GMA_BRODWELL_BDW_U_GT1     GFX_MODEL_CONSTRUCT(INTEL, 0x1606) // BDW U GT1
-#define GMA_BRODWELL_BDW_160A      GFX_MODEL_CONSTRUCT(INTEL, 0x160A) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_160B      GFX_MODEL_CONSTRUCT(INTEL, 0x160B) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_160D      GFX_MODEL_CONSTRUCT(INTEL, 0x160D) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_160E      GFX_MODEL_CONSTRUCT(INTEL, 0x160E) // Intel(R) HD Graphics Drivers
-#define GMA_BRODWELL_BDW_1612      GFX_MODEL_CONSTRUCT(INTEL, 0x1612) // Intel(R) HD Graphics 5600 Drivers
-#define GMA_BRODWELL_BDW_U_GT2     GFX_MODEL_CONSTRUCT(INTEL, 0x1616) // BDW U GT2 Intel(R) HD Graphics 5500 Drivers
-#define GMA_BRODWELL_BDW_161B      GFX_MODEL_CONSTRUCT(INTEL, 0x161B) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_161A      GFX_MODEL_CONSTRUCT(INTEL, 0x161A) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_161D      GFX_MODEL_CONSTRUCT(INTEL, 0x161D) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_Y_GT2     GFX_MODEL_CONSTRUCT(INTEL, 0x161E) // BDW Y GT2 Intel(R) HD Graphics 5300 Drivers
-#define GMA_BRODWELL_BDW_1622      GFX_MODEL_CONSTRUCT(INTEL, 0x1622) // Intel(R) Iris(TM) Pro Graphics 6200 Drivers
-#define GMA_BRODWELL_BDW_162A      GFX_MODEL_CONSTRUCT(INTEL, 0x162A) // Intel(R) Iris(TM) Pro Graphics 6300P Drivers
-#define GMA_BRODWELL_BDW_U_GT3     GFX_MODEL_CONSTRUCT(INTEL, 0x1626) // BDW U GT3 15W Intel(R) HD Graphics 6000 Drivers
-#define GMA_BRODWELL_BDW_U_GT3_2   GFX_MODEL_CONSTRUCT(INTEL, 0x162B) // BDW U GT3 28W Intel(R) Iris(TM) Pro Graphics 6100 Drivers
-#define GMA_BRODWELL_BDW_162D      GFX_MODEL_CONSTRUCT(INTEL, 0x162D) // Intel(R) Iris(TM) Pro Graphics 6300P Drivers
-#define GMA_BRODWELL_BDW_162E      GFX_MODEL_CONSTRUCT(INTEL, 0x162E) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_1632      GFX_MODEL_CONSTRUCT(INTEL, 0x1632) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_1636      GFX_MODEL_CONSTRUCT(INTEL, 0x1636) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_163A      GFX_MODEL_CONSTRUCT(INTEL, 0x163A) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_163B      GFX_MODEL_CONSTRUCT(INTEL, 0x163B) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_163D      GFX_MODEL_CONSTRUCT(INTEL, 0x163D) // Broadwell-U Integrated Graphics
-#define GMA_BRODWELL_BDW_163E      GFX_MODEL_CONSTRUCT(INTEL, 0x163E) // Broadwell-U Integrated Graphics
+/* Broadwell */
+#define GMA_BROADWELL_BDW_0bd0      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd0) // Intel Broadwell HD Graphics HAS GT0 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_0bd1      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd1) // Intel Broadwell HD Graphics HAS GT1 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_0bd2      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd2) // Intel Broadwell HD Graphics HAS GT2 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_0bd3      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd3) // Intel Broadwell HD Graphics HAS GT3 Drivers
+#define GMA_BROADWELL_BDW_0bd4      GFX_MODEL_CONSTRUCT(INTEL, 0x0bd4) // Intel Broadwell HD Graphics HAS GT4 Drivers
+#define GMA_BROADWELL_BDW_1602      GFX_MODEL_CONSTRUCT(INTEL, 0x1602) // Intel(R) HD Graphics Drivers // Halo // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_U_GT1     GFX_MODEL_CONSTRUCT(INTEL, 0x1606) // BDW U GT1 // ULT // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_160A      GFX_MODEL_CONSTRUCT(INTEL, 0x160A) // Broadwell-U Integrated Graphics // Server // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_160B      GFX_MODEL_CONSTRUCT(INTEL, 0x160B) // Broadwell-U Integrated Graphics // ULT // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_160D      GFX_MODEL_CONSTRUCT(INTEL, 0x160D) // Broadwell-U Integrated Graphics // Workstation // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_160E      GFX_MODEL_CONSTRUCT(INTEL, 0x160E) // Intel(R) HD Graphics Drivers // ULX // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_1612      GFX_MODEL_CONSTRUCT(INTEL, 0x1612) // Intel(R) HD Graphics 5600 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_U_GT2     GFX_MODEL_CONSTRUCT(INTEL, 0x1616) // BDW U GT2 Intel(R) HD Graphics 5500 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_161B      GFX_MODEL_CONSTRUCT(INTEL, 0x161B) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_161A      GFX_MODEL_CONSTRUCT(INTEL, 0x161A) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_161D      GFX_MODEL_CONSTRUCT(INTEL, 0x161D) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_Y_GT2     GFX_MODEL_CONSTRUCT(INTEL, 0x161E) // BDW Y GT2 Intel(R) HD Graphics 5300 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_1622      GFX_MODEL_CONSTRUCT(INTEL, 0x1622) // Intel(R) Iris(TM) Pro Graphics 6200 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_162A      GFX_MODEL_CONSTRUCT(INTEL, 0x162A) // Intel(R) Iris(TM) Pro Graphics 6300P Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_U_GT3     GFX_MODEL_CONSTRUCT(INTEL, 0x1626) // BDW U GT3 15W Intel(R) HD Graphics 6000 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_U_GT3_2   GFX_MODEL_CONSTRUCT(INTEL, 0x162B) // BDW U GT3 28W Intel(R) Iris(TM) Pro Graphics 6100 Drivers // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_162D      GFX_MODEL_CONSTRUCT(INTEL, 0x162D) // Intel(R) Iris(TM) Pro Graphics 6300P Drivers  // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_162E      GFX_MODEL_CONSTRUCT(INTEL, 0x162E) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_1632      GFX_MODEL_CONSTRUCT(INTEL, 0x1632) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_1636      GFX_MODEL_CONSTRUCT(INTEL, 0x1636) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_163A      GFX_MODEL_CONSTRUCT(INTEL, 0x163A) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_163B      GFX_MODEL_CONSTRUCT(INTEL, 0x163B) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_163D      GFX_MODEL_CONSTRUCT(INTEL, 0x163D) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
+#define GMA_BROADWELL_BDW_163E      GFX_MODEL_CONSTRUCT(INTEL, 0x163E) // Broadwell-U Integrated Graphics // AppleIntelBDWGraphics.kext
 
-/*
-https://fossies.org/linux/MesaLib/include/pci_ids/i965_pci_ids.h
-CHIPSET(0x1602, bdw_gt1, "Intel(R) Broadwell GT1")
-CHIPSET(0x1606, bdw_gt1, "Intel(R) Broadwell GT1")
-CHIPSET(0x160A, bdw_gt1, "Intel(R) Broadwell GT1")
-CHIPSET(0x160B, bdw_gt1, "Intel(R) Broadwell GT1")
-CHIPSET(0x160D, bdw_gt1, "Intel(R) Broadwell GT1")
-CHIPSET(0x160E, bdw_gt1, "Intel(R) Broadwell GT1")
-
-CHIPSET(0x1612, bdw_gt2, "Intel(R) HD Graphics 5600 (Broadwell GT2)")
-CHIPSET(0x1616, bdw_gt2, "Intel(R) HD Graphics 5500 (Broadwell GT2)")
-CHIPSET(0x161A, bdw_gt2, "Intel(R) Broadwell GT2")
-CHIPSET(0x161B, bdw_gt2, "Intel(R) Broadwell GT2")
-CHIPSET(0x161D, bdw_gt2, "Intel(R) Broadwell GT2")
-CHIPSET(0x161E, bdw_gt2, "Intel(R) HD Graphics 5300 (Broadwell GT2)")
-
-CHIPSET(0x1622, bdw_gt3, "Intel(R) Iris Pro 6200 (Broadwell GT3e)")
-CHIPSET(0x1626, bdw_gt3, "Intel(R) HD Graphics 6000 (Broadwell GT3)")
-CHIPSET(0x162A, bdw_gt3, "Intel(R) Iris Pro P6300 (Broadwell GT3e)")
-CHIPSET(0x162B, bdw_gt3, "Intel(R) Iris 6100 (Broadwell GT3)")
-CHIPSET(0x162D, bdw_gt3, "Intel(R) Broadwell GT3")
-CHIPSET(0x162E, bdw_gt3, "Intel(R) Broadwell GT3")
-*/
-// 0x0bd0	Intel Broadwell HD Graphics HAS GT0 Drivers
-// 0x0bd1	Intel Broadwell HD Graphics HAS GT1 Drivers
-// 0x0bd2	Intel Broadwell HD Graphics HAS GT2 Drivers
-// 0x0bd3	Intel Broadwell HD Graphics HAS GT3 Drivers
-// 0x0bd4	Intel Broadwell HD Graphics HAS GT4 Drivers
+/* Skylake */
+#define GMA_SKYLAKE_ULT_GT1	GFX_MODEL_CONSTRUCT(INTEL, 0x1906) // Intel(R) HD Graphics 510
+#define GMA_SKYLAKE_ULT_GT15	GFX_MODEL_CONSTRUCT(INTEL, 0x1913) // Intel(R) HD Graphics 510
+#define GMA_SKYLAKE_ULT_GT2	GFX_MODEL_CONSTRUCT(INTEL, 0x1916) // Intel(R) HD Graphics 520
+#define GMA_SKYLAKE_ULX_GT1	GFX_MODEL_CONSTRUCT(INTEL, 0x190E) // Intel(R) HD Graphics
+#define GMA_SKYLAKE_ULX_GT2	GFX_MODEL_CONSTRUCT(INTEL, 0x191E) // Intel(R) HD Graphics 515
+#define GMA_SKYLAKE_DT_GT2	GFX_MODEL_CONSTRUCT(INTEL, 0x1912) // Intel(R) HD Graphics 530
+#define GMA_SKYLAKE_1921	GFX_MODEL_CONSTRUCT(INTEL, 0x1921) // Intel(R) HD Graphics 520
+#define GMA_SKYLAKE_ULT_GT3_E	GFX_MODEL_CONSTRUCT(INTEL, 0x1926) // Intel(R) Iris(TM) Graphics 540
+#define GMA_SKYLAKE_ULT_GT3	GFX_MODEL_CONSTRUCT(INTEL, 0x1923) // Intel(R) HD Graphics 535
+#define GMA_SKYLAKE_ULT_GT3_28W	GFX_MODEL_CONSTRUCT(INTEL, 0x1927) // Intel(R) Iris(TM) Graphics 550
+#define GMA_SKYLAKE_DT_GT15	GFX_MODEL_CONSTRUCT(INTEL, 0x1917) // Intel(R) HD Graphics 530
+#define GMA_SKYLAKE_DT_GT1	GFX_MODEL_CONSTRUCT(INTEL, 0x1902) // Intel(R) HD Graphics 510
+#define GMA_SKYLAKE_DT_GT4	GFX_MODEL_CONSTRUCT(INTEL, 0x1932) // Intel(R) Iris(TM) Pro Graphics 570/580
+#define GMA_SKYLAKE_GT4		GFX_MODEL_CONSTRUCT(INTEL, 0x193B) // Intel(R) Iris(TM) Pro Graphics 580
+#define GMA_SKYLAKE_GT3_FE	GFX_MODEL_CONSTRUCT(INTEL, 0x192B) // Intel(R) Iris(TM) Graphics
+#define GMA_SKYLAKE_GT2		GFX_MODEL_CONSTRUCT(INTEL, 0x191B) // Intel(R) HD Graphics 530
+#define GMA_SKYLAKE_192A	GFX_MODEL_CONSTRUCT(INTEL, 0x192A) // Intel(R) Iris(TM) Pro Graphics P580
+#define GMA_SKYLAKE_SRW_GT4	GFX_MODEL_CONSTRUCT(INTEL, 0x193A) // Intel(R) Iris(TM) Pro Graphics P580
+#define GMA_SKYLAKE_WS_GT2	GFX_MODEL_CONSTRUCT(INTEL, 0x191D) // Intel(R) HD Graphics P530
+#define GMA_SKYLAKE_WS_GT4	GFX_MODEL_CONSTRUCT(INTEL, 0x193D) // Intel(R) Iris(TM) Pro Graphics P580
 
 /* END */
 

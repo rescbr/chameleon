@@ -33,9 +33,63 @@
 #define DBG(x...)  msglog(x)
 #endif
 
-extern uint8_t acpi_cpu_count;
-extern uint32_t acpi_cpu_p_blk;
-extern char* acpi_cpu_name[32];
+uint8_t acpi_cpu_count	= 0;
+uint32_t acpi_cpu_p_blk	= 0;
+char *acpi_cpu_name[32];
+
+void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
+{
+	uint32_t i;
+
+	DBG("\tACPI patcher: start finding cpu names. Length %d\n", length);
+
+	for (i=0; i<length-7; i++)
+	{
+		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
+		{
+			DBG("\tACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
+
+			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
+
+			bool add_name = true;
+
+			uint8_t j;
+
+			for (j=0; j<4; j++)
+			{
+				char c = dsdt[offset+j];
+
+				if (!aml_isvalidchar(c))
+				{
+					add_name = false;
+					DBG("\tACPI patcher: invalid character found in ProcessorOP '0x%X'!\n", c);
+					break;
+				}
+			}
+
+			if (add_name)
+			{
+				acpi_cpu_name[acpi_cpu_count] = malloc(4);
+				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
+				i = offset + 5;
+
+				if (acpi_cpu_count == 0)
+				{
+					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
+				}
+
+				DBG("\tACPI patcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
+
+				if (++acpi_cpu_count == 32)
+				{
+					return;
+				}
+			}
+		}
+	}
+
+	DBG("\tACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
+}
 
 static char const pss_ssdt_header[] =
 {
@@ -71,16 +125,17 @@ char resource_template_register_systemio[] =
 
 struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 {
+	verbose("[ GENERATE P-STATES ]\n");
 
 	if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL) // 0x756E6547
 	{
-		DBG("Not an Intel platform: P-States will not be generated !!!\n");
+		DBG("\tNot an Intel platform: P-States will not be generated !!!\n");
 		return NULL;
 	}
 
 	if (!(Platform.CPU.Features & CPU_FEATURE_MSR))
 	{
-		DBG("Unsupported CPU: P-States will not be generated !!! No MSR support\n");
+		DBG("\tUnsupported CPU: P-States will not be generated !!! No MSR support\n");
 		return NULL;
 	}
 
@@ -102,10 +157,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 				switch (Platform.CPU.Model)
 				{
 					case CPUID_MODEL_DOTHAN:	// Intel Pentium M
-					case CPUID_MODEL_YONAH:	// Intel Mobile Core Solo, Duo
-					case CPUID_MODEL_MEROM:	// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
+					case CPUID_MODEL_YONAH:		// Intel Mobile Core Solo, Duo
+					case CPUID_MODEL_MEROM:		// Intel Mobile Core 2 Solo, Duo, Xeon 30xx, Xeon 51xx, Xeon X53xx, Xeon E53xx, Xeon X32xx
 					case CPUID_MODEL_PENRYN:	// Intel Core 2 Solo, Duo, Quad, Extreme, Xeon X54xx, Xeon X33xx
-					case CPUID_MODEL_ATOM:	// Intel Atom (45nm)
+					case CPUID_MODEL_ATOM:		// Intel Atom (45nm)
 					{
 						bool cpu_dynamic_fsb = false;
 
@@ -169,7 +224,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 						// Sanity check
 						if (maximum.CID < minimum.CID)
 						{
-							DBG("P-States: Insane FID values!");
+							DBG("\tP-States: Insane FID values!");
 							p_states_count = 0;
 						}
 						else
@@ -184,6 +239,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 							{
 								p_states_count = 32;
 							}
+							DBG("\tPStates count=%d\n", p_states_count);
 
 							vidstep = ((maximum.VID << 2) - (minimum.VID << 2)) / (p_states_count - 1);
 
@@ -227,8 +283,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 						break;
 					}
 					case CPUID_MODEL_FIELDS:		// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
-					case CPUID_MODEL_DALES:			//
-					case CPUID_MODEL_DALES_32NM:		// Intel Core i3, i5 LGA1156 (32nm)
+					case CPUID_MODEL_CLARKDALE:		//
+					case CPUID_MODEL_DALES:			// Intel Core i3, i5 LGA1156 (32nm)
 					case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPUID_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65xx
 					case CPUID_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
@@ -241,7 +297,10 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 					//case CPUID_MODEL_HASWELL_H:		//
 					case CPUID_MODEL_HASWELL_SVR:		//
 					case CPUID_MODEL_HASWELL_ULT:		//
-					case CPUID_MODEL_CRYSTALWELL:		//
+					case CPUID_MODEL_HASWELL_ULX:		//
+					case CPUID_MODEL_BROADWELL_HQ:
+					case CPUID_MODEL_SKYLAKE_S:
+					case CPUID_MODEL_ATOM_3700:
 
 					{
 					if ( (Platform.CPU.Model == CPUID_MODEL_SANDYBRIDGE) ||
@@ -251,7 +310,8 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 						(Platform.CPU.Model == CPUID_MODEL_IVYBRIDGE_XEON) ||
 						(Platform.CPU.Model == CPUID_MODEL_HASWELL_SVR) ||
 						(Platform.CPU.Model == CPUID_MODEL_HASWELL_ULT) ||
-						(Platform.CPU.Model == CPUID_MODEL_CRYSTALWELL) )
+						(Platform.CPU.Model == CPUID_MODEL_HASWELL_ULX) ||
+						(Platform.CPU.Model == CPUID_MODEL_ATOM_3700) )
 					{
 						maximum.Control = (rdmsr64(MSR_IA32_PERF_STATUS) >> 8) & 0xff;
 					}
@@ -262,12 +322,12 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 
 					minimum.Control = (rdmsr64(MSR_PLATFORM_INFO) >> 40) & 0xff;
 
-					DBG("P-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
+					DBG("\tP-States: min 0x%x, max 0x%x\n", minimum.Control, maximum.Control);
 
 					// Sanity check
 					if (maximum.Control < minimum.Control)
 					{
-						DBG("Insane control values!");
+						DBG("\tInsane control values!");
 						p_states_count = 0;
 					}
 					else
@@ -287,7 +347,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 					break;
 				}
 				default:
-					DBG("Unsupported CPU (0x%X): P-States not generated !!!\n", Platform.CPU.Family);
+					DBG("\tUnsupported CPU (0x%X): P-States not generated !!!\n", Platform.CPU.Family);
 					break;
 			}
 		}
@@ -299,16 +359,16 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 
 		int i;
 
-		AML_CHUNK* root = aml_create_node(NULL);
+		AML_CHUNK *root = aml_create_node(NULL);
 		aml_add_buffer(root, pss_ssdt_header, sizeof(pss_ssdt_header)); // SSDT header
 
-		AML_CHUNK* scop = aml_add_scope(root, "\\_PR_");
-		AML_CHUNK* name = aml_add_name(scop, "PSS_");
-		AML_CHUNK* pack = aml_add_package(name);
+		AML_CHUNK *scop = aml_add_scope(root, "\\_PR_");
+		AML_CHUNK *name = aml_add_name(scop, "PSS_");
+		AML_CHUNK *pack = aml_add_package(name);
 
 		for (i = 0; i < p_states_count; i++)
 		{
-			AML_CHUNK* pstt = aml_add_package(pack);
+			AML_CHUNK *pstt = aml_add_package(pack);
 
 			aml_add_dword(pstt, p_states[i].Frequency);
 			aml_add_dword(pstt, 0x00000000); // Power
@@ -318,7 +378,7 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 			aml_add_dword(pstt, i+1); // Status
 		}
 
-			// Add aliaces
+			// Add aliaces CPUs
 			for (i = 0; i < acpi_cpu_count; i++)
 			{
 				char name[9];
@@ -342,31 +402,34 @@ struct acpi_2_ssdt *generate_pss_ssdt(struct acpi_2_dsdt *dsdt)
 
 			//dumpPhysAddr("P-States SSDT content: ", ssdt, ssdt->Length);
 
-			DBG("SSDT with CPU P-States generated successfully\n");
+			DBG("\tSSDT with CPU P-States generated successfully\n");
 
 			return ssdt;
 		}
 	}
 	else
 	{
-		DBG("ACPI CPUs not found: P-States not generated !!!\n");
+		DBG("\tACPI CPUs not found: P-States not generated !!!\n");
 	}
+
+	verbose("\n");
 
 	return NULL;
 }
 
 struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 {
+	verbose("[ GENERATE C-STATES ]\n");
 
 	if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL) // 0x756E6547
 	{
-		DBG("Not an Intel platform: C-States will not be generated !!!\n");
+		DBG("\tNot an Intel platform: C-States will not be generated !!!\n");
 		return NULL;
 	}
 
 	if (fadt == NULL)
 	{
-		DBG("FACP not exists: C-States will not be generated !!!\n");
+		DBG("\tFACP not exists: C-States will not be generated !!!\n");
 		return NULL;
 	}
 
@@ -374,7 +437,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 
 	if (dsdt == NULL)
 	{
-		DBG("DSDT not found: C-States will not be generated !!!\n");
+		DBG("\tDSDT not found: C-States will not be generated !!!\n");
 		return NULL;
 	}
 
@@ -578,14 +641,16 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 
 		// dumpPhysAddr("C-States SSDT content: ", ssdt, ssdt->Length);
 
-		DBG("SSDT with CPU C-States generated successfully\n");
+		DBG("\tSSDT with CPU C-States generated successfully\n");
 
 		return ssdt;
 	}
 	else
 	{
-		DBG("ACPI CPUs not found: C-States not generated !!!\n");
+		DBG("\tACPI CPUs not found: C-States not generated !!!\n");
 	}
+
+	verbose("\n");
 
 	return NULL;
 }

@@ -72,14 +72,18 @@
 static unsigned char kFSUUIDNamespaceSHA1[] = {0xB3,0xE2,0x0F,0x39,0xF2,0x92,0x11,0xD6,0x97,0xA4,0x00,0x30,0x65,0x43,0xEC,0xAC};
 #endif
 
-#if DEBUG
-#define DBG(x...)	printf(x)
-#else
-#define DBG(x...)	msglog(x)
+#ifndef DEBUG_SYS
+	#define DEBUG_SYS 0
 #endif
 
-#ifndef DEBUG_FEATURE_LAST_BOOT
-#define DEBUG_FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
+#if DEBUG_SYS
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)	msglog(x)
+#endif
+
+#ifndef FEATURE_LAST_BOOT
+	#define FEATURE_LAST_BOOT 0 // AllocateKernelMemory error with feature from 2562
 #endif
 
 extern int multiboot_partition;
@@ -965,15 +969,12 @@ BVRef selectBootVolume(BVRef chain)
 	BVRef bvr1		= NULL;
 	BVRef bvr2		= NULL;
 
-#if DEBUG_FEATURE_LAST_BOOT
+#if FEATURE_LAST_BOOT
 	char dirSpec[]		= "hd(%d,%d)/";
 	char fileSpec[]		= "Volumes";
-#endif
 	char *label;
-#if DEBUG_FEATURE_LAST_BOOT
 	u_int32_t time;
 	u_int32_t lasttime	= 0;
-
 	long flags;
 #endif
 
@@ -993,12 +994,21 @@ BVRef selectBootVolume(BVRef chain)
 
 			if ( (bvr->part_no == multiboot_partition) && (bvr->biosdev == gBIOSDev) )
 			{
+#if FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("Multiboot partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 				return bvr;
 			}
 		}
 	}
+
+#if 0
+	DBG("multiboot_partition_set = %d\n", multiboot_partition_set);
+	DBG("multiboot_partition = %d\n",  multiboot_partition);
+	DBG("multiboot_skip_partition_set = %d\n", multiboot_skip_partition_set);
+	DBG("multiboot_skip_partition = %d\n", multiboot_skip_partition);
+#endif
 
 	/*
 	 * Checking "Default Partition" key in system configuration - use format: hd(x,y), the volume UUID or label -
@@ -1018,15 +1028,17 @@ BVRef selectBootVolume(BVRef chain)
 			if (matchVolumeToString(bvr, val, false))
 			{
 				free(val);
+#if FEATURE_LAST_BOOT
 				label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 				DBG("User default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 				return bvr;
 			}
 		}
 		free(val);
 	}
 
-#if DEBUG_FEATURE_LAST_BOOT   // the above code cause "AllocateKernelMemory error"
+#if FEATURE_LAST_BOOT   // the above code cause "AllocateKernelMemory error"
 	// Bungo: select last booted partition as the boot volume
 	// TODO: support other OSes (foreign boot)
 	for (bvr = chain; bvr; bvr = bvr->next)
@@ -1128,8 +1140,10 @@ BVRef selectBootVolume(BVRef chain)
 	}
 
 	bvr = bvr2 ? bvr2 : (bvr1 ? bvr1 : chain);
+#if FEATURE_LAST_BOOT
 	label = bvr->label[0] ? bvr->label : (bvr->altlabel[0] ? bvr->altlabel : (bvr->name[0] ? bvr->name : "Untitled"));
 	DBG("Default partition set: hd(%d,%d) '%s'\n", BIOS_DEV_UNIT(bvr), bvr->part_no, label);
+#endif
 	return bvr;
 }
 

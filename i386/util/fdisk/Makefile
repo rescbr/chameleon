@@ -13,8 +13,9 @@ DIR = fdisk
 include ${SRCROOT}/Make.rules
 
 
-LDFLAGS := $(LDFALGS) -mmacosx-version-min=10.5
+LDFLAGS := $(LDFLAGS) -mmacosx-version-min=10.5
 
+CFLAGS := $(CFLAGS) -mmacosx-version-min=10.5
 
 OBJS =  cmd.o32 disk.o32 fdisk.o32 getrawpartition.o32 mbr.o32 misc.o32 opendev.o32 part.o32 user.o32 auto.o32 \
 		cmd.o64 disk.o64 fdisk.o64 getrawpartition.o64 mbr.o64 misc.o64 opendev.o64 part.o64 user.o64 auto.o64

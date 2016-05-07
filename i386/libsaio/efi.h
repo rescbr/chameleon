@@ -140,10 +140,32 @@ typedef struct {
 } EFI_GUID;
 
 #define APPLE_VENDOR_GUID \
-    {0xAC39C713, 0x7E50, 0x423D, {0x88, 0x9D, 0x27,0x8F, 0xCC, 0x34, 0x22, 0xB6} }
+    {0xAC39C713, 0x7E50, 0x423D, {0x88, 0x9D, 0x27, 0x8F, 0xCC, 0x34, 0x22, 0xB6} }
 
 #define EFI_GLOBAL_VARIABLE_GUID \
     {0x8BE4DF61, 0x93CA, 0x11D2, {0xAA, 0x0D, 0x00, 0xE0, 0x98, 0x03, 0x2B, 0x8C} }
+
+#define EFI_SMBIOS_TABLE_GUID \
+    {0xEB9D2D31, 0x2D88, 0x11D3, {0x9A, 0x16, 0x0, 0x90, 0x27, 0x3F, 0xC1, 0x4D} }
+
+// ACPI 1.0 Table GUID in EFI System Table
+#define EFI_ACPI_TABLE_GUID \
+    {0xEB9D2D30, 0x2D88, 0x11D3, {0x9A, 0x16, 0x0, 0x90, 0x27, 0x3F, 0xC1, 0x4D} }
+
+// ACPI 2.0 Table GUID in EFI System Table
+#define EFI_ACPI_20_TABLE_GUID \
+    {0x8868E871, 0xE4f1, 0x11D3, {0xBC, 0x22, 0x0, 0x80, 0xC7, 0x3C, 0x88, 0x81} }
+
+// ACPI 3.0 Table GUID in EFI System Table
+#define EFI_ACPI_30_TABLE_GUID EFI_ACPI_20_TABLE_GUID
+
+// The EFI variable GUID for the 'FirmwareFeatures' and friends. Also known as AppleFirmwareVariableGuid in other sources.
+#define APPLE_FIRMWARE_VARIABLE_GUID \
+    {0x4D1EDE05, 0x38C7, 0x4A6A, {0x9C, 0xC6, 0x4B, 0xCC, 0xA8, 0xB3, 0x8C, 0x14 } }
+
+// The EFI variable GUID for the 'boot-args' variable and others. Also known as AppleNVRAMVariableGuid in other sources.
+#define APPLE_NVRAM_VARIABLE_GUID \
+    {0x7C436110, 0xAB2A, 0x4BBB, {0xA8, 0x80, 0xFE, 0x41, 0x99, 0x5C, 0x9F, 0x82 } }
 
 typedef union {
   EFI_GUID  Guid;
@@ -187,7 +209,7 @@ typedef struct {
 #define EFI_UNSPECIFIED_TIMEZONE  0x07FF
 
 typedef enum {
-	EfiReservedMemoryType,
+	EfiReservedMemoryType,	// 0
 	EfiLoaderCode,
 	EfiLoaderData,
 	EfiBootServicesCode,
@@ -201,7 +223,7 @@ typedef enum {
 	EfiMemoryMappedIO,
 	EfiMemoryMappedIOPortSpace,
 	EfiPalCode,
-	EfiMaxMemoryType
+	EfiMaxMemoryType	// 14
 } EFI_MEMORY_TYPE;
 
 typedef struct {
@@ -213,20 +235,17 @@ typedef struct {
 } __attribute__((aligned(8))) EFI_TABLE_HEADER;
 
 // possible caching types for the memory range
-
-#define EFI_MEMORY_UC   0x0000000000000001ULL
-#define EFI_MEMORY_WC   0x0000000000000002ULL
-#define EFI_MEMORY_WT   0x0000000000000004ULL
-#define EFI_MEMORY_WB   0x0000000000000008ULL
-#define EFI_MEMORY_UCE  0x0000000000000010ULL
-
+#define EFI_MEMORY_UC		0x0000000000000001ULL	/* uncached */
+#define EFI_MEMORY_WC		0x0000000000000002ULL	/* write-coalescing */
+#define EFI_MEMORY_WT		0x0000000000000004ULL	/* write-through */
+#define EFI_MEMORY_WB		0x0000000000000008ULL	/* write-back */
+#define EFI_MEMORY_UCE		0x0000000000000010ULL	/* uncached, exported */
 
 // physical memory protection on range
 
-#define EFI_MEMORY_WP 0x0000000000001000ULL
-#define EFI_MEMORY_RP 0x0000000000002000ULL
-#define EFI_MEMORY_XP 0x0000000000004000ULL
-
+#define EFI_MEMORY_WP		0x0000000000001000ULL	/* write-protect */
+#define EFI_MEMORY_RP		0x0000000000002000ULL	/* read-protect */
+#define EFI_MEMORY_XP		0x0000000000004000ULL	/* execute-protect */
 
 // range requires a runtime mapping
 
@@ -491,9 +510,12 @@ typedef struct {
 
 #define EFI_SYSTEM_TABLE_SIGNATURE      0x5453595320494249ULL
 #define EFI_SYSTEM_TABLE_REVISION       ((EFI_SPECIFICATION_MAJOR_REVISION << 16) | (EFI_SPECIFICATION_MINOR_REVISION))
-#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | 00)
-#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | 02)
-#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | 10)
+#define EFI_2_30_SYSTEM_TABLE_REVISION  ((2 << 16) | (30))
+#define EFI_2_20_SYSTEM_TABLE_REVISION  ((2 << 16) | (20))
+#define EFI_2_10_SYSTEM_TABLE_REVISION  ((2 << 16) | (10))
+#define EFI_2_00_SYSTEM_TABLE_REVISION  ((2 << 16) | (00))
+#define EFI_1_10_SYSTEM_TABLE_REVISION  ((1 << 16) | (10))
+#define EFI_1_02_SYSTEM_TABLE_REVISION  ((1 << 16) | (02))
 
 typedef struct EFI_SYSTEM_TABLE_32 {
 	EFI_TABLE_HEADER              Hdr;

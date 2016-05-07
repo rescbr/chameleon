@@ -659,7 +659,7 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 				decodeOemProcessorBusSpeed(structHeader);
 				break;
 
-			//kSMBTypeOemPlatformFeature: // Type 133
+			//case kSMBTypeOemPlatformFeature: // Type 133
 			//	decodeOemPlatformFeature(structHeader);
 			//	break;
 

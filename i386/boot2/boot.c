@@ -2,7 +2,7 @@
  * Copyright (c) 1999-2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
- * 
+ *
  * Portions Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights
  * Reserved.  This file contains Original Code and/or Modifications of
  * Original Code as defined in and that are subject to the Apple Public
@@ -10,7 +10,7 @@
  * except in compliance with the License.  Please obtain a copy of the
  * License at http://www.apple.com/publicsource and read it before using
  * this file.
- * 
+ *
  * The Original Code and all software distributed under the License are
  * distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY KIND, EITHER
  * EXPRESS OR IMPLIED, AND APPLE HEREBY DISCLAIMS ALL SUCH WARRANTIES,
@@ -18,11 +18,11 @@
  * FITNESS FOR A PARTICULAR PURPOSE OR NON- INFRINGEMENT.  Please see the
  * License for the specific language governing rights and limitations
  * under the License.
- * 
+ *
  * @APPLE_LICENSE_HEADER_END@
  */
 
-/* 
+/*
  * Mach Operating System
  * Copyright (c) 1990 Carnegie-Mellon University
  * Copyright (c) 1989 Carnegie-Mellon University
@@ -31,8 +31,8 @@
  *
  *          INTEL CORPORATION PROPRIETARY INFORMATION
  *
- *  This software is supplied under the terms of a license  agreement or 
- *  nondisclosure agreement with Intel Corporation and may not be copied 
+ *  This software is supplied under the terms of a license  agreement or
+ *  nondisclosure agreement with Intel Corporation and may not be copied
  *  nor disclosed except in accordance with the terms of that agreement.
  *
  *	Copyright 1988, 1989 by Intel Corporation
@@ -57,13 +57,17 @@
 #include "device_tree.h"
 
 #ifndef DEBUG_BOOT2
-#define DEBUG_BOOT2 0
+	#define DEBUG_BOOT2 0
+#endif
+
+#ifndef DEBUG_INTERRUPTS
+	#define DEBUG_INTERRUPTS 0
 #endif
 
 #if DEBUG_BOOT2
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 /*
@@ -77,7 +81,9 @@ bool		gEnableCDROMRescan;
 bool		gScanSingleDrive;
 bool		useGUI;
 
-static int	interruptsAvailable = 0;
+#if DEBUG_INTERRUPTS
+	static int	interruptsAvailable = 0;
+#endif
 
 static bool	gUnloadPXEOnExit = false;
 
@@ -99,7 +105,7 @@ static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
 
 /** options.c **/
-extern char* msgbuf;
+extern char *msgbuf;
 void showTextBuffer(char *buf, int size);
 
 //==========================================================================
@@ -227,12 +233,12 @@ static int ExecKernel(void *binary)
 	finalizeBootStruct();
 
 	// Jump to kernel's entry point. There's no going back now.
-	if ( TIGER || LEOPARD || SNOW_LEOPARD )
+	if ( MacOSVerCurrent < MacOSVer2Int("10.7") )
 	{
 		// Notify modules that the kernel is about to be started
-		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsPreLion, NULL, NULL);
+		execute_hook("Kernel Start", (void *)kernelEntry, (void *)bootArgsLegacy, NULL, NULL);
 
-		startprog( kernelEntry, bootArgsPreLion );
+		startprog( kernelEntry, bootArgsLegacy );
 	}
 	else
 	{
@@ -258,7 +264,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	char		kernelCacheFile[512];
 	char		kernelCachePath[512];
 	long		flags, ret=-1;
-	unsigned long adler32;
+	unsigned long	adler32 = 0;
 	u_int32_t time, cachetime, kerneltime, exttime;
 
 	if((gBootMode & kBootModeSafe) != 0)
@@ -276,7 +282,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	else
 	{
 		// Leopard prelink kernel cache file
-		if ( TIGER || LEOPARD ) // OSX is 10.4 or 10.5
+		if ( MacOSVerCurrent >= MacOSVer2Int("10.4") && MacOSVerCurrent <= MacOSVer2Int("10.5") ) // OSX is 10.4 or 10.5
 		{
 			// Reset cache name.
 			bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
@@ -287,7 +293,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 
 		}
 		// Snow Leopard prelink kernel cache file
-		else if ( SNOW_LEOPARD )
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.6") && MacOSVerCurrent < MacOSVer2Int("10.7") )
 		{
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
 				(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
@@ -310,14 +316,14 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 						prev_time = time;
 					}
 				}
-				verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
+				verbose("Kernel Cache file path (Mac OS X 10.6): %s\n", kernelCacheFile);
 			}
 			closedir(cacheDir);
 		}
 		else
 		{
-			// Lion, Mountain Lion, Mavericks and Yosemite prelink kernel cache file
-			// for 10.7 10.8 10.9 10.10
+			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
+			// for 10.7 10.8 10.9 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
 			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
@@ -327,7 +333,6 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	// Check if the kernel cache file exists
 	ret = -1;
 
-	// If boot from a boot helper partition check the kernel cache file on it
 	if (gBootVolume->flags & kBVFlagBooter)
 	{
 		snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
@@ -409,9 +414,9 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 // own things, and then calls common_boot.
 void boot(int biosdev)
 {
+	initialize_runtime();
 	// Enable A20 gate before accessing memory above 1Mb.
 	enableA20();
-	initialize_runtime();
 	common_boot(biosdev);
 }
 
@@ -446,12 +451,14 @@ void common_boot(int biosdev)
 	// Initialize boot-log
 	initBooterLog();
 
+#if DEBUG_INTERRUPTS
 	// Enable interrupts
 	interruptsAvailable = SetupInterrupts();
 	if (interruptsAvailable)
 	{
 		EnableInterrupts();
 	}
+#endif
 
 	// Initialize boot info structure.
 	initKernBootStruct();
@@ -636,7 +643,8 @@ void common_boot(int biosdev)
 			}
 		}
 
-		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig)) {
+		if (getValueForKey(kKernelArchKey, &val, &len, &bootInfo->chameleonConfig))
+		{
 			if (strncmp(val, "i386", sizeof("i386") ) == 0)
 			{
 				archCpuType = CPU_TYPE_I386;
@@ -656,7 +664,8 @@ void common_boot(int biosdev)
 			tryresumedefault = false;
 		}
 
-		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig)) {
+		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig))
+		{
 			forceresume = false;
 		}
 
@@ -762,18 +771,20 @@ void common_boot(int biosdev)
 			if (strncmp(bootInfo->bootFile, "bt(", sizeof("bt(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "hd(", sizeof("hd(") ) == 0 ||
 				strncmp(bootInfo->bootFile, "rd(", sizeof("rd(") ) == 0)
+			{
 				bootFileWithDevice = true;
+			}
 
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE ) // Is not Yosemite 10.10
+				if ( !YOSEMITE || !ELCAPITAN ) //Is not Yosemite 10.10 or El Capitan 10.11
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
 				else
 				{
-					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite
+					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite or El Capitan
 				}
 			}
 			else
@@ -856,11 +867,17 @@ void common_boot(int biosdev)
 		nbpUnloadBaseCode();
 	}
 
+#if DEBUG_INTERRUPTS
 	if (interruptsAvailable)
 	{
 		DisableInterrupts();
 	}
+#endif
+
 }
+
+
+// =========================================================================
 
 /*!
 	Selects a new BIOS device, taking care to update the global state appropriately.
@@ -883,7 +900,8 @@ static void selectBiosDevice(void)
 }
 */
 
-bool checkOSVersion(const char * version)
+// =========================================================================
+bool checkOSVersion(const char *version)
 {
 	if ( (sizeof(version) > 4) && ('.' != version[4]) && ('\0' != version[4]) )
 	{
@@ -896,7 +914,6 @@ bool checkOSVersion(const char * version)
 		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
 		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
 	}
-
 }
 
 uint32_t getMacOSVerCurrent()
@@ -905,6 +922,9 @@ uint32_t getMacOSVerCurrent()
 	return MacOSVerCurrent;
 }
 
+// =========================================================================
+unsigned long Adler32(unsigned char *buf, long len)
+{
 #define BASE 65521L /* largest prime smaller than 65536 */
 #define NMAX 5000
 // NMAX (was 5521) the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1
@@ -915,28 +935,36 @@ uint32_t getMacOSVerCurrent()
 #define DO8(buf, i)	DO4(buf, i); DO4(buf, i + 4);
 #define DO16(buf)	DO8(buf, 0); DO8(buf, 8);
 
-unsigned long Adler32(unsigned char *buf, long len)
-{
+	int k;
+
 	unsigned long s1 = 1; // adler & 0xffff;
 	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
 	unsigned long result;
-	int k;
 
 	while (len > 0) {
 		k = len < NMAX ? len : NMAX;
 		len -= k;
-		while (k >= 16) {
+		while (k >= 16)
+		{
 			DO16(buf);
 			buf += 16;
 			k -= 16;
 		}
-		if (k != 0) do {
-			s1 += *buf++;
-			s2 += s1;
-		} while (--k);
+
+		if (k != 0)
+		{
+			do
+			{
+				s1 += *buf++;
+				s2 += s1;
+			} while (--k);
+		}
+
 		s1 %= BASE;
 		s2 %= BASE;
 	}
+
 	result = (s2 << 16) | s1;
+
 	return OSSwapHostToBigInt32(result);
 }

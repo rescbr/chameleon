@@ -18,6 +18,20 @@
 #include "pci.h"
 #include "sl.h"
 
+#ifndef DEBUG_EFI
+	#define DEBUG_EFI 0
+#endif
+
+#ifndef RANDOMSEED
+	#define RANDOMSEED 0
+#endif
+
+#if DEBUG_EFI
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)
+#endif
+
 extern void setup_pci_devs(pci_dt_t *pci_dt);
 
 /*
@@ -69,13 +83,19 @@ static uint64_t ptov64(uint32_t addr)
 }
 
 // ==========================================================================
-// ErmaC
-static inline uint64_t getCPUTick(void)
+
+EFI_UINT32 getCPUTick(void)
 {
-	uint32_t lowest;
-	uint32_t highest;
-	__asm__ volatile ("rdtsc" : "=a" (lowest), "=d" (highest));
-	return (uint64_t) highest << 32 | lowest;
+	uint32_t out;
+	__asm__ volatile (
+		"rdtsc\n"
+		"shl $32,%%edx\n"
+		"or %%edx,%%eax\n"
+		: "=a" (out)
+		:
+		: "%edx"
+	);
+	return out;
 }
 
 /*==========================================================================
@@ -84,10 +104,9 @@ static inline uint64_t getCPUTick(void)
 
 /* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'C','h','a','m','e','l','e','o','n','_','2','.','3', 0};
-// Bungo
-//static EFI_UINT32 const FIRMWARE_REVISION = 132; /* FIXME: Find a constant for this. */
+
 static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
-// Bungo
+
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
  */
@@ -421,23 +440,13 @@ static const char CPU_Frequency_prop[] = "CPUFrequency";
  */
 
 /* From Foundation/Efi/Guid/Smbios/SmBios.c */
-EFI_GUID const	gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
+EFI_GUID const  gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
 
 #define SMBIOS_RANGE_START		0x000F0000
 #define SMBIOS_RANGE_END		0x000FFFFF
 
 /* '_SM_' in little endian: */
 #define SMBIOS_ANCHOR_UINT32_LE 0x5f4d535f
-
-#define EFI_ACPI_TABLE_GUID \
-{ \
-	0xeb9d2d30, 0x2d88, 0x11d3, { 0x9a, 0x16, 0x0, 0x90, 0x27, 0x3f, 0xc1, 0x4d } \
-}
-
-#define EFI_ACPI_20_TABLE_GUID \
-{ \
-	0x8868e871, 0xe4f1, 0x11d3, { 0xbc, 0x22, 0x0, 0x80, 0xc7, 0x3c, 0x88, 0x81 } \
-}
 
 EFI_GUID gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
 EFI_GUID gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
@@ -460,15 +469,19 @@ static const char SYSTEM_TYPE_PROP[] = "system-type";
 static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
 static const char DEV_PATH_SUP[] = "DevicePathsSupported";
-static EFI_UINT32 DevPathSup = 1;
-static EFI_UINT32 MachineSig = 0;  //Bungo
+static const char START_POWER_EV[] = "StartupPowerEvents";
+static const char MACHINE_SIG_PROP[] = "machine-signature";
+static EFI_UINT8 const DEVICE_PATHS_SUPPORTED[] = { 0x01, 0x00, 0x00, 0x00 };
+static EFI_UINT8 const STARTUP_POWER_EVENTS[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+static EFI_UINT8 const COMPAT_MODE[] = { 0x01, 0x00, 0x00, 0x00 };
+
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
 static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 {
 	const char	*src = getStringForKey(key, &bootInfo->smbiosConfig);
-	EFI_CHAR16*	 dst = 0;
+	EFI_CHAR16	*dst = 0;
 	size_t		 i = 0;
 
 	if (!key || !(*key) || !len || !src)
@@ -477,7 +490,7 @@ static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 	}
 	
 	*len = strlen(src);
-	dst = (EFI_CHAR16*) malloc( ((*len)+1) * 2 );
+	dst = (EFI_CHAR16 *) malloc( ((*len)+1) * 2 );
 	for (; i < (*len); i++)
 	{
 		dst[i] = src[i];
@@ -486,71 +499,6 @@ static EFI_CHAR16 *getSmbiosChar16(const char *key, size_t *len)
 	*len = ((*len)+1)*2; // return the CHAR16 bufsize including zero terminated CHAR16
 	return dst;
 }
-
-// Bungo
-/*
- * Get the SystemID from the bios dmi info
-
-static	EFI_CHAR8 *getSmbiosUUID()
-{
-	static EFI_CHAR8	uuid[UUID_LEN];
-	int			i;
-	int			isZero;
-	int			isOnes;
-	SMBByte			*p;
-
-	p = (SMBByte *)Platform.UUID;
-
-	for (i=0, isZero=1, isOnes=1; i<UUID_LEN; i++)
-	{
-		if (p[i] != 0x00)
-		{
-			isZero = 0;
-		}
-
-		if (p[i] != 0xff)
-		{
-			isOnes = 0;
-		}
-	}
-
-	if (isZero || isOnes) // empty or setable means: no uuid present
-	{
-		verbose("No UUID present in SMBIOS System Information Table\n");
-		return 0;
-	}
-
-	memcpy(uuid, p, UUID_LEN);
-	return uuid;
-}
-
-
-// return a binary UUID value from the overriden SystemID and SMUUID if found, 
-// or from the bios if not, or from a fixed value if no bios value is found 
-
-static EFI_CHAR8 *getSystemID()
-{
-	// unable to determine UUID for host. Error: 35 fix
-	// Rek: new SMsystemid option conforming to smbios notation standards, this option should
-	// belong to smbios config only ...
-	const char *sysId = getStringForKey(kSystemID, &bootInfo->chameleonConfig);
-	EFI_CHAR8*	ret = getUUIDFromString(sysId);
-
-	if (!sysId || !ret) // try bios dmi info UUID extraction
-	{
-		ret = getSmbiosUUID();
-		sysId = 0;
-	}
-
-	if (!ret)
-	{
-		// no bios dmi UUID available, set a fixed value for system-id
-		ret=getUUIDFromString((sysId = (const char *) SYSTEM_ID));
-	}
-	verbose("Customizing SystemID with : %s\n", getStringFromUUID(ret)); // apply a nice formatting to the displayed output
-	return ret;
-}
- */
 
 /*
  * Must be called AFTER setupAcpi because we need to take care of correct
@@ -627,11 +575,19 @@ static void setupEfiDeviceTree(void)
 
 	// New node: /efi/kernel-compatibility
 	Node *efiKernelComNode = DT__AddChild(node, "kernel-compatibility");
-	len = 1;
-	DT__AddProperty(efiKernelComNode, "x86_64", sizeof(uint32_t), (EFI_UINT32 *)&len);
+
+	if (MacOSVerCurrent >= MacOSVer2Int("10.9"))
+	{
+		DT__AddProperty(efiKernelComNode, "x86_64", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+	}
+	else
+	{
+		DT__AddProperty(efiKernelComNode, "i386", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+		DT__AddProperty(efiKernelComNode, "x86_64", sizeof(COMPAT_MODE), (EFI_UINT8 *) &COMPAT_MODE);
+	}
 
 	// Now fill in the /efi/platform Node
-	Node *efiPlatformNode = DT__AddChild(node, "platform");
+	Node *efiPlatformNode = DT__AddChild(node, "platform"); // "/efi/platform"
 
 	// NOTE WELL: If you do add FSB Frequency detection, make sure to store
 	// the value in the fsbFrequency global and not an malloc'd pointer
@@ -653,7 +609,9 @@ static void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
-	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(EFI_UINT32), &DevPathSup);
+	DT__AddProperty(efiPlatformNode,START_POWER_EV, sizeof(STARTUP_POWER_EVENTS), (EFI_UINT8 *) &STARTUP_POWER_EVENTS);
+
+	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(DEVICE_PATHS_SUPPORTED), (EFI_UINT8 *) &DEVICE_PATHS_SUPPORTED);
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
@@ -692,55 +650,65 @@ void setupBoardId()
 	{
 		stop("Couldn't get root '/' node");
 	}
-	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
+	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig); // SMboardserial
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
 	}
 }
 
 /*
  * Populate the chosen node
  */
-
 void setupChosenNode()
 {
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
-	if (chosenNode == 0)
+	unsigned long adler32 = 0;
+
+	if (chosenNode == NULL)
 	{
 		stop("setupChosenNode: Couldn't get '/chosen' node");
 	}
 
-	int length = strlen(gBootUUIDString);
-	if (length)
+	// Only accept a UUID with the correct length.
+	if (strlen(gBootUUIDString) == 36)
 	{
-		DT__AddProperty(chosenNode, "boot-uuid", length + 1, gBootUUIDString);
+		DT__AddProperty(chosenNode, "boot-uuid", 37, gBootUUIDString);
 	}
 
-	length = strlen(bootArgs->CommandLine);
-	DT__AddProperty(chosenNode, "boot-args", length + 1, bootArgs->CommandLine);
+	DT__AddProperty(chosenNode, "boot-args", sizeof(bootArgs->CommandLine), (EFI_UINT8 *)bootArgs->CommandLine);
 
-	length = strlen(bootInfo->bootFile);
-	DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+	// Adding the default kernel name (mach_kernel) for kextcache.
+	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);
+
 //	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
 
 //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
 
-//	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
+	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &adler32);
 
-	DT__AddProperty(chosenNode, "machine-signature", sizeof(EFI_UINT32), (EFI_UINT32 *)&MachineSig);
+	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
-	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) // Yosemite+
 	{
 		//
 		// Pike R. Alpha - 12 October 2014
 		//
 		UInt8 index = 0;
 		EFI_UINT16 PMTimerValue = 0;
+
+#if RANDOMSEED
 		EFI_UINT32 randomValue = 0, cpuTick = 0;
 		EFI_UINT32 ecx = 0, edx = 0, esi = 0, edi = 0;
+#else
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi = 0;
+		EFI_UINT64 rcx, rdx, rsi, rdi;
 
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		cpuTick = rcx = rdx = rsi = rdi = 0;
+#endif
 		// LEAF_1 - Feature Information (Function 01h).
 		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
 		{
@@ -754,12 +722,12 @@ void setupChosenNode()
 			for (index = 0; index < 16; index++)					// 0x17e12:
 			{
 				randomValue = computeRand();					// callq	0x18e20
-				cpuTick = (EFI_UINT32) getCPUTick();		// callq	0x121a7
+				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
 				seedBuffer[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
 			}									// jb		0x17e12
 
-			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32*) &seedBuffer);
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT32 *) &seedBuffer);
 		}
 		else
 		{
@@ -785,8 +753,21 @@ void setupChosenNode()
 					continue;						// jb		0x17e55		(retry)
 				}
 
-				cpuTick = (EFI_UINT32) getCPUTick();		// callq	0x121a7
+				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 //				printf("value: 0x%x\n", getCPUTick());
+
+#if RANDOMSEED
+				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				edi = esi;							// mov		%rsi,	%rdi
+				edi = (edi ^ cpuTick);						// xor		%rax,	%rdi
+				edi = (edi ^ ecx);						// xor		%rcx,	%rdi
+				edi = (edi ^ edx);						// xor		%rdx,	%rdi
+
+				seedBuffer[index] = (edi & 0xff);
+#else
 				ecx = (cpuTick >> 8);						// mov		%rax,	%rcx
 				// shr		$0x8,	%rcx
 				edx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
@@ -797,7 +778,7 @@ void setupChosenNode()
 				edi = (edi ^ edx);						// xor		%rdx,	%rdi
 
 				seedBuffer[index] = (edi & 0xff);				// mov		%dil,	(%r15,%r12,1)
-
+#endif
 				edi = (edi & 0x2f);						// and		$0x2f,	%edi
 				edi = (edi + esi);						// add		%esi,	%edi
 				index++;							// inc		r12
@@ -806,10 +787,11 @@ void setupChosenNode()
 			} while (index < 64);							// cmp		%r14d,	%r12d
 			// jne		0x17e55		(next)
 
-			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8*) &seedBuffer);
+			DT__AddProperty(chosenNode, "random-seed", sizeof(seedBuffer), (EFI_UINT8 *) &seedBuffer);
 
 		}
 	}
+
 }
 
 /*
@@ -885,19 +867,21 @@ void saveOriginalSMBIOS(void)
 	node = DT__FindNode("/efi/platform", false);
 	if (!node)
 	{
-		verbose("/efi/platform node not found\n");
+		DBG("saveOriginalSMBIOS: '/efi/platform' node not found\n");
 		return;
 	}
 
 	origeps = getSmbios(SMBIOS_ORIGINAL);
 	if (!origeps)
 	{
+		DBG("saveOriginalSMBIOS: original SMBIOS not found\n");
 		return;
 	}
 
 	tableAddress = (void *)AllocateKernelMemory(origeps->dmi.tableLength);
 	if (!tableAddress)
 	{
+		DBG("saveOriginalSMBIOS: can not allocate memory for original SMBIOS\n");
 		return;
 	}
 

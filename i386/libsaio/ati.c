@@ -6,6 +6,15 @@
  */
 
 #include "ati.h"
+#ifndef DEBUG_ATI
+	#define DEBUG_ATI 0
+#endif
+
+#if DEBUG_ATI
+	#define DBG(x...)	printf(x)
+#else
+	#define DBG(x...)	msglog(x)
+#endif
 
 /* vals */
 static value_t aty_name;
@@ -54,10 +63,10 @@ static card_config_t card_configs[] = {
 	{"Galago",	2},
 	{"Colobus",	2},
 	{"Mangabey",	2},
-	{"Nomascus",	4},
+	{"Nomascus",	4}, // 5
 	{"Orangutan",	2},
 	/* AMD6000Controller */
-	{"Pithecia",	2},
+	{"Pithecia",	2}, // 3
 	{"Bulrushes",	6},
 	{"Cattail",	4},
 	{"Hydrilla",	5},
@@ -98,7 +107,8 @@ static card_config_t card_configs[] = {
 	/* AMD9000Controller */
 	{"Exmoor",	4},
 	{"Basset",	4},
-	{"Greyhound",	6}
+	{"Greyhound",	6},
+	{"Labrador",	6}
 };
 
 static radeon_card_info_t radeon_cards[] = {
@@ -1090,8 +1100,8 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6606,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon HD 8790M",		kNull       }, // Mobile
 	{ 0x6607,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R5 M240",		kNull       }, // Mobile
 	{ 0x6608,	0x00000000, CHIP_FAMILY_OLAND,		"AMD FirePro W2100",		kNull       },
-	{ 0x6610,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 200 Series",	kNull       },
-	{ 0x6611,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 200 Series",	kNull       },
+	{ 0x6610,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 250",		kFutomaki       },
+	{ 0x6611,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 340 Series",	kNull       },
 	{ 0x6613,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon R7 240",		kFutomaki	},
 //	{ 0x6620,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon",      kNull       }, // Mobile
 //	{ 0x6621,	0x00000000, CHIP_FAMILY_OLAND,		"AMD Radeon",      kNull       }, // Mobile
@@ -1100,23 +1110,24 @@ static radeon_card_info_t radeon_cards[] = {
 
 	// BONAIRE
 	{ 0x6640,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon HD 8950",      kNull       }, // Mobile
-//	{ 0x6641,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon",      kNull       }, // Mobile
+	{ 0x6641,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon HD 8930M",      kNull       }, // Mobile
 	{ 0x6646,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 M280X",      kNull       }, // Mobile
 	{ 0x6647,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 M270X",      kNull       }, // Mobile
 	{ 0x6649,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD FirePro W5100",      kNull       },
 //	{ 0x6650,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon",      kNull       },
 //	{ 0x6651,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon",      kNull       },
-	{ 0x6658,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R7 200",      kNull       },
+	{ 0x6658,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R7 260X",      kNull       },
 	{ 0x665C,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon HD 7790",	kFutomaki	},
 	{ 0x665D,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 260",	kFutomaki	},
+	{ 0x665F,	0x00000000, CHIP_FAMILY_BONAIRE,	"AMD Radeon R9 360",	kFutomaki	},
 
 	// HAINAN
-	{ 0x6660,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8600M",      kNull       }, // Mobile
-	{ 0x6663,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8500M",      kNull       }, // Mobile
-	{ 0x6664,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M200",      kNull       }, // Mobile
-	{ 0x6665,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M200",      kNull       }, // Mobile
-	{ 0x6667,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M200",      kNull       }, // Mobile
-	{ 0x666F,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8500M",      kNull       }, // Mobile
+	{ 0x6660,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8670M",      kNull       }, // Mobile
+	{ 0x6663,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8570M",      kNull       }, // Mobile
+	{ 0x6664,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M240",      kNull       }, // Mobile
+	{ 0x6665,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M230",      kNull       }, // Mobile
+	{ 0x6667,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon R5 M230",      kNull       }, // Mobile
+	{ 0x666F,	0x00000000, CHIP_FAMILY_HAINAN,		"AMD Radeon HD 8550M",      kNull       }, // Mobile
 
 	// CAYMAN
 	{ 0x6701,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6xxx Series",	kLotus		},
@@ -1130,12 +1141,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6709,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6xxx Series",	kLotus		},
 	{ 0x6718,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6970 Series",	kLotus		},
 	{ 0x6719,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6950 Series",	kLotus		},
-	{ 0x671C,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6970 Series",	kLotus		},
+	{ 0x671C,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6990 Series",	kLotus		},
 	{ 0x671D,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6950 Series",	kLotus		},
 	{ 0x671F,	0x00000000, CHIP_FAMILY_CAYMAN,	"AMD Radeon HD 6930 Series",	kLotus		},
 
 	// BARTS
-	{ 0x6720,	0x00000000, CHIP_FAMILY_BARTS,	"AMD Radeon HD 6900M Series",	kFanwort	},
+	{ 0x6720,	0x00000000, CHIP_FAMILY_BARTS,	"AMD Radeon HD 6970M Series",	kFanwort	},
 	{ 0x6722,	0x00000000, CHIP_FAMILY_BARTS,	"AMD Radeon HD 6900M Series",	kFanwort	},
 	{ 0x6729,	0x00000000, CHIP_FAMILY_BARTS,	"AMD Radeon HD 6900M Series",	kFanwort	},
 	{ 0x6738,	0x00000000, CHIP_FAMILY_BARTS,	"AMD Radeon HD 6870 Series",	kDuckweed	},
@@ -1145,7 +1156,7 @@ static radeon_card_info_t radeon_cards[] = {
 	// TURKS
 	{ 0x6740,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 6770M Series",	kCattail	},
 	{ 0x6741,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 6750M",	kCattail	},
-	{ 0x6742,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 7500/7600 Series",	kCattail	},
+	{ 0x6742,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 7500/7600",	kCattail	},
 	{ 0x6745,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 6600M Series",	kCattail	},
 	{ 0x6749,	0x00000000, CHIP_FAMILY_TURKS,	"ATI Radeon FirePro V4900",	kPithecia	},
 	{ 0x674A,	0x00000000, CHIP_FAMILY_TURKS,	"AMD FirePro V3900",	kPithecia	},
@@ -1170,17 +1181,17 @@ static radeon_card_info_t radeon_cards[] = {
 	// TAHITI
 	//Framebuffers: Aji - 4 Desktop, Buri - 4 Mobile, Chutoro - 5 Mobile,  Dashimaki - 4, IkuraS - HMDI
 	// Ebi - 5 Mobile, Gari - 5 M, Futomaki - 4 D, Hamachi - 4 D, OPM - 6 Server, Ikura - 6
-	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kIkuraS		},
 	{ 0x6784,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6788,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
-	{ 0x678A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
-	{ 0x6790,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x678A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD FirePro W8000",		kFutomaki	},
+	{ 0x6790,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7970"	,	kFutomaki	},
 	{ 0x6791,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6792,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6798,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7970X/8970/R9 280X",	kFutomaki	},
 	{ 0x6799,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kAji		},
 	{ 0x679A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950/8950/R9 280",	kFutomaki	},
-	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
+	{ 0x679B,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7990 Series",	kChutoro	},
 	{ 0x679E,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7870 XT",	kFutomaki	},
 	{ 0x679F,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7950 Series",	kFutomaki	},
 
@@ -1205,7 +1216,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6806,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7600 Series",	kFutomaki	},
 	{ 0x6808,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7600 Series",	kFutomaki	},
 	{ 0x6809,	0x00000000, CHIP_FAMILY_PITCAIRN,	"ATI FirePro V",	kNull		},
-	{ 0x6810,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon R9 270X",	kFutomaki		},
+	{ 0x6810,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon R9 270X",	kNamako		},
 	{ 0x6811,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon R9 270",	kFutomaki		},
 //	{ 0x6816,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon",	kFutomaki		},
 //	{ 0x6817,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon",	kFutomaki		},
@@ -1230,12 +1241,12 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6830,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7800M Series",	kBuri	}, // Mobile
 	{ 0x6831,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kBuri	}, // Mobile
 	{ 0x6835,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD R7 Series",	kBuri	},
-	{ 0x6837,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kBuri	},
-	{ 0x6838,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kBuri	},
-	{ 0x6839,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kBuri	},
-	{ 0x683B,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kBuri	},
-	{ 0x683D,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7770 Series",	kBuri	},
-	{ 0x683F,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7750 Series",	kBuri	},
+	{ 0x6837,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7730 Series",	kFutomaki	},
+	{ 0x6838,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kFutomaki	},
+	{ 0x6839,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kFutomaki	},
+	{ 0x683B,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7700 Series",	kFutomaki	},
+	{ 0x683D,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7770 Series",	kFutomaki	}, //R7 250X
+	{ 0x683F,	0x00000000, CHIP_FAMILY_VERDE,	"AMD Radeon HD 7750 Series",	kFutomaki	},
 
 	// TURKS
 	{ 0x6840,	0x00000000, CHIP_FAMILY_TURKS,	"AMD Radeon HD 7670M Series",	kPondweed	}, // Mobile
@@ -1286,9 +1297,9 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68BF,	0x00000000, CHIP_FAMILY_JUNIPER,	"ATI Radeon HD 6750 Series",	kHoolock	},
 
 	// REDWOOD
-	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730 Series",	kBaboon	}, // Mobile
-	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5650 Series",	kBaboon	}, // Mobile
-	{ 0x68C7,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5570",	kEulemur	}, // Mobile
+	{ 0x68C0,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5730 Series",	kGalago	}, // Mobile
+	{ 0x68C1,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5650 Series",	kGalago	}, // Mobile
+	{ 0x68C7,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Mobility Radeon HD 5570",	kGalago	}, // Mobile
 	{ 0x68C8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI FirePro v4800",    kBaboon	},
 	{ 0x68C9,	0x00000000, CHIP_FAMILY_REDWOOD,	"FirePro 3D V3800",	kBaboon	},
 	{ 0x68D8,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5670 Series",	kBaboon	},
@@ -1297,10 +1308,10 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68DE,	0x00000000, CHIP_FAMILY_REDWOOD,	"ATI Radeon HD 5000 Series",	kNull	},
 
 	// CEDAR
-	{ 0x68E0,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5470 Series",	kEulemur	},
-	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230",		kEulemur	},
-	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6370M Series",	kEulemur	},
-	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6300M Series",	kEulemur	},
+	{ 0x68E0,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5470 Series",	kGalago		},
+	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230",		kGalago		},
+	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6370M Series",	kGalago		},
+	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6300M Series",	kGalago		},
 //	{ 0x68E8,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 //	{ 0x68E9,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 	{ 0x68F1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD FirePro 2460",	kEulemur	},
@@ -1309,6 +1320,15 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x68F9,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5450 Series",	kEulemur	},
 	{ 0x68FA,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 7300 Series",	kEulemur	},
 //	{ 0x68FE,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
+
+	// 
+	{ 0x6900,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R7 M260/M265",  kExmoor	},
+	{ 0x6901,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R5 M255",       kExmoor	},
+	{ 0x6920,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M395X",      kLabrador	},
+	{ 0x6921,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kExmoor	},
+	{ 0x692B,	0x00000000, CHIP_FAMILY_TONGA,		"ATI Firepro W7100",        kBaladi	},
+	{ 0x6938,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kExmoor	},
+	{ 0x6939,	0x00000000, CHIP_FAMILY_TONGA,		"ATI Radeon R9 285",        kBaladi	},
 
 	// R520
 	{ 0x7100, 0x00000000, CHIP_FAMILY_R520,  "ATI Radeon HD Desktop ",	kNull		},
@@ -1768,6 +1788,9 @@ static const char *chip_family_name[] = {
 	"Hawaii",
 	/* ... */
 	"Mullins",
+	"Topas",
+	"Amethyst",
+	"Tonga",
 	""
 };
 
@@ -2025,7 +2048,7 @@ void devprop_add_list(AtiDevProp devprop_list[])
 					{
 						if (devprop_list[i].get_value(val))
 						{
-							devprop_list[i].name[1] = 0x30 + pnum; // convert to ascii
+							devprop_list[i].name[1] = (uint8_t)(0x30 + pnum); // convert to ascii
 							devprop_add_value(card->device, devprop_list[i].name, val->data, val->size);
 							free_val(val);
 						}
@@ -2049,7 +2072,7 @@ void devprop_add_list(AtiDevProp devprop_list[])
 					{
 						if (devprop_list[i].default_val.type != kNul)
 						{
-							devprop_list[i].name[1] = 0x30 + pnum; // convert to ascii
+							devprop_list[i].name[1] = (uint8_t)(0x30 + pnum); // convert to ascii
 							devprop_add_value(card->device, devprop_list[i].name,
 								devprop_list[i].default_val.type == kCst ?
 								(uint8_t *)&(devprop_list[i].default_val.data) : devprop_list[i].default_val.data,
@@ -2388,32 +2411,32 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info == NULL) // Jief
 	{
-		verbose("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%04x:%04x] \n", 
+		DBG("Unsupported ATI card! Device ID: [%04x:%04x] Subsystem ID: [%04x:%04x] \n", 
 				pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys.vendor_id, pci_dev->subsys_id.subsys.device_id);
 		return false;
 	}
-   	verbose("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
+   	DBG("Found ATI card! Device ID:[%04X:%04X] Subsystem ID:[%08X] - Radeon [%04X:%08X] %s\n", 
 		pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id, card->info->device_id, card->info->subsys_id, card->info->model_name);
 	
 	card->fb		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_0) & ~0x0f);
 	card->mmio		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_2) & ~0x0f);
 	card->io		= (uint8_t *)(pci_config_read32(pci_dev->dev.addr, PCI_BASE_ADDRESS_4) & ~0x03);
 
-	verbose("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
+	DBG("Framebuffer @0x%08X  MMIO @0x%08X	I/O Port @0x%08X ROM Addr @0x%08X\n",
 		(unsigned) card->fb, (unsigned) card->mmio, (unsigned) card->io, pci_config_read32(pci_dev->dev.addr, PCI_ROM_ADDRESS));
 	
 	card->posted = radeon_card_posted();
-	verbose("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
-	verbose("\n");
+	DBG("ATI card %s, ", card->posted ? "POSTed" : "non-POSTed");
+	DBG("\n");
 	get_vram_size();
 	
 	getBoolForKey(kATYbinimage, &add_vbios, &bootInfo->chameleonConfig);
-	
+
 	if (add_vbios)
 	{
 		if (!load_vbios_file(kUseAtiROM, pci_dev->vendor_id, pci_dev->device_id, pci_dev->subsys_id.subsys_id))
 		{
-			verbose("reading Video BIOS from %s", card->posted ? "legacy space" : "PCI ROM");
+			DBG("reading Video BIOS from %s", card->posted ? "legacy space" : "PCI ROM");
 			if (card->posted)
 			{
 				read_vbios(false);
@@ -2429,7 +2452,7 @@ static bool init_card(pci_dt_t *pci_dev)
 
 	if (card->info->chip_family >= CHIP_FAMILY_CEDAR)
 	{
-		verbose("ATI Radeon EVERGREEN family\n");
+		DBG("ATI Radeon EVERGREEN family\n");
 		card->flags |= EVERGREEN;
 	}
 
@@ -2444,7 +2467,7 @@ static bool init_card(pci_dt_t *pci_dev)
 		card->cfg_name = card_configs[card->info->cfg_name].name;
 		
 		// which means one of the fb's or kNull
-		verbose("Framebuffer set to device's default: %s\n", card->cfg_name);
+		DBG("Framebuffer set to device's default: %s\n", card->cfg_name);
 	}
 	else
 	{
@@ -2457,8 +2480,8 @@ static bool init_card(pci_dt_t *pci_dev)
 	// if a value bigger than 0 ?? is found, (do we need >= 0 ?? that's null FB on card_configs)
 	if (n_ports > 0)
 	{
-		card->ports = n_ports; // use it.
-		verbose("(AtiPorts) # of ports set to: %d\n", card->ports);
+		card->ports = (uint8_t)n_ports; // use it.
+		DBG("(AtiPorts) Nr of ports set to: %d\n", card->ports);
 	}
 	else
 	{
@@ -2471,7 +2494,7 @@ static bool init_card(pci_dt_t *pci_dev)
 			}
 		}
 
-		verbose("# of ports set to framebuffer's default: %d\n", card->ports);
+		DBG("Nr of ports set to framebuffer's default: %d\n", card->ports);
 	}
 
 
@@ -2491,6 +2514,8 @@ static bool init_card(pci_dt_t *pci_dev)
 bool setup_ati_devprop(pci_dt_t *ati_dev)
 {
 	char *devicepath;
+
+	verbose("\tClass code: [%04X]\n", ati_dev->class_id );
 
 	if (!init_card(ati_dev))
 	{
@@ -2539,14 +2564,12 @@ bool setup_ati_devprop(pci_dt_t *ati_dev)
 	stringlength = string->length;
 	// -------------------------------------------------
 
-	verbose("ATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x]):: %s\n",
+	DBG("\tATI %s %s %dMB (%s) [%04x:%04x] (subsys [%04x:%04x])\n\t%s\n",
 			chip_family_name[card->info->chip_family], card->info->model_name,
 			(uint32_t)(card->vram_size / (1024 * 1024)), card->cfg_name,
 			ati_dev->vendor_id, ati_dev->device_id,
 			ati_dev->subsys_id.subsys.vendor_id, ati_dev->subsys_id.subsys.device_id,
 			devicepath);
-
-	verbose("---------------------------------------------\n");
 
 	free(card);
 
