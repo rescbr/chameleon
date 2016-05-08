@@ -87,6 +87,9 @@ static uint64_t ptov64(uint32_t addr)
 EFI_UINT32 getCPUTick(void)
 {
 	uint32_t out;
+	/*
+	 * Note: shl $32, %edx leaves 0 in %edx, and or to %eax does nothing - zenith432
+	 */
 	__asm__ volatile (
 		"rdtsc\n"
 		"shl $32,%%edx\n"
@@ -772,10 +775,16 @@ void setupChosenNode()
 				// shr		$0x8,	%rcx
 				rdx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
 				// shr		$0x10,	%rdx
-				rdi = rsi;							// mov		%rsi,	%rdi
+				/*
+				 * Note: In x86 assembly, rXX is upper part of eXX register.
+				 *   In C they're different variables.
+				 *   The code is identical with or without RANDOMSEED. - zenith432
+				 */
+				rdi = rsi = esi;						// mov		%rsi,	%rdi
 				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
 				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
 				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+				edi = (EFI_UINT32) rdi;
 
 				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
 #endif

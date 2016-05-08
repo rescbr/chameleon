@@ -495,9 +495,11 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 // own things, and then calls common_boot.
 void boot(int biosdev)
 {
-	initialize_runtime();
 	// Enable A20 gate before accessing memory above 1Mb.
+	// Note: malloc_init(), called via initialize_runtime() writes
+	//   memory >= 1Mb, so A20 must be enabled before calling it. - zenith432
 	enableA20();
+	initialize_runtime();
 	common_boot(biosdev);
 }
 
