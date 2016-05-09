@@ -92,7 +92,7 @@ enum {
 
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
-/*static*/ unsigned long Adler32( unsigned char * buffer, long length );
+static inline unsigned long Adler32( unsigned char * buffer, long length );
 
 long FileLoadDrivers(char *dirSpec, long plugin);
 long NetLoadDrivers(char *dirSpec);
@@ -119,7 +119,7 @@ static char	*gFileName;
 // Bungo:
 char gDarwinBuildVerStr[256] = "Darwin Kernel Version";
 
-/*static*/ unsigned long Adler32( unsigned char *buffer, long length )
+static inline unsigned long Adler32( unsigned char *buffer, long length )
 {
 	long          cnt;
 	unsigned long result, lowHalf, highHalf;
