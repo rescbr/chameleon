@@ -46,6 +46,7 @@
 // kernel cache
 #define kDefaultCachePathLeo		"/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow		"/System/Library/Caches/com.apple.kext.caches/Startup/"
+#define kDefaultCachePathYosemite	"/System/Library/PrelinkedKernels/"
 
 // Lion installer
 #define kLionInstallerDataFolder	"/Mac OS X Install Data/"
@@ -185,7 +186,9 @@
 #define kEnableHDMIAudio		"EnableHDMIAudio"		/* ati.c && nvidia.c */
 
 /* cparm: added these keys */
+#define kRebootOnPanic			"RebootOnPanic"
 #define kEnableHiDPI			"EnableHiDPI"			// enable High resolution display (aka Retina)
+
 /* ErmaC: added these keys */
 #define kEnableDualLink			"EnableDualLink"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaGeneric			"NvidiaGeneric"			/* nvidia.c */
@@ -204,6 +207,7 @@
 #define kDropBGRT			"DropBGRT"			/* acpi_patcher.c */
 #define kDropMCFG			"DropMCFG"			/* acpi_patcher.c */
 #define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
+#define kCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
 
 /* Pike R. Alpha: added this key */
 #define kBlackMode			"BlackMode"

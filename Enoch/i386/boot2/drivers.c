@@ -176,6 +176,8 @@ long LoadDrivers( char *dirSpec )
 		return 0;
 	}
 
+	// ========================================
+
 	// Load extra drivers if a hook has been installed.
 	if (LoadExtraDrivers_p != NULL)
 	{

@@ -149,6 +149,81 @@ static int ExecKernel(void *binary)
 	entry_t		kernelEntry;
 
 	bootArgs->kaddr = bootArgs->ksize = 0;
+
+// ===============================================================================
+
+    // OS X Mountain Lion 10.8
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.8") ) // Mountain Lion and Up!
+	{
+		// cparm
+		bool KPRebootOption	= false;
+		bool HiDPIOption	= false;
+		getBoolForKey(kRebootOnPanic, &KPRebootOption, &bootInfo->chameleonConfig);
+		if ( KPRebootOption )
+		{
+			bootArgs->flags |= kBootArgsFlagRebootOnPanic;
+		}
+
+		// cparm
+		getBoolForKey(kEnableHiDPI, &HiDPIOption, &bootInfo->chameleonConfig);
+
+		if ( HiDPIOption )
+		{
+			bootArgs->flags |= kBootArgsFlagHiDPI;
+		}
+	}
+
+	// OS X Yosemite 10.10
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) // Yosemite and Up!
+	{
+		// Pike R. Alpha
+		bool FlagBlackOption	= false;
+		getBoolForKey(kBlackMode, &FlagBlackOption, &bootInfo->chameleonConfig);
+		if ( FlagBlackOption )
+		{
+			//bootArgs->flags |= kBootArgsFlagBlack;
+			bootArgs->flags |= kBootArgsFlagBlackBg; // Micky1979
+		}
+	}
+
+	// OS X El Capitan 10.11
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
+	{
+		// ErmaC
+		int	crsValue;
+
+#if 0
+		/*
+		 * A special BootArgs flag "kBootArgsFlagCSRBoot"
+		 * is set in the Recovery or Installation environment.
+		 * This flag is kind of overkill by turning off all the protections
+		 */
+
+		if (isRecoveryHD)
+		{
+			// SIP can be controlled with or without FileNVRAM.kext  (Pike R. Alpha)
+			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+		}
+#endif
+
+		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
+
+		// Set limit to 7bit
+		if ( getIntForKey(kCsrActiveConfig, &crsValue, &bootInfo->chameleonConfig) && (crsValue >= 0 && crsValue <= 127) )
+		{
+			bootArgs->csrActiveConfig	= crsValue;
+		}
+		else
+		{
+			// zenith432
+			bootArgs->csrActiveConfig	= 0x67;
+		}
+		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
+		bootArgs->boot_SMC_plimit	= 0;
+    }
+
+// ===============================================================================
+
 	execute_hook("ExecKernel", (void *)binary, NULL, NULL, NULL);
 
 	ret = DecodeKernel(binary,
@@ -316,13 +391,20 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			}
 			closedir(cacheDir);
 		}
-		else
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.7") && MacOSVerCurrent < MacOSVer2Int("10.10") )
 		{
-			// Lion, Mountain Lion, Mavericks, Yosemite and El Capitan prelink kernel cache file
-			// for 10.7 10.8 10.9 10.10 10.11
+			// Lion, Mountain Lion and Mavericks prelink kernel cache file
+			// for 10.7 10.8 10.9
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
 			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
+		}
+		else
+		{
+			// Yosemite and El Capitan prelink kernel cache file
+			// for 10.10 10.11
+			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCachePathYosemite);
+			verbose("Kernel Cache file path (OS X 10.10 and newer): %s\n", kernelCacheFile);
 		}
 	}
 
@@ -410,9 +492,11 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 // own things, and then calls common_boot.
 void boot(int biosdev)
 {
-	initialize_runtime();
 	// Enable A20 gate before accessing memory above 1Mb.
+	// Note: malloc_init(), called via initialize_runtime() writes
+	//   memory >= 1Mb, so A20 must be enabled before calling it. - zenith432
 	enableA20();
+	initialize_runtime();
 	common_boot(biosdev);
 }
 
@@ -899,16 +983,13 @@ static void selectBiosDevice(void)
 // =========================================================================
 bool checkOSVersion(const char *version)
 {
-	if ( (sizeof(version) > 4) && ('.' != version[4]) && ('\0' != version[4]) )
+	if ( '\0' != version[4] )
 	{
-		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
-		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3])
-		&& (gMacOSVersion[4] == version[4]));
+		return !memcmp(&gMacOSVersion[0], &version[0], 5);
 	}
 	else
 	{
-		return ((gMacOSVersion[0] == version[0]) && (gMacOSVersion[1] == version[1])
-		&& (gMacOSVersion[2] == version[2]) && (gMacOSVersion[3] == version[3]));
+		return !memcmp(&gMacOSVersion[0], &version[0], 4);
 	}
 }
 

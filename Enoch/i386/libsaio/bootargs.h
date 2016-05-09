@@ -132,10 +132,31 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsFlagHiDPI		(1 << 1)
 #define kBootArgsFlagBlack		(1 << 2)
 #define kBootArgsFlagCSRActiveConfig	(1 << 3)
-#define kBootArgsFlagCSRPendingConfig	(1 << 4)
+#define kBootArgsFlagCSRConfigMode	(1 << 4)
 #define kBootArgsFlagCSRBoot		(1 << 5)
 #define kBootArgsFlagBlackBg		(1 << 6)
 #define kBootArgsFlagLoginUI		(1 << 7)
+#define kBootArgsFlagInstallUI		(1 << 8)
+
+/* Rootless configuration flags */
+// http://www.idelta.info/archives/kext-to-check-sip-rootless-status-on-el-capitan/
+#define CSR_ALLOW_UNTRUSTED_KEXTS	(1 << 0) /* Allow untrusted kexts */
+#define CSR_ALLOW_UNRESTRICTED_FS	(1 << 1) /* Allow unrestricted file system. */
+#define CSR_ALLOW_TASK_FOR_PID		(1 << 2) /* Allow test_for_pid() */
+#define CSR_ALLOW_KERNEL_DEBUGGER	(1 << 3)
+#define CSR_ALLOW_APPLE_INTERNAL	(1 << 4)
+#define CSR_ALLOW_UNRESTRICTED_DTRACE	(1 << 5) /* Allow unrestricted dtrace */
+#define CSR_ALLOW_UNRESTRICTED_NVRAM	(1 << 6) /* Allow unrestricted NVRAM */
+#define CSR_ALLOW_DEVICE_CONFIGURATION	(1 << 7) /* Allow device configuration */
+
+#define CSR_VALID_FLAGS (CSR_ALLOW_UNTRUSTED_KEXTS | \
+		CSR_ALLOW_UNRESTRICTED_FS | \
+		CSR_ALLOW_TASK_FOR_PID | \
+		CSR_ALLOW_KERNEL_DEBUGGER | \
+		CSR_ALLOW_APPLE_INTERNAL | \
+		CSR_ALLOW_UNRESTRICTED_DTRACE | \
+		CSR_ALLOW_UNRESTRICTED_NVRAM | \
+		CSR_ALLOW_DEVICE_CONFIGURATION)
 
 typedef struct boot_args
 {
@@ -181,9 +202,13 @@ typedef struct boot_args
     uint64_t    pciConfigSpaceBaseAddress;
     uint32_t    pciConfigSpaceStartBusNumber;
     uint32_t    pciConfigSpaceEndBusNumber;
-    uint32_t	csrActiveConfig;
-    uint32_t	csrPendingConfig;
-    uint32_t    __reserved4[728];
+
+    uint32_t    csrActiveConfig;
+    uint32_t    csrCapabilities;
+    uint32_t    boot_SMC_plimit;
+    uint16_t	bootProgressMeterStart;
+    uint16_t	bootProgressMeterEnd;
+    uint32_t    __reserved4[726];
 
 } boot_args;
 

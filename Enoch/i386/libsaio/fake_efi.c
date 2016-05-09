@@ -87,6 +87,9 @@ static uint64_t ptov64(uint32_t addr)
 EFI_UINT32 getCPUTick(void)
 {
 	uint32_t out;
+	/*
+	 * Note: shl $32, %edx leaves 0 in %edx, and or to %eax does nothing - zenith432
+	 */
 	__asm__ volatile (
 		"rdtsc\n"
 		"shl $32,%%edx\n"
@@ -105,7 +108,13 @@ EFI_UINT32 getCPUTick(void)
 /* Identify ourselves as the EFI firmware vendor */
 static EFI_CHAR16 const FIRMWARE_VENDOR[] = {'E','n','o','c','h', 0};
 
-static EFI_UINT32 const FIRMWARE_REVISION = 0x0001000a; // got from real MBP6,1
+// Pike R. Alpha
+/*
+ * We use the same value for everything, as we should, which means (currently)
+ * 0x0001000A for EFI64 and 0x00010001 for EFI32. Just like on real Mac's.
+ */
+
+static EFI_UINT32 const FIRMWARE_REVISION = EFI_SYSTEM_TABLE_REVISION;
 
 /* Default platform system_id (fix by IntVar)
  static EFI_CHAR8 const SYSTEM_ID[] = "0123456789ABCDEF"; //random value gen by uuidgen
@@ -475,6 +484,26 @@ static EFI_UINT8 const DEVICE_PATHS_SUPPORTED[] = { 0x01, 0x00, 0x00, 0x00 };
 static EFI_UINT8 const STARTUP_POWER_EVENTS[] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
 static EFI_UINT8 const COMPAT_MODE[] = { 0x01, 0x00, 0x00, 0x00 };
 
+// Pike R. Alpha
+static EFI_UINT8 const BOOT_DEVICE_PATH[] =
+{
+    0x02, 0x01, 0x0C, 0x00, 0xD0, 0x41, 0x08, 0x0A, 0x00, 0x00, 0x00, 0x00, 0x01, 0x01, 0x06, 0x00,
+    0x02, 0x1F, 0x03, 0x12, 0x0A, 0x00, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x01, 0x2A, 0x00,
+    0x02, 0x00, 0x00, 0x00, 0x28, 0x40, 0x06, 0x00, 0x00, 0x00, 0x00, 0x00, 0x90, 0x0B, 0x63, 0x34,
+    0x00, 0x00, 0x00, 0x00, 0x65, 0x8C, 0x53, 0x3F, 0x1B, 0xCA, 0x83, 0x38, 0xA9, 0xD0, 0xF0, 0x46,
+    0x19, 0x14, 0x8E, 0x31, 0x02, 0x02, 0x7F, 0xFF, 0x04, 0x00
+};
+// Pike R. Alpha
+static EFI_UINT8 const BOOT_FILE_PATH[] =
+{
+    0x04, 0x04, 0x50, 0x00, 0x5c, 0x00, 0x53, 0x00, 0x79, 0x00, 0x73, 0x00, 0x74, 0x00, 0x65, 0x00,
+    0x6d, 0x00, 0x5c, 0x00, 0x4c, 0x00, 0x69, 0x00, 0x62, 0x00, 0x72, 0x00, 0x61, 0x00, 0x72, 0x00,
+    0x79, 0x00, 0x5c, 0x00, 0x43, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x65, 0x00, 0x53, 0x00, 0x65, 0x00,
+    0x72, 0x00, 0x76, 0x00, 0x69, 0x00, 0x63, 0x00, 0x65, 0x00, 0x73, 0x00, 0x5c, 0x00, 0x62, 0x00,
+    0x6f, 0x00, 0x6f, 0x00, 0x74, 0x00, 0x2e, 0x00, 0x65, 0x00, 0x66, 0x00, 0x69, 0x00, 0x00, 0x00,
+    0x7f, 0xff, 0x04, 0x00
+};
+
 /*
  * Get an smbios option string option to convert to EFI_CHAR16 string
  */
@@ -656,6 +685,8 @@ void setupChosenNode()
 {
 	Node *chosenNode;
 	chosenNode = DT__FindNode("/chosen", false);
+	unsigned long adler32 = 0;
+
 	if (chosenNode == NULL)
 	{
 		stop("setupChosenNode: Couldn't get '/chosen' node");
@@ -672,11 +703,12 @@ void setupChosenNode()
 	// Adding the default kernel name (mach_kernel) for kextcache.
 	DT__AddProperty(chosenNode, "boot-file", sizeof(bootInfo->bootFile), bootInfo->bootFile);
 
-//	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
+	DT__AddProperty(chosenNode, "boot-file-path", sizeof(BOOT_FILE_PATH), (EFI_UINT8 *) &BOOT_FILE_PATH);
 
-//	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
+	// Adding the root path for kextcache.
+	DT__AddProperty(chosenNode, "boot-device-path", sizeof(BOOT_DEVICE_PATH), (EFI_UINT8 *) &BOOT_DEVICE_PATH);
 
-//	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(adler32), adler32);
+	DT__AddProperty(chosenNode, "boot-kernelcache-adler32", sizeof(unsigned long), &adler32);
 
 	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
 
@@ -762,10 +794,16 @@ void setupChosenNode()
 				// shr		$0x8,	%rcx
 				rdx = (cpuTick >> 0x10);					// mov		%rax,	%rdx
 				// shr		$0x10,	%rdx
-				rdi = rsi;							// mov		%rsi,	%rdi
+				/*
+				 * Note: In x86 assembly, rXX is upper part of eXX register.
+				 *   In C they're different variables.
+				 *   The code is identical with or without RANDOMSEED. - zenith432
+				 */
+				rdi = rsi = esi;						// mov		%rsi,	%rdi
 				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
 				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
 				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+				edi = (EFI_UINT32) rdi;
 
 				seedBuffer[index] = (rdi & 0xff);				// mov		%dil,	(%r15,%r12,1)
 #endif

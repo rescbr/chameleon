@@ -266,6 +266,7 @@ int verbose(const char * fmt, ...)
 			vprf(fmt, ap);
 		}
 	}
+	va_end(ap);
 
 	{
 		// Kabyl: BooterLog
@@ -280,11 +281,12 @@ int verbose(const char * fmt, ...)
 		}
 		pi.str = cursor;
 		pi.last_str = 0;
+		va_start(ap, fmt);
 		prf(fmt, ap, sputc, &pi);
+		va_end(ap);
 		cursor +=  strlen((char *)cursor);
 	}
 
-	va_end(ap);
 	return(0);
 }
 
@@ -301,6 +303,7 @@ int error(const char * fmt, ...)
 	{
 		vprf(fmt, ap);
 	}
+	va_end(ap);
 
 	// Kabyl: BooterLog
 	struct putc_info pi;
@@ -317,10 +320,11 @@ int error(const char * fmt, ...)
 
 	pi.str = cursor;
 	pi.last_str = 0;
+	va_start(ap, fmt);
 	prf(fmt, ap, sputc, &pi);
+	va_end(ap);
 	cursor +=  strlen((char *)cursor);
 
-	va_end(ap);
 	return(0);
 }
 

@@ -9,7 +9,7 @@
 	<!-- license file="License.rtf" sla="EA0401" -->
 	<readme file='Description.html'/>
 	<conclusion file="Conclusion.html"/>
-	<background file='background' alignment='topleft' scaling='no'/>
+	<background file='background' mime-type='image/png' alignment='topleft' scaling='no'/>
 
 	<title>Enoch Bootloder revision %CHAMELEONREVISION%</title>
 
@@ -101,7 +101,8 @@
 		return false;
 	}
 
-	function check_chameleon_list_option(key, value) {
+	function check_chameleon_list_option(key, value)
+	{
 		if ( bootPlist &amp;&amp; bootPlist[ key ] )
 		{
 			var items = bootPlist[ key ].split(" ");
