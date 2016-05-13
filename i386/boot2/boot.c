@@ -498,8 +498,9 @@ void boot(int biosdev)
 	// Enable A20 gate before accessing memory above 1Mb.
 	// Note: malloc_init(), called via initialize_runtime() writes
 	//   memory >= 1Mb, so A20 must be enabled before calling it. - zenith432
+	zeroBSS();
 	enableA20();
-	initialize_runtime();
+	malloc_init(0, 0, 0, malloc_error);
 	common_boot(biosdev);
 }
 
