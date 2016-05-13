@@ -2647,12 +2647,14 @@ msgstr "Set 06002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
 #, no-wrap
+#| msgid "00002216"
 msgid "07002216"
 msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
 #, no-wrap
+#| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
 msgstr "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
 
@@ -3331,6 +3333,7 @@ msgstr "CrsActiveConfig"
 #. type: "CrsActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
+#| msgid "System Integrity Protection."
 msgid "System Integrity Protection (SIP)."
 msgstr "System Integrity Protection (SIP)."
 

@@ -293,6 +293,7 @@ msgstr "Полезно, если необходимо установить то�
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
 #, no-wrap
+#| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
 msgstr "Этапы загрузчика"
 
@@ -306,9 +307,12 @@ msgid ""
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
 "Здесь вы можете полностью или частично пропустить установку загрузчика.\n"
-"Это может быть полезно, если вы хотите записать файлы в Extra, или пропустить какой-либо этап (0,1 и активация целевого раздела).\n"
-"Пропуск всех этапов разрешает вам оставить все, как уже рабочие загрузочные сектора, особенно полезно с 4k дисками.\n"
-"загрузка всегда копируется на целевой раздел когда вы пропускаете один или несколько этапов."
+"Это может быть полезно, если вы хотите записать файлы в Extra, или "
+"пропустить какой-либо этап (0,1 и активация целевого раздела).\n"
+"Пропуск всех этапов разрешает вам оставить все, как уже рабочие загрузочные "
+"сектора, особенно полезно с 4k дисками.\n"
+"загрузка всегда копируется на целевой раздел когда вы пропускаете один или "
+"несколько этапов."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
@@ -357,20 +361,26 @@ msgid ""
 "Stage 2 is always copied/replaced."
 msgstr ""
 "Предотвращает активацию целевого раздела.\n"
-"На некоторых старых материнских платах плохая реализация GPT в биосе, и они не могут определить разделы, помеченные как Guid Partition Table.\n"
+"На некоторых старых материнских платах плохая реализация GPT в биосе, и они "
+"не могут определить разделы, помеченные как Guid Partition Table.\n"
 "Этап 2 всегда копируется/перемещается."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
 #, no-wrap
+#| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
 msgstr "Установить Chameleon в указанный раздел."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
 #, no-wrap
+#| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr "Установка файлов Chameleon в корень выбранного раздела используя boot0, boot0md или boot0hfs основываясь на вашей системе, без уничтожения любой установленной копии Windows, если таковая имеется."
+msgstr ""
+"Установка файлов Chameleon в корень выбранного раздела используя boot0, "
+"boot0md или boot0hfs основываясь на вашей системе, без уничтожения любой "
+"установленной копии Windows, если таковая имеется."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
@@ -381,8 +391,11 @@ msgstr "Установить Chameleon в раздел ESP"
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
 #, no-wrap
+#| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr "Установка файлов Chameleon в ESP (системный раздел EFI) целевого тома используя boot0, boot0md или boot0hfs основываясь на вашей системе."
+msgstr ""
+"Установка файлов Chameleon в ESP (системный раздел EFI) целевого тома "
+"используя boot0, boot0md или boot0hfs основываясь на вашей системе."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -661,6 +674,7 @@ msgstr "Перезагрузка при панике ядра."
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
 #, no-wrap
+#| msgid "EnableHDMIAudio=Yes"
 msgid "EnableHiDPI=Yes"
 msgstr "EnableHiDPI=Yes"
 
@@ -673,6 +687,7 @@ msgstr "Включить режим высокого разрешения (aka r
 #. type: "BlackMode_title"
 #: Resources/templates/Localizable.strings:143
 #, no-wrap
+#| msgid "Wake=Yes"
 msgid "BlackMode=Yes"
 msgstr "BlackMode=Yes"
 
@@ -680,7 +695,9 @@ msgstr "BlackMode=Yes"
 #: Resources/templates/Localizable.strings:144
 #, no-wrap
 msgid "The new BlackMode loads the white Apple logo, instead of the gray Apple logo, on a black background."
-msgstr "Новый режим BlackMode загружает белый логотип Apple, вместо серого логотипа Apple на черном фоне."
+msgstr ""
+"Новый режим BlackMode загружает белый логотип Apple, вместо серого логотипа "
+"Apple на черном фоне."
 
 #. type: "InstantMenu_title"
 #: Resources/templates/Localizable.strings:146
@@ -740,7 +757,9 @@ msgstr "PrivateData=No"
 #: Resources/templates/Localizable.strings:159
 #, no-wrap
 msgid "Show masked data (serial number) in bdmesg log (enbaled by default)."
-msgstr "Показать скрытую информацию (серийный номер) в логе bdmesg (по умолчанию включено)."
+msgstr ""
+"Показать скрытую информацию (серийный номер) в логе bdmesg (по умолчанию "
+"включено)."
 
 #. type: "USBBusFix_title"
 #: Resources/templates/Localizable.strings:163
@@ -1262,7 +1281,7 @@ msgstr "Установить графический режим экрана за
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
 msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
-msgstr ""
+msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 
 #. type: "Crs1_description"
 #: Resources/templates/Localizable.strings:299
@@ -1274,7 +1293,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_FS"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 
 #. type: "Crs2_description"
 #: Resources/templates/Localizable.strings:302
@@ -1286,7 +1305,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
 msgid "CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgstr "CRS_ALLOW_TASK_FOR_PID"
 
 #. type: "Crs4_description"
 #: Resources/templates/Localizable.strings:305
@@ -1298,7 +1317,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid "CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgstr "CRS_ALLOW_KERNEL_DEBUGGER"
 
 #. type: "Crs8_description"
 #: Resources/templates/Localizable.strings:308
@@ -1310,7 +1329,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
 msgid "CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgstr "CRS_ALLOW_APPLE_INTERNAL"
 
 #. type: "Crs16_description"
 #: Resources/templates/Localizable.strings:311
@@ -1322,7 +1341,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_DTRACE"
 
 #. type: "Crs32_description"
 #: Resources/templates/Localizable.strings:314
@@ -1334,7 +1353,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_NVRAM"
 
 #. type: "Crs64_description"
 #: Resources/templates/Localizable.strings:317
@@ -1346,7 +1365,7 @@ msgstr ""
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgstr "CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "Crs128_description"
 #: Resources/templates/Localizable.strings:320
@@ -2417,12 +2436,14 @@ msgstr "Установить 00002b16 в качестве Intel Broadwell (Mobil
 #. type: "IntelBroadwellx06_title"
 #: Resources/templates/Localizable.strings:645
 #, no-wrap
+#| msgid "00002604"
 msgid "00002216"
 msgstr "00002216"
 
 #. type: "IntelBroadwellx06_description"
 #: Resources/templates/Localizable.strings:646
 #, no-wrap
+#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgstr "Установить 00002216 в качестве Intel Broadwell AAPL,ig-platform-id."
 
@@ -2435,6 +2456,7 @@ msgstr "01000e16"
 #. type: "IntelBroadwellx07_description"
 #: Resources/templates/Localizable.strings:649
 #, no-wrap
+#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgstr "Установить 01000e16 в качестве Intel Broadwell AAPL,ig-platform-id."
 
@@ -2507,18 +2529,22 @@ msgstr "02002b16"
 #. type: "IntelBroadwellx13_description"
 #: Resources/templates/Localizable.strings:667
 #, no-wrap
+#| msgid "Set 02001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 02002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 02002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 02002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx14_title"
 #: Resources/templates/Localizable.strings:669
 #, no-wrap
+#| msgid "0300220d"
 msgid "03001216"
 msgstr "03001216"
 
 #. type: "IntelBroadwellx14_description"
 #: Resources/templates/Localizable.strings:670
 #, no-wrap
+#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
 msgstr "Установить 03001216 в качестве Intel Broadwell AAPL,ig-platform-id."
 
@@ -2531,32 +2557,40 @@ msgstr "04002b16"
 #. type: "IntelBroadwellx15_description"
 #: Resources/templates/Localizable.strings:673
 #, no-wrap
+#| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002b16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 04002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 04002b16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx16_title"
 #: Resources/templates/Localizable.strings:675
 #, no-wrap
+#| msgid "00002604"
 msgid "04002616"
 msgstr "04002616"
 
 #. type: "IntelBroadwellx16_description"
 #: Resources/templates/Localizable.strings:676
 #, no-wrap
+#| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 04002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 04002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 04002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx17_title"
 #: Resources/templates/Localizable.strings:678
 #, no-wrap
+#| msgid "0500260a"
 msgid "05002616"
 msgstr "05002616"
 
 #. type: "IntelBroadwellx17_description"
 #: Resources/templates/Localizable.strings:679
 #, no-wrap
+#| msgid "Set 0500260a for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 05002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 05002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 05002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx18_title"
 #: Resources/templates/Localizable.strings:681
@@ -2572,183 +2606,188 @@ msgstr "Установить 06002616 в качестве Intel Broadwell (Mobil
 
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002604"
 msgid "07002216"
-msgstr "00002604"
+msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 07002216 в качестве Intel Broadwell  AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex00_title"
 #: Resources/templates/Localizable.strings:689
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00000e16"
 msgid "0000e019"
-msgstr "00000e16"
+msgstr "0000e019"
 
 #. type: "IntelSkylakex00_description"
 #: Resources/templates/Localizable.strings:690
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 0000e019 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 00000e16 в качестве Intel Broadwell AAPL,ig-platform-id."
+msgstr "Установить 0000e019 в качестве Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex01_title"
 #: Resources/templates/Localizable.strings:692
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001619"
-msgstr "00001616"
+msgstr "00001619"
 
 #. type: "IntelSkylakex01_description"
 #: Resources/templates/Localizable.strings:693
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 00001619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 00001616 в качестве Intel Broadwell AAPL,ig-platform-id."
+msgstr "Установить 00001619 в качестве Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex02_title"
 #: Resources/templates/Localizable.strings:695
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00002616"
 msgid "00002619"
-msgstr "00002616"
+msgstr "00002619"
 
 #. type: "IntelSkylakex02_description"
 #: Resources/templates/Localizable.strings:696
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00002619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 00002604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 00002619 в качестве IntelSkylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex03_title"
 #: Resources/templates/Localizable.strings:698
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001b19"
-msgstr "00001616"
+msgstr "00001b19"
 
 #. type: "IntelSkylakex03_description"
 #: Resources/templates/Localizable.strings:699
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001b19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 00001b19 в качестве Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex04_title"
 #: Resources/templates/Localizable.strings:701
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001616"
 msgid "00001219"
-msgstr "00001616"
+msgstr "00001219"
 
 #. type: "IntelSkylakex04_description"
 #: Resources/templates/Localizable.strings:702
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 00001219 в качестве Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex05_title"
 #: Resources/templates/Localizable.strings:704
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "01660002"
 msgid "01000219"
-msgstr "01660002"
+msgstr "01000219"
 
 #. type: "IntelSkylakex05_description"
 #: Resources/templates/Localizable.strings:705
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00002616 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 01000219 в качестве Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex06_title"
 #: Resources/templates/Localizable.strings:707
 #, no-wrap
 msgid "01001719"
-msgstr ""
+msgstr "01001719"
 
 #. type: "IntelSkylakex06_description"
 #: Resources/templates/Localizable.strings:708
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001719 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 01001719 в качестве Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex07_title"
 #: Resources/templates/Localizable.strings:710
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "0300220d"
 msgid "01001219"
-msgstr "0300220d"
+msgstr "01001219"
 
 #. type: "IntelSkylakex07_description"
 #: Resources/templates/Localizable.strings:711
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001604 for Intel Haswell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01001219 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 00001604 в качестве Intel Haswell (Mobile) AAPL,ig-platform-id."
+msgstr "Установить 01001219 в качестве IntelSkylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex08_title"
 #: Resources/templates/Localizable.strings:713
 #, no-wrap
 msgid "01003219"
-msgstr ""
+msgstr "01003219"
 
 #. type: "IntelSkylakex08_description"
 #: Resources/templates/Localizable.strings:714
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01003219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 01001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 01003219 в качестве Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex09_title"
 #: Resources/templates/Localizable.strings:716
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02001616"
 msgid "02001619"
-msgstr "02001616"
+msgstr "02001619"
 
 #. type: "IntelSkylakex09_description"
 #: Resources/templates/Localizable.strings:717
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02001619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 02001616 в качестве Intel Broadwell AAPL,ig-platform-id."
+msgstr "Установить 02001619 в качестве Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex10_title"
 #: Resources/templates/Localizable.strings:719
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "02002616"
 msgid "02002619"
-msgstr "02002616"
+msgstr "02002619"
 
 #. type: "IntelSkylakex10_description"
 #: Resources/templates/Localizable.strings:720
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02002619 for Intel Skylake AAPL,ig-platform-id."
-msgstr "Установить 02002216 в качестве Intel Broadwell AAPL,ig-platform-id."
+msgstr "Установить 02002619 в качестве Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex11_title"
 #: Resources/templates/Localizable.strings:722
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "00001e16"
 msgid "03001e19"
-msgstr "00001e16"
+msgstr "03001e19"
 
 #. type: "IntelSkylakex11_description"
 #: Resources/templates/Localizable.strings:723
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001e19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
-msgstr "Установить 00001e16 в качестве Intel Broadwell (Mobile) AAPL,ig-platform-id."
+msgstr ""
+"Установить 03001e19 в качестве Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "AD2000B_PinConf_title"
 #: Resources/templates/Localizable.strings:727
@@ -2856,7 +2895,11 @@ msgstr "UseIntelHDMI=Yes"
 #: Resources/templates/Localizable.strings:754
 #, no-wrap
 msgid "If YES, hda-gfx=onboard-1 will be injected into the GFX0 and HDEF devices. Also, if an ATI or Nvidia HDMI device is present, they'll be assigned to onboard-2. If NO, then ATI or Nvidia devices will get onboard-1 as well as the HDAU device if present."
-msgstr "Если \"Да\", hda-gfx=onboard-1 будет инжектировано в устройства GFX0 и HDEF. Также, если присуствует устройство HDMI от ATI или Nvidia, они будут назначены в onboard-2. Если \"Нет\", тогда устройства от ATI или Nvidia получат onboard-1, также как и устройство HDAU, если имеется."
+msgstr ""
+"Если \"Да\", hda-gfx=onboard-1 будет инжектировано в устройства GFX0 и HDEF. "
+"Также, если присуствует устройство HDMI от ATI или Nvidia, они будут "
+"назначены в onboard-2. Если \"Нет\", тогда устройства от ATI или Nvidia "
+"получат onboard-1, также как и устройство HDAU, если имеется."
 
 #. type: "UseAtiROM_title"
 #: Resources/templates/Localizable.strings:756
@@ -2976,7 +3019,9 @@ msgstr "NvidiaSingle=No"
 #: Resources/templates/Localizable.strings:784
 #, no-wrap
 msgid "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default)."
-msgstr "Если у вас две карты Nvidia и вы хотите инжектировать только первую, тогда установите данный параметр (включен по умолчанию)."
+msgstr ""
+"Если у вас две карты Nvidia и вы хотите инжектировать только первую, тогда "
+"установите данный параметр (включен по умолчанию)."
 
 #. type: "Verbose_title"
 #: Resources/templates/Localizable.strings:790
@@ -3107,7 +3152,11 @@ msgstr "rootless=0"
 #: Resources/templates/Localizable.strings:823
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
-msgstr "Rootless - новая возможность представленная в OS X 10.11 (El Capitan). Она не позволяет модифицировать системные файлы. Чтобы обойти это ограничение, эту обязательную возможность можно отключить, добавив флаг 'rootless=0' ('rootless=1' включает её)."
+msgstr ""
+"Rootless - новая возможность представленная в OS X 10.11 (El Capitan). Она "
+"не позволяет модифицировать системные файлы. Чтобы обойти это ограничение, "
+"эту обязательную возможность можно отключить, добавив флаг 'rootless=0' "
+"('rootless=1' включает её)."
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:825
@@ -3271,7 +3320,7 @@ msgstr "Настройки поведения Chameleon."
 #: Resources/templates/Localizable.strings:883
 #, no-wrap
 msgid "CrsActiveConfig"
-msgstr ""
+msgstr "CrsActiveConfig"
 
 #. type: "CrsActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
@@ -3383,17 +3432,19 @@ msgstr "Выберите значение AAPL,ig-platform-id, использу�
 
 #. type: "IntelSkl_title"
 #: Resources/templates/Localizable.strings:923
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Skl AAPL,ig-platform-id"
-msgstr "Intel Azul AAPL,ig-platform-id"
+msgstr "Intel Skl AAPL,ig-platform-id"
 
 #. type: "IntelSkl_description"
 #: Resources/templates/Localizable.strings:924
-#, fuzzy, no-wrap
+#, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Skylake."
-msgstr "Выберите значение AAPL,ig-platform-id, используемое по умолчанию для графического процессора Intel Haswell."
+msgstr ""
+"Выберите значение AAPL,ig-platform-id, используемое по умолчанию для "
+"графического процессора Intel Skylake."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:927
@@ -3434,18 +3485,21 @@ msgstr "Выберите основную раскладку клавиатур�
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
 #, no-wrap
+#| msgid "Kext Patcher"
 msgid "Patches"
 msgstr "Патчи"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, no-wrap
+#| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
 msgstr "Выбор параметров патча ядра."
 
 #. type: "kernelPatcher_title"
 #: Resources/templates/Localizable.strings:948
 #, no-wrap
+#| msgid "Kernel Patcher"
 msgid "kernel Patcher"
 msgstr "Патч ядра"
 
@@ -3470,18 +3524,21 @@ msgstr "Заново включить кексты /Extra/Extensions на нов
 #. type: "KernelPm_title"
 #: Resources/templates/Localizable.strings:956
 #, no-wrap
+#| msgid "Kernel Patcher"
 msgid "KernelPm"
 msgstr "KernelPm"
 
 #. type: "KernelPm_description"
 #: Resources/templates/Localizable.strings:957
 #, no-wrap
+#| msgid "Power Management"
 msgid "Kernel Power Management patch."
 msgstr "Патч ядра управления питанием."
 
 #. type: "KernelLapicError_title"
 #: Resources/templates/Localizable.strings:960
 #, no-wrap
+#| msgid "Kernel Patcher"
 msgid "KernelLapicError"
 msgstr "KernelLapicError"
 
@@ -3494,6 +3551,7 @@ msgstr "Убрать панику Local Apic Error."
 #. type: "KernelLapicVersion_title"
 #: Resources/templates/Localizable.strings:964
 #, no-wrap
+#| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
 msgstr "KernelLapicVersion"
 
@@ -3506,6 +3564,7 @@ msgstr "Убрать панику Local Apic Version."
 #. type: "KernelHaswell_title"
 #: Resources/templates/Localizable.strings:968
 #, no-wrap
+#| msgid "Kernel Flags"
 msgid "KernelHaswell"
 msgstr "KernelHaswell"
 
@@ -3525,7 +3584,9 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
-msgstr "Патч cpuid_family, что убрать паники the _cpuid_set_info _panic и _tsc_init _panic. Для неподдерживаемых CPU."
+msgstr ""
+"Патч cpuid_family, что убрать паники the _cpuid_set_info _panic и _tsc_init "
+"_panic. Для неподдерживаемых CPU."
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
@@ -3537,7 +3598,9 @@ msgstr "KernelSSE3"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
-msgstr "Патч для включения дополнительных инструкций SSE3 на старых CPU для запуска новых OS."
+msgstr ""
+"Патч для включения дополнительных инструкций SSE3 на старых CPU для запуска "
+"новых OS."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982
