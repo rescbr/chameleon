@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 15:03+0000\n"
+"POT-Creation-Date: 2016-04-26 18:46+0100\n"
 "PO-Revision-Date: 2015-11-02 15:22+0000\n"
 "Last-Translator: arsradu <arsradu@gmail.com>\n"
 "Language-Team: ro <ro@li.org>\n"
@@ -3519,14 +3519,12 @@ msgstr "Selectati o limba a tastaturii, aceasta va instala si modulul pentru div
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
 #, no-wrap
-#| msgid "Kext Patcher"
 msgid "Patches"
 msgstr "Patch-uri"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, no-wrap
-#| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
 msgstr "O selectie de optiuni pentru a petici kernel-ul."
 
