@@ -3527,7 +3527,6 @@ msgstr "Patch-uri"
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, no-wrap
-#| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
 msgstr "O selectie de optiuni pentru a petici kernel-ul."
 

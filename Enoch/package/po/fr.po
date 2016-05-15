@@ -1299,9 +1299,7 @@ msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
-msgstr ""
-"Kext signature: Introduit en 10.9, renforcée en 10.10 (signature kext requis "
-"pour tous les kexts), devenu maintenant partie de déracinés (SIP)."
+msgstr "Kext signature: Introduit en 10.9, renforcée en 10.10 (signature kext requis pour tous les kexts), devenu maintenant partie de déracinés (SIP)."
 
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
@@ -1313,9 +1311,7 @@ msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
-msgstr ""
-"La protection de système de fichiers: fichiers système importants sont "
-"protégés et ne peuvent être modifiés."
+msgstr "La protection de système de fichiers: fichiers système importants sont protégés et ne peuvent être modifiés."
 
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
@@ -2670,182 +2666,156 @@ msgstr "Règle 06002616 pour Intel Broadwell (Mobile) AAPL,ig-platform-id."
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
 #, no-wrap
-#| msgid "00002216"
 msgid "07002216"
 msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
 #, no-wrap
-#| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 07002216 for Intel Broadwell AAPL,ig-platform-id."
 msgstr "Règle 07002216 pour Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex00_title"
 #: Resources/templates/Localizable.strings:689
 #, no-wrap
-#| msgid "00000e16"
 msgid "0000e019"
 msgstr "0000e019"
 
 #. type: "IntelSkylakex00_description"
 #: Resources/templates/Localizable.strings:690
 #, no-wrap
-#| msgid "Set 00000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 0000e019 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 0000e019 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex01_title"
 #: Resources/templates/Localizable.strings:692
 #, no-wrap
-#| msgid "00001616"
 msgid "00001619"
 msgstr "00001619"
 
 #. type: "IntelSkylakex01_description"
 #: Resources/templates/Localizable.strings:693
 #, no-wrap
-#| msgid "Set 00001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 00001619 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 00001619 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex02_title"
 #: Resources/templates/Localizable.strings:695
 #, no-wrap
-#| msgid "00002616"
 msgid "00002619"
 msgstr "00002619"
 
 #. type: "IntelSkylakex02_description"
 #: Resources/templates/Localizable.strings:696
 #, no-wrap
-#| msgid "Set 00002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 00002619 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 00002619 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex03_title"
 #: Resources/templates/Localizable.strings:698
 #, no-wrap
-#| msgid "00001616"
 msgid "00001b19"
 msgstr "00001b19"
 
 #. type: "IntelSkylakex03_description"
 #: Resources/templates/Localizable.strings:699
 #, no-wrap
-#| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001b19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
 msgstr "Règle 00001b19 pour Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex04_title"
 #: Resources/templates/Localizable.strings:701
 #, no-wrap
-#| msgid "00001616"
 msgid "00001219"
 msgstr "00001219"
 
 #. type: "IntelSkylakex04_description"
 #: Resources/templates/Localizable.strings:702
 #, no-wrap
-#| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 00001219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
 msgstr "Règle 00001219 pour Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex05_title"
 #: Resources/templates/Localizable.strings:704
 #, no-wrap
-#| msgid "01000e16"
 msgid "01000219"
 msgstr "01000219"
 
 #. type: "IntelSkylakex05_description"
 #: Resources/templates/Localizable.strings:705
 #, no-wrap
-#| msgid "Set 00002616 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01000219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
 msgstr "Règle 01000219 pour Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex06_title"
 #: Resources/templates/Localizable.strings:707
 #, no-wrap
-#| msgid "01001e16"
 msgid "01001719"
 msgstr "01001719"
 
 #. type: "IntelSkylakex06_description"
 #: Resources/templates/Localizable.strings:708
 #, no-wrap
-#| msgid "Set 01000e16 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 01001719 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 01001719 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex07_title"
 #: Resources/templates/Localizable.strings:710
 #, no-wrap
-#| msgid "01001e16"
 msgid "01001219"
 msgstr "01001219"
 
 #. type: "IntelSkylakex07_description"
 #: Resources/templates/Localizable.strings:711
 #, no-wrap
-#| msgid "Set 03001216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 01001219 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 01001219 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex08_title"
 #: Resources/templates/Localizable.strings:713
 #, no-wrap
-#| msgid "01000e16"
 msgid "01003219"
 msgstr "01003219"
 
 #. type: "IntelSkylakex08_description"
 #: Resources/templates/Localizable.strings:714
 #, no-wrap
-#| msgid "Set 01001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 01003219 for Intel Skylake (Mobile) AAPL,ig-platform-id."
 msgstr "Règle 01003219 pour Intel Skylake (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex09_title"
 #: Resources/templates/Localizable.strings:716
 #, no-wrap
-#| msgid "02001616"
 msgid "02001619"
 msgstr "02001619"
 
 #. type: "IntelSkylakex09_description"
 #: Resources/templates/Localizable.strings:717
 #, no-wrap
-#| msgid "Set 02001616 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02001619 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 02001619 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex10_title"
 #: Resources/templates/Localizable.strings:719
 #, no-wrap
-#| msgid "02002616"
 msgid "02002619"
 msgstr "02002619"
 
 #. type: "IntelSkylakex10_description"
 #: Resources/templates/Localizable.strings:720
 #, no-wrap
-#| msgid "Set 02002216 for Intel Broadwell AAPL,ig-platform-id."
 msgid "Set 02002619 for Intel Skylake AAPL,ig-platform-id."
 msgstr "Règle 02002619 pour Intel Skylake AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex11_title"
 #: Resources/templates/Localizable.strings:722
 #, no-wrap
-#| msgid "00001e16"
 msgid "03001e19"
 msgstr "03001e19"
 
 #. type: "IntelSkylakex11_description"
 #: Resources/templates/Localizable.strings:723
 #, no-wrap
-#| msgid "Set 00001e16 for Intel Broadwell (Mobile) AAPL,ig-platform-id."
 msgid "Set 03001e19 for Intel Skylake (Mobile) AAPL,ig-platform-id."
 msgstr "Règle 03001e19 pour Intel Skylake (Mobile) AAPL,ig-platform-id."
 
@@ -3488,18 +3458,14 @@ msgstr "Définir une AAPL, ig-platform-id à utiliser pour votre contrôleur Int
 #. type: "IntelSkl_title"
 #: Resources/templates/Localizable.strings:923
 #, no-wrap
-#| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Skl AAPL,ig-platform-id"
 msgstr "Intel Skl AAPL,ig-platform-id"
 
 #. type: "IntelSkl_description"
 #: Resources/templates/Localizable.strings:924
 #, no-wrap
-#| msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Skylake."
-msgstr ""
-"Définir une AAPL, ig-platform-id à utiliser pour votre contrôleur Intel "
-"Skylake."
+msgstr "Définir une AAPL, ig-platform-id à utiliser pour votre contrôleur Intel Skylake."
 
 #. type: "HDEFPinConfiguration_title"
 #: Resources/templates/Localizable.strings:927
@@ -3542,21 +3508,18 @@ msgstr ""
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
 #, no-wrap
-#| msgid "Kext Patcher"
 msgid "Patches"
 msgstr "Correctifs"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, no-wrap
-#| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the kernel."
 msgstr "Options concernant les correctifs."
 
 #. type: "kernelPatcher_title"
 #: Resources/templates/Localizable.strings:948
 #, no-wrap
-#| msgid "Kernel Patcher"
 msgid "kernel Patcher"
 msgstr "kernel Patcher"
 
@@ -3576,28 +3539,23 @@ msgstr "KernelBooter_kexts"
 #: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
-msgstr ""
-"Re-activer /Extra/ Extensions kexts sur les systèmes d’exploitation plus "
-"récents."
+msgstr "Re-activer /Extra/ Extensions kexts sur les systèmes d’exploitation plus récents."
 
 #. type: "KernelPm_title"
 #: Resources/templates/Localizable.strings:956
 #, no-wrap
-#| msgid "Kernel Patcher"
 msgid "KernelPm"
 msgstr "KernelPm"
 
 #. type: "KernelPm_description"
 #: Resources/templates/Localizable.strings:957
 #, no-wrap
-#| msgid "Power Management"
 msgid "Kernel Power Management patch."
 msgstr "Kernel Power Management patch."
 
 #. type: "KernelLapicError_title"
 #: Resources/templates/Localizable.strings:960
 #, no-wrap
-#| msgid "Kernel Patcher"
 msgid "KernelLapicError"
 msgstr "KernelLapicError"
 
@@ -3610,7 +3568,6 @@ msgstr "Supprimer l’erreur panique Apic locale."
 #. type: "KernelLapicVersion_title"
 #: Resources/templates/Localizable.strings:964
 #, no-wrap
-#| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
 msgstr "KernelLapicVersion"
 
@@ -3623,7 +3580,6 @@ msgstr "Retirez la panique locale Apic Version."
 #. type: "KernelHaswell_title"
 #: Resources/templates/Localizable.strings:968
 #, no-wrap
-#| msgid "Kernel Flags"
 msgid "KernelHaswell"
 msgstr "KernelHaswell"
 
@@ -3631,9 +3587,7 @@ msgstr "KernelHaswell"
 #: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
-msgstr ""
-"Patch pour Haswell \\\"E\\\" et support \\\"ULT\\\" sur les systèmes d’exploitation "
-"plus anciens."
+msgstr "Patch pour Haswell \\\"E\\\" et support \\\"ULT\\\" sur les systèmes d’exploitation plus anciens."
 
 #. type: "KernelcpuFamily_title"
 #: Resources/templates/Localizable.strings:972
@@ -3645,9 +3599,7 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
-msgstr ""
-"Patch l’adresse cpuid_family pour enlever le _cpuid_set_info _panic et "
-"_tsc_init _panic. Pour les CPU non pris en charge"
+msgstr "Patch l’adresse cpuid_family pour enlever le _cpuid_set_info _panic et _tsc_init _panic. Pour les CPU non pris en charge"
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
@@ -3659,9 +3611,7 @@ msgstr "KernelSSE3"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
-msgstr ""
-"Patch pour permettre à plus d’instructions SSE3 sur les anciennes CPU pour "
-"exécuter les systèmes d’exploitation plus récents."
+msgstr "Patch pour permettre à plus d’instructions SSE3 sur les anciennes CPU pour exécuter les systèmes d’exploitation plus récents."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982

@@ -14,6 +14,11 @@ declare -r SCPT_TPL_DIR="${PKGROOT}/Scripts.templates"
 # Add by FurtiF fix patch of brew gettext
 export PATH=${PATH}:/usr/local/opt/gettext/bin
 
+# Micky1979, I build Clover too, gettex should be there
+if [[ -f "${HOME}"/src/opt/local/bin/gettext ]];then
+    export PATH=${PATH}:"${HOME}"/src/opt/local/bin
+fi
+
 if [[ $# -lt 3 ]];then
     echo "Too few arguments. Aborting..." >&2 && exit 1
 fi
@@ -96,10 +101,6 @@ declare -a chameleonOptionValues
 declare -a pkgrefs
 declare -a choice_key
 declare -a choice_options
-declare -a choice_selected
-declare -a choice_force_selected
-declare -a choice_title
-declare -a choive_description
 declare -a choice_pkgrefs
 declare -a choice_parent_group_index
 declare -a choice_group_items
@@ -108,8 +109,6 @@ declare -a choice_group_exclusive
 # Init Main Group
 choice_key[0]=""
 choice_options[0]=""
-choice_title[0]=""
-choice_description[0]=""
 choices_pkgrefs[0]=""
 choice_group_items[0]=""
 choice_group_exclusive[0]=""
@@ -270,8 +269,6 @@ getChoiceIndex () {
 # Add a new choice
 addChoice () {
     # Optional arguments:
-    #    --title=<title> : Force the title
-    #    --description=<description> : Force the description
     #    --group=<group> : Group Choice Id
     #    --start-selected=<javascript code> : Specifies whether this choice is initially selected or unselected
     #    --start-enabled=<javascript code>  : Specifies the initial enabled state of this choice
@@ -281,39 +278,27 @@ addChoice () {
     # $1 Choice Id
 
     local option
-    local title=""
-    local description=""
     local groupChoice=""
     local choiceOptions=""
-    local choiceSelected=""
-    local choiceForceSelected=""
     local pkgrefs=""
 
     # Check the arguments.
     for option in "${@}";do
         case "$option" in
-            --title=*)
-                       shift; title="${option#*=}" ;;
-            --description=*)
-                       shift; description="${option#*=}" ;;
             --group=*)
                        shift; groupChoice=${option#*=} ;;
-            --start-selected=*)
-                       shift; choiceOptions="$choiceOptions start_selected=\"${option#*=}\"" ;;
-            --start-enabled=*)
-                       shift; choiceOptions="$choiceOptions start_enabled=\"${option#*=}\"" ;;
-            --start-visible=*)
-                       shift; choiceOptions="$choiceOptions start_visible=\"${option#*=}\"" ;;
-            --enabled=*)
-                       shift; choiceOptions="$choiceOptions enabled=\"${option#*=}\"" ;;
             --selected=*)
-                       shift; choiceSelected="${option#*=}" ;;
-            --force-selected=*)
-                       shift; choiceForceSelected="${option#*=}" ;;
-            --visible=*)
-                       shift; choiceOptions="$choiceOptions visible=\"${option#*=}\"" ;;
+                         shift; choiceOptions="$choiceOptions selected=\"${option#*=}\"" ;;
+            --enabled=*)
+                         shift; choiceOptions="$choiceOptions enabled=\"${option#*=}\"" ;;
+            --start-selected=*)
+                         shift; choiceOptions="$choiceOptions start_selected=\"${option#*=}\"" ;;
+            --start-enabled=*)
+                         shift; choiceOptions="$choiceOptions start_enabled=\"${option#*=}\"" ;;
+            --start-visible=*)
+                         shift; choiceOptions="$choiceOptions start_visible=\"${option#*=}\"" ;;
             --pkg-refs=*)
-                       shift; pkgrefs=${option#*=} ;;
+                          shift; pkgrefs=${option#*=} ;;
             -*)
                 echo "Unrecognized addChoice option '$option'" >&2
                 exit 1
@@ -352,11 +337,7 @@ addChoice () {
 
     # Record new node
     choice_key[$idx]="$choiceId"
-    choice_title[$idx]="${title:-${choiceId}_title}"
-    choice_description[$idx]="${description:-${choiceId}_description}"
     choice_options[$idx]=$(trim "${choiceOptions}") # Removing leading and trailing whitespace(s)
-    choice_selected[$idx]=$(trim "${choiceSelected}") # Removing leading and trailing whitespace(s)
-    choice_force_selected[$idx]=$(trim "${choiceForceSelected}") # Removing leading and trailing whitespace(s)
     choice_parent_group_index[$idx]=$idx_group
     choice_pkgrefs[$idx]="$pkgrefs"
 
@@ -366,8 +347,6 @@ addChoice () {
 # Add a group choice
 addGroupChoices() {
     # Optional arguments:
-    #    --title=<title> : Force the title
-    #    --description=<description> : Force the description
     #    --parent=<parent> : parent group choice id
     #    --exclusive_zero_or_one_choice : only zero or one choice can be selected in the group
     #    --exclusive_one_choice : only one choice can be selected in the group
@@ -375,35 +354,18 @@ addGroupChoices() {
     # $1 Choice Id
 
     local option
-    local title=""
-    local description=""
     local groupChoice=""
     local exclusive_function=""
-    local choiceOptions=
 
     for option in "${@}";do
         case "$option" in
-            --title=*)
-                       shift; title="${option#*=}" ;;
-            --description=*)
-                       shift; description="${option#*=}" ;;
             --exclusive_zero_or_one_choice)
                        shift; exclusive_function="exclusive_zero_or_one_choice" ;;
             --exclusive_one_choice)
                        shift; exclusive_function="exclusive_one_choice" ;;
             --parent=*)
                        shift; groupChoice=${option#*=} ;;
-            --start-selected=*)
-                       shift; choiceOptions+=("--start-selected=${option#*=}") ;;
-            --start-enabled=*)
-                       shift; choiceOptions+=("--start-enabled=${option#*=}") ;;
-            --start-visible=*)
-                       shift; choiceOptions+=("--start-visible=${option#*=}") ;;
-            --enabled=*)
-                       shift; choiceOptions+=("--enabled=${option#*=}") ;;
-            --selected=*)
-                       shift; choiceOptions+=("--selected=${option#*=}") ;;
-           -*)
+            -*)
                 echo "Unrecognized addGroupChoices option '$option'" >&2
                 exit 1
                 ;;
@@ -416,7 +378,7 @@ addGroupChoices() {
         exit 1
     fi
 
-    addChoice --group="$groupChoice" --title="$title" --description="$description" ${choiceOptions[*]} "${1}"
+    addChoice --group="$groupChoice" "${1}"
     local idx=$? # index of the new created choice
 
     choice_group_exclusive[$idx]="$exclusive_function"
@@ -435,8 +397,6 @@ exclusive_one_choice () {
     done
     if [[ -n "$result" ]];then
         echo "!(${result%$separator})"
-    else
-        echo "choices['$myChoice'].selected"
     fi
 }
 
@@ -445,7 +405,6 @@ exclusive_zero_or_one_choice () {
     # $2..$n Others choice(s) (ie: "test2" "test3"). Current can or can't be in the others choices
     local myChoice="${1}"
     local result;
-    local exclusive_one_choice_code="$(exclusive_one_choice ${@})"
     echo "(my.choice.selected &amp;&amp; $(exclusive_one_choice ${@}))"
 }
 
@@ -1174,7 +1133,7 @@ echo "================ standard ================"
                        --subst="YAML_FILE=${yamlFile}" CleanOptions
     generate_options_yaml_file "${PKG_BUILD_DIR}/${choiceId}/Scripts/$yamlFile"
     cp -f ${PKGROOT}/Scripts/Main/${choiceId}postinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
-    ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
+    # ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
@@ -1193,7 +1152,7 @@ echo "================== EFI =================="
                        --subst="YAML_FILE=${yamlFile}" CleanOptions
     generate_options_yaml_file "${PKG_BUILD_DIR}/${choiceId}/Scripts/$yamlFile"
     cp -f ${PKGROOT}/Scripts/Main/ESPpostinstall ${PKG_BUILD_DIR}/${choiceId}/Scripts/postinstall
-    ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
+    #     ditto --arch i386 `which SetFile` ${PKG_BUILD_DIR}/${choiceId}/Scripts/Resources/SetFile
 
     packageRefId=$(getPackageRefId "${packagesidentity}" "${choiceId}")
     buildpackage "$packageRefId" "${choiceId}" "${PKG_BUILD_DIR}/${choiceId}" "/"
@@ -1245,7 +1204,7 @@ buildpackage ()
 
         echo -e "\t[BUILD] ${packageName}"
 
-        find "${packagePath}" \( -name '.DS_Store' -o -name '.svn' \) -print0 | xargs -0 rm -rf
+        find "${packagePath}" -name '.DS_Store' -delete
         local filecount=$( find "${packagePath}/Root" | wc -l )
         if [ "${packageSize}" ]; then
             local installedsize="${packageSize}"
@@ -1332,13 +1291,9 @@ generateChoices() {
 
     for (( idx=1; idx < ${#choice_key[*]} ; idx++)); do
         local choiceId=${choice_key[$idx]}
-        local choiceTitle=${choice_title[$idx]}
-        local choiceDescription=${choice_description[$idx]}
         local choiceOptions=${choice_options[$idx]}
         local choiceParentGroupIndex=${choice_parent_group_index[$idx]}
         set +u; local group_exclusive=${choice_group_exclusive[$choiceParentGroupIndex]}; set -u
-        local selected_option="${choice_selected[$idx]}"
-        local exclusive_option=""
 
         # Create the node and standard attributes
         local choiceNode="\t<choice\n\t\tid=\"${choiceId}\"\n\t\ttitle=\"${choiceId}_title\"\n\t\tdescription=\"${choiceId}_description\""
@@ -1400,7 +1355,6 @@ makedistribution ()
 
 #   Create the Distribution file
     ditto --noextattr --noqtn "${PKGROOT}/Distribution" "${PKG_BUILD_DIR}/${packagename}/Distribution"
-    makeSubstitutions "${PKG_BUILD_DIR}/${packagename}/Distribution"
 
     local start_indent_level=2
     echo -e "\n\t<choices-outline>" >> "${PKG_BUILD_DIR}/${packagename}/Distribution"
@@ -1428,7 +1382,7 @@ makedistribution ()
         bin/po4a/po4a                                                     \
         --package-name 'Chameleon'                                        \
         --package-version "${CHAMELEON_VERSION}-r${CHAMELEON_REVISION}"   \
-        --msgmerge-opt '--lang=$lang --previous --width=79'               \
+        --msgmerge-opt '--lang=$lang'                                     \
         --variable PODIR="po"                                             \
         --variable TEMPLATES_DIR="Resources/templates"                    \
         --variable OUTPUT_DIR="${PKG_BUILD_DIR}/${packagename}/Resources" \
@@ -1438,7 +1392,8 @@ makedistribution ()
     ditto --noextattr --noqtn "${PKGROOT}/Resources/common" "${PKG_BUILD_DIR}/${packagename}/Resources/en.lproj"
 
     # CleanUp the directory
-    find "${PKG_BUILD_DIR}/${packagename}" \( -type d -name '.svn' \) -o -name '.DS_Store' -depth -exec rm -rf {} \;
+    find "${PKG_BUILD_DIR}/${packagename}" -name .svn -print0 | xargs -0 rm -rf
+    find "${PKG_BUILD_DIR}/${packagename}" -name '*.DS_Store' -type f -delete
     find "${PKG_BUILD_DIR}/${packagename}" -type d -depth -empty -exec rmdir {} \; # Remove empty directories
 
     # Make substitutions for version, revision, stage, developers, credits, etc..

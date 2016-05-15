@@ -280,7 +280,6 @@ msgstr "이미 부트로더가 설치되있을 경우 사용자가 기타 옵션
 #. type: "Stages_title"
 #: Resources/templates/Localizable.strings:28
 #, no-wrap
-#| msgid "Chameleon Bootloader Package"
 msgid "Bootloader Stages"
 msgstr "부트로더 단계"
 
@@ -351,18 +350,14 @@ msgstr ""
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
 #, no-wrap
-#| msgid "&nbsp;has been written to the root of your chosen partition."
 msgid "Install Chameleon in the chosen partition."
 msgstr "선택된 파티션에 카멜레온을 설치합니다."
 
 #. type: "Standard_description"
 #: Resources/templates/Localizable.strings:48
 #, no-wrap
-#| msgid "Install Chameleon's files to the root of the selected partition using either boot0 or boot0md depending on your system without destroying any existing Windows installation if you have one."
 msgid "Install Chameleon's files to the root of the selected partition using either boot0, boot0md or boot0hfs depending on your system without destroying any existing Windows installation if you have one."
-msgstr ""
-"선택된 파티션의 루트 디렉토리에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0, boot0md 또는 boot0hfs 를 "
-"이용하여 설치합니다. 윈도우즈가 설치되있더라도 영향을 주지 않습니다."
+msgstr "선택된 파티션의 루트 디렉토리에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0, boot0md 또는 boot0hfs 를 이용하여 설치합니다. 윈도우즈가 설치되있더라도 영향을 주지 않습니다."
 
 #. type: "EFI_title"
 #: Resources/templates/Localizable.strings:50
@@ -373,11 +368,8 @@ msgstr "ESP에 카멜레온 설치"
 #. type: "EFI_description"
 #: Resources/templates/Localizable.strings:51
 #, no-wrap
-#| msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0 or boot0md depending on your system."
 msgid "Install Chameleon's files in the ESP (EFI System Partition) of the target volume using either boot0, boot0md or boot0hfs depending on your system."
-msgstr ""
-"평상 시 숨겨져있는 EFI (EFI System Partition) 시스템 파티션에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 "
-"boot0, boot0md 또는 boot0hfs 를 이용하여 설치합니다."
+msgstr "평상 시 숨겨져있는 EFI (EFI System Partition) 시스템 파티션에 카멜레온에 필요한 파일들을 사용자의 시스템에 따라 boot0, boot0md 또는 boot0hfs 를 이용하여 설치합니다."
 
 #. type: "Module_title"
 #: Resources/templates/Localizable.strings:56
@@ -678,7 +670,6 @@ msgstr "(커널) 패닉 시 재시동"
 #. type: "EnableHiDPI_title"
 #: Resources/templates/Localizable.strings:140
 #, no-wrap
-#| msgid "EnableHDMIAudio=Yes"
 msgid "EnableHiDPI=Yes"
 msgstr "EnableHiDPI=Yes"
 
