@@ -189,7 +189,7 @@ static int ExecKernel(void *binary)
 	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
 	{
 		// ErmaC
-		int	crsValue;
+		int	csrValue;
 
 #if 0
 		/*
@@ -208,15 +208,16 @@ static int ExecKernel(void *binary)
 		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
 
 		// Set limit to 7bit
-		if ( getIntForKey(KCsrActiveConfig, &crsValue, &bootInfo->chameleonConfig) && (crsValue >= 0 && crsValue <= 127) )
+		if ( getIntForKey(KCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
 		{
-			bootArgs->csrActiveConfig	= crsValue;
+			bootArgs->csrActiveConfig	= csrValue;
 		}
 		else
 		{
 			// zenith432
 			bootArgs->csrActiveConfig	= 0x67;
 		}
+		verbose("CsrActiveConfig set to 0x%x\n", bootArgs->csrActiveConfig);
 		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
 		bootArgs->boot_SMC_plimit	= 0;
     }
@@ -498,8 +499,9 @@ void boot(int biosdev)
 	// Enable A20 gate before accessing memory above 1Mb.
 	// Note: malloc_init(), called via initialize_runtime() writes
 	//   memory >= 1Mb, so A20 must be enabled before calling it. - zenith432
+	zeroBSS();
 	enableA20();
-	initialize_runtime();
+	malloc_init(0, 0, 0, malloc_error);
 	common_boot(biosdev);
 }
 
@@ -861,7 +863,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE || !ELCAPITAN ) //Is not Yosemite 10.10 or El Capitan 10.11
+				if ( !YOSEMITE && !ELCAPITAN ) //Is not Yosemite 10.10 or El Capitan 10.11
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
