@@ -863,7 +863,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE && !ELCAPITAN ) //Is not Yosemite 10.10 or El Capitan 10.11
+				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Micky1979 - Is prior to Yosemite 10.10
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
