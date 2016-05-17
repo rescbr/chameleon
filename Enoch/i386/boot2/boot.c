@@ -140,6 +140,10 @@ void initialize_runtime(void)
 	malloc_init(0, 0, 0, malloc_error);
 }
 
+// =========================================================================
+
+
+
 //==========================================================================
 // ExecKernel - Load the kernel image (mach-o) and jump to its entry point.
 
@@ -189,7 +193,7 @@ static int ExecKernel(void *binary)
 	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
 	{
 		// ErmaC
-		int	crsValue;
+		int	csrValue;
 
 #if 0
 		/*
@@ -208,15 +212,16 @@ static int ExecKernel(void *binary)
 		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
 
 		// Set limit to 7bit
-		if ( getIntForKey(kCsrActiveConfig, &crsValue, &bootInfo->chameleonConfig) && (crsValue >= 0 && crsValue <= 127) )
+		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
 		{
-			bootArgs->csrActiveConfig	= crsValue;
+			bootArgs->csrActiveConfig	= csrValue;
 		}
 		else
 		{
 			// zenith432
 			bootArgs->csrActiveConfig	= 0x67;
 		}
+		verbose("CsrActiveConfig set to 0x%x\n", bootArgs->csrActiveConfig);
 		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
 		bootArgs->boot_SMC_plimit	= 0;
     }
@@ -858,7 +863,7 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( !YOSEMITE || !ELCAPITAN ) //Is not Yosemite 10.10 or El Capitan 10.11
+				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Micky1979 - Is prior to Yosemite 10.10
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
