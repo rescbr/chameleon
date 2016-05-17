@@ -17,6 +17,7 @@
 #include "convert.h"
 #include "pci.h"
 #include "sl.h"
+#include "vers.h"
 
 #ifndef DEBUG_EFI
 	#define DEBUG_EFI 0
@@ -778,12 +779,14 @@ void setupChosenNode()
 					 */
 					if (PMRepeatCount)
 					{
-					--PMRepeatCount;
-					continue;						// jb		0x17e55		(retry)
+						--PMRepeatCount;
+						continue;						// jb		0x17e55		(retry)
 					}
 				}
 				else
+				{
 					PMRepeatCount = 0xffff;
+				}
 
 				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 //				printf("value: 0x%x\n", getCPUTick());
@@ -830,6 +833,19 @@ void setupChosenNode()
 		}
 	}
 
+	// Micky1979 : MIMIC booter entry for El Capitan
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan
+	{
+		verbose("Adding booter spec to the Platform Expert \n");
+		// booter-build-time (Fri May 22 19:06:42 PDT 2015) DP1
+		// booter-build-time (Fri Jul 24 17:39:22 PDT 2015) DP7
+		DT__AddProperty(chosenNode, "booter-build-time", sizeof(I386BOOT_BUILDDATE), I386BOOT_BUILDDATE);
+		// booter-name (boot.efi)
+		DT__AddProperty(chosenNode, "booter-name", sizeof("Enoch"), "Enoch");
+		// booter-version (version:295.0.0.1.1) DP1
+		// booter-version (version:304) DP7
+		DT__AddProperty(chosenNode, "booter-version", sizeof(I386BOOT_CHAMELEONREVISION), I386BOOT_CHAMELEONREVISION);
+	}
 }
 
 /*
