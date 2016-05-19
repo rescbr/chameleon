@@ -64,7 +64,7 @@ static int printn(
 	int minwidth,
 	int (*putfn_p)(),
 	void* putfn_arg
-)
+	)
 {
 	char prbuf[22];
 	register char *cp;
@@ -81,7 +81,8 @@ static int printn(
 		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + (int) (n%b)];
 		n /= b;
 		width++;
-	} while (n);
+	}
+	while (n);
 
 	if (neg)
 	{
@@ -104,12 +105,37 @@ static int printn(
 	return width;
 }
 
+/*
+ * Printp prints a pointer.
+ */
+static int printp(
+	const void* p,
+	int minwidth,
+	int (*putfn_p)(),
+	void* putfn_arg
+	)
+{
+	int width = 0;
+
+	if (p)
+	{
+		if (putfn_p)
+		{
+			(void)(*putfn_p)('0', putfn_arg);
+			(void)(*putfn_p)('x', putfn_arg);
+		}
+		width = 2;
+		minwidth = (minwidth >= 2) ? (minwidth - 2) : 0;
+	}
+	return width + printn((unsigned long long) p, 16, ZERO, minwidth, putfn_p, putfn_arg);
+}
+
 int prf(
 	const char *fmt,
 	va_list ap,
 	int (*putfn_p)(),
 	void *putfn_arg
-)
+	)
 {
 	int b, c, len = 0;
 	const char *s;
@@ -172,6 +198,7 @@ again:
 			b = 16;
 			goto number;
 		case 'd':
+		case 'i':
 			flag |= SIGNED;
 			/* fall through */
 		case 'u':
@@ -220,6 +247,23 @@ again:
 				(void)(*putfn_p)((char) va_arg(ap, int), putfn_arg);
 			}
 			len++;
+			break;
+		case '%':
+			if (putfn_p)
+			{
+				(void)(*putfn_p)('%', putfn_arg);
+			}
+			len++;
+			break;
+		case 'p':
+			len += printp(va_arg(ap, const void*), minwidth, putfn_p, putfn_arg);
+			break;
+		case 'n':
+			s = va_arg(ap, const char*);
+			if (s)
+			{
+				*(int*) s = len;
+			}
 			break;
 		default:
 			break;
