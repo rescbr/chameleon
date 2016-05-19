@@ -38,11 +38,12 @@
  *	@(#)prf.c	7.1 (Berkeley) 6/5/86
  */
 
-#include <sys/param.h>
+#include <stdarg.h>
 
 #define SPACE	1
 #define ZERO	2
-#define UCASE   16
+#define UCASE	16
+#define SIGNED	32
 
 /*
  * Scaled down version of C Library printf.
@@ -56,53 +57,68 @@
  * Printn prints a number n in base b.
  * We don't use recursion to avoid deep kernel stacks.
  */
-static void printn(n, b, flag, minwidth, putfn_p, putfn_arg)
-	u_long n;
-	int b, flag, minwidth;
-	void (*putfn_p)();
-	void *putfn_arg;
+static int printn(
+	unsigned long long n,
+	int b,
+	int flag,
+	int minwidth,
+	int (*putfn_p)(),
+	void* putfn_arg
+)
 {
-	char prbuf[11];
+	char prbuf[22];
 	register char *cp;
 	int width = 0, neg = 0;
 
-	if (b == 10 && (int)n < 0) {
+	if ((flag & SIGNED) && (long long)n < 0)
+	{
 		neg = 1;
-		n = (unsigned)(-(int)n);
+		n = (unsigned long long)(-(long long)n);
 	}
 	cp = prbuf;
-	do {
-		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + n%b];
+	do
+	{
+		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + (int) (n%b)];
 		n /= b;
 		width++;
 	} while (n);
-	
-	if (neg) {
-		(*putfn_p)('-', putfn_arg);
+
+	if (neg)
+	{
+		if (putfn_p)
+		{
+			(void)(*putfn_p)('-', putfn_arg);
+		}
 		width++;
 	}
-	while (width++ < minwidth)
-		(*putfn_p)( (flag & ZERO) ? '0' : ' ', putfn_arg);
-	
+	if (!putfn_p)
+	{
+		return (width < minwidth) ? minwidth : width;
+	}
+	for (;width < minwidth; width++)
+		(void)(*putfn_p)( (flag & ZERO) ? '0' : ' ', putfn_arg);
+
 	do
-		(*putfn_p)(*--cp, putfn_arg);
+		(void)(*putfn_p)(*--cp, putfn_arg);
 	while (cp > prbuf);
+	return width;
 }
 
 int prf(
-	char *fmt,
-	unsigned int *adx,
-	void (*putfn_p)(),
+	const char *fmt,
+	va_list ap,
+	int (*putfn_p)(),
 	void *putfn_arg
 )
 {
-	int b, c, len =0;
-	char *s;
-	int flag = 0, width = 0;
+	int b, c, len = 0;
+	const char *s;
+	int flag, width, ells;
 	int minwidth;
 
 loop:
-	while ((c = *fmt++) != '%') {
+	while ((c = *fmt++) != '%')
+	{
 		if(c == '\0')
 		{
 			return len;
@@ -110,15 +126,22 @@ loop:
 
 		if (putfn_p)
 		{
-			(*putfn_p)(c, putfn_arg);
+			(void)(*putfn_p)(c, putfn_arg);
 		}
 		len++;
 	}
 	minwidth = 0;
+	flag = 0;
+	ells = 0;
 again:
 	c = *fmt++;
-	switch (c) {
+	switch (c)
+	{
 		case 'l':
+			if (ells < 2)
+			{
+				++ells;
+			}
 			goto again;
 		case ' ':
 			flag |= SPACE;
@@ -149,23 +172,35 @@ again:
 			b = 16;
 			goto number;
 		case 'd':
+			flag |= SIGNED;
+			/* fall through */
+		case 'u':
 			b = 10;
 			goto number;
 		case 'o': case 'O':
 			b = 8;
 		number:
-			if (putfn_p)
+			switch (ells)
 			{
-				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
+			case 2:
+				len += printn(va_arg(ap, unsigned long long), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
+			case 1:
+				len += printn(va_arg(ap, unsigned long), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
+			default:
+				len += printn(va_arg(ap, unsigned int), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
 			}
-			len++;
 			break;
 		case 's':
-			s = (char *)*adx;
-			while ((c = *s++)) {
+			s = va_arg(ap, const char*);
+			width = 0;
+			while (s && (c = *s++))
+			{
 				if (putfn_p)
 				{
-					(*putfn_p)(c, putfn_arg);
+					(void)(*putfn_p)(c, putfn_arg);
 				}
 				len++;
 				width++;
@@ -174,7 +209,7 @@ again:
 			{
 				if (putfn_p)
 				{
-					(*putfn_p)(' ', putfn_arg);
+					(void)(*putfn_p)(' ', putfn_arg);
 				}
 				len++;
 			}
@@ -182,13 +217,12 @@ again:
 		case 'c':
 			if (putfn_p)
 			{
-				(*putfn_p)((char)*adx, putfn_arg);
+				(void)(*putfn_p)((char) va_arg(ap, int), putfn_arg);
 			}
 			len++;
 			break;
 		default:
 			break;
 	}
-	adx++;
 	goto loop;
 }
