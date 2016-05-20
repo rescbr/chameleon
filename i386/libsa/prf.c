@@ -53,6 +53,37 @@
  *
  */
 
+#define DIVIDEND_LOW  *(unsigned int*) dividend
+#define DIVIDEND_HIGH ((unsigned int*) dividend)[1]
+
+/*
+ * Divides 64-bit dividend by 32-bit divisor.
+ *   Quotient stored in dividend, remainder returned.
+ * Assumes little-endian byte order.
+ * Assumes divisor is non-zero.
+ */
+unsigned int i386_unsigned_div(
+	unsigned long long* dividend,
+	unsigned int divisor
+	)
+{
+	unsigned int high = DIVIDEND_HIGH;
+
+	if (high >= divisor)
+	{
+		__asm__ volatile ("xorl %%edx, %%edx; divl %2" : "=a"(DIVIDEND_HIGH), "=d"(high) : "r"(divisor), "a"(high));
+	}
+	else
+	{
+		DIVIDEND_HIGH = 0;
+	}
+	__asm__ volatile("divl %2" : "+a"(DIVIDEND_LOW), "+d"(high) : "r"(divisor));
+	return high;
+}
+
+#undef DIVIDEND_HIGH
+#undef DIVIDEND_LOW
+
 /*
  * Printn prints a number n in base b.
  * We don't use recursion to avoid deep kernel stacks.
@@ -69,6 +100,7 @@ static int printn(
 	char prbuf[22];
 	register char *cp;
 	int width = 0, neg = 0;
+	static const char hexdig[] = "0123456789abcdef0123456789ABCDEF";
 
 	if ((flag & SIGNED) && (long long)n < 0)
 	{
@@ -76,13 +108,27 @@ static int printn(
 		n = (unsigned long long)(-(long long)n);
 	}
 	cp = prbuf;
-	do
+	if ((b & -b) == b)	// b is a power of 2
 	{
-		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + (int) (n%b)];
-		n /= b;
-		width++;
+		unsigned int log2b = (unsigned int) (__builtin_ctz((unsigned int) b) & 31);
+		unsigned int mask  = (unsigned int) (b - 1);
+		do
+		{
+			*cp++ = hexdig[(flag & UCASE) + (int) (n & mask)];
+			n >>= log2b;
+			width++;
+		}
+		while (n);
 	}
-	while (n);
+	else	// b is not a power of 2
+	{
+		do
+		{
+			*cp++ = hexdig[(flag & UCASE) + (int) i386_unsigned_div(&n, (unsigned int) b)];
+			width++;
+		}
+		while (n);
+	}
 
 	if (neg)
 	{
@@ -223,21 +269,24 @@ again:
 		case 's':
 			s = va_arg(ap, const char*);
 			width = 0;
+			if (!putfn_p)
+			{
+				while (s && (c = *s++))
+				{
+					width++;
+				}
+				len += ((width < minwidth) ? minwidth : width);
+				break;
+			}
 			while (s && (c = *s++))
 			{
-				if (putfn_p)
-				{
-					(void)(*putfn_p)(c, putfn_arg);
-				}
+				(void)(*putfn_p)(c, putfn_arg);
 				len++;
 				width++;
 			}
 			while (width++ < minwidth)
 			{
-				if (putfn_p)
-				{
-					(void)(*putfn_p)(' ', putfn_arg);
-				}
+				(void)(*putfn_p)(' ', putfn_arg);
 				len++;
 			}
 			break;
