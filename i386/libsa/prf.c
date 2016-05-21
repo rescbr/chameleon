@@ -171,7 +171,7 @@ static int printp(
 			(void)(*putfn_p)('x', putfn_arg);
 		}
 		width = 2;
-		minwidth = (minwidth >= 2) ? (minwidth - 2) : 0;
+		minwidth = ((minwidth >= 2) ? (minwidth - 2) : 0);
 	}
 	return width + printn((unsigned long long) p, 16, ZERO, minwidth, putfn_p, putfn_arg);
 }
@@ -268,17 +268,21 @@ again:
 			break;
 		case 's':
 			s = va_arg(ap, const char*);
+			if (!s)
+			{
+				s = "(null)";
+			}
 			width = 0;
 			if (!putfn_p)
 			{
-				while (s && (c = *s++))
+				while ((c = *s++))
 				{
 					width++;
 				}
 				len += ((width < minwidth) ? minwidth : width);
 				break;
 			}
-			while (s && (c = *s++))
+			while ((c = *s++))
 			{
 				(void)(*putfn_p)(c, putfn_arg);
 				len++;
