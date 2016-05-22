@@ -1308,9 +1308,10 @@ void updateGraphicBootPrompt()
 
 static inline void vramwrite (void *data, int width, int height)
 {
+	extern void* memcpy_interruptible(void*, const void*, size_t);
 	if (VIDEO (depth) == 32 && VIDEO (rowBytes) == gui.backbuffer->width * 4)
 	{
-		memcpy((uint8_t *)vram, gui.backbuffer->pixels, VIDEO (rowBytes)*VIDEO (height));
+		memcpy_interruptible((uint8_t *)vram, gui.backbuffer->pixels, VIDEO (rowBytes)*VIDEO (height));
 	}
 	else
 	{

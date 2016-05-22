@@ -1078,5 +1078,6 @@ void enableA20(void)
     bb.intno = 0x15;
     bb.eax.rr = 0x2401;
     bios(&bb);
+//  return !bb.flags.cf;
 }
 */
