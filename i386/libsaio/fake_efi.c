@@ -759,12 +759,14 @@ void setupChosenNode()
 					 */
 					if (PMRepeatCount)
 					{
-					--PMRepeatCount;
-					continue;						// jb		0x17e55		(retry)
+						--PMRepeatCount;
+						continue;						// jb		0x17e55		(retry)
 					}
 				}
 				else
+				{
 					PMRepeatCount = 0xffff;
+				}
 
 				cpuTick = (EFI_UINT32) getCPUTick();				// callq	0x121a7
 //				printf("value: 0x%x\n", getCPUTick());
