@@ -251,7 +251,7 @@ static uint64_t rtc_set_cyc_per_sec(uint64_t cycles)
 }
 
 // Bronya C1E fix
-void post_startup_cpu_fixups(void)
+static void post_startup_cpu_fixups(void)
 {
 	/*
 	 * Some AMD processors support C1E state. Entering this state will
@@ -269,6 +269,90 @@ void post_startup_cpu_fixups(void)
 		wrmsr64(MSR_AMD_INT_PENDING_CMP_HALT, reg);
 		verbose("\tC1E disabled!\n");
 	}
+}
+
+/*
+ * Large memcpy() into MMIO space can take longer than 1 clock tick (55ms).
+ *   The timer interrupt must remain responsive when updating VRAM so
+ *   as not to miss timer interrupts during countdown().
+ *
+ * If interrupts are enabled, use normal memcpy.
+ *
+ * If interrupts are disabled, breaks memcpy down
+ *   into 128K chunks, times itself and makes a bios
+ *   real-mode call every 25 msec in order to service
+ *   pending interrupts.
+ *
+ * -- zenith432, May 22nd, 2016
+ */
+void* memcpy_interruptible(void* dst, const void* src, size_t len)
+{
+	uint64_t tscFreq, lastTsc;
+	uint32_t eflags, threshold;
+	ptrdiff_t offset;
+	const size_t chunk = 131072U;	// 128K
+
+	if (len <= chunk)
+	{
+		/*
+		 * Short memcpy - use normal.
+		 */
+		return memcpy(dst, src, len);
+	}
+
+	__asm__ volatile("pushfl; popl %0" : "=r"(eflags));
+	if (eflags & 0x200U)
+	{
+		/*
+		 * Interrupts are enabled - use normal memcpy.
+		 */
+		return memcpy(dst, src, len);
+	}
+
+	tscFreq = Platform.CPU.TSCFrequency;
+	if ((uint32_t) (tscFreq >> 32))
+	{
+		/*
+		 * If TSC Frequency >= 2 ** 32, use a default time threshold.
+		 */
+		threshold = (~0U) / 40U;
+	}
+	else if (!(uint32_t) tscFreq)
+	{
+		/*
+		 * If early on and TSC Frequency hasn't been estimated yet,
+		 *   use normal memcpy.
+		 */
+		return memcpy(dst, src, len);
+	}
+	else
+	{
+		threshold = ((uint32_t) tscFreq) / 40U;
+	}
+
+	/*
+	 * Do the work
+	 */
+	offset = 0;
+	lastTsc = rdtsc64();
+	do
+	{
+		(void) memcpy((char*) dst + offset, (const char*) src + offset, chunk);
+		offset += (ptrdiff_t) chunk;
+		len -= chunk;
+		if ((rdtsc64() - lastTsc) < threshold)
+		{
+			continue;
+		}
+		(void) readKeyboardStatus();	// visit real-mode
+		lastTsc = rdtsc64();
+	}
+	while (len > chunk);
+	if (len)
+	{
+		(void) memcpy((char*) dst + offset, (const char*) src + offset, len);
+	}
+	return dst;
 }
 
 /*
@@ -529,6 +613,9 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 					break;
 				case CPUID_MODEL_ATOM_3700:
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
+					break;
 				case CPUID_MODEL_ATOM:
 					p->CPU.NoCores		= 2;
 					p->CPU.NoThreads	= 2;

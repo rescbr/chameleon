@@ -38,11 +38,12 @@
  *	@(#)prf.c	7.1 (Berkeley) 6/5/86
  */
 
-#include <sys/param.h>
+#include <stdarg.h>
 
 #define SPACE	1
 #define ZERO	2
-#define UCASE   16
+#define UCASE	16
+#define SIGNED	32
 
 /*
  * Scaled down version of C Library printf.
@@ -52,57 +53,144 @@
  *
  */
 
+#define DIVIDEND_LOW  *(unsigned int*) dividend
+#define DIVIDEND_HIGH ((unsigned int*) dividend)[1]
+
+/*
+ * Divides 64-bit dividend by 32-bit divisor.
+ *   Quotient stored in dividend, remainder returned.
+ * Assumes little-endian byte order.
+ * Assumes divisor is non-zero.
+ */
+unsigned int i386_unsigned_div(
+	unsigned long long* dividend,
+	unsigned int divisor
+	)
+{
+	unsigned int high = DIVIDEND_HIGH;
+
+	if (high >= divisor)
+	{
+		__asm__ volatile ("xorl %%edx, %%edx; divl %2" : "=a"(DIVIDEND_HIGH), "=d"(high) : "r"(divisor), "a"(high));
+	}
+	else
+	{
+		DIVIDEND_HIGH = 0;
+	}
+	__asm__ volatile("divl %2" : "+a"(DIVIDEND_LOW), "+d"(high) : "r"(divisor));
+	return high;
+}
+
+#undef DIVIDEND_HIGH
+#undef DIVIDEND_LOW
+
 /*
  * Printn prints a number n in base b.
  * We don't use recursion to avoid deep kernel stacks.
  */
-static void printn(n, b, flag, minwidth, putfn_p, putfn_arg)
-	u_long n;
-	int b, flag, minwidth;
-	void (*putfn_p)();
-	void *putfn_arg;
+static int printn(
+	unsigned long long n,
+	int b,
+	int flag,
+	int minwidth,
+	int (*putfn_p)(),
+	void* putfn_arg
+	)
 {
-	char prbuf[11];
+	char prbuf[22];
 	register char *cp;
 	int width = 0, neg = 0;
+	static const char hexdig[] = "0123456789abcdef0123456789ABCDEF";
 
-	if (b == 10 && (int)n < 0) {
+	if ((flag & SIGNED) && (long long)n < 0)
+	{
 		neg = 1;
-		n = (unsigned)(-(int)n);
+		n = (unsigned long long)(-(long long)n);
 	}
 	cp = prbuf;
-	do {
-		*cp++ = "0123456789abcdef0123456789ABCDEF"[(flag & UCASE) + n%b];
-		n /= b;
-		width++;
-	} while (n);
-	
-	if (neg) {
-		(*putfn_p)('-', putfn_arg);
+	if ((b & -b) == b)	// b is a power of 2
+	{
+		unsigned int log2b = (unsigned int) (__builtin_ctz((unsigned int) b) & 31);
+		unsigned int mask  = (unsigned int) (b - 1);
+		do
+		{
+			*cp++ = hexdig[(flag & UCASE) + (int) (n & mask)];
+			n >>= log2b;
+			width++;
+		}
+		while (n);
+	}
+	else	// b is not a power of 2
+	{
+		do
+		{
+			*cp++ = hexdig[(flag & UCASE) + (int) i386_unsigned_div(&n, (unsigned int) b)];
+			width++;
+		}
+		while (n);
+	}
+
+	if (neg)
+	{
+		if (putfn_p)
+		{
+			(void)(*putfn_p)('-', putfn_arg);
+		}
 		width++;
 	}
-	while (width++ < minwidth)
-		(*putfn_p)( (flag & ZERO) ? '0' : ' ', putfn_arg);
-	
+	if (!putfn_p)
+	{
+		return (width < minwidth) ? minwidth : width;
+	}
+	for (;width < minwidth; width++)
+		(void)(*putfn_p)( (flag & ZERO) ? '0' : ' ', putfn_arg);
+
 	do
-		(*putfn_p)(*--cp, putfn_arg);
+		(void)(*putfn_p)(*--cp, putfn_arg);
 	while (cp > prbuf);
+	return width;
+}
+
+/*
+ * Printp prints a pointer.
+ */
+static int printp(
+	const void* p,
+	int minwidth,
+	int (*putfn_p)(),
+	void* putfn_arg
+	)
+{
+	int width = 0;
+
+	if (p)
+	{
+		if (putfn_p)
+		{
+			(void)(*putfn_p)('0', putfn_arg);
+			(void)(*putfn_p)('x', putfn_arg);
+		}
+		width = 2;
+		minwidth = ((minwidth >= 2) ? (minwidth - 2) : 0);
+	}
+	return width + printn((unsigned long long) p, 16, ZERO, minwidth, putfn_p, putfn_arg);
 }
 
 int prf(
-	char *fmt,
-	unsigned int *adx,
-	void (*putfn_p)(),
+	const char *fmt,
+	va_list ap,
+	int (*putfn_p)(),
 	void *putfn_arg
-)
+	)
 {
-	int b, c, len =0;
-	char *s;
-	int flag = 0, width = 0;
+	int b, c, len = 0;
+	const char *s;
+	int flag, width, ells;
 	int minwidth;
 
 loop:
-	while ((c = *fmt++) != '%') {
+	while ((c = *fmt++) != '%')
+	{
 		if(c == '\0')
 		{
 			return len;
@@ -110,15 +198,22 @@ loop:
 
 		if (putfn_p)
 		{
-			(*putfn_p)(c, putfn_arg);
+			(void)(*putfn_p)(c, putfn_arg);
 		}
 		len++;
 	}
 	minwidth = 0;
+	flag = 0;
+	ells = 0;
 again:
 	c = *fmt++;
-	switch (c) {
+	switch (c)
+	{
 		case 'l':
+			if (ells < 2)
+			{
+				++ells;
+			}
 			goto again;
 		case ' ':
 			flag |= SPACE;
@@ -149,46 +244,82 @@ again:
 			b = 16;
 			goto number;
 		case 'd':
+		case 'i':
+			flag |= SIGNED;
+			/* fall through */
+		case 'u':
 			b = 10;
 			goto number;
 		case 'o': case 'O':
 			b = 8;
 		number:
-			if (putfn_p)
+			switch (ells)
 			{
-				printn((u_long)*adx, b, flag, minwidth, putfn_p, putfn_arg);
+			case 2:
+				len += printn(va_arg(ap, unsigned long long), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
+			case 1:
+				len += printn(va_arg(ap, unsigned long), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
+			default:
+				len += printn(va_arg(ap, unsigned int), b, flag, minwidth, putfn_p, putfn_arg);
+				break;
 			}
-			len++;
 			break;
 		case 's':
-			s = (char *)*adx;
-			while ((c = *s++)) {
-				if (putfn_p)
+			s = va_arg(ap, const char*);
+			if (!s)
+			{
+				s = "(null)";
+			}
+			width = 0;
+			if (!putfn_p)
+			{
+				while ((c = *s++))
 				{
-					(*putfn_p)(c, putfn_arg);
+					width++;
 				}
+				len += ((width < minwidth) ? minwidth : width);
+				break;
+			}
+			while ((c = *s++))
+			{
+				(void)(*putfn_p)(c, putfn_arg);
 				len++;
 				width++;
 			}
 			while (width++ < minwidth)
 			{
-				if (putfn_p)
-				{
-					(*putfn_p)(' ', putfn_arg);
-				}
+				(void)(*putfn_p)(' ', putfn_arg);
 				len++;
 			}
 			break;
 		case 'c':
 			if (putfn_p)
 			{
-				(*putfn_p)((char)*adx, putfn_arg);
+				(void)(*putfn_p)((char) va_arg(ap, int), putfn_arg);
 			}
 			len++;
+			break;
+		case '%':
+			if (putfn_p)
+			{
+				(void)(*putfn_p)('%', putfn_arg);
+			}
+			len++;
+			break;
+		case 'p':
+			len += printp(va_arg(ap, const void*), minwidth, putfn_p, putfn_arg);
+			break;
+		case 'n':
+			s = va_arg(ap, const char*);
+			if (s)
+			{
+				*(int*) s = len;
+			}
 			break;
 		default:
 			break;
 	}
-	adx++;
 	goto loop;
 }

@@ -324,8 +324,9 @@ strtouq(nptr, endptr, base)
 	register const char *s = nptr;
 	register unsigned long long acc;
 	register int c;
-	register unsigned long long qbase, cutoff;
+	/* register */ unsigned long long qbase, cutoff;
 	register int neg, any, cutlim;
+	extern unsigned int i386_unsigned_div(unsigned long long*, unsigned int);
 
 	/*
 	 * See strtoq for comments as to the logic used.
@@ -365,8 +366,8 @@ strtouq(nptr, endptr, base)
 	}
 
 	qbase = (unsigned)base;
-	cutoff = (unsigned long long)UQUAD_MAX / qbase;
-	cutlim = (unsigned long long)UQUAD_MAX % qbase;
+	cutoff = (unsigned long long)UQUAD_MAX;
+	cutlim = (int) i386_unsigned_div(&cutoff, (unsigned int) base);
 
 	for (acc = 0, any = 0;; c = *s++)
 	{

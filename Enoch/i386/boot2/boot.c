@@ -863,12 +863,13 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Micky1979 - Is prior to Yosemite 10.10
+				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Mavericks and older
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
 				else
 				{
+					// Yosemite and newer
 					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite or El Capitan
 				}
 			}
