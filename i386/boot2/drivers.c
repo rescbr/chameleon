@@ -176,6 +176,8 @@ long LoadDrivers( char *dirSpec )
 		return 0;
 	}
 
+	// ========================================
+
 	// Load extra drivers if a hook has been installed.
 	if (LoadExtraDrivers_p != NULL)
 	{
@@ -254,7 +256,7 @@ long LoadDrivers( char *dirSpec )
 			{
 				verbose("Attempting to loading drivers from standard repositories:\n");
 
-				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || gMacOSVersion[4] == '1' ) )) // issue 352
+				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || (gMacOSVersion[4] == '1') || (gMacOSVersion[4] == '2') ) )) // issue 352
 				{
 					verbose("\t- Third party extensions search path: /Library/Extensions\n");
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */

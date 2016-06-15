@@ -208,7 +208,7 @@ static int ExecKernel(void *binary)
 		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
 
 		// Set limit to 7bit
-		if ( getIntForKey(KCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
+		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
 		{
 			bootArgs->csrActiveConfig	= csrValue;
 		}
@@ -408,7 +408,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// Yosemite and El Capitan prelink kernel cache file
 			// for 10.10 10.11
 			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCachePathYosemite);
-			verbose("Kernel Cache file path (Mac OS X 10.10 and newer): %s\n", kernelCacheFile);
+			verbose("Kernel Cache file path (OS X 10.10 and newer): %s\n", kernelCacheFile);
 		}
 	}
 
@@ -863,12 +863,13 @@ void common_boot(int biosdev)
 			// bootFile must start with a / if it not start with a device name
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
-				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Micky1979 - Is prior to Yosemite 10.10
+				if ( MacOSVerCurrent < MacOSVer2Int("10.10") ) // Mavericks and older
 				{
 					snprintf(bootFile, sizeof(bootFile), "/%s", bootInfo->bootFile); // append a leading /
 				}
 				else
 				{
+					// Yosemite and newer
 					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos"%s", bootInfo->bootFile); // Yosemite or El Capitan
 				}
 			}

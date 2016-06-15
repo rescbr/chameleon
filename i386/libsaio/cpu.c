@@ -613,6 +613,9 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 					break;
 				case CPUID_MODEL_ATOM_3700:
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
+					break;
 				case CPUID_MODEL_ATOM:
 					p->CPU.NoCores		= 2;
 					p->CPU.NoThreads	= 2;

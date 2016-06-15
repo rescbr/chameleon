@@ -188,7 +188,7 @@
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
 #define kHDAULayoutID			"HDAULayoutID"			/* hda.c */
-#define KCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
+#define kCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
 
 /* Pike R. Alpha: added this key */
 #define kBlackMode			"BlackMode"
