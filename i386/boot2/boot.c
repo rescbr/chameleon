@@ -81,6 +81,12 @@ bool		gEnableCDROMRescan;
 bool		gScanSingleDrive;
 bool		useGUI;
 
+/* recovery or installer ? */
+bool isInstaller;
+bool isRecoveryHD;
+bool isMacOSXUpgrade;
+bool isOSXUpgrade;
+
 #if DEBUG_INTERRUPTS
 	static int	interruptsAvailable = 0;
 #endif
@@ -335,20 +341,107 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			}
 			closedir(cacheDir);
 		}
-		else if ( MacOSVerCurrent >= MacOSVer2Int("10.7") && MacOSVerCurrent < MacOSVer2Int("10.10") )
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.7") && MacOSVerCurrent < MacOSVer2Int("10.9") )
 		{
-			// Lion, Mountain Lion and Mavericks prelink kernel cache file
-			// for 10.7 10.8 10.9
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+			// Lion, Mountain Lion
+			// for 10.7 10.8
+			if (isMacOSXUpgrade)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", "/Mac OS X Install Data/");
+			}
+			else if (isInstaller)
+			{
+				if (MacOSVerCurrent >= MacOSVer2Int("10.7") && MacOSVerCurrent < MacOSVer2Int("10.8") )
+				{
+					snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kLionInstallerDataFolder);
+				}
+				else if ( MacOSVerCurrent >= MacOSVer2Int("10.8") && MacOSVerCurrent < MacOSVer2Int("10.9") )
+				{
+					snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kMLionInstallerDataFolder);
+				}
+
+			}
+			else  if (isRecoveryHD)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheRecoveryHD);
+			}
+			else
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+			}
+
 			verbose("Kernel Cache file path (Mac OS X 10.7 and newer): %s\n", kernelCacheFile);
 
 		}
-		else
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.9") && MacOSVerCurrent < MacOSVer2Int("10.10") )
 		{
-			// Yosemite and El Capitan prelink kernel cache file
-			// for 10.10 10.11
-			snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCachePathYosemite);
-			verbose("Kernel Cache file path (OS X 10.10 and newer): %s\n", kernelCacheFile);
+			// Mavericks prelinked cache file
+			// for 10.9
+			if (isOSXUpgrade)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", "/OS X Install Data/");
+			}
+			else if (isInstaller)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheInstallerNew);
+			}
+			else if (isRecoveryHD)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheRecoveryHD);
+			}
+			else
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCachePathSnow);
+			}
+
+			verbose("Kernel Cache file path (OS X 10.9): %s\n", kernelCacheFile);
+
+		}
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.10") && MacOSVerCurrent < MacOSVer2Int("10.11") )
+		{
+			// Yosemite prelink kernel cache file
+			// for 10.10 and 10.11
+			if (isOSXUpgrade)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", "/OS X Install Data/");
+			}
+			else if (isInstaller)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheInstallerNew);
+			}
+			else if (isRecoveryHD)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheRecoveryHD);
+			}
+			else
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCachePathYosemite);
+			}
+
+			verbose("Kernel Cache file path (OS X 10.10): %s\n", kernelCacheFile);
+		}
+		else if ( MacOSVerCurrent >= MacOSVer2Int("10.11") )
+		{
+			// El Capitan on prelinked kernel cache file
+			// for 10.10 and 10.11
+			if (isOSXUpgrade)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", "/OS X Install Data/");
+			}
+			else if (isInstaller)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCacheInstallerNew);
+			}
+			else if (isRecoveryHD)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCacheRecoveryHD);
+			}
+			else
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", kDefaultCachePathYosemite);
+			}
+
+			verbose("Kernel Cache file path (OS X 10.11 and newer): %s\n", kernelCacheFile);
 		}
 	}
 
@@ -357,22 +450,76 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 
 	if (gBootVolume->flags & kBVFlagBooter)
 	{
-		snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
-		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
-
-		if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+		if (isRecoveryHD)
 		{
-			snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.R/%s", kernelCacheFile);
+			strncpy(kernelCachePath, "/com.apple.recovery.boot/prelinkedkernel", sizeof(kernelCachePath) );
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
-				snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.S/%s", kernelCacheFile);
+				strncpy(kernelCachePath, "/com.apple.recovery.boot/kernelcache", sizeof(kernelCachePath) );
+				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				{
+					ret = -1;
+				}
+			}
+		}
+		else if (isInstaller)
+		{
+			strncpy(kernelCachePath, "/.IABootFiles/prelinkedkernel", sizeof(kernelCachePath) );
+			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+			{
+				strncpy(kernelCachePath, "/.IABootFiles/kernelcache", sizeof(kernelCachePath) );
+				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				{
+					ret = -1;
+				}
+			}
+		}
+		else if (isMacOSXUpgrade)
+		{
+			strncpy(kernelCachePath, "/Mac OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+			if ((flags & kFileTypeMask) != kFileTypeFlat)
+			{
+				ret = -1;
+			}
+		}
+		else if (isOSXUpgrade)
+		{
+			strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
+			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+			{
+				strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				{
+					ret = -1;
+				}
+			}
+		}
+		else
+		{
+			snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
+			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
+			{
+				snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.R/%s", kernelCacheFile);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					strncpy(kernelCachePath, "/com.apple.recovery.boot/kernelcache", sizeof(kernelCachePath) );
+					snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.S/%s", kernelCacheFile);
 					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 					if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -403,24 +550,27 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		return -1;
 	}
 
-	// Check if the kernel cache file is more recent (mtime)
-	// than the kernel file or the S/L/E directory
-	ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
-
-	// Check if the kernel file is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
+	if ( !isInstaller && !isRecoveryHD && !isMacOSXUpgrade && !isOSXUpgrade )
 	{
-		DBG("Kernel file '%s' is more recent than Kernel Cache '%s'! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
-		return -1;
-	}
+		// Check if the kernel cache file is more recent (mtime)
+		// than the kernel file or the S/L/E directory
+		ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
 
-	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+		// Check if the kernel file is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
+		{
+			DBG("Kernel file '%s' is more recent than Kernel Cache '%s'! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
+			return -1;
+		}
 
-	// Check if the S/L/E directory time is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
-	{
-		DBG("Folder '/System/Library/Extensions' is more recent than Kernel Cache file '%s'! Ignoring Kernel Cache.\n", kernelCacheFile);
-		return -1;
+		ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
+
+		// Check if the S/L/E directory time is more recent than the cache file
+		if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
+		{
+			DBG("Folder '/System/Library/Extensions' is more recent than Kernel Cache file '%s'! Ignoring Kernel Cache.\n", kernelCacheFile);
+			return -1;
+		}
 	}
 
 	// Since the kernel cache file exists and is the most recent try to load it
@@ -679,61 +829,88 @@ void common_boot(int biosdev)
 		// Notify modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
 
-		if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig))
+		if (gBootVolume->OSisInstaller)
 		{
-			tryresume = true;
-			tryresumedefault = true;
-		}
-		else
-		{
-			tryresumedefault = false;
+			isInstaller  = true;
 		}
 
-		if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig))
+		if (gBootVolume->OSisMacOSXUpgrade)
 		{
-			forceresume = false;
+			isMacOSXUpgrade = true;
 		}
 
-		if (forceresume)
+		if (gBootVolume->OSisOSXUpgrade)
 		{
-			tryresume = true;
-			tryresumedefault = false;
+			isOSXUpgrade    = true;
 		}
 
-		while (tryresume)
+		if (gBootVolume->OSisRecovery)
 		{
-			const char *tmp;
-			BVRef bvr;
-			if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->chameleonConfig))
-				val = "/private/var/vm/sleepimage";
+			isRecoveryHD = true;
+		}
 
-			// Do this first to be sure that root volume is mounted
-			ret = GetFileInfo(0, val, &flags, &sleeptime);
-
-			if ((bvr = getBootVolumeRef(val, &tmp)) == NULL)
-				break;
-
-			// Can't check if it was hibernation Wake=y is required
-			if (bvr->modTime == 0 && tryresumedefault)
-				break;
-
-			if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
-				break;
-
-			if (!forceresume && ((sleeptime+3)<bvr->modTime))
+		if ( !isRecoveryHD && !isInstaller && !isMacOSXUpgrade && !isOSXUpgrade )
+		{
+			if (!getBoolForKey (kWake, &tryresume, &bootInfo->chameleonConfig))
 			{
-#if DEBUG
-				printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",
-						bvr->modTime-sleeptime);
-#endif
-				break;
+				tryresume = true;
+				tryresumedefault = true;
+			}
+			else
+			{
+				tryresumedefault = false;
 			}
 
-			HibernateBoot((char *)val);
-			break;
+			if (!getBoolForKey (kForceWake, &forceresume, &bootInfo->chameleonConfig))
+			{
+				forceresume = false;
+			}
+
+			if (forceresume)
+			{
+				tryresume = true;
+				tryresumedefault = false;
+			}
+
+			while (tryresume)
+			{
+				const char *tmp;
+				BVRef bvr;
+				if (!getValueForKey(kWakeImage, &val, &len, &bootInfo->chameleonConfig))
+					val = "/private/var/vm/sleepimage";
+
+				// Do this first to be sure that root volume is mounted
+				ret = GetFileInfo(0, val, &flags, &sleeptime);
+
+				if ((bvr = getBootVolumeRef(val, &tmp)) == NULL)
+					break;
+
+				// Can't check if it was hibernation Wake=y is required
+				if (bvr->modTime == 0 && tryresumedefault)
+					break;
+
+				if ((ret != 0) || ((flags & kFileTypeMask) != kFileTypeFlat))
+					break;
+
+				if (!forceresume && ((sleeptime+3)<bvr->modTime))
+				{
+#if DEBUG
+					printf ("Hibernate image is too old by %d seconds. Use ForceWake=y to override\n",
+							bvr->modTime-sleeptime);
+#endif
+					break;
+				}
+
+				HibernateBoot((char *)val);
+				break;
+			}
 		}
 
-		getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
+		if (!isRecoveryHD && !isInstaller && !isMacOSXUpgrade && !isOSXUpgrade )
+		{
+			getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
+		}
+
 		if (useKernelCache)
 		{
 			do
@@ -949,22 +1126,21 @@ void setupBooterArgs()
 		verbose("\n");
 		int	csrValue;
 
-#if 0
 		/*
 		 * A special BootArgs flag "kBootArgsFlagCSRBoot"
 		 * is set in the Recovery or Installation environment.
 		 * This flag is kind of overkill by turning off all the protections
 		 */
 
-		if (isRecoveryHD)
+		if (isRecoveryHD || isInstaller || isOSXUpgrade || isMacOSXUpgrade)
 		{
 			// SIP can be controlled with or without FileNVRAM.kext (Pike R. Alpha)
 			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
 		}
-#endif
-
-		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
-
+		else
+		{
+			bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
+		}
 
 		// Set limit to 7bit
 		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
