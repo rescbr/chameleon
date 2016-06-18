@@ -966,17 +966,16 @@ void setupBooterArgs()
 		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
 		{
 			bootArgs->csrActiveConfig	= csrValue;
-
+			csrInfo(csrValue, 1);
 		}
 		else
 		{
 			// zenith432
 			bootArgs->csrActiveConfig	= 0x67;
+			csrInfo(0x67, 0);
 
 		}
 
-// ===============================================================================
-		verbose("CsrActiveConfig set to 0x%x\n", bootArgs->csrActiveConfig);
 
 // ===============================================================================
 
@@ -986,6 +985,35 @@ void setupBooterArgs()
 }
 
 // =========================================================================
+// ErmaC
+void csrInfo(int csrValue, bool custom)
+{
+	int mask = 0x20;
+	verbose("System Integrity Protection status: %s ", (csrValue == 0) ? "enabled":"disabled");
+	verbose("(%s Configuration).\nCsrActiveConfig = 0x%02x (", custom ? "Custom":"Default", csrValue);
+
+	// Display integer number into binary using bitwise operator
+	((csrValue & 0x20) == 0) ? verbose("0"): verbose("1");
+	while (mask != 0)
+	{
+		( ((csrValue & mask) == 0) ? verbose("0"): verbose("1") );
+		mask = mask >> 1;
+	}
+	verbose(")\n");
+	if (csrValue != 0)
+	{
+		verbose("\nConfiguration:\n");
+		verbose("Kext Signing: %s\n", ((csrValue & 0x01) == 0) ? "enabled":"disabled");           /* (1 << 0) Allow untrusted kexts */
+		verbose("Filesystem Protections: %s\n", ((csrValue & 0x02) == 0) ? "enabled":"disabled"); /* (1 << 1) Allow unrestricted file system. */
+		verbose("Task for PID: %s\n", ((csrValue & 0x04) == 0) ? "enabled":"disabled");           /* (1 << 2) */
+		verbose("Debugging Restrictions: %s\n", ((csrValue & 0x08) == 0) ? "enabled":"disabled"); /* (1 << 3) */
+		verbose("Apple Internal: %s\n", ((csrValue & 0x10) == 0) ? "enabled":"disabled");         /* (1 << 4) */
+		verbose("DTrace Restrictions: %s\n", ((csrValue & 0x20) == 0) ? "enabled":"disabled");    /* (1 << 5) Allow unrestricted dtrace */
+		verbose("NVRAM Protections: %s\n", ((csrValue & 0x40) == 0) ? "enabled":"disabled");      /* (1 << 6) Allow unrestricted NVRAM */
+//		verbose("DEVICE configuration: %s\n", ((csrValue & 0x80) == 0) ? "enabled":"disabled");   /* (1 << 7) Allow device configuration */
+	}
+	verbose("\n");
+}
 
 // =========================================================================
 
