@@ -140,6 +140,10 @@ void initialize_runtime(void)
 	malloc_init(0, 0, 0, malloc_error);
 }
 
+// =========================================================================
+
+
+
 //==========================================================================
 // ExecKernel - Load the kernel image (mach-o) and jump to its entry point.
 
@@ -149,80 +153,16 @@ static int ExecKernel(void *binary)
 	entry_t		kernelEntry;
 
 	bootArgs->kaddr = bootArgs->ksize = 0;
-	// ===============================================================================
 
-    // OS X Mountain Lion 10.8
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.8") ) // Mountain Lion and Up!
-	{
-		// cparm
-		bool KPRebootOption	= false;
-		bool HiDPIOption	= false;
-		getBoolForKey(kRebootOnPanic, &KPRebootOption, &bootInfo->chameleonConfig);
-		if ( KPRebootOption )
-		{
-			bootArgs->flags |= kBootArgsFlagRebootOnPanic;
-		}
+// ===============================================================================
 
-		// cparm
-		getBoolForKey(kEnableHiDPI, &HiDPIOption, &bootInfo->chameleonConfig);
+	gMacOSVersion[0] = 0;
+	// TODO identify sierra as macOS
+	verbose("Booting on %s %s (%s)\n", (MacOSVerCurrent < MacOSVer2Int("10.8")) ? "Mac OS X" : "OS X", gBootVolume->OSFullVer, gBootVolume->OSBuildVer );
 
-		if ( HiDPIOption )
-		{
-			bootArgs->flags |= kBootArgsFlagHiDPI;
-		}
-	}
+	setupBooterArgs();
 
-	// OS X Yosemite 10.10
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) // Yosemite and Up!
-	{
-		// Pike R. Alpha
-		bool FlagBlackOption	= false;
-		getBoolForKey(kBlackMode, &FlagBlackOption, &bootInfo->chameleonConfig);
-		if ( FlagBlackOption )
-		{
-			//bootArgs->flags |= kBootArgsFlagBlack;
-			bootArgs->flags |= kBootArgsFlagBlackBg; // Micky1979
-		}
-	}
-
-	// OS X El Capitan 10.11
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
-	{
-		// ErmaC
-		int	csrValue;
-
-#if 0
-		/*
-		 * A special BootArgs flag "kBootArgsFlagCSRBoot"
-		 * is set in the Recovery or Installation environment.
-		 * This flag is kind of overkill by turning off all the protections
-		 */
-
-		if (isRecoveryHD)
-		{
-			// SIP can be controlled with or without FileNVRAM.kext  (Pike R. Alpha)
-			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
-		}
-#endif
-
-		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
-
-		// Set limit to 7bit
-		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
-		{
-			bootArgs->csrActiveConfig	= csrValue;
-		}
-		else
-		{
-			// zenith432
-			bootArgs->csrActiveConfig	= 0x67;
-		}
-		verbose("CsrActiveConfig set to 0x%x\n", bootArgs->csrActiveConfig);
-		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
-		bootArgs->boot_SMC_plimit	= 0;
-    }
-
-	// ===============================================================================
+// ===============================================================================
 
 	execute_hook("ExecKernel", (void *)binary, NULL, NULL, NULL);
 
@@ -962,6 +902,94 @@ void common_boot(int biosdev)
 
 }
 
+// =========================================================================
+//
+void setupBooterArgs()
+{
+	bool KPRebootOption	= false;
+	bool HiDPIOption	= false;
+	bool FlagBlackOption	= false;
+
+
+	// OS X Mountain Lion 10.8
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.8") ) // Mountain Lion and Up!
+	{
+		// cparm
+		getBoolForKey(kRebootOnPanic, &KPRebootOption, &bootInfo->chameleonConfig);
+		if ( KPRebootOption )
+		{
+			bootArgs->flags |= kBootArgsFlagRebootOnPanic;
+		}
+
+		// cparm
+		getBoolForKey(kEnableHiDPI, &HiDPIOption, &bootInfo->chameleonConfig);
+
+		if ( HiDPIOption )
+		{
+			bootArgs->flags |= kBootArgsFlagHiDPI;
+		}
+	}
+
+	// OS X Yosemite 10.10
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) // Yosemite and Up!
+	{
+		// Pike R. Alpha
+		getBoolForKey(kBlackMode, &FlagBlackOption, &bootInfo->chameleonConfig);
+		if ( FlagBlackOption )
+		{
+			// bootArgs->flags |= kBootArgsFlagBlack;
+			bootArgs->flags |= kBootArgsFlagBlackBg; // Micky1979
+		}
+	}
+
+	// OS X El Capitan 10.11
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
+	{
+		// ErmaC
+		verbose("\n");
+		int	csrValue;
+
+#if 0
+		/*
+		 * A special BootArgs flag "kBootArgsFlagCSRBoot"
+		 * is set in the Recovery or Installation environment.
+		 * This flag is kind of overkill by turning off all the protections
+		 */
+
+		if (isRecoveryHD)
+		{
+			// SIP can be controlled with or without FileNVRAM.kext (Pike R. Alpha)
+			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+		}
+#endif
+
+		bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
+
+
+		// Set limit to 7bit
+		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
+		{
+			bootArgs->csrActiveConfig	= csrValue;
+
+		}
+		else
+		{
+			// zenith432
+			bootArgs->csrActiveConfig	= 0x67;
+
+		}
+
+// ===============================================================================
+		verbose("CsrActiveConfig set to 0x%x\n", bootArgs->csrActiveConfig);
+
+// ===============================================================================
+
+		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
+		bootArgs->boot_SMC_plimit	= 0;
+	}
+}
+
+// =========================================================================
 
 // =========================================================================
 

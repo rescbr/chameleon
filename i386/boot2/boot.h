@@ -341,6 +341,15 @@ extern size_t lzvn_encode(void		*dst,
                           void		*work);
 */
 
+/*
+ * boot.c
+ */
+bool FlagBlackOption; // <-- This is first set in boot.c into setupBooterArgs function
+bool HiDPIOption;
+
+void setupBooterArgs(void);
+void csrInfo(int csrValue, bool custom);
+
 struct compressed_kernel_header {
 	u_int32_t signature;
 	u_int32_t compress_type;
