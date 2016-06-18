@@ -108,6 +108,10 @@ extern char	*strcat(char * s1, const char * s2);
 extern char	*strncat(char * s1, const char * s2, size_t n);
 extern char	*strdup(const char *s1);
 
+extern char	*strpbrk_c(const char *s, const char *accept);
+extern char	*strsep_c(char **stringp, const char *delim);
+extern size_t	__strxspn_c(const char *s, const char *map, int parity);
+
 #if STRNCASECMP
 extern int strncasecmp(const char *s1, const char *s2, size_t n);
 #endif

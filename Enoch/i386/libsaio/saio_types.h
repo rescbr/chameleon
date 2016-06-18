@@ -214,8 +214,10 @@ struct BootVolume {
 	char			OSFullVer[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' */
 	char			OSBuildVer[OSVERSTRLEN];/* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductBuildVersion' */
 	bool			OSisServer;		/* 1 = OS X server , 0 = OS X client */
-	bool			OSisInstaller;		/* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
-
+	bool			OSisInstaller;		/* 1 = OS X Installer */
+	bool			OSisMacOSXUpgrade;	/* 1 = OS X Installer Upgrade */
+	bool			OSisOSXUpgrade;		/* 1 = OS X Installer Upgrade */
+	bool			OSisRecovery;		/* 1 = Recovery HD partition */
 };
 
 enum

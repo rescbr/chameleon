@@ -1394,6 +1394,62 @@ int processBootOptions()
 		addBootArg("kext-dev-mode=1");
 	}
 
+	// Micky1979 (Recovery HD)
+	if (gBootVolume->OSisRecovery)
+	{
+		const char	*rval = 0;
+		config_file_t ocBplist;
+		char  caBp[1024]; //too large ?. On El capitan is 365 bytes.. but we are testing
+		snprintf(caBp, sizeof(caBp), "/com.apple.recovery.boot/com.apple.Boot.plist");
+
+		loadConfigFile(caBp, &ocBplist);
+		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
+		addBootArg(rval);
+	}
+
+	// Micky1979 (Vanilla Installer)
+	if (gBootVolume->OSisInstaller)
+	{
+		const char	*rval = 0;
+		config_file_t ocBplist;
+
+		char  caBp[2048];
+
+		snprintf(caBp, sizeof(caBp), "/.IABootFiles/com.apple.Boot.plist");
+
+		loadConfigFile(caBp, &ocBplist);
+		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
+		addBootArg(rval);
+	}
+
+	// Micky1979 (old Vanilla upgrade)
+	if (gBootVolume->OSisMacOSXUpgrade)
+	{
+		const char	*rval = 0;
+		config_file_t ocBplist;
+		char  caBp[2048];
+
+		snprintf(caBp, sizeof(caBp), "/Mac OS X Install Data/com.apple.Boot.plist");
+
+		loadConfigFile(caBp, &ocBplist);
+		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
+		addBootArg(rval);
+	}
+
+	// Micky1979 (new Vanilla upgrade)
+	if (gBootVolume->OSisMacOSXUpgrade)
+	{
+		const char	*rval = 0;
+		config_file_t ocBplist;
+		char  caBp[2048];
+
+		snprintf(caBp, sizeof(caBp), "/OS X Install Data/com.apple.Boot.plist");
+
+		loadConfigFile(caBp, &ocBplist);
+		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
+		addBootArg(rval);
+	}
+
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space
 	argP = bootArgs->CommandLine;
 

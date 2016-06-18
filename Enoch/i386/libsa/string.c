@@ -432,3 +432,54 @@ uint8_t checksum8( void *start, unsigned int length )
 	return csum;
 }
 
+/*
+ bsd functions variants (already available in klibc)
+ strsep, strpbrk and __strxspn
+ */
+#ifndef UCHAR_MAX
+	#define UCHAR_MAX	255u
+#endif
+//==========================================================================
+char *strsep_c(char **stringp, const char *delim)
+{
+	char *s = *stringp;
+	char *e;
+
+	if (!s)
+		return NULL;
+
+	e = strpbrk_c(s, delim);
+	if (e)
+		*e++ = '\0';
+
+	*stringp = e;
+	return s;
+}
+//==========================================================================
+char *strpbrk_c(const char *s, const char *accept)
+{
+	const char *ss = s + __strxspn_c(s, accept, 1);
+
+	return *ss ? (char *)ss : NULL;
+}
+//==========================================================================
+size_t __strxspn_c(const char *s, const char *map, int parity)
+{
+	char matchmap[UCHAR_MAX + 1];
+	size_t n = 0;
+
+	/* Create bitmap */
+	memset(matchmap, 0, sizeof matchmap);
+	while (*map)
+		matchmap[(unsigned char)*map++] = 1;
+
+	/* Make sure the null character never matches */
+	matchmap[0] = parity;
+
+	/* Calculate span length */
+	while (matchmap[(unsigned char)*s++] ^ parity)
+		n++;
+
+	return n;
+}
+//==========================================================================

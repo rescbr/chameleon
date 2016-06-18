@@ -48,14 +48,16 @@
 #define kDefaultCachePathLeo		"/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow		"/System/Library/Caches/com.apple.kext.caches/Startup/"
 #define kDefaultCachePathYosemite	"/System/Library/PrelinkedKernels/"
+#define kDefaultCacheRecoveryHD		"/com.apple.recovery.boot/"
 
-// Lion installer
+// Lion installer ??
 #define kLionInstallerDataFolder	"/Mac OS X Install Data/"
-#define kLionInstallerPlist		kLionInstallerDataFolder "com.apple.Boot.plist"
 
-// Mountain Lion installer
+// Mountain Lion installer ??
 #define kMLionInstallerDataFolder	"/OS X Install Data/"
-#define kMLionInstallerPlist		kMLionInstallerDataFolder "com.apple.Boot.plist"
+
+// Installer new
+#define kDefaultCacheInstallerNew	"/.IABootFiles/"
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
@@ -209,6 +211,10 @@
 #define kDropMCFG			"DropMCFG"			/* acpi_patcher.c */
 #define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
 #define kCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
+#define kProductBuildVersion		"ProductBuildVersion"		/* boot.c */
+
+uint32_t kernelOSVer; /* boot.c */
+
 
 /* Pike R. Alpha: added this key */
 #define kBlackMode			"BlackMode"
@@ -308,6 +314,12 @@ extern long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize
 typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
 // Bungo:
 extern char gDarwinBuildVerStr[256];
+
+// Micky1979
+int gDarwinMajor;
+int gDarwinMinor;
+int gDarwinRev;
+bool useDarwinVersion;
 
 /*!
     Hookable function pointer called during the driver loading phase that
