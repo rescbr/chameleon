@@ -44,21 +44,21 @@ enum {
 };
 
 enum {
-    kEfiReservedMemoryType      = 0,
-    kEfiLoaderCode              = 1,
-    kEfiLoaderData              = 2,
-    kEfiBootServicesCode        = 3,
-    kEfiBootServicesData        = 4,
-    kEfiRuntimeServicesCode     = 5,
-    kEfiRuntimeServicesData     = 6,
-    kEfiConventionalMemory      = 7,
-    kEfiUnusableMemory          = 8,
-    kEfiACPIReclaimMemory       = 9,
-    kEfiACPIMemoryNVS           = 10,
-    kEfiMemoryMappedIO          = 11,
+    kEfiReservedMemoryType	= 0,
+    kEfiLoaderCode		= 1,
+    kEfiLoaderData		= 2,
+    kEfiBootServicesCode	= 3,
+    kEfiBootServicesData	= 4,
+    kEfiRuntimeServicesCode	= 5,
+    kEfiRuntimeServicesData	= 6,
+    kEfiConventionalMemory	= 7,
+    kEfiUnusableMemory		= 8,
+    kEfiACPIReclaimMemory	= 9,
+    kEfiACPIMemoryNVS		= 10,
+    kEfiMemoryMappedIO		= 11,
     kEfiMemoryMappedIOPortSpace = 12,
-    kEfiPalCode                 = 13,
-    kEfiMaxMemoryType           = 14
+    kEfiPalCode			= 13,
+    kEfiMaxMemoryType		= 14
 };
 
 /*
@@ -124,8 +124,8 @@ typedef struct boot_icon_element boot_icon_element;
 #define kBootArgsVersion2		2
 #define kBootArgsRevision2_0		0
 
-#define kBootArgsEfiMode32		32
-#define kBootArgsEfiMode64		64
+#define kBootArgsEfiMode32              32
+#define kBootArgsEfiMode64              64
 
 /* Bitfields for boot_args->flags */
 #define kBootArgsFlagRebootOnPanic	(1 << 0)
@@ -209,6 +209,7 @@ typedef struct boot_args_pre_lion
 
     uint32_t    efiRuntimeServicesPageStart; /* physical address of defragmented runtime pages */
     uint32_t    efiRuntimeServicesPageCount;
+
     uint32_t    efiSystemTable;   /* physical address of system table in runtime area */
 
     uint8_t     efiMode;       /* 32 means 32-bit mode, 64 means 64-bit mode */

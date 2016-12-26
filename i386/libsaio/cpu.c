@@ -243,7 +243,7 @@ static uint64_t measure_aperf_frequency(void)
 	/* mperfDelta is now the least number of MPERF ticks the processor made in
 	 * a timespan of 0.03 s (e.g. 30 milliseconds)
 	 */
-	
+
 	if (aperfDelta > (1ULL<<32))
 	{
 		retval = 0;
@@ -275,9 +275,9 @@ void scan_cpu(PlatformInfo_t *p)
 	uint32_t	max_ratio = 0;
 	uint32_t	min_ratio = 0;
 	uint32_t	reg[4];
-    uint32_t	cores_per_package = 0;
-    uint32_t    logical_per_package = 1;
-    uint32_t    threads_per_core = 1;;
+	uint32_t	cores_per_package = 0;
+	uint32_t	logical_per_package = 1;
+	uint32_t	threads_per_core = 1;;
 
 	uint8_t		bus_ratio_max = 0;
 	uint8_t		bus_ratio_min = 0;
@@ -288,52 +288,66 @@ void scan_cpu(PlatformInfo_t *p)
 
 	const char	*newratio;
 	char		str[128];
-    char        *s = 0;
+	char		*s = 0;
 
-	int         len = 0;
-	int         myfsb = 0;
-    int         i = 0;
+	int		len = 0;
+	int		myfsb = 0;
+	int		i = 0;
 
 	/* get cpuid values */
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
-    p->CPU.Vendor = p->CPU.CPUID[CPUID_0][ebx];
-    
+	p->CPU.Vendor = p->CPU.CPUID[CPUID_0][ebx];
+
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
-    if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((bit(28) & p->CPU.CPUID[CPUID_1][edx]) != 0)) { // Intel && HTT/Multicore
-        logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
-    }
-    
+
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && ((bit(28) & p->CPU.CPUID[CPUID_1][edx]) != 0)) // Intel && HTT/Multicore
+	{
+		logical_per_package = bitfield(p->CPU.CPUID[CPUID_1][ebx], 23, 16);
+	}
+
 	do_cpuid(0x00000002, p->CPU.CPUID[CPUID_2]); // TLB/Cache/Prefetch
-    
+
 	do_cpuid(0x00000003, p->CPU.CPUID[CPUID_3]); // S/N
-    
-    /* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
-    if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000)) {
-        for (i = 0; i < 0xFF; i++) { // safe loop
-            do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
-            if (bitfield(reg[eax], 4, 0) == 0) break;
-            //cores_per_package = bitfield(reg[eax], 31, 26) + 1;
-        }
-    }
-    do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
-    if (i > 0) {
-        cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
-        threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
-    }
-    if (cores_per_package == 0) cores_per_package = 1;
-    
-	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) { // Monitor/Mwait
+
+	/* Based on Apple's XNU cpuid.c - Deterministic cache parameters */
+	if ((p->CPU.CPUID[CPUID_0][eax] > 3) && (p->CPU.CPUID[CPUID_0][eax] < 0x80000000))
+	{
+		for (i = 0; i < 0xFF; i++) // safe loop
+		{
+			do_cpuid2(0x00000004, i, reg); // AX=4: Fn, CX=i: cache index
+			if (bitfield(reg[eax], 4, 0) == 0)
+			{
+				break;
+			}
+			//cores_per_package = bitfield(reg[eax], 31, 26) + 1;
+		}
+	}
+	do_cpuid2(0x00000004, 0, p->CPU.CPUID[CPUID_4]);
+	if (i > 0)
+	{
+		cores_per_package = bitfield(p->CPU.CPUID[CPUID_4][eax], 31, 26) + 1; // i = cache index
+		threads_per_core = bitfield(p->CPU.CPUID[CPUID_4][eax], 25, 14) + 1;
+	}
+
+	if (cores_per_package == 0) cores_per_package = 1;
+
+	if (p->CPU.CPUID[CPUID_0][0] >= 0x5) // Monitor/Mwait
+	{
 		do_cpuid(5,  p->CPU.CPUID[CPUID_5]);
 	}
-	if (p->CPU.CPUID[CPUID_0][0] >= 6) { // Thermal/Power
+	if (p->CPU.CPUID[CPUID_0][0] >= 6) // Thermal/Power
+	{
 		do_cpuid(6, p->CPU.CPUID[CPUID_6]);
 	}
-    
-    do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
-	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8) {
+
+	do_cpuid(0x80000000, p->CPU.CPUID[CPUID_80]);
+	if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 8)
+	{
 		do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
-	} else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1) {
+	}
+	else if ((p->CPU.CPUID[CPUID_80][0] & 0x0000000f) >= 1)
+	{
 		do_cpuid(0x80000001, p->CPU.CPUID[CPUID_81]);
 	}
 
@@ -365,11 +379,15 @@ void scan_cpu(PlatformInfo_t *p)
 	p->CPU.ExtFamily	= bitfield(p->CPU.CPUID[CPUID_1][0], 27, 20);
 /*
 	if (p->CPU.Family == 0x0f)
-        p->CPU.Family += p->CPU.ExtFamily;
-    if (p->CPU.Family == 0x0f || p->CPU.Family == 0x06) */
-        p->CPU.Model += (p->CPU.ExtModel << 4);
-    
-    /* get BrandString (if supported) */
+	{
+		p->CPU.Family += p->CPU.ExtFamily;
+	}
+
+	if (p->CPU.Family == 0x0f || p->CPU.Family == 0x06)
+*/
+	p->CPU.Model += (p->CPU.ExtModel << 4);
+
+	/* get BrandString (if supported) */
 	/* Copyright: from Apple's XNU cpuid.c */
 	if (p->CPU.CPUID[CPUID_80][0] > 0x80000004)
 	{
@@ -392,7 +410,7 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 		}
 		strlcpy(p->CPU.BrandString, s, 48);
-		
+
 		if (!strncmp(p->CPU.BrandString, CPU_STRING_UNKNOWN, MIN(sizeof(p->CPU.BrandString), (unsigned)strlen(CPU_STRING_UNKNOWN) + 1)))
 		{
 			/*
@@ -404,65 +422,72 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.BrandString[47] = '\0';
         //		verbose("Brandstring = %s\n", p->CPU.BrandString);
 	}
-    
-    /*
-     * Find the number of enabled cores and threads
-     * (which determines whether SMT/Hyperthreading is active).
-     */
-    switch (p->CPU.Vendor) {
-        case CPUID_VENDOR_INTEL:
-            switch (p->CPU.Model) {
-                case CPUID_MODEL_NEHALEM:
-                case CPUID_MODEL_FIELDS:
-                case CPUID_MODEL_DALES:
-                case CPUID_MODEL_NEHALEM_EX:
-                case CPUID_MODEL_JAKETOWN:
-                case CPUID_MODEL_SANDYBRIDGE:
-                case CPUID_MODEL_IVYBRIDGE:
-                case CPUID_MODEL_IVYBRIDGE_EP:
-                case CPUID_MODEL_HASWELL:
-                case CPUID_MODEL_HASWELL_SVR:
-                    //case CPUID_MODEL_HASWELL_H:
-                case CPUID_MODEL_HASWELL_ULT:
-                case CPUID_MODEL_CRYSTALWELL:
-                    msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-                    p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
-                    p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
-                    break;
-                    
-                case CPUID_MODEL_DALES_32NM:
-                case CPUID_MODEL_WESTMERE:
-                case CPUID_MODEL_WESTMERE_EX:
-                    msr = rdmsr64(MSR_CORE_THREAD_COUNT);
-                    p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 19, 16);
-                    p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
-                    break;
-            }
-            if (p->CPU.NoCores == 0) {
-                p->CPU.NoCores = cores_per_package;
-                p->CPU.NoThreads = logical_per_package;
-            }
+
+	/*
+	 * Find the number of enabled cores and threads
+	 * (which determines whether SMT/Hyperthreading is active).
+	 */
+	switch (p->CPU.Vendor)
+	{
+		case CPUID_VENDOR_INTEL:
+			switch (p->CPU.Model)
+			{
+				case CPUID_MODEL_NEHALEM:
+				case CPUID_MODEL_FIELDS:
+				case CPUID_MODEL_DALES:
+				case CPUID_MODEL_NEHALEM_EX:
+				case CPUID_MODEL_JAKETOWN:
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE_EP:
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
+				//case CPUID_MODEL_HASWELL_H:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_CRYSTALWELL:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+				break;
+
+				case CPUID_MODEL_DALES_32NM:
+				case CPUID_MODEL_WESTMERE:
+				case CPUID_MODEL_WESTMERE_EX:
+					msr = rdmsr64(MSR_CORE_THREAD_COUNT);
+					p->CPU.NoCores	= (uint32_t)bitfield((uint32_t)msr, 19, 16);
+					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
+				break;
+			}
+
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores = cores_per_package;
+				p->CPU.NoThreads = logical_per_package;
+			}
             break;
-            
-        case CPUID_VENDOR_AMD:
-            p->CPU.NoCores		= (uint32_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
-            p->CPU.NoThreads	= (uint32_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
-            if (p->CPU.NoCores == 0) p->CPU.NoCores = 1;
-            if (p->CPU.NoThreads < p->CPU.NoCores) p->CPU.NoThreads = p->CPU.NoCores;
-            break;
-            
-        default:
-            stop("Unsupported CPU detected! System halted.");
-	}
-    
-    //workaround for N270. I don't know why it detected wrong
-    // MSR is *NOT* available on the Intel Atom CPU
-    if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270"))) {
-        p->CPU.NoCores		= 1;
-        p->CPU.NoThreads	= 2;
-    }
-    
-    /* setup features */
+
+		case CPUID_VENDOR_AMD:
+			p->CPU.NoCores	= (uint32_t)bitfield(p->CPU.CPUID[CPUID_88][2], 7, 0) + 1;
+			p->CPU.NoThreads	= (uint32_t)bitfield(p->CPU.CPUID[CPUID_1][1], 23, 16);
+			if (p->CPU.NoCores == 0)
+				p->CPU.NoCores = 1;
+			if (p->CPU.NoThreads < p->CPU.NoCores)
+				p->CPU.NoThreads = p->CPU.NoCores;
+			break;
+
+		default:
+			stop("Unsupported CPU detected! System halted.");
+		}
+
+		//workaround for N270. I don't know why it detected wrong
+		// MSR is *NOT* available on the Intel Atom CPU
+		if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+		{
+			p->CPU.NoCores		= 1;
+			p->CPU.NoThreads	= 2;
+		}
+
+	/* setup features */
 	if ((bit(23) & p->CPU.CPUID[CPUID_1][3]) != 0)
 	{
 		p->CPU.Features |= CPU_FEATURE_MMX;
@@ -502,14 +527,15 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		p->CPU.Features |= CPU_FEATURE_MSR;
 	}
-    
-    if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && (p->CPU.NoThreads > p->CPU.NoCores)) {
+
+	if ((p->CPU.Vendor == CPUID_VENDOR_INTEL) && (p->CPU.NoThreads > p->CPU.NoCores))
+	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
-    }
+	}
 
 	tscFrequency = measure_tsc_frequency();
 	//verbose("cpu freq classic = 0x%016llx\n", tscFrequency);
-    
+
 	/* if usual method failed */
 	if ( tscFrequency < 1000 )	//TEST
 	{
@@ -556,9 +582,10 @@ void scan_cpu(PlatformInfo_t *p)
 				bus_ratio_min = bitfield(msr, 47, 40); //valv: not sure about this one (Remarq.1)
 				msr = rdmsr64(MSR_FLEX_RATIO);
 				//verbose("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
-				if (bitfield(msr, 16, 16)) {
+				if (bitfield(msr, 16, 16))
+				{
 					flex_ratio = bitfield(msr, 15, 8);
-                    
+
 					// bcc9: at least on the gigabyte h67ma-ud2h,
 					// where the cpu multipler can't be changed to
 					// allow overclocking, the flex_ratio msr has unexpected (to OSX)
@@ -566,60 +593,65 @@ void scan_cpu(PlatformInfo_t *p)
 					// fail to compute the bus ratio correctly, instead
 					// causing the system to crash since tscGranularity
 					// is inadvertently set to 0.
-					if (flex_ratio == 0) {
+					if (flex_ratio == 0)
+					{
 						// Clear bit 16 (evidently the presence bit)
 						wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 						msr = rdmsr64(MSR_FLEX_RATIO);
 						verbose("CPU: Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
-					} else {
-						if (bus_ratio_max > flex_ratio) {
+					}
+					else
+					{
+						if (bus_ratio_max > flex_ratio)
+						{
 							bus_ratio_max = flex_ratio;
 						}
 					}
 				}
 
-					if (bus_ratio_max)
-					{
+				if (bus_ratio_max)
+				{
 					fsbFrequency = (tscFrequency / bus_ratio_max);
 				}
 
 				//valv: Turbo Ratio Limit
-					if ((intelCPU != 0x2e) && (intelCPU != 0x2f))
-					{
+				if ((intelCPU != 0x2e) && (intelCPU != 0x2f))
+				{
 					msr = rdmsr64(MSR_TURBO_RATIO_LIMIT);
+
 					cpuFrequency = bus_ratio_max * fsbFrequency;
 					max_ratio = bus_ratio_max * 10;
-					}
-					else
-					{
+				}
+				else
+				{
 					cpuFrequency = tscFrequency;
 				}
-					if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
-					{
+				if ((getValueForKey(kbusratio, &newratio, &len, &bootInfo->chameleonConfig)) && (len <= 4))
+				{
 					max_ratio = atoi(newratio);
 					max_ratio = (max_ratio * 10);
-						if (len >= 3)
-						{
+					if (len >= 3)
+					{
 						max_ratio = (max_ratio + 5);
 					}
 
 					//verbose("Bus-Ratio: min=%d, max=%s\n", bus_ratio_min, newratio);
 
 					// extreme overclockers may love 320 ;)
-						if ((max_ratio >= min_ratio) && (max_ratio <= 320))
-						{
+					if ((max_ratio >= min_ratio) && (max_ratio <= 320))
+					{
 						cpuFrequency = (fsbFrequency * max_ratio) / 10;
-							if (len >= 3)
-							{
+						if (len >= 3)
+						{
 							maxdiv = 1;
-							}
-							else
-							{
-							maxdiv = 0;
-						}
 						}
 						else
 						{
+							maxdiv = 0;
+						}
+					}
+					else
+					{
 						max_ratio = (bus_ratio_max * 10);
 					}
 				}
@@ -651,8 +683,8 @@ void scan_cpu(PlatformInfo_t *p)
 				}
 				else
 				{
-					/* On lower models, currcoef defines TSC freq */
-					/* XXX */
+					// On lower models, currcoef defines TSC freq
+					// XXX
 					maxcoef = currcoef;
 				}
 
@@ -685,7 +717,7 @@ void scan_cpu(PlatformInfo_t *p)
 				break;
 			}
 		}
-		/* Mobile CPU */
+		// Mobile CPU
 		if (rdmsr64(MSR_IA32_PLATFORM_ID) & (1<<28))
 		{
 			p->CPU.Features |= CPU_FEATURE_MOBILE;
@@ -695,13 +727,13 @@ void scan_cpu(PlatformInfo_t *p)
 	{
 		switch(p->CPU.ExtFamily)
 		{
-			case 0x00: /* K8 */
+			case 0x00: //* K8 *//
 				msr = rdmsr64(K8_FIDVID_STATUS);
 				maxcoef = bitfield(msr, 21, 16) / 2 + 4;
 				currcoef = bitfield(msr, 5, 0) / 2 + 4;
 				break;
 
-			case 0x01: /* K10 */
+			case 0x01: //* K10 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				do_cpuid2(0x00000006, 0, p->CPU.CPUID[CPUID_6]);
 				// EffFreq: effective frequency interface
@@ -719,7 +751,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x05: /* K14 */
+			case 0x05: //* K14 *//
 				msr = rdmsr64(K10_COFVID_STATUS);
 				currcoef  = (bitfield(msr, 54, 49) + 0x10) << 2;
 				currdiv = (bitfield(msr, 8, 4) + 1) << 2;
@@ -727,7 +759,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 				break;
 
-			case 0x02: /* K11 */
+			case 0x02: //* K11 *//
 				// not implimented
 				break;
 		}
@@ -750,8 +782,11 @@ void scan_cpu(PlatformInfo_t *p)
 					fsbFrequency = ((cpuFrequency * currdiv) / currcoef);
 				}
 				//verbose("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			} else {
-				if (!cpuFrequency) {
+			}
+			else
+			{
+				if (!cpuFrequency)
+				{
 					fsbFrequency = (tscFrequency / maxcoef);
 				}
 				else
@@ -767,7 +802,9 @@ void scan_cpu(PlatformInfo_t *p)
 			{
 				fsbFrequency = ((tscFrequency * currdiv) / currcoef);
 				//verbose("%d.%d\n", currcoef / currdiv, ((currcoef % currdiv) * 100) / currdiv);
-			} else {
+			}
+			else
+			{
 				fsbFrequency = (tscFrequency / currcoef);
 				//verbose("%d\n", currcoef);
 			}
@@ -779,7 +816,7 @@ void scan_cpu(PlatformInfo_t *p)
 	if (!fsbFrequency)
 	{
 		fsbFrequency = (DEFAULT_FSB * 1000);
-        verbose("CPU: fsbFrequency=0! using the default value for FSB!\n");
+		verbose("CPU: fsbFrequency=0! using the default value for FSB!\n");
 		cpuFrequency = tscFrequency;
 	}
 
@@ -799,19 +836,20 @@ void scan_cpu(PlatformInfo_t *p)
 	//verbose("\n---------------------------------------------\n");
    	verbose("\n------------------ CPU INFO -----------------\n");
 	//verbose("---------------------------------------------\n");
-    verbose("\nCPUID Raw Values:\n");
-    for (i = 0; i < CPUID_MAX; i++) {
-        verbose("%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
-    }
-    verbose("\n");
-	verbose("Brand String:            %s\n",		p->CPU.BrandString); // Processor name (BIOS)
-	verbose("Vendor:                  0x%X\n",		p->CPU.Vendor); // Vendor ex: GenuineIntel
-	verbose("Family:                  0x%X\n",		p->CPU.Family); // Family ex: 6 (06h)
+	verbose("\nCPUID Raw Values:\n");
+	for (i = 0; i < CPUID_MAX; i++)
+	{
+		verbose("%02d:  %08X-%08X-%08X-%08X\n", i, p->CPU.CPUID[i][eax], p->CPU.CPUID[i][ebx], p->CPU.CPUID[i][ecx], p->CPU.CPUID[i][edx]);
+	}
+	verbose("\n");
+	verbose("Brand String:            %s\n",		p->CPU.BrandString);	// Processor name (BIOS)
+	verbose("Vendor:                  0x%X\n",		p->CPU.Vendor);		// Vendor ex: GenuineIntel
+	verbose("Family:                  0x%X\n",		p->CPU.Family);		// Family ex: 6 (06h)
 	verbose("ExtFamily:               0x%X\n",		p->CPU.ExtFamily);
-	verbose("Signature:               0x%08X\n",	p->CPU.Signature); // CPUID signature
-	verbose("Model:                   0x%X\n",		p->CPU.Model); // Model ex: 37 (025h)
+	verbose("Signature:               0x%08X\n",		p->CPU.Signature);	// CPUID signature
+	verbose("Model:                   0x%X\n",		p->CPU.Model);		// Model ex: 37 (025h)
 	verbose("ExtModel:                0x%X\n",		p->CPU.ExtModel);
-	verbose("Stepping:                0x%X\n",		p->CPU.Stepping); // Stepping ex: 5 (05h)
+	verbose("Stepping:                0x%X\n",		p->CPU.Stepping);	// Stepping ex: 5 (05h)
 	verbose("MaxCoef:                 %d\n",		p->CPU.MaxCoef);
 	verbose("CurrCoef:                %d\n",		p->CPU.CurrCoef);
 	verbose("MaxDiv:                  %d\n",		p->CPU.MaxDiv);
@@ -819,11 +857,12 @@ void scan_cpu(PlatformInfo_t *p)
 	verbose("TSCFreq:                 %dMHz\n",		p->CPU.TSCFrequency / 1000000);
 	verbose("FSBFreq:                 %dMHz\n",		p->CPU.FSBFrequency / 1000000);
 	verbose("CPUFreq:                 %dMHz\n",		p->CPU.CPUFrequency / 1000000);
-	verbose("Cores:                   %d\n",		p->CPU.NoCores); // Cores
-    verbose("Logical procesors:       %d\n",		p->CPU.NoThreads); // Threads
-	verbose("Features:                0x%08x\n",	p->CPU.Features);
+	verbose("Cores:                   %d\n",		p->CPU.NoCores);	// Cores
+	verbose("Logical procesors:       %d\n",		p->CPU.NoThreads);	// Threads
+	verbose("Features:                0x%08x\n",		p->CPU.Features);
+
 	verbose("---------------------------------------------\n\n");
 #if DEBUG_CPU
-    pause("\n[DEBUG CPU] ");
+	pause("\n[DEBUG CPU] ");
 #endif
 }

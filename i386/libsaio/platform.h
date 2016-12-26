@@ -30,26 +30,26 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_88			9
 #define CPUID_MAX			10
 
-#define CPUID_MODEL_ANY             0xFF
-#define CPUID_MODEL_UNKNOWN         0x00
-//#define CPUID_MODEL_PRESCOTT          0x03			// Celeron D, Pentium 4 (90nm)
-#define CPUID_MODEL_NOCONA          0x03			// Celeron D, Pentium 4, Xeon (90nm)
+#define CPUID_MODEL_ANY			0xFF
+#define CPUID_MODEL_UNKNOWN		0x00
+//#define CPUID_MODEL_PRESCOTT		0x03			// Celeron D, Pentium 4 (90nm)
+#define CPUID_MODEL_NOCONA		0x03			// Celeron D, Pentium 4, Xeon (90nm)
 //#define CPUID_MODEL_NOCONA            0x04			// Xeon Nocona/Paxville, Irwindale (90nm)
-#define CPUID_MODEL_IRWINDALE       0x04			// Xeon Paxville, Irwindale (90nm)
-#define CPUID_MODEL_PRESLER         0x06			// Pentium 4, Pentium D (65nm)
+#define CPUID_MODEL_IRWINDALE		0x04			// Xeon Paxville, Irwindale (90nm)
+#define CPUID_MODEL_PRESLER		0x06			// Pentium 4, Pentium D (65nm)
 #define CPUID_MODEL_PENTIUM_M		0x09			// Banias Pentium M (130nm)
-#define CPUID_MODEL_DOTHAN          0x0D			// Dothan Pentium M, Celeron M (90nm)
-#define CPUID_MODEL_YONAH           0x0E			// Sossaman, Yonah
-#define CPUID_MODEL_MEROM           0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
+#define CPUID_MODEL_DOTHAN		0x0D			// Dothan Pentium M, Celeron M (90nm)
+#define CPUID_MODEL_YONAH		0x0E			// Sossaman, Yonah
+#define CPUID_MODEL_MEROM		0x0F			// Allendale, Conroe, Kentsfield, Woodcrest, Clovertown, Tigerton, Merom
 //#define CPUID_MODEL_CONROE		0x0F			//
-#define CPUID_MODEL_CELERON         0x16			// Merom, Conroe (65nm), Celeron (45nm)
-#define CPUID_MODEL_PENRYN          0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
+#define CPUID_MODEL_CELERON		0x16			// Merom, Conroe (65nm), Celeron (45nm)
+#define CPUID_MODEL_PENRYN		0x17			// Wolfdale, Yorkfield, Harpertown, Penryn
 //#define CPUID_MODEL_WOLFDALE		0x17			// Xeon 31xx, 33xx, 52xx, 54xx, Core 2 Quad 8xxx and 9xxx
-#define CPUID_MODEL_NEHALEM         0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
-#define CPUID_MODEL_ATOM            0x1C			// Pineview, Bonnell
-#define CPUID_MODEL_XEON_MP         0x1D			// MP 7400
-#define CPUID_MODEL_FIELDS          0x1E			// Lynnfield, Clarksfield, Jasper Forest
-#define CPUID_MODEL_DALES           0x1F			// Havendale, Auburndale
+#define CPUID_MODEL_NEHALEM		0x1A			// Bloomfield. Nehalem-EP, Nehalem-WS, Gainestown
+#define CPUID_MODEL_ATOM		0x1C			// Pineview, Bonnell
+#define CPUID_MODEL_XEON_MP		0x1D			// MP 7400
+#define CPUID_MODEL_FIELDS		0x1E			// Lynnfield, Clarksfield, Jasper Forest
+#define CPUID_MODEL_DALES		0x1F			// Havendale, Auburndale
 #define CPUID_MODEL_DALES_32NM		0x25			// Clarkdale, Arrandale
 #define CPUID_MODEL_ATOM_SAN		0x26			// Lincroft
 #define CPUID_MODEL_LINCROFT		0x27			// Bonnell
@@ -62,7 +62,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_ATOM_2000		0x36			// Cedarview / Saltwell
 #define CPUID_MODEL_SILVERMONT		0x37			// Atom E3000, Z3000 Atom Silvermont
 #define CPUID_MODEL_IVYBRIDGE		0x3A			// Ivy Bridge
-#define CPUID_MODEL_HASWELL         0x3C			// Haswell DT
+#define CPUID_MODEL_HASWELL		0x3C			// Haswell DT
 #define CPUID_MODEL_BROADWELL		0x3D			// Core M, Broadwell / Core-AVX2
 //#define CPUID_MODEL_IVYBRIDGE_XEON	0x3E			// Ivy Bridge Xeon
 #define CPUID_MODEL_IVYBRIDGE_EP	0x3E			// Ivy Bridge Xeon
@@ -167,13 +167,14 @@ typedef struct _PlatformInfo_t
 		uint8_t			MaxDiv;					// Min Multiplier
 		uint8_t			CurrCoef;				// Current Multiplier
 		uint8_t			CurrDiv;
-		uint64_t		TSCFrequency;			// TSC Frequency Hz
-		uint64_t		FSBFrequency;			// FSB Frequency Hz
-		uint64_t		CPUFrequency;			// CPU Frequency Hz
+		uint64_t		TSCFrequency;				// TSC Frequency Hz
+		uint64_t		FSBFrequency;				// FSB Frequency Hz
+		uint64_t		CPUFrequency;				// CPU Frequency Hz
 		uint32_t		MaxRatio;				// Max Bus Ratio
 		uint32_t		MinRatio;				// Min Bus Ratio
-		char			BrandString[48];		// 48 Byte Branding String
-		uint32_t		CPUID[CPUID_MAX][4];	// CPUID 0..4, 80..81 Raw Values
+		char			BrandString[48];			// 48 Byte Branding String
+		uint32_t		CPUID[CPUID_MAX][4];			// CPUID 0..4, 80..81 Raw Values
+
 	} CPU;
 
 	struct RAM {
@@ -190,15 +191,15 @@ typedef struct _PlatformInfo_t
 	} RAM;
 
 	struct DMI {
-		int			MaxMemorySlots;             // number of memory slots populated by SMBIOS
-		int			CntMemorySlots;             // number of memory slots counted
-		int			MemoryModules;              // number of memory modules installed
-		int			DIMM[MAX_RAM_SLOTS];        // Information and SPD mapping for each slot
+		int			MaxMemorySlots;		// number of memory slots populated by SMBIOS
+		int			CntMemorySlots;		// number of memory slots counted
+		int			MemoryModules;		// number of memory modules installed
+		int			DIMM[MAX_RAM_SLOTS];	// Information and SPD mapping for each slot
 	} DMI;
 
 	uint8_t				Type;                   // system-type: 1=Desktop, 2=Portable, 3=Workstation... according ACPI2.0 (FACP: PM_Profile)
 	uint8_t				*UUID;                  // system-id (SMBIOS Table 1: system uuid)
-    uint32_t            HWSignature;            // machine-signature (FACS: Hardware Signature)
+	uint32_t			HWSignature;            // machine-signature (FACS: Hardware Signature)
 } PlatformInfo_t;
 
 extern PlatformInfo_t Platform;

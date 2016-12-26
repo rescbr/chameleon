@@ -50,7 +50,7 @@
 #if DEBUG_GMA
 #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)
+#define DBG(x...)   msglog(x)
 #endif
 
 static bool	doit	= false;
@@ -397,7 +397,9 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	struct DevPropDevice *device = devprop_add_device(string, devicepath);
 	if (!device) {
 		error("[setup_gma_devprop] Failed initializing dev-prop string dev-entry!\n");
-		pause("");
+#if DEBUG_GMA
+        pause("\n[DEBUG_GMA] ");
+#endif
 		return false;
 	}
 
@@ -527,7 +529,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             device_id = 0x00000102;					// Inject a valid mobile GPU device id instead of patching kexts
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
-            devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
+            devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
             //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD2000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD2000_os_info, 20);
@@ -540,7 +542,7 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
             devprop_add_value(device, "built-in",			&BuiltIn, 1);
             devprop_add_value(device, "class-code",			ClassFix, 4);
             device_id = 0x00000126;					// Inject a valid mobile GPU device id instead of patching kexts
-            devprop_add_value(device, "device-id",			(uint8_t*)&device_id, sizeof(device_id));
+            devprop_add_value(device, "device-id",			(uint8_t *)&device_id, sizeof(device_id));
             //devprop_add_value(device, "hda-gfx",			(uint8_t *)"onboard-1", 10);
             devprop_add_value(device, "AAPL,tbl-info",			HD3000_tbl_info, 18);
             devprop_add_value(device, "AAPL,os-info",			HD3000_os_info, 20);
@@ -604,8 +606,10 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 
 				default:
 					error("\nPlease specify 96, 64, or 32MB RAM for the HD4000 in the bios.\n"
-                          "The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
-                    pause("");
+					"The selected %dMB RAM configuration is not supported for the  HD4000.\n", ram);
+#if DEBUG_GMA
+                    pause("\n[DEBUG_GMA] ");
+#endif
 					return false;	// Exit early before the AAPL,ig-platform-id property is set.
 					break;
 			}
@@ -717,12 +721,14 @@ bool setup_gma_devprop(pci_dt_t *gma_dev)
 	if (!stringdata)
 	{
 		error("[setup_gma_devprop] No stringdata!\n");
-		pause("");
+#if DEBUG_GMA
+        pause("\n[DEBUG_GMA] ");
+#endif
 		return false;
 	}
 
 	verbose("---------------------------------------------\n");
-	memcpy(stringdata, (uint8_t*)devprop_generate_string(string), string->length);
+	memcpy(stringdata, (uint8_t *)devprop_generate_string(string), string->length);
 	stringlength = string->length;
 
 	return true;

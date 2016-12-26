@@ -560,7 +560,7 @@ int is_no_emulation(int drive)
 	printf("drive_num: %x\n", pkt.drive_num);
 	printf("device_spec: %x\n", pkt.device_spec);
 
-	pause();
+	pause("\n[DEBUG] ");
 #endif
 
 	/* Some BIOSes erroneously return cf = 1 */
@@ -730,7 +730,7 @@ int get_drive_info(int drive, struct driveInfo *dp)
 	print_drive_info(di);
 	printf("uses_ebios = 0x%x\n", dp->uses_ebios);
 	printf("result %d\n", ret);
-	pause();
+	pause("\n[DEBUG] ");
 #endif
 
 	if (ret == 0) {

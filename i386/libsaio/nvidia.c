@@ -77,7 +77,7 @@
 #define WRITE_LE_SHORT(data)       (((data) << 8 & 0xff00) | ((data) >> 8 & 0x00ff ))
 #define WRITE_LE_INT(data)         (WRITE_LE_SHORT(data) << 16 | WRITE_LE_SHORT(data >> 16))
 
-static bool     showGeneric         = false;
+static bool	showGeneric	= false;
 static bool	doit		= false;
 char generic_name[128];
 extern uint32_t devices_number;

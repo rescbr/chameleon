@@ -74,11 +74,10 @@ typedef u_int64_t cn_t;
 typedef u_int16_t wchar;
 
 #pragma pack(1)
-
-#define BBSIZE              1024
-#define	BBOFF               ((off_t)(0))
-#define	BBLOCK              ((daddr_t)(0))
-#define	NTFS_MFTINO         0
+#define BBSIZE			1024
+#define	BBOFF			((off_t)(0))
+#define	BBLOCK			((daddr_t)(0))
+#define	NTFS_MFTINO		0
 #define	NTFS_VOLUMEINO		3
 #define	NTFS_ATTRDEFINO		4
 #define	NTFS_ROOTINO		5
@@ -108,14 +107,14 @@ struct attrhdr {
 	u_int16_t       a_index;
 };
 
-#define NTFS_A_STD          0x10
-#define NTFS_A_ATTRLIST     0x20
-#define NTFS_A_NAME         0x30
+#define NTFS_A_STD		0x10
+#define NTFS_A_ATTRLIST		0x20
+#define NTFS_A_NAME		0x30
 #define NTFS_A_VOLUMENAME	0x60
-#define NTFS_A_DATA         0x80
-#define	NTFS_A_INDXROOT     0x90
-#define	NTFS_A_INDX         0xA0
-#define NTFS_A_INDXBITMAP   0xB0
+#define NTFS_A_DATA		0x80
+#define	NTFS_A_INDXROOT		0x90
+#define	NTFS_A_INDX		0xA0
+#define NTFS_A_INDXBITMAP	0xB0
 
 #define NTFS_MAXATTRNAME	255
 
@@ -140,7 +139,7 @@ struct attr {
 		}               a_S_nr;
 	}               a_S;
 };
-#define a_r     a_S.a_S_r
+#define a_r	a_S.a_S_r
 #define a_nr	a_S.a_S_nr
 
 typedef struct {
@@ -150,15 +149,15 @@ typedef struct {
 	u_int64_t       t_access;
 } ntfs_times_t;
 
-#define NTFS_FFLAG_RDONLY       0x01LL
-#define NTFS_FFLAG_HIDDEN       0x02LL
-#define NTFS_FFLAG_SYSTEM       0x04LL
-#define NTFS_FFLAG_ARCHIVE      0x20LL
+#define NTFS_FFLAG_RDONLY	0x01LL
+#define NTFS_FFLAG_HIDDEN	0x02LL
+#define NTFS_FFLAG_SYSTEM	0x04LL
+#define NTFS_FFLAG_ARCHIVE	0x20LL
 #define NTFS_FFLAG_COMPRESSED	0x0800LL
-#define NTFS_FFLAG_DIR          0x10000000LL
+#define NTFS_FFLAG_DIR		0x10000000LL
 
 struct attr_name {
-	u_int32_t       n_pnumber;	/* Parent ntnode */
+	u_int32_t	n_pnumber;	/* Parent ntnode */
 	u_int32_t       reserved;
 	ntfs_times_t    n_times;
 	u_int64_t       n_size;
@@ -179,7 +178,7 @@ struct attr_indexroot {
 	u_int32_t       ir_datalen;	/* (total size of index enties?) sizeof something */
 	u_int32_t       ir_allocated;	/* (allocated size of index entries?) */
 	u_int8_t       	ir_flag;	/* 1=index allocation needed (large index) */
-    u_int8_t        ir_pad1;	/* padding */
+        u_int8_t	ir_pad1;	/* padding */
 	u_int16_t       ir_pad2;	/* padding */
 };
 
@@ -221,7 +220,7 @@ struct attr_indexentry {
 	u_int64_t       ie_fallocated;
 	u_int64_t       ie_fsize;
 	u_int32_t       ie_fflag;
-    u_int32_t       unknown3;	/* used by reparse points and external attributes? */
+        u_int32_t	unknown3;	/* used by reparse points and external attributes? */
 	u_int8_t        ie_fnamelen;
 	u_int8_t        ie_fnametype;
 	wchar           ie_fname[NTFS_MAXFILENAME];
@@ -244,8 +243,8 @@ struct filerec {
 };
 
 #define	NTFS_ATTRNAME_MAXLEN	0x40
-#define	NTFS_ADFLAG_NONRES      0x0080	/* Attrib can be non resident */
-#define	NTFS_ADFLAG_INDEX       0x0002	/* Attrib can be indexed */
+#define	NTFS_ADFLAG_NONRES	0x0080	/* Attrib can be non resident */
+#define	NTFS_ADFLAG_INDEX	0x0002	/* Attrib can be indexed */
 struct attrdef {
 	wchar		ad_name[NTFS_ATTRNAME_MAXLEN];
 	u_int32_t	ad_type;
@@ -257,7 +256,7 @@ struct attrdef {
 
 struct ntvattrdef {
 	char		ad_name[0x40];
-	int         ad_namelen;
+	int		ad_namelen;
 	u_int32_t	ad_type;
 };
 
@@ -270,21 +269,21 @@ struct bootfile {
 	u_int8_t        bf_spc;		/* sectors per cluster */
 	u_int8_t        reserved2[7];	/* unused (zeroed) */
 	u_int8_t        bf_media;	/* media desc. (0xF8) */
-	u_int8_t        reserved3[2]; /* always 0 */
+	u_int8_t        reserved3[2];	/* always 0 */
 	u_int16_t       bf_spt;		/* sectors per track */
 	u_int16_t       bf_heads;	/* number of heads */
-    u_int32_t       bf_hidsecs;  /* hidden sectors */
-	u_int8_t        reserver4[8]; /* not used by NTFS (0x00000000) */
+	u_int32_t       bf_hidsecs;	/* hidden sectors */
+	u_int8_t        reserver4[8];	/* not used by NTFS (0x00000000) */
 	u_int64_t       bf_spv;		/* sectors per volume (total) */
 	cn_t            bf_mftcn;	/* $MFT cluster number */
 	cn_t            bf_mftmirrcn;	/* $MFTMirr cn */
 	u_int8_t        bf_mftrecsz;	/* MFT record size (clust) */
-                                    /* 0xF6 inducates 1/4 */
-    u_int8_t        reserved5[3];
+					/* 0xF6 inducates 1/4 */
+	u_int8_t        reserved5[3];
 	u_int8_t        bf_ibsz;	/* index buffer size */
-    u_int8_t        reserved6[3];   /* not used by NTFS (0x000000) */
+	u_int8_t        reserved6[3];	/* not used by NTFS (0x000000) */
 	u_int64_t       bf_volsn;	/* volume ser. num. */
-    u_int32_t       bf_crc32;    /* checksum */
+	u_int32_t       bf_crc32;	/* checksum */
 };
 
 /*
@@ -303,50 +302,50 @@ struct bootfile {
 
 #define	NTFS_SYSNODESNUM	0x0B
 struct ntfsmount {
-	struct mount       *ntm_mountp;	/* filesystem vfs structure */
-	struct bootfile     ntm_bootfile;
-	dev_t               ntm_dev;	/* device mounted */
-	struct vnode       *ntm_devvp;	/* block device mounted vnode */
-	struct vnode       *ntm_sysvn[NTFS_SYSNODESNUM];
-	u_int32_t           ntm_bpmftrec;
-	uid_t               ntm_uid;
-	gid_t               ntm_gid;
-	mode_t              ntm_mode;
-	u_long              ntm_flag;
-	cn_t                ntm_cfree;
-	struct ntvattrdef  *ntm_ad;	/* attribute names are stored in native byte order */
-	int                 ntm_adnum;
- 	wchar *             ntm_82u;	/* 8bit to Unicode */
- 	char **             ntm_u28;	/* Unicode to 8 bit */
+	struct mount   *ntm_mountp;	/* filesystem vfs structure */
+	struct bootfile ntm_bootfile;
+	dev_t           ntm_dev;	/* device mounted */
+	struct vnode   *ntm_devvp;	/* block device mounted vnode */
+	struct vnode   *ntm_sysvn[NTFS_SYSNODESNUM];
+	u_int32_t       ntm_bpmftrec;
+	uid_t           ntm_uid;
+	gid_t           ntm_gid;
+	mode_t          ntm_mode;
+	u_long          ntm_flag;
+	cn_t		ntm_cfree;
+	struct ntvattrdef *ntm_ad;	/* attribute names are stored in native byte order */
+	int		ntm_adnum;
+ 	wchar *		ntm_82u;	/* 8bit to Unicode */
+ 	char **		ntm_u28;	/* Unicode to 8 bit */
 #ifdef APPLE
 	struct netexport ntm_export;	/* NFS export information */
 #endif
 };
 
-#define ntm_mftcn       ntm_bootfile.bf_mftcn
+#define ntm_mftcn	ntm_bootfile.bf_mftcn
 #define ntm_mftmirrcn	ntm_bootfile.bf_mftmirrcn
 #define	ntm_mftrecsz	ntm_bootfile.bf_mftrecsz
-#define	ntm_spc         ntm_bootfile.bf_spc
-#define	ntm_bps         ntm_bootfile.bf_bps
+#define	ntm_spc		ntm_bootfile.bf_spc
+#define	ntm_bps		ntm_bootfile.bf_bps
 
 #pragma pack()
 
 #define	NTFS_NEXTREC(s, type) ((type)(((caddr_t) s) + le16toh((s)->reclen)))
 
 /* Convert mount ptr to ntfsmount ptr. */
-#define VFSTONTFS(mp)       ((struct ntfsmount *)((mp)->mnt_data))
-#define VTONT(v)            FTONT(VTOF(v))
-#define	VTOF(v)             ((struct fnode *)((v)->v_data))
-#define	FTOV(f)             ((f)->f_vp)
-#define	FTONT(f)            ((f)->f_ip)
-#define ntfs_cntobn(cn)     ((daddr_t)(cn) * (ntmp->ntm_spc))
-#define ntfs_cntob(cn)      ((off_t)(cn) * (ntmp)->ntm_spc * (ntmp)->ntm_bps)
-#define ntfs_btocn(off)     (cn_t)((off) / ((ntmp)->ntm_spc * (ntmp)->ntm_bps))
-#define ntfs_btocl(off)     (cn_t)((off + ntfs_cntob(1) - 1) / ((ntmp)->ntm_spc * (ntmp)->ntm_bps))
+#define VFSTONTFS(mp)	((struct ntfsmount *)((mp)->mnt_data))
+#define VTONT(v)	FTONT(VTOF(v))
+#define	VTOF(v)		((struct fnode *)((v)->v_data))
+#define	FTOV(f)		((f)->f_vp)
+#define	FTONT(f)	((f)->f_ip)
+#define ntfs_cntobn(cn)	((daddr_t)(cn) * (ntmp->ntm_spc))
+#define ntfs_cntob(cn)	((off_t)(cn) * (ntmp)->ntm_spc * (ntmp)->ntm_bps)
+#define ntfs_btocn(off)	(cn_t)((off) / ((ntmp)->ntm_spc * (ntmp)->ntm_bps))
+#define ntfs_btocl(off)	(cn_t)((off + ntfs_cntob(1) - 1) / ((ntmp)->ntm_spc * (ntmp)->ntm_bps))
 #define ntfs_btocnoff(off)	(off_t)((off) % ((ntmp)->ntm_spc * (ntmp)->ntm_bps))
-#define ntfs_bntob(bn)      (daddr_t)((bn) * (ntmp)->ntm_bps)
+#define ntfs_bntob(bn)	(daddr_t)((bn) * (ntmp)->ntm_bps)
 
-#define	ntfs_bpbl           (daddr_t)((ntmp)->ntm_bps)
+#define	ntfs_bpbl	(daddr_t)((ntmp)->ntm_bps)
 
 #ifdef MALLOC_DECLARE
 MALLOC_DECLARE(M_NTFSMNT);

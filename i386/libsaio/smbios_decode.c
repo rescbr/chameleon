@@ -230,10 +230,12 @@ char *SMBStringForField(SMBStructHeader *structHeader, uint8_t field, const bool
 {
 	char  *str = NULL;
 	str = getSMBStringForField(structHeader, field);
-	if (!field) {
+	if (!field)
+	{
 		str = NotSpecifiedStr;
 	}
-	else if (mask) {
+	else if (mask)
+	{
 		str = PrivateStr;
 	}
 
@@ -279,16 +281,22 @@ void decodeSystemInformation(SMBStructHeader *structHeader)
 	verbose("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBSystemInformation *)structHeader)->version, neverMask));
 	verbose("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBSystemInformation *)structHeader)->serialNumber, privateData));
 	uint8_t *uuid = ((SMBSystemInformation *)structHeader)->uuid;
-	if (privateData) {
+	if (privateData)
+	{
 		verbose("\tUUID: %s\n", PrivateStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tUUID: %02X%02X%02X%02X-%02X%02X-%02X%02X-%02x%02X-%02X%02X%02X%02X%02X%02X\n",
 			uuid[0], uuid[1], uuid[2], uuid[3], uuid[4], uuid[5], uuid[6], uuid[7],
 			uuid[8], uuid[9], uuid[10], uuid[11], uuid[12], uuid[13], uuid[14], uuid[15]);
 	}
-	if (((SMBSystemInformation *)structHeader)->wakeupReason > 8) {
+	if (((SMBSystemInformation *)structHeader)->wakeupReason > 8)
+	{
 		verbose("\tWake-up Type: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tWake-up Type: %s\n", SMBWakeUpTypes[((SMBSystemInformation *)structHeader)->wakeupReason]);
 	}
 	verbose("\tSKU Number: %s\n", SMBStringForField(structHeader, ((SMBSystemInformation *)structHeader)->skuNumber, neverMask)); // System SKU#
@@ -311,9 +319,12 @@ void decodeBaseBoard(SMBStructHeader *structHeader)
 // Feature Flags (BYTE)
 	verbose("\tLocation In Chassis: %s\n", SMBStringForField(structHeader, ((SMBBaseBoard *)structHeader)->locationInChassis, neverMask)); // Part Component
 // Chassis Handle (WORD)
-	if ((((SMBBaseBoard *)structHeader)->boardType < kSMBBaseBoardUnknown) || (((SMBBaseBoard *)structHeader)->boardType > kSMBBaseBoardInterconnect)) {
+	if ((((SMBBaseBoard *)structHeader)->boardType < kSMBBaseBoardUnknown) || (((SMBBaseBoard *)structHeader)->boardType > kSMBBaseBoardInterconnect))
+	{
 		verbose("\tType: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tType: %s\n", SMBBaseBoardTypes[(((SMBBaseBoard *)structHeader)->boardType - 1)]);
 	}
 // Number of Contained Object Handles (n) (BYTE)
@@ -329,9 +340,12 @@ void decodeSystemEnclosure(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	verbose("Chassis Information\n");
 	verbose("\tManufacturer: %s\n", SMBStringForField(structHeader, ((SMBSystemEnclosure *)structHeader)->manufacturer, neverMask));
-	if ((((SMBSystemEnclosure *)structHeader)->chassisType < kSMBchassisOther) || (((SMBSystemEnclosure *)structHeader)->chassisType > kSMBchassisBladeEnclosing)) {
+	if ((((SMBSystemEnclosure *)structHeader)->chassisType < kSMBchassisOther) || (((SMBSystemEnclosure *)structHeader)->chassisType > kSMBchassisBladeEnclosing))
+	{
 		verbose("\tType: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tType: %s\n", SMBChassisTypes[(((SMBSystemEnclosure *)structHeader)->chassisType - 1)]);
 	}
 // Lock:
@@ -362,14 +376,16 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 	verbose("\tSocket Designation: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->socketDesignation, neverMask));
 	if ((((SMBProcessorInformation *)structHeader)->processorType < kSMBprocessorTypeOther) || (((SMBProcessorInformation *)structHeader)->processorType > kSMBprocessorTypeGPU)) {
 		verbose("\tType: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tType: %s\n", SMBProcessorTypes[((SMBProcessorInformation *)structHeader)->processorType - 1]);
 	}
 	verbose("\tFamily: 0x%X\n", ((SMBProcessorInformation *)structHeader)->processorFamily);
 	verbose("\tManufacturer: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->manufacturer, neverMask));
-    uint64_t procID = ((SMBProcessorInformation *)structHeader)->processorID;
-//    verbose("\tID: %02X %02X %02X %02X %02X %02X %02X %02X\n", bitfield(procID, 63, 56), bitfield(procID, 55, 48), bitfield(procID, 47, 40), bitfield(procID, 39, 32), bitfield(procID, 31, 24), bitfield(procID, 23, 16), bitfield(procID, 15, 8), bitfield(procID, 7, 0));
-    verbose("\tID: %02X %02X %02X %02X %02X %02X %02X %02X\n", (procID >> 56) & 0xFF, (procID >> 48) & 0xFF, (procID >> 40) & 0xFF, (procID >> 32) & 0xFF, (procID >> 24) & 0xFF, (procID >> 16) & 0xFF, (procID >> 8) & 0xFF, (procID >> 0) & 0xFF);
+	uint64_t procID = ((SMBProcessorInformation *)structHeader)->processorID;
+//	verbose("\tID: %02X %02X %02X %02X %02X %02X %02X %02X\n", bitfield(procID, 63, 56), bitfield(procID, 55, 48), bitfield(procID, 47, 40), bitfield(procID, 39, 32), bitfield(procID, 31, 24), bitfield(procID, 23, 16), bitfield(procID, 15, 8), bitfield(procID, 7, 0));
+	verbose("\tID: %02X %02X %02X %02X %02X %02X %02X %02X\n", (procID >> 56) & 0xFF, (procID >> 48) & 0xFF, (procID >> 40) & 0xFF, (procID >> 32) & 0xFF, (procID >> 24) & 0xFF, (procID >> 16) & 0xFF, (procID >> 8) & 0xFF, (procID >> 0) & 0xFF);
 //	verbose("\tSignature: Type=%02X, Family=%02X, Model=%02X, Stepping=%02X\n", (eax >> 12) & 0x3, ((eax >> 20) & 0xFF) + ((eax >> 8) & 0x0F), ((eax >> 12) & 0xF0) + ((eax >> 4) & 0x0F), eax & 0xF);
 // Flags:
 	verbose("\tVersion: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->processorVersion, neverMask));
@@ -378,9 +394,12 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 	verbose("\tMax Speed: %d MHz\n", ((SMBProcessorInformation *)structHeader)->maximumClock);
 	verbose("\tCurrent Speed: %d MHz\n", ((SMBProcessorInformation *)structHeader)->currentClock);
 // Status: Populated/Unpopulated
-	if ((((SMBProcessorInformation *)structHeader)->processorUpgrade < 1) || (((SMBProcessorInformation *)structHeader)->processorUpgrade > 0x2C)) {
+	if ((((SMBProcessorInformation *)structHeader)->processorUpgrade < 1) || (((SMBProcessorInformation *)structHeader)->processorUpgrade > 0x2C))
+	{
 		verbose("\tUpgrade: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tUpgrade: %s\n", SMBProcessorUpgrades[((SMBProcessorInformation *)structHeader)->processorUpgrade - 1]);
 	}
 // L1 Cache Handle:
@@ -442,7 +461,8 @@ void decodeSMBOEMStrings(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	verbose("OEM Strings\n");
 	SMBByte i;
-	for (i = 1; i <= ((SMBOEMStrings *)structHeader)->count; i++) {
+	for (i = 1; i <= ((SMBOEMStrings *)structHeader)->count; i++)
+	{
 		verbose("\tString %d: %s\n", i, stringPtr);
 		stringPtr = stringPtr + strlen(stringPtr) + 1;
 	}
@@ -468,39 +488,48 @@ void decodeMemoryDevice(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	verbose("Memory Device\n");
 // Aray Handle
-	if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF) {
+	if (((SMBMemoryDevice *)structHeader)->errorHandle == 0xFFFF)
+	{
 		verbose("\tError Information Handle: No Error\n");
-	} else {
+	}
+	else
+	{
 		verbose("\tError Information Handle: 0x%x\n", ((SMBMemoryDevice *)structHeader)->errorHandle);
 	}
 // Total Width:
 // Data Width:
 	switch (((SMBMemoryDevice *)structHeader)->memorySize)
 	{
-        case 0:
-            verbose("\tSize: No Module Installed\n");
-            break;
-        case 0x7FFF:
-            verbose("\tSize: 32GB or more\n");
-            break;
-        case 0xFFFF:
-            verbose("\tSize: Unknown\n");
-            break;
-        default:
-            verbose("\tSize: %d %s\n", ((SMBMemoryDevice *)structHeader)->memorySize & 0x7FFF, ((((SMBMemoryDevice *)structHeader)->memorySize & 0x8000) == 0x8000) ? "kB" : "MB");
-            break;
-    }
-    if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F)) {
+		case 0:
+			verbose("\tSize: No Module Installed\n");
+			break;
+		case 0x7FFF:
+			verbose("\tSize: 32GB or more\n");
+			break;
+		case 0xFFFF:
+			verbose("\tSize: Unknown\n");
+			break;
+		default:
+			verbose("\tSize: %d %s\n", ((SMBMemoryDevice *)structHeader)->memorySize & 0x7FFF, ((((SMBMemoryDevice *)structHeader)->memorySize & 0x8000) == 0x8000) ? "kB" : "MB");
+			break;
+	}
+	if ((((SMBMemoryDevice *)structHeader)->formFactor < 0x01) || (((SMBMemoryDevice *)structHeader)->formFactor > 0x0F))
+	{
  		verbose("\tForm Factor: %s\n", OutOfSpecStr);
- 	} else {
-        verbose("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
-      }
+ 	}
+	else
+	{
+		verbose("\tForm Factor: %s\n", SMBMemoryDeviceFormFactors[((SMBMemoryDevice *)structHeader)->formFactor - 1]);
+	}
 // Set:
 	verbose("\tLocator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->deviceLocator, neverMask));
 	verbose("\tBank Locator: %s\n", SMBStringForField(structHeader, ((SMBMemoryDevice *)structHeader)->bankLocator, neverMask));
-	if (((SMBMemoryDevice *)structHeader)->memoryType > kSMBMemoryDeviceTypeCount) {
+	if (((SMBMemoryDevice *)structHeader)->memoryType > kSMBMemoryDeviceTypeCount)
+	{
 		verbose("\tMemory Type: %s\n", OutOfSpecStr);
-	} else {
+	}
+	else
+	{
 		verbose("\tMemory Type: %s\n", SMBMemoryDeviceTypes[((SMBMemoryDevice *)structHeader)->memoryType]);
 	}
 // Type Detail:
@@ -574,7 +603,7 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 
 	getBoolForKey(kPrivateData, &privateData, &bootInfo->chameleonConfig);  // Bungo: chek if mask some data
 
-    verbose("\n");
+	verbose("\n");
 	for (;((eps->dmi.tableAddress + eps->dmi.tableLength) > ((uint32_t)(uint8_t *)structHeader + sizeof(SMBStructHeader)));)
 	{
 		switch (structHeader->type)
@@ -636,7 +665,7 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 			//	break;
 
 			case kSMBTypeEndOfTable: // Type 127
-                printHeader(structHeader);
+				printHeader(structHeader);
 				//verbose("Handle 0x%04x, DMI type %d, %d  bytes\n", structHeader->handle, structHeader->type, structHeader->length);
 				verbose("End of Table\n");
 				break;
@@ -648,13 +677,15 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 		ptr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 
 		structHeader = (SMBStructHeader *)ptr;
 	}
-    if (gVerboseMode) pause("");
-	verbose("\n");
+#if DEBUG_SMBIOS
+		pause("\n[DEBUG_SMBIOS] ");
+#endif
 }
 

@@ -73,7 +73,7 @@ typedef struct Tag Tag, *TagPtr;
 
 typedef struct {
 	char	plist[IO_CONFIG_DATA_SIZE];	// buffer for plist
-	TagPtr	dictionary;     		// buffer for xml dictionary
+	TagPtr	dictionary;			// buffer for xml dictionary
 	bool	canOverride;			// flag to mark a dictionary can be overriden
 } config_file_t;
 
@@ -144,9 +144,9 @@ typedef struct FinderInfo
 } FinderInfo;
 
 
-struct         BootVolume;
-typedef struct BootVolume *BVRef;
-typedef struct BootVolume *CICell;
+struct		BootVolume;
+typedef struct	BootVolume *BVRef;
+typedef struct	BootVolume *CICell;
 
 typedef long (*FSInit)(CICell ih);
 typedef long (*FSLoadFile)(CICell ih, char * filePath);
@@ -167,52 +167,52 @@ struct iob {
 	int            i_filesize;      /* size of file */
 };
 
-#define BPS         512                  /* sector size of the device */
-#define F_READ      0x1				/* file opened for reading */
-#define F_WRITE     0x2				/* file opened for writing */
-#define F_ALLOC     0x4				/* buffer allocated */
-#define F_FILE      0x8				/* file instead of device */
-#define F_NBSF      0x10				/* no bad sector forwarding */
-#define F_SSI       0x40				/* set skip sector inhibit */
-#define F_MEM       0x80				/* memory instead of file or device */
+#define BPS	   512				/* sector size of the device */
+#define F_READ	   0x1				/* file opened for reading */
+#define F_WRITE	   0x2				/* file opened for writing */
+#define F_ALLOC	   0x4				/* buffer allocated */
+#define F_FILE	   0x8				/* file instead of device */
+#define F_NBSF	   0x10				/* no bad sector forwarding */
+#define F_SSI	   0x40				/* set skip sector inhibit */
+#define F_MEM	   0x80				/* memory instead of file or device */
 
 struct dirstuff {
-	char *              dir_path;		/* directory path */
-	long long           dir_index;		/* directory entry index */
-	BVRef               dir_bvr;        /* volume reference */
+	char *		   dir_path;		/* directory path */
+	long long	   dir_index;		/* directory entry index */
+	BVRef		   dir_bvr;		/* volume reference */
 };
 
 #define BVSTRLEN 36 // changed from 32 to 36 due to gpt partition name length
 #define OSVERSTRLEN 9
 
 struct BootVolume {
-	BVRef               next;                   /* list linkage pointer */
-	int                 biosdev;                /* BIOS device number */
-	int                 type;                   /* device type (floppy, hd, network) */
-	unsigned int		flags;                  /* attribute flags */
-	BVGetDescription	description;            /* BVGetDescription function */
-	int                 part_no;                /* partition number (1 based) */
-	unsigned int		part_boff;              /* partition block offset */
-	unsigned int		part_type;              /* partition type */
-	unsigned int		fs_boff;                /* 1st block # of next read */
-	unsigned int		fs_byteoff;             /* Byte offset for read within block */
-	FSLoadFile          fs_loadfile;            /* FSLoadFile function */
-	FSReadFile          fs_readfile;            /* FSReadFile function */
-	FSGetDirEntry		fs_getdirentry;         /* FSGetDirEntry function */
-	FSGetFileBlock		fs_getfileblock;        /* FSGetFileBlock function */
-	FSGetUUID           fs_getuuid;             /* FSGetUUID function */
-	unsigned int		bps;                    /* bytes per sector for this device */
-	char                name[BVSTRLEN];         /* (name of partition) */
-	char                type_name[BVSTRLEN];    /* (type of partition, eg. Apple_HFS) */
-	BVFree              bv_free;                /* BVFree function */
-	uint32_t            modTime;
-	char                label[BVSTRLEN];        /* partition volume label */
-	char                altlabel[BVSTRLEN];     /* alternate partition volume label */
-	bool                filtered;               /* newFilteredBVChain() will set to TRUE */
-	bool                visible;                /* will shown in the device list */
-	char                OSVersion[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' e.g. "10.10.10" - hope will not reach e.g. 111.222.333 soon:) If so, OSVERSTRLEN 9 change to 12 */
-	bool                OSisServer;             /* 1 = OS X server , 0 = OS X client */
-	bool                OSisInstaller;          /* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
+	BVRef			next;			/* list linkage pointer */
+	int			biosdev;		/* BIOS device number */
+	int			type;			/* device type (floppy, hd, network) */
+	unsigned int		flags;			/* attribute flags */
+	BVGetDescription	description;		/* BVGetDescription function */
+	int			part_no;		/* partition number (1 based) */
+	unsigned int		part_boff;		/* partition block offset */
+	unsigned int		part_type;		/* partition type */
+	unsigned int		fs_boff;		/* 1st block # of next read */
+	unsigned int		fs_byteoff;		/* Byte offset for read within block */
+	FSLoadFile		fs_loadfile;		/* FSLoadFile function */
+	FSReadFile		fs_readfile;		/* FSReadFile function */
+	FSGetDirEntry		fs_getdirentry;		/* FSGetDirEntry function */
+	FSGetFileBlock		fs_getfileblock;	/* FSGetFileBlock function */
+	FSGetUUID		fs_getuuid;		/* FSGetUUID function */
+	unsigned int		bps;			/* bytes per sector for this device */
+	char			name[BVSTRLEN];		/* (name of partition) */
+	char			type_name[BVSTRLEN];	/* (type of partition, eg. Apple_HFS) */
+	BVFree			bv_free;		/* BVFree function */
+	uint32_t		modTime;
+	char			label[BVSTRLEN];	/* partition volume label */
+	char			altlabel[BVSTRLEN];	/* alternate partition volume label */
+	bool			filtered;		/* newFilteredBVChain() will set to TRUE */
+	bool			visible;		/* will shown in the device list */
+	char			OSVersion[OSVERSTRLEN]; /* Null terminated string from '/System/Library/CoreServices/SystemVersion.plist/ProductVersion' e.g. "10.10.10" - hope will not reach e.g. 111.222.333 soon:) If so, OSVERSTRLEN 9 change to 12 */
+	bool			OSisServer;		/* 1 = OS X server , 0 = OS X client */
+	bool			OSisInstaller;		/* 1 = OS X Install partition / recovery partition , 0 = OS X Install */
 
 };
 
@@ -225,13 +225,13 @@ enum
 	kBVFlagEFISystem		= 0x10,
 	kBVFlagBooter			= 0x20,
 	kBVFlagSystemVolume		= 0x40,
-	kBVFlagInstallVolume	= 0x80
+	kBVFlagInstallVolume		= 0x80
 };
 
 enum
 {
 	kBIOSDevTypeFloppy		= 0x00,
-	kBIOSDevTypeHardDrive	= 0x80,
+	kBIOSDevTypeHardDrive		= 0x80,
 	kBIOSDevTypeNetwork		= 0xE0,
 	kBIOSDevUnitMask		= 0x0F,
 	kBIOSDevTypeMask		= 0xF0,
@@ -241,18 +241,18 @@ enum
 enum
 {
 	//KPartitionTypeFAT12		= 0x01,     // FAT12
-	kPartitionTypeHPFS          = 0x07,     // Mac OS X
-	kPartitionTypeFAT16         = 0x06,     // FAT16
-	kPartitionTypeFAT32         = 0x0C,     // FAT32
-	kPartitionTypeEXT3          = 0x83,     // Linux
+	kPartitionTypeHPFS		= 0x07,     // Mac OS X
+	kPartitionTypeFAT16		= 0x06,     // FAT16
+	kPartitionTypeFAT32		= 0x0C,     // FAT32
+	kPartitionTypeEXT3		= 0x83,     // Linux
 	kPartitionTypeOSXBoot		= 0xAB,     // Mac OS X Boot partition
 	kPartitionTypeFreeBSD		= 0xA5,     // FreeBSD
 	kPartitionTypeOpenBSD		= 0xA6,     // OpenBSD
 	//kPartitionTypeNeXTSTEP	= 0xA7      // NeXTSTEP
 	//kPartitionTypeNetBSD		= 0xA9      // NetBSD
-	kPartitionTypeHFS           = 0xAF,     // Mac OS X
+	kPartitionTypeHFS		= 0xAF,     // Mac OS X
 	//kPartitionTypeSolaris		= 0xBE,	    // Solaris
-	kPartitionTypeBEFS          = 0xEB,     // BeOS BFS
+	kPartitionTypeBEFS		= 0xEB,     // BeOS BFS
 	//kPartitionTypeBeOS		= 0xEB,     // BeOS BFS
 	//kPartitionTypeSkyOS		= 0xEC,     // SkyOS
 };

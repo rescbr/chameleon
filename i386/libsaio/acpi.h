@@ -33,13 +33,13 @@
 // TODO Migrate
 struct acpi_2_rsdp
 {
-    // 1.0
+	// 1.0
 	char			Signature[8];
 	uint8_t			Checksum;
 	char			OEMID[6];
 	uint8_t			Revision;
 	uint32_t		RsdtAddress;
-    // 2.0
+	// 2.0
 	uint32_t		Length;
 	uint64_t		XsdtAddress;
 	uint8_t			ExtendedChecksum;
@@ -101,13 +101,14 @@ struct acpi_2_ssdt
 	uint32_t		CreatorRevision;
 } __attribute__((packed));
 
-struct ssdt_pmref {
-    char oemTabID[9];
-    char byte1;
-    uint32_t addr;
-    char byte2;
-    uint32_t length;
-    char byte3;
+struct ssdt_pmref
+{
+	char oemTabID[9];
+	char byte1;
+	uint32_t addr;
+	char byte2;
+	uint32_t length;
+	char byte3;
 } __attribute__((packed));
 
 // TODO Migrate
@@ -176,7 +177,7 @@ struct acpi_2_fadt
 /* Begin Asere */
 	//Reset Fix
 	uint32_t        Flags;
-    // Reset Register
+	// Reset Register
 	uint8_t         Reset_SpaceID;
 	uint8_t         Reset_BitWidth;
 	uint8_t         Reset_BitOffset;
@@ -191,16 +192,17 @@ struct acpi_2_fadt
 	uint8_t         notimp2[96];
 } __attribute__((packed));
 
-struct acpi_2_facs {
-    char			Signature[4];
-	uint32_t		Length;
-    uint32_t        HWSignature;
-    uint32_t        FWWakingVector32;
-    uint32_t        GlobalLock;
-    uint32_t        Flags;
-    uint64_t        FWWakingVector64;
-    uint8_t         Version;
-    uint8_t         Reserved[31];
+struct acpi_2_facs
+{
+	char		Signature[4];
+	uint32_t	Length;
+	uint32_t        HWSignature;
+	uint32_t        FWWakingVector32;
+	uint32_t        GlobalLock;
+	uint32_t        Flags;
+	uint64_t        FWWakingVector64;
+	uint8_t         Version;
+	uint8_t         Reserved[31];
 } __attribute__((packed));
 
 #endif /* !__LIBSAIO_ACPI_H */

@@ -10,26 +10,28 @@
 /** Transform a 16 bytes hexadecimal value UUID to a string */
 const char * getStringFromUUID(const EFI_CHAR8* eUUID)
 {
-  static char msg[UUID_LEN*2 + 8] = "";
-  if (!eUUID) return "";
-  const unsigned char * uuid = (unsigned char*) eUUID;
-  sprintf(msg, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
+	static char msg[UUID_LEN*2 + 8] = "";
+	if (!eUUID) return "";
+	const unsigned char * uuid = (unsigned char*) eUUID;
+	sprintf(msg, "%02x%02x%02x%02x-%02x%02x-%02x%02x-%02x%02x-%02x%02x%02x%02x%02x%02x",
 		    uuid[0], uuid[1], uuid[2], uuid[3], 
 		    uuid[4], uuid[5], uuid[6], uuid[7],
 		    uuid[8], uuid[9], uuid[10],uuid[11],
 		    uuid[12],uuid[13],uuid[14],uuid[15]);
-  return msg ;
+	return msg ;
 }
 
 /** Parse an UUID string into an (EFI_CHAR8*) buffer */
 EFI_CHAR8*  getUUIDFromString(const char *source)
 {
-    if (!source) return 0;
-    int	i = strlen(source);
-    if (i != 36) { // e.g 00112233-4455-6677-8899-AABBCCDDEEFF
-        verbose("[ERROR] UUID='%s' has incorrect length=%d. Use format: 00112233-4455-6677-8899-AABBCCDDEEFF.\n", source, i);
-        return 0;
-    }
+	if (!source) return 0;
+	int	i = strlen(source);
+	if (i != 36)
+	{
+		// e.g 00112233-4455-6677-8899-AABBCCDDEEFF
+		verbose("[ERROR] UUID='%s' has incorrect length=%d. Use format: 00112233-4455-6677-8899-AABBCCDDEEFF.\n", source, i);
+		return 0;
+	}
 
 	char	*p = (char *)source;
 	char	buf[3];
@@ -67,8 +69,8 @@ uint32_t ascii_hex_to_int(char *buff)
 	uint32_t	value = 0, i, digit;
 	for(i = 0; i < strlen(buff); i++)
 	{
-		if (buff[i] >= 48 && buff[i] <= 57)			// '0' through '9'
-			digit = buff[i] - 48;	
+		if (buff[i] >= 48 && buff[i] <= 57)		// '0' through '9'
+			digit = buff[i] - 48;
 		else if (buff[i] >= 65 && buff[i] <= 70)	// 'A' through 'F'
 			digit = buff[i] - 55;
 		else if (buff[i] >= 97 && buff[i] <= 102)	// 'a' through 'f'
@@ -83,62 +85,62 @@ uint32_t ascii_hex_to_int(char *buff)
 
 void *convertHexStr2Binary(const char *hexStr, int *outLength)
 {
-  int len;
-  char hexNibble;
-  char hexByte[2];
-  uint8_t binChar;
-  uint8_t *binStr;
-  int hexStrIdx, binStrIdx, hexNibbleIdx;
+	int len;
+	char hexNibble;
+	char hexByte[2];
+	uint8_t binChar;
+	uint8_t *binStr;
+	int hexStrIdx, binStrIdx, hexNibbleIdx;
 
-  len = strlen(hexStr);
-  if (len > 1)
-  {
-    // the resulting binary will be the half size of the input hex string
-    binStr = malloc(len / 2);
+	len = strlen(hexStr);
+	if (len > 1)
+	{
+		// the resulting binary will be the half size of the input hex string
+		binStr = malloc(len / 2);
 
-    binStrIdx = 0;
-    hexNibbleIdx = 0;
-    for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
-    {
-      hexNibble = hexStr[hexStrIdx];
-      
-	// ignore all chars except valid hex numbers
-	if ( (hexNibble >= '0' && hexNibble <= '9') ||
-		(hexNibble >= 'A' && hexNibble <= 'F') ||
+		binStrIdx = 0;
+		hexNibbleIdx = 0;
+		for (hexStrIdx = 0; hexStrIdx < len; hexStrIdx++)
+		{
+			hexNibble = hexStr[hexStrIdx];
+
+			// ignore all chars except valid hex numbers
+			if ( (hexNibble >= '0' && hexNibble <= '9') ||
+				(hexNibble >= 'A' && hexNibble <= 'F') ||
 				(hexNibble >= 'a' && hexNibble <= 'f') )
 			{
-        hexByte[hexNibbleIdx++] = hexNibble;
-        
-        // found both two nibbles, convert to binary
-        if (hexNibbleIdx == 2)
-        {
-          binChar = 0;
-          
+				hexByte[hexNibbleIdx++] = hexNibble;
+
+				// found both two nibbles, convert to binary
+				if (hexNibbleIdx == 2)
+				{
+					binChar = 0;
+
 				for (hexNibbleIdx = 0; hexNibbleIdx < sizeof(hexByte); hexNibbleIdx++)
 				{
 					if (hexNibbleIdx > 0)
 					{
-			binChar = binChar << 4;
-		}
+						binChar = binChar << 4;
+					}
 
-            if (hexByte[hexNibbleIdx] <= '9') binChar += hexByte[hexNibbleIdx] - '0';
-            else if (hexByte[hexNibbleIdx] <= 'F') binChar += hexByte[hexNibbleIdx] - ('A' - 10);
-            else if (hexByte[hexNibbleIdx] <= 'f') binChar += hexByte[hexNibbleIdx] - ('a' - 10);
-          }
+					if (hexByte[hexNibbleIdx] <= '9') binChar += hexByte[hexNibbleIdx] - '0';
+					else if (hexByte[hexNibbleIdx] <= 'F') binChar += hexByte[hexNibbleIdx] - ('A' - 10);
+					else if (hexByte[hexNibbleIdx] <= 'f') binChar += hexByte[hexNibbleIdx] - ('a' - 10);
+				}
           
-          binStr[binStrIdx++] = binChar;						
-          hexNibbleIdx = 0;
-        }
-      }
-    }
-    *outLength = binStrIdx;
-    return binStr;
-  }
-  else
-  {
-    *outLength = 0;
-    return NULL;
-  }
+				binStr[binStrIdx++] = binChar;						
+				hexNibbleIdx = 0;
+				}
+			}
+		}
+		*outLength = binStrIdx;
+		return binStr;
+	}
+	else
+	{
+		*outLength = 0;
+		return NULL;
+	}
 }
 
 // FIXME: can't use my original code here,

@@ -866,7 +866,7 @@ print_nibble:
 ;--------------------------------------------------------------------------
 ; NULL terminated strings.
 ;
-log_title_str	db  10, 13, 'boot0:', 0
+log_title_str		db  10, 13, 'boot0:', 0
 
 gpt_str			db  'GPT', 0
 ;test_str		db  'test', 0
@@ -874,7 +874,7 @@ done_str		db  'done', 0
 
 %endif
 
-boot_error_str  db  'error', 0
+boot_error_str   	db  'error', 0
 
 ;--------------------------------------------------------------------------
 ; Pad the rest of the 512 byte sized booter with zeroes. The last

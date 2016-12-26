@@ -443,7 +443,7 @@ void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 
 	if (HFSInitPartition(ih) == -1)
 	{
-        verbose("HFSGetDescription: Init partition failed");
+		verbose("HFSGetDescription: Init partition failed");
 		return;
 	}
 
@@ -460,7 +460,7 @@ void HFSGetDescription(CICell ih, char *str, long strMaxLen)
 
 	strncpy(str, name, strMaxLen);
 	str[strMaxLen] = '\0';
-    //verbose("HFS: label=%s\n", str);
+	//verbose("HFS: label=%s\n", str);
 }
 
 //==============================================================================

@@ -39,9 +39,9 @@
 #endif
 
 char		gMacOSVersion[OSVERSTRLEN];
-uint32_t    MacOSVerCurrent = 0;
-bool showBootBanner = true; //Azi:showinfo
-static bool shouldboot = false;
+uint32_t	MacOSVerCurrent = 0;
+bool		showBootBanner = true; //Azi:showinfo
+static bool	shouldboot = false;
 
 extern int multiboot_timeout;
 extern int multiboot_timeout_set;
@@ -70,31 +70,46 @@ void showTextBuffer(char *buf_orig, int size);
 // MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
 uint32_t MacOSVer2Int(const char *osver)
 {
-    uint32_t    result = 0;
-    uint8_t    *resptr = (uint8_t *)&result;
-    uint8_t     len = strlen(osver);
-    uint8_t     i, j, m;
+	uint32_t    result = 0;
+	uint8_t    *resptr = (uint8_t *)&result;
+	uint8_t     len = strlen(osver);
+	uint8_t     i, j, m;
 #define CHR2UINT(c) ((uint8_t)(c - '0'))
 #define ISDIGIT(c)  ((c >= '0') && (c <= '9'))
 #define ISDOT(c)    (c == '.')
 
-    if (!osver || (len < 4) || (len > OSVERSTRLEN - 1) || !ISDIGIT(osver[0]) || !ISDOT(osver[2]) || !ISDIGIT(osver[len - 1])) {
-        verbose("ERROR: wrong Mac OS version string syntax: '%s'\n", osver);
-        return 0;
-    }
-    
-    for (i = 0, j = 3, m = 1; i < len; i++) {
-        if (ISDIGIT(osver[i])) {
-            resptr[j] = resptr[j] * m + CHR2UINT(osver[i]);
-            m = 10;
-        } else if (ISDOT(osver[i])) {
-            if (j > 0) j--;
-            else return 0;
-            m = 1;
-        } else return 0;
-    }
-    
-    return result;
+	if (!osver || (len < 4) || (len > OSVERSTRLEN - 1) || !ISDIGIT(osver[0]) || !ISDOT(osver[2]) || !ISDIGIT(osver[len - 1]))
+	{
+		verbose("ERROR: wrong Mac OS version string syntax: '%s'\n", osver);
+		return 0;
+	}
+
+	for (i = 0, j = 3, m = 1; i < len; i++)
+	{
+		if (ISDIGIT(osver[i]))
+		{
+			resptr[j] = resptr[j] * m + CHR2UINT(osver[i]);
+			m = 10;
+		}
+		else if (ISDOT(osver[i]))
+		{
+			if (j > 0)
+			{
+				j--;
+			}
+			else
+			{
+				return 0;
+			}
+			m = 1;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	return result;
 }
 
 //==========================================================================
@@ -143,11 +158,11 @@ static bool flushKeyboardBuffer(void)
 
 static int countdown( const char * msg, int row, int timeout )
 {
-    unsigned long time;
-    int ch  = 0;
-    int col = strlen(msg) + 1;
-	
-    flushKeyboardBuffer();
+	unsigned long time;
+	int ch  = 0;
+	int col = strlen(msg) + 1;
+
+	flushKeyboardBuffer();
 
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
@@ -157,53 +172,53 @@ static int countdown( const char * msg, int row, int timeout )
 	} else {
 
 		position_t p = pos( gui.screen.width / 2 + 1 , ( gui.devicelist.pos.y + 3 ) + ( ( gui.devicelist.height - gui.devicelist.iconspacing ) / 2 ) );
-	
+
 		char dummy[80];
 		getBootVolumeDescription( gBootVolume, dummy, sizeof(dummy) - 1, true );
 		drawDeviceIcon( gBootVolume, gui.screen.pixmap, p, true );
 		drawStrCenteredAt( (char *) msg, &font_small, gui.screen.pixmap, gui.countdown.pos );
-		
+
 		// make this screen the new background
 		memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
-		
+
 	}
 
 	int multi_buff = 18 * (timeout);
-    int multi = ++multi_buff;
+	int multi = ++multi_buff;
 
-    int lasttime=0;
+	int lasttime=0;
 
-    for ( time = time18(), timeout++; timeout > 0; )
-    {
+	for ( time = time18(), timeout++; timeout > 0; )
+	{
 		if( time18() > lasttime)
 		{
 			multi--; 
 			lasttime=time18();
 		}		
   
-        if ( (ch = readKeyboardStatus()) )
-            break;
+		if ( (ch = readKeyboardStatus()) )
+			break;
 
-        // Count can be interrupted by holding down shift,
-        // control or alt key
-        if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
+		// Count can be interrupted by holding down shift,
+		// control or alt key
+		if ( ( readKeyboardShiftFlags() & 0x0F ) != 0 )
 		{
-            ch = 1;
-            break;
-        }
+			ch = 1;
+			break;
+		}
 
-        if ( time18() >= time )
-        {
-            time += 18;
-            timeout--;
+		if ( time18() >= time )
+		{
+			time += 18;
+			timeout--;
 
 			if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 			{
 				moveCursor( col, row );
 				printf("(%d) ", timeout);
 			}
-        }
-	
+		}
+
 		if( bootArgs->Video.v_display != VGA_TEXT_MODE )
 		{
 			drawProgressBar( gui.screen.pixmap, 100, gui.progressbar.pos , ( multi * 100 / multi_buff ) );
@@ -211,20 +226,20 @@ static int countdown( const char * msg, int row, int timeout )
 			updateVRAM();
 		}
 
-    }
+	}
 
-    flushKeyboardBuffer();
+	flushKeyboardBuffer();
 
-    return ch;
+	return ch;
 }
 
 //==========================================================================
 
-char         gBootArgs[BOOT_STRING_LEN];
-static char *gBootArgsPtr = gBootArgs;
-static char *gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
-static char  booterCommand[BOOT_STRING_LEN];
-static char  booterParam[BOOT_STRING_LEN];
+char		gBootArgs[BOOT_STRING_LEN];
+static char	*gBootArgsPtr = gBootArgs;
+static char	*gBootArgsEnd = gBootArgs + BOOT_STRING_LEN - 1;
+static char	booterCommand[BOOT_STRING_LEN];
+static char	booterParam[BOOT_STRING_LEN];
 
 static void clearBootArgs(void)
 {
@@ -257,7 +272,7 @@ static void showBootPrompt(int row, bool visible)
 
 	if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 	{
-		changeCursor( 0, row, kCursorTypeUnderline, 0 );    
+		changeCursor( 0, row, kCursorTypeUnderline, 0 );
 		clearScreenRows( row, kScreenLastRow );
 	}
 
@@ -295,50 +310,56 @@ static void showBootPrompt(int row, bool visible)
 
 static void updateBootArgs( int key )
 {
-    key = ASCII_KEY(key);
+	key = ASCII_KEY(key);
 
-    switch ( key )
-    {
-        case KEY_BKSP:
-            if ( gBootArgsPtr > gBootArgs )
-            {
-                *--gBootArgsPtr = '\0';
+	switch ( key )
+	{
+		case KEY_BKSP:
+			if ( gBootArgsPtr > gBootArgs )
+			{
+				*--gBootArgsPtr = '\0';
 
-                int x, y, t;
-                getCursorPositionAndType( &x, &y, &t );
-                if ( x == 0 && y )
-                {
-                    x = 80; y--;
-                }
-                if (x) {
-			x--;
-		}
+				int x, y, t;
+				getCursorPositionAndType( &x, &y, &t );
+				if ( x == 0 && y )
+				{
+					x = 80; y--;
+				}
+
+				if (x)
+				{
+					x--;
+				}
 
 				if( bootArgs->Video.v_display == VGA_TEXT_MODE )
 				{
 					setCursorPosition( x, y, 0 );
 					putca(' ', 0x07, 1);
 				}
-                else
-                {
-                    updateGraphicBootPrompt();
-                }
-            }
-			break;
-
-        default:
-            if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
-            {
-                *gBootArgsPtr++ = key;
-
-			if( bootArgs->Video.v_display != VGA_TEXT_MODE )
-				updateGraphicBootPrompt();
-			else if ( key >= ' ' && key < 0x7f)
-				putchar(key);
+				else
+				{
+					updateGraphicBootPrompt();
+				}
 			}
-            
 			break;
-    }
+
+        	default:
+			if ( key >= ' ' && gBootArgsPtr < gBootArgsEnd)
+			{
+				*gBootArgsPtr++ = key;
+
+				if( bootArgs->Video.v_display != VGA_TEXT_MODE )
+				{
+					updateGraphicBootPrompt();
+				}
+				else if ( key >= ' ' && key < 0x7f)
+				{
+					putchar(key);
+				}
+			}
+
+			break;
+	}
 }
 
 //==========================================================================
@@ -410,11 +431,11 @@ static void showMenu( const MenuItem * items, int count,
 	// Draw the visible items.
 
 	if( bootArgs->Video.v_display != VGA_TEXT_MODE )
-	
+	{
 		drawDeviceList(gMenuStart, gMenuEnd, gMenuSelection);
-
-	else {
-		
+	}
+	else
+	{
 		changeCursor( 0, row, kCursorTypeHidden, &cursorState );
 
 		for ( i = gMenuTop; i <= gMenuBottom; i++ )
@@ -423,7 +444,7 @@ static void showMenu( const MenuItem * items, int count,
 		}
 
 		restoreCursor( &cursorState );
-    }
+	}
 }
 
 //==========================================================================
@@ -737,7 +758,7 @@ void lspci(void)
 
 	dump_pci_dt(root_pci_dev->children);
 
-	pause("");
+	pause("\n[dump lspci] ");
 
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
 		setActiveDisplayPage(0);
@@ -1148,26 +1169,27 @@ extern unsigned char chainbootflag;
 
 bool copyArgument(const char *argName, const char *val, int cnt, char **argP, int *cntRemainingP)
 {
-    int argLen = argName ? strlen(argName) : 0;
-	int len = argLen + cnt + 1;  // + 1 to account for space.
+	int argLen = argName ? strlen(argName) : 0;
+	int len = argLen + cnt + 1;  // +1 to account for space
 
 	if (argName)
 	{
 		len++; // +1 to account for '='
 	}
 
-    if (len > *cntRemainingP) {
-        error("Warning: boot arguments too long, truncating\n");
-        return false;
-    }
+	if (len > *cntRemainingP)
+	{
+		error("Warning: boot arguments too long, truncating\n");
+		return false;
+	}
 
 	if (argName)
 	{
-        strncpy( *argP, argName, argLen );
-        *argP += argLen;
-        *argP[0] = '=';
-        (*argP)++;
-    }
+		strncpy(*argP, argName, argLen);
+		*argP += argLen;
+		*argP[0] = '=';
+		(*argP)++;
+	}
 
 	strncpy(*argP, val, cnt);
 	*argP += cnt;
@@ -1231,8 +1253,10 @@ int processBootOptions()
 	skipblanks( &cp );
 
 	// Update the unit and partition number.
-	if (gBootVolume) {
-		if (!(gBootVolume->flags & kBVFlagNativeBoot)) {
+	if (gBootVolume)
+	{
+		if (!(gBootVolume->flags & kBVFlagNativeBoot))
+		{
 			readBootSector(gBootVolume->biosdev, gBootVolume->part_boff, (void *)0x7c00);
 			//
 			// Setup edx, and signal intention to chain load the
@@ -1250,26 +1274,28 @@ int processBootOptions()
 	}
 	// If no boot volume fail immediately because we're just going to fail
 	// trying to load the config file anyway.
-	else {
+	else
+	{
 		return -1;
 	}
-    
-    // Save a version of mac os we're booting.
-    MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
-    // so copy it and trim
-    gMacOSVersion[0] = 0;
+
+	// Save a version of mac os we're booting.
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	// so copy it and trim
+	gMacOSVersion[0] = 0;
 	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
 	{
-        strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 5);
 	}
 	else
 	{
-        strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
-    }
-    
+		strncat(gMacOSVersion, gBootVolume->OSVersion, 4);
+	}
+
 	// Load config table specified by the user, or use the default.
 
-	if (!getValueForBootKey(cp, "config", &val, &cnt)) {
+	if (!getValueForBootKey(cp, "config", &val, &cnt))
+	{
 		val = 0;
 		cnt = 0;
 	}
@@ -1365,7 +1391,7 @@ int processBootOptions()
 			gBootVolume->fs_getuuid(gBootVolume, gBootUUIDString);
 		}
 	}
-    verbose("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
+	verbose("Boot UUID [%s (%s), %s]: %s\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name, gBootUUIDString);
 
 	if (!processBootArgument(kRootDeviceKey, cp, configKernelFlags, bootInfo->config,
                              &argP, &cntRemaining, gRootDevice, ROOT_DEVICE_SIZE))
@@ -1379,8 +1405,8 @@ int processBootOptions()
 			val = valueBuffer;
 			if (cnt > 0)
 			{
-                copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
-            }
+				copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
+			}
 		}
 		else
 		{
@@ -1398,7 +1424,8 @@ int processBootOptions()
 			}
 		}
 /* Bungo
-		if (cnt > 0) {
+		if (cnt > 0)
+		{
 			copyArgument( kRootDeviceKey, val, cnt, &argP, &cntRemaining);
 		}
 */

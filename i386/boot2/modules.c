@@ -58,8 +58,8 @@ char *strrchr(const char *s, int c)
  */
 int init_module_system()
 {
-    // Start any modules that were compiled in first.
-    start_built_in_modules();
+	// Start any modules that were compiled in first.
+	start_built_in_modules();
 
 
 	int retVal = 0;
@@ -85,9 +85,11 @@ int init_module_system()
 		}
 		else
 		{
-			// The module does not have a valid start function
+#if CONFIG_MODULE_DEBUG
+            // The module does not have a valid start function
 			error("[ERROR!] Unable to start a module '%s' at 0x%08X.\n", SYMBOLS_MODULE, module_data);
-            pause("");
+            pause("[CONFIG_MODULE_DEBUG] ");
+#endif
 		}
 	}
 
@@ -207,7 +209,7 @@ int load_module(char* module)
 	// Check to see if the module has already been loaded
 	if(is_module_loaded(module))
 	{
-        verbose("Module '%s' already loaded.\n", module);
+		verbose("Module '%s' already loaded.\n", module);
 		return 1;
 	}
 
@@ -220,11 +222,11 @@ int load_module(char* module)
 	}
 	unsigned int moduleSize = file_size(fh);
 
-    if(moduleSize == 0)
-    {
-        verbose("[WARNING!] The module '%s' has a file size=%d. Not loading.\n", modString, moduleSize);
-        return 0;
-    }
+	if(moduleSize == 0)
+	{
+		verbose("[WARNING!] The module '%s' has a file size=%d. Not loading.\n", modString, moduleSize);
+		return 0;
+	}
 
 	char* module_base = (char*) malloc(moduleSize);
 	if (moduleSize && read(fh, module_base, moduleSize) == moduleSize)
@@ -243,10 +245,10 @@ int load_module(char* module)
 		else // The module does not have a valid start function. This may be a library.
 		{
 #if CONFIG_MODULE_DEBUG
-            error("[debug load_module] [WARNING!] Unable to start module '%s'.\n", module);
-			pause("");
+		error("[debug load_module] [WARNING!] Unable to start module '%s'.\n", module);
+        pause("[CONFIG_MODULE_DEBUG] ");
 #else
-            verbose("[WARNING!] Unable to start module '%s'.\n", module);
+		verbose("[WARNING!] Unable to start module '%s'.\n", module);
 #endif
 		}
 	}
@@ -254,9 +256,9 @@ int load_module(char* module)
 	{
 #if CONFIG_MODULE_DEBUG
 		error("[debug load_module] [WARNING!] Unable to read in module '%s'.\n", module);
-        pause("");
+        pause("[CONFIG_MODULE_DEBUG] ");
 #else
-        verbose("[WARNING!] Unable to read in module '%s'.\n", module);
+		verbose("[WARNING!] Unable to read in module '%s'.\n", module);
 #endif
 		retVal = 0;
 	}
@@ -306,9 +308,9 @@ void module_loaded(const char* name, void* start, const char* author, const char
 
 	loadedModules = new_entry;
 
-    if(!name) name = "Unknown";
-    if(!author) author = "Unknown";
-    if(!description) description = "";
+	if(!name) name = "Unknown";
+	if(!author) author = "Unknown";
+	if(!description) description = "";
 
 	new_entry->name = name;
 	new_entry->author = author;
@@ -338,6 +340,7 @@ int is_module_loaded(const char* name)
 		{
 			entry = entry->next;
 		}
+
 	}
 
 	//verbose("'%s' module not loaded.\n", name);
@@ -371,7 +374,7 @@ unsigned int lookup_all_symbols(const char* name)
 
 #if CONFIG_MODULE_DEBUG
 	printf("[debug lookup_all_symbols] [WARNING!] Unable to locate symbol %s.\n", name);
-	pause("");
+	pause("[CONFIG_MODULE_DEBUG] ");
 #endif
 
 	if(strcmp(name, VOID_SYMBOL) == 0) return 0xFFFFFFFF;
@@ -488,7 +491,7 @@ void* parse_mach(void* binary,
                     }
                 }
 				break;
-			case LC_SEGMENT_64:	// 64bit macho's
+                case LC_SEGMENT_64:	// 64bit macho's
                 {
                     segCommand64 = binary + binaryIndex;
                     UInt32 sectionIndex;
@@ -931,7 +934,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					error("[ERROR!] Unable to bind symbol %s.\n", symbolName);
-					pause("");
+					pause("[CONFIG_MODULE_DEBUG] ");
 				}
 
 				segmentAddress += sizeof(void*);
@@ -950,7 +953,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					error("[ERROR!] Unable to bind symbol %s.\n", symbolName);
-					pause("");
+					pause("[CONFIG_MODULE_DEBUG] ");
 				}
 
 				segmentAddress += tmp + sizeof(void*);
@@ -968,7 +971,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					error("[ERROR!] Unable to bind symbol %s.\n", symbolName);
-					pause("");
+					pause("[CONFIG_MODULE_DEBUG] ");
 				}
 				segmentAddress += (immediate * sizeof(void*)) + sizeof(void*);
 
@@ -993,7 +996,7 @@ void bind_macho(void* base, UInt8* bind_stream, UInt32 size)
 				else
 				{
 					error("[ERROR!] Unable to bind symbol %s.\n", symbolName);
-					pause("");
+					pause("[CONFIG_MODULE_DEBUG] ");
 				}
 				break;
 			default:
@@ -1124,12 +1127,12 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 		newCallback->next = hook->callbacks;
 		hook->callbacks = newCallback;
 		newCallback->callback = callback;
-        verbose("Added.\n");
+		verbose("Added.\n");
 	}
 	else
 	{
 		// create new hook
-        verbose("Hook not exists, creating a new hook.\n");
+		verbose("Hook not exists, creating a new hook.\n");
 		moduleHook_t *newHook = malloc(sizeof(moduleHook_t));
 		newHook->name = name;
 		newHook->callbacks = malloc(sizeof(callbackList_t));
@@ -1138,6 +1141,7 @@ void register_hook_callback(const char* name, void(*callback)(void*, void*, void
 
 		newHook->next = moduleCallbacks;
 		moduleCallbacks = newHook;
+
 	}
 
 #if CONFIG_MODULE_DEBUG
@@ -1179,8 +1183,8 @@ void print_hook_list()
 		printf("Hook: %s\n", hooks->name);
 		hooks = hooks->next;
 	}
+    pause("[CONFIG_MODULE_DEBUG] ");
 }
-
 #endif
 
 /********************************************************************************/
@@ -1190,7 +1194,7 @@ void print_hook_list()
 void dyld_stub_binder()
 {
 	printf("[ERROR!] 'dyld_stub_binder' was called, should have been take care of by the linker.\n");
-	pause("");
+	pause("[CONFIG_MODULE_DEBUG] ");
 }
 
 #else /* CONFIG_MODULES */
@@ -1213,13 +1217,13 @@ int execute_hook(const char* name, void* arg1, void* arg2, void* arg3, void* arg
 void register_hook_callback(const char* name, void(*callback)(void*, void*, void*, void*))
 {
 	error("[WARNING!] 'register_hook_callback' is not supported when compiled in.\n");
-	pause("");
+	pause("[CONFIG_MODULE_DEBUG] ");
 }
 
 int replace_function(const char* symbol, void* newAddress)
 {
 	error("[WARNING!] 'replace_functions' is not supported when compiled in.\n");
-	pause("");
+	pause("[CONFIG_MODULE_DEBUG] ");
 	return 0;
 }
 

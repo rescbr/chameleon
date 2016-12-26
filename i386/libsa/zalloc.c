@@ -78,7 +78,8 @@ void malloc_init(char * start, int size, int nodes, void (*malloc_err_fn)(char *
 	zavailable          = (zmem *) zalloc_base + sizeof(zmem) * totalNodes;
 	zavailable[0].start = (char *)zavailable + sizeof(zmem) * totalNodes;
 
-	if (size == 0) {
+	if (size == 0)
+	{
 		size = ZALLOC_LEN;
 	}
 
@@ -108,8 +109,10 @@ void * safe_malloc(size_t size, const char *file, int line)
 
 	size = ((size + 0xf) & ~0xf);
 
-        if (size == 0) {
-		if (zerror) {
+	if (size == 0)
+	{
+		if (zerror)
+		{
 			(*zerror)((char *)0xdeadbeef, 0, file, line);
         	}
         }
@@ -154,13 +157,16 @@ void * safe_malloc(size_t size, const char *file, int line)
 #endif
 
 done:
-	if ((ret == 0) || (ret + size >= zalloc_end)) {
-		if (zerror) {
+	if ((ret == 0) || (ret + size >= zalloc_end))
+	{
+		if (zerror)
+		{
 			(*zerror)(ret, size, file, line);
 		}
 	}
 
-	if (ret != 0) {
+	if (ret != 0)
+	{
 		bzero(ret, size);
 	}
 #if ZDEBUG
@@ -186,7 +192,8 @@ void free(void * pointer)
         rp = 0;
 #endif
 
-	if (!start) {
+	if (!start)
+	{
 		return;
 	}
 
@@ -207,8 +214,10 @@ void free(void * pointer)
 			break;
 		}
 	}
-	if (!found) {
-		if (zerror) {
+	if (!found)
+	{
+		if (zerror)
+		{
 			(*zerror)(pointer, rp, "free", 0);
 		} else {
 			return;
@@ -218,7 +227,8 @@ void free(void * pointer)
         zalloced_size -= tsize;
 #endif
 
-	for (i = 0; i < availableNodes; i++) {
+	for (i = 0; i < availableNodes; i++)
+	{
 		if ((start + tsize) == zavailable[i].start)  // merge it in
 		{
 			zavailable[i].start = start;
@@ -227,15 +237,19 @@ void free(void * pointer)
 			return;
 		}
 
-		if ((i > 0) && (zavailable[i-1].start + zavailable[i-1].size == start)) {
+		if ((i > 0) && (zavailable[i-1].start + zavailable[i-1].size == start))
+		{
 			zavailable[i-1].size += tsize;
 			zcoalesce();
 			return;
 		}
 
-		if ((start + tsize) < zavailable[i].start) {
-                        if (++availableNodes > totalNodes) {
-				if (zerror) {
+		if ((start + tsize) < zavailable[i].start)
+		{
+                        if (++availableNodes > totalNodes)
+			{
+				if (zerror)
+				{
 					(*zerror)((char *)0xf000f000, 0, "free", 0);
 				}
 			}
@@ -246,8 +260,10 @@ void free(void * pointer)
 		}
 	}
 
-	if (++availableNodes > totalNodes) {
-		if (zerror) {
+	if (++availableNodes > totalNodes)
+	{
+		if (zerror)
+		{
 			(*zerror)((char *)0xf000f000, 1, "free", 0);
 		}
 	}
@@ -270,8 +286,10 @@ zallocate(char * start,int size)
 	zalloced[allocedNodes].start = start;
 	zalloced[allocedNodes].size  = size;
 
-	if (++allocedNodes > totalNodes) {
-		if (zerror) {
+	if (++allocedNodes > totalNodes)
+	{
+		if (zerror)
+		{
 			(*zerror)((char *)0xf000f000, 2, "zallocate", 0);
 		}
 	};
@@ -287,7 +305,8 @@ zinsert(zmem * zp, int ndx)
 	z1 = zp + i;
 	z2 = z1 + 1;
 
-	for (; i >= ndx; i--, z1--, z2--) {
+	for (; i >= ndx; i--, z1--, z2--)
+	{
 		*z2 = *z1;
 	}
 }
@@ -301,7 +320,8 @@ zdelete(zmem * zp, int ndx)
 	z1 = zp + ndx;
 	z2 = z1 + 1;
 
-	for (i = ndx; i < totalNodes - 1; i++, z1++, z2++) {
+	for (i = ndx; i < totalNodes - 1; i++, z1++, z2++)
+	{
 		*z1 = *z2;
 	}
 }
@@ -311,8 +331,10 @@ zcoalesce(void)
 {
 	int i;
 
-	for (i = 0; i < availableNodes-1; i++) {
-		if ( zavailable[i].start + zavailable[i].size == zavailable[i + 1].start ) {
+	for (i = 0; i < availableNodes-1; i++)
+	{
+		if ( zavailable[i].start + zavailable[i].size == zavailable[i + 1].start )
+		{
 			zavailable[i].size += zavailable[i + 1].size;
 			zdelete(zavailable, i + 1); availableNodes--;
 			return;

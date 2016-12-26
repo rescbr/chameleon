@@ -34,79 +34,79 @@
 /* =======================
  BIOS Information (Type 0)
  ========================= */
-#define kSMBBIOSInformationVendorKey		        "SMbiosvendor"         // Apple Inc.
-#define kSMBBIOSInformationVersionKey		        "SMbiosversion"        // MP31.88Z.006C.B05.0802291410
-#define kSMBBIOSInformationReleaseDateKey	        "SMbiosdate"           // 02/29/08
+#define kSMBBIOSInformationVendorKey			"SMbiosvendor"		// Apple Inc.
+#define kSMBBIOSInformationVersionKey			"SMbiosversion"		// MP31.88Z.006C.B05.0802291410
+#define kSMBBIOSInformationReleaseDateKey		"SMbiosdate"		// 02/29/08
 // Bungo
-#define kSMBBIOSInformationReleaseKey               "SMbiosrelease"        // BIOS Revision
+#define kSMBBIOSInformationReleaseKey			"SMbiosrelease"		// BIOS Revision
 // example: BIOS Revision: 1.23 --> 2 bytes: Major=0x01, Minor=0x17 --> after swap: 0x1701hex = 5889dec (SMBIOS_spec_DSP0134_2.7.1)
 
 /* =========================
  System Information (Type 1)
  =========================== */
-#define kSMBSystemInformationManufacturerKey        "SMmanufacturer"       // Apple Inc.
-#define kSMBSystemInformationProductNameKey         "SMproductname"        // MacPro3,1
-#define kSMBSystemInformationVersionKey             "SMsystemversion"      // 1.0
-#define kSMBSystemInformationSerialNumberKey        "SMserial"             // Serial number
+#define kSMBSystemInformationManufacturerKey		"SMmanufacturer"	// Apple Inc.
+#define kSMBSystemInformationProductNameKey		"SMproductname"		// MacPro3,1
+#define kSMBSystemInformationVersionKey			"SMsystemversion"	// 1.0
+#define kSMBSystemInformationSerialNumberKey		"SMserial"		// Serial number
 //Bungo
-#define kSMBSystemInformationUUIDKey                "SMsystemuuid"         // ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }'
-#define kSMBSystemInformationSKUNumberKey           "SMskunumber"          // System SKU#
+#define kSMBSystemInformationUUIDKey			"SMsystemuuid"		// ioreg -rd1 -c IOPlatformExpertDevice | awk '/IOPlatformUUID/ { split($0, line, "\""); printf("%s\n", line[4]); }'
+#define kSMBSystemInformationSKUNumberKey		"SMskunumber"		// System SKU#
 
-#define kSMBSystemInformationFamilyKey              "SMfamily"             // MacPro
+#define kSMBSystemInformationFamilyKey			"SMfamily"		// MacPro
 
 /* =========================================
  Base Board (or Module) Information (Type 2)
  =========================================== */
-#define kSMBBaseBoardManufacturerKey                "SMboardmanufacturer"  // Apple Inc.
-#define kSMBBaseBoardProductKey                     "SMboardproduct"       // Mac-F2268DC8
+#define kSMBBaseBoardManufacturerKey			"SMboardmanufacturer"	// Apple Inc.
+#define kSMBBaseBoardProductKey				"SMboardproduct"	// Mac-F2268DC8
 // Bungo
-#define kSMBBaseBoardVersionKey                     "SMboardversion"       // MacPro3,1
-#define kSMBBaseBoardSerialNumberKey                "SMboardserial"        // C02140302D5DMT31M
-#define kSMBBaseBoardAssetTagKey                    "SMboardassettag"      // Base Board Asset Tag# Bungo: renamed folowing convention
-#define kSMBBaseBoardLocationInChassisKey           "SMboardlocation"      // Part Component
+#define kSMBBaseBoardVersionKey				"SMboardversion"	// MacPro3,1
+#define kSMBBaseBoardSerialNumberKey			"SMboardserial"		// C02140302D5DMT31M
+#define kSMBBaseBoardAssetTagKey			"SMboardassettag"	// Base Board Asset Tag# Bungo: renamed folowing convention
+#define kSMBBaseBoardLocationInChassisKey		"SMboardlocation"	// Part Component
 
 // ErmaC BoardType 0x0a(10) or 0x0b(11) MacPro Family
-#define kSMBBaseBoardTypeKey                        "SMboardtype"          // 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
+#define kSMBBaseBoardTypeKey				"SMboardtype"		// 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
 
 // Bungo
 /* =======================
  System Enclosure (Type 3)
  ========================= */
-#define kSMBSystemEnclosureManufacturerKey          "SMchassismanufacturer" // Apple Inc.
-#define kSMBSystemEnclosureTypeKey                  "SMchassistype"         // 7 Desktop
-#define kSMBSystemEnclosureVersionKey               "SMchassisversion"      // Mac-F42C88C8
-#define kSMBSystemEnclosureSerialNumberKey          "SMchassisserial"       // Serial number
-#define kSMBSystemEnclosureAssetTagKey              "SMchassisassettag"     // Pro-Enclosure  Bungo: renamed folowing convention
+#define kSMBSystemEnclosureManufacturerKey		"SMchassismanufacturer"	// Apple Inc.
+#define kSMBSystemEnclosureTypeKey			"SMchassistype"		// 7 Desktop
+#define kSMBSystemEnclosureVersionKey			"SMchassisversion"	// Mac-F42C88C8
+#define kSMBSystemEnclosureSerialNumberKey		"SMchassisserial"	// Serial number
+#define kSMBSystemEnclosureAssetTagKey			"SMchassisassettag"	// Pro-Enclosure  Bungo: renamed folowing convention
 
 /* ============================
  Processor Information (Type 4)
  ============================== */
 // Bungo
-#define kSMBProcessorInformationSocketKey           "SMcpusocket"
-#define kSMBProcessorInformationManufacturerKey     "SMcpumanufacturer"
-#define kSMBProcessorInformationVersionKey          "SMcpuversion"
+#define kSMBProcessorInformationSocketKey		"SMcpusocket"
+#define kSMBProcessorInformationManufacturerKey		"SMcpumanufacturer"
+#define kSMBProcessorInformationVersionKey		"SMcpuversion"
 //
 #define kSMBProcessorInformationExternalClockKey	"SMexternalclock"
 #define kSMBProcessorInformationMaximumClockKey		"SMmaximalclock"
 // Bungo
-#define kSMBProcessorInformationCurrentClockKey     "SMcurrentclock"
-#define kSMBProcessorInformationUpgradeKey          "SMcpuupgrade"
-#define kSMBProcessorInformationSerialNumberKey     "SMcpuserial"
-#define kSMBProcessorInformationAssetTagKey         "SMcpuassettag" // Bungo: renamed folowing convention
-#define kSMBProcessorInformationPartNumberKey       "SMcpupartnumber"
+#define kSMBProcessorInformationCurrentClockKey		"SMcurrentclock"
+#define kSMBProcessorInformationUpgradeKey		"SMcpuupgrade"
+#define kSMBProcessorInformationSerialNumberKey		"SMcpuserial"
+#define kSMBProcessorInformationAssetTagKey		"SMcpuassettag"		// Bungo: renamed folowing convention
+#define kSMBProcessorInformationPartNumberKey		"SMcpupartnumber"
 
 /* =====================
  Memory Device (Type 17)
  ======================= */
-#define kSMBMemoryDeviceDeviceLocatorKey            "SMmemdevloc"           //
-#define kSMBMemoryDeviceBankLocatorKey              "SMmembankloc"          //
-#define kSMBMemoryDeviceMemoryTypeKey               "SMmemtype"             //
-#define kSMBMemoryDeviceMemorySpeedKey              "SMmemspeed"            //
-#define kSMBMemoryDeviceManufacturerKey             "SMmemmanufacturer"     //
-#define kSMBMemoryDeviceSerialNumberKey             "SMmemserial"           //
-#define kSMBMemoryDevicePartNumberKey               "SMmempart"             //
+#define kSMBMemoryDeviceDeviceLocatorKey		"SMmemdevloc"           //
+#define kSMBMemoryDeviceBankLocatorKey			"SMmembankloc"          //
+#define kSMBMemoryDeviceMemoryTypeKey			"SMmemtype"             //
+#define kSMBMemoryDeviceMemorySpeedKey			"SMmemspeed"            //
+#define kSMBMemoryDeviceManufacturerKey			"SMmemmanufacturer"     //
+#define kSMBMemoryDeviceSerialNumberKey			"SMmemserial"           //
+#define kSMBMemoryDevicePartNumberKey			"SMmempart"             //
 // Bungo:
-#define kSMBMemoryDeviceAssetTagKey                 "SMmemassettag"         //
+#define kSMBMemoryDeviceAssetTagKey			"SMmemassettag"         //
 
 /* ===========================================
  Memory SPD Data   (Apple Specific - Type 130)
@@ -115,17 +115,17 @@
 /* ============================================
  OEM Processor Type (Apple Specific - Type 131)
  ============================================== */
-#define kSMBOemProcessorTypeKey                     "SMoemcputype" // Bungo: renamed from SMcputype
+#define kSMBOemProcessorTypeKey				"SMoemcputype"		// Bungo: renamed from SMcputype
 
 /* =================================================
  OEM Processor Bus Speed (Apple Specific - Type 132)
  =================================================== */
-#define kSMBOemProcessorBusSpeedKey                 "SMoemcpubusspeed" // Bungo: renamed from SMbusspeed
+#define kSMBOemProcessorBusSpeedKey			"SMoemcpubusspeed"	// Bungo: renamed from SMbusspeed
 
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
-//#define kSMBOemPlatformFeatureKey                 "SMoemplatformfeature"
+//#define kSMBOemPlatformFeatureKey			"SMoemplatformfeature"
 
 /* ==================================================*/
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
@@ -195,7 +195,7 @@ defaultChassis_t defaultChassis;
 typedef struct
 {
 	uint8_t			type;
-	SMBValueType	valueType;
+	SMBValueType		valueType;
 	uint8_t			fieldOffset;
 	char			*keyString;
 	bool			(*getSMBValue)(returnType *);
@@ -208,75 +208,75 @@ SMBValueSetter SMBSetters[] =
 	 BIOS Information (Type 0)
 	 ========================= */
 	{ kSMBTypeBIOSInformation, kSMBString, getFieldOffset(SMBBIOSInformation, vendor),
-		kSMBBIOSInformationVendorKey, NULL, &defaultBIOSInfo.vendor }, // SMbiosvendor - Apple Inc.
+		kSMBBIOSInformationVendorKey, NULL, &defaultBIOSInfo.vendor },				// SMbiosvendor - Apple Inc.
 
 	{ kSMBTypeBIOSInformation, kSMBString, getFieldOffset(SMBBIOSInformation, version),
-		kSMBBIOSInformationVersionKey, NULL, &defaultBIOSInfo.version }, // SMbiosversion - MP31.88Z.006C.B05.0802291410
+		kSMBBIOSInformationVersionKey, NULL, &defaultBIOSInfo.version },			// SMbiosversion - MP31.88Z.006C.B05.0802291410
 
 	{ kSMBTypeBIOSInformation, kSMBString, getFieldOffset(SMBBIOSInformation, releaseDate),
-		kSMBBIOSInformationReleaseDateKey, NULL, &defaultBIOSInfo.releaseDate }, // SMbiosdate - 02/29/08
+		kSMBBIOSInformationReleaseDateKey, NULL, &defaultBIOSInfo.releaseDate },		// SMbiosdate - 02/29/08
 
 	// Bungo
 	{ kSMBTypeBIOSInformation, kSMBWord, getFieldOffset(SMBBIOSInformation, releaseMajor),
-		kSMBBIOSInformationReleaseKey, NULL,	(char **)&defaultBIOSInfo.release }, // SMbiosrelease - 0.1 (256)
+		kSMBBIOSInformationReleaseKey, NULL,	(char **)&defaultBIOSInfo.release },		// SMbiosrelease - 0.1 (256)
 
 	/* =========================
 	 System Information (Type 1)
 	 =========================== */
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, manufacturer),
-		kSMBSystemInformationManufacturerKey, NULL,	&defaultSystemInfo.manufacturer	}, // SMmanufacturer - Apple Inc.
+		kSMBSystemInformationManufacturerKey, NULL,	&defaultSystemInfo.manufacturer	},	// SMmanufacturer - Apple Inc.
 
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, productName),
-		kSMBSystemInformationProductNameKey, NULL, &defaultSystemInfo.productName }, // SMproductname - MacPro3,1
+		kSMBSystemInformationProductNameKey, NULL, &defaultSystemInfo.productName },		// SMproductname - MacPro3,1
 
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, version),
-		kSMBSystemInformationVersionKey, NULL, &defaultSystemInfo.version }, // SMsystemversion - 1.0
+		kSMBSystemInformationVersionKey, NULL, &defaultSystemInfo.version },			// SMsystemversion - 1.0
 
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, serialNumber),
-		kSMBSystemInformationSerialNumberKey, NULL, &defaultSystemInfo.serialNumber }, // SMserial - Serial number
+		kSMBSystemInformationSerialNumberKey, NULL, &defaultSystemInfo.serialNumber },		// SMserial - Serial number
 	/* Bungo:
 	{kSMBTypeSystemInformation,	kSMBByte,	getFieldOffset(SMBSystemInformation, uuid),
-		kSMBSystemInformationUUIDKey, NULL, NULL}, // SMsystemuuid
+		kSMBSystemInformationUUIDKey, NULL, NULL},						// SMsystemuuid
 
 	{kSMBTypeSystemInformation,	kSMBByte,	getFieldOffset(SMBSystemInformation, wakeupReason),
-		NULL, NULL, NULL}, // reason for system wakeup
+		NULL, NULL, NULL},									// reason for system wakeup
 	*/
 
 	// Bungo
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, skuNumber),
-		kSMBSystemInformationSKUNumberKey, NULL, &defaultSystemInfo.skuNumber}, // SMskunumber - System SKU#
+		kSMBSystemInformationSKUNumberKey, NULL, &defaultSystemInfo.skuNumber},			// SMskunumber - System SKU#
 
 	{kSMBTypeSystemInformation,	kSMBString,	getFieldOffset(SMBSystemInformation, family),
-		kSMBSystemInformationFamilyKey,	NULL,	&defaultSystemInfo.family}, // SMfamily - MacPro
+		kSMBSystemInformationFamilyKey,	NULL,	&defaultSystemInfo.family},			// SMfamily - MacPro
 
 
 	/* =========================================
 	 Base Board (or Module) Information (Type 2)
 	 =========================================== */
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, manufacturer),
-		kSMBBaseBoardManufacturerKey, NULL, &defaultBaseBoard.manufacturer }, // SMboardmanufacturer - Apple Inc.
+		kSMBBaseBoardManufacturerKey, NULL, &defaultBaseBoard.manufacturer },			// SMboardmanufacturer - Apple Inc.
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, product),
-		kSMBBaseBoardProductKey, NULL, &defaultBaseBoard.product }, // SMboardproduct - Mac-F2268DC8
+		kSMBBaseBoardProductKey, NULL, &defaultBaseBoard.product },				// SMboardproduct - Mac-F2268DC8
 
 	// Bungo
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, version),
-		kSMBBaseBoardVersionKey, NULL, &defaultBaseBoard.version }, // SMboardversion - MacPro3,1
+		kSMBBaseBoardVersionKey, NULL, &defaultBaseBoard.version },				// SMboardversion - MacPro3,1
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, serialNumber),
-		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber }, // SMboardserial - C02140302D5DMT31M
+		kSMBBaseBoardSerialNumberKey, NULL, &defaultBaseBoard.serialNumber },			// SMboardserial - C02140302D5DMT31M
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, assetTag),
-		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag }, // SMboardassettag - Base Board Asset Tag#
+		kSMBBaseBoardAssetTagKey, NULL, &defaultBaseBoard.assetTag },				// SMboardassettag - Base Board Asset Tag#
 
 	{kSMBTypeBaseBoard,	kSMBString,	getFieldOffset(SMBBaseBoard, locationInChassis),
-		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis }, // SMboardlocation - Part Component
+		kSMBBaseBoardLocationInChassisKey, NULL, &defaultBaseBoard.locationInChassis },		// SMboardlocation - Part Component
 
 	{kSMBTypeBaseBoard,	kSMBByte,	getFieldOffset(SMBBaseBoard, boardType),
-		kSMBBaseBoardTypeKey,	NULL, (char **)&defaultBaseBoard.boardType }, // SMboardtype - 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
+		kSMBBaseBoardTypeKey,	NULL, (char **)&defaultBaseBoard.boardType },			// SMboardtype - 10 (Motherboard) all model, 11 (Processor+Memory Module) MacPro
 
 /*	{kSMBTypeBaseBoard,	kSMBByte, getFieldOffset(SMBBaseBoard, numberOfContainedHandles),
-		NULL , NULL, NULL }, // numberOfContainedHandles = 0
+		NULL , NULL, NULL },									// numberOfContainedHandles = 0
 */
 	//
 
@@ -285,19 +285,19 @@ SMBValueSetter SMBSetters[] =
 	 System Enclosure (Type 3)
 	 ========================= */
 	{kSMBTypeSystemEnclosure,	kSMBString,	getFieldOffset(SMBSystemEnclosure, manufacturer),
-		kSMBSystemEnclosureManufacturerKey, NULL,	&defaultChassis.manufacturer }, // SMchassismanufacturer - Apple Inc.
+		kSMBSystemEnclosureManufacturerKey, NULL,	&defaultChassis.manufacturer },		// SMchassismanufacturer - Apple Inc.
 
 	{kSMBTypeSystemEnclosure, kSMBByte,	getFieldOffset(SMBSystemEnclosure, chassisType),
-		kSMBSystemEnclosureTypeKey, NULL, (char **)&defaultChassis.chassisType	}, // SMchassistype - 7
+		kSMBSystemEnclosureTypeKey, NULL, (char **)&defaultChassis.chassisType	},		// SMchassistype - 7
 
 	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, version),
-		kSMBSystemEnclosureVersionKey, NULL, &defaultChassis.version }, // SMchassisversion - Mac-F42C88C8
+		kSMBSystemEnclosureVersionKey, NULL, &defaultChassis.version },				// SMchassisversion - Mac-F42C88C8
 
 	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, serialNumber),
-		kSMBSystemEnclosureSerialNumberKey, NULL, &defaultChassis.serialNumber }, // SMchassisserial
+		kSMBSystemEnclosureSerialNumberKey, NULL, &defaultChassis.serialNumber },		// SMchassisserial
 
 	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, assetTag),
-		kSMBSystemEnclosureAssetTagKey, NULL, &defaultChassis.assetTag }, // SMchassisassettag - Pro Enclosure
+		kSMBSystemEnclosureAssetTagKey, NULL, &defaultChassis.assetTag },			// SMchassisassettag - Pro Enclosure
 
 	/*
 	{kSMBTypeSystemEnclosure, kSMBString, getFieldOffset(SMBSystemEnclosure, skuNumber),
@@ -308,32 +308,32 @@ SMBValueSetter SMBSetters[] =
 	 Processor Information (Type 4)
 	 ============================== */
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, socketDesignation),
-		kSMBProcessorInformationSocketKey, NULL, NULL}, // SMcpusocket -
+		kSMBProcessorInformationSocketKey, NULL, NULL},						// SMcpusocket -
 
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, manufacturer),
-		kSMBProcessorInformationManufacturerKey, NULL, NULL}, // SMcpumanufacturer - Intel(R) Corporation
+		kSMBProcessorInformationManufacturerKey, NULL, NULL},					// SMcpumanufacturer - Intel(R) Corporation
 
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, processorVersion),
-		kSMBProcessorInformationVersionKey, NULL, NULL}, // SMcpuversion
+		kSMBProcessorInformationVersionKey, NULL, NULL},					// SMcpuversion
 
 	{kSMBTypeProcessorInformation,	kSMBWord, getFieldOffset(SMBProcessorInformation, externalClock),
-		kSMBProcessorInformationExternalClockKey, getProcessorInformationExternalClock,	NULL}, // SMcpuexternalclock
+		kSMBProcessorInformationExternalClockKey, getProcessorInformationExternalClock,	NULL},	// SMcpuexternalclock
 
 	{kSMBTypeProcessorInformation,	kSMBWord, getFieldOffset(SMBProcessorInformation, maximumClock),
-		kSMBProcessorInformationMaximumClockKey, getProcessorInformationMaximumClock,	NULL}, // SMcpumaximumclock
+		kSMBProcessorInformationMaximumClockKey, getProcessorInformationMaximumClock,	NULL},	// SMcpumaximumclock
 	// Bungo
 	{kSMBTypeProcessorInformation,	kSMBWord,	getFieldOffset(SMBProcessorInformation, currentClock),
-		kSMBProcessorInformationCurrentClockKey, NULL, NULL}, // SMcpucurrentclock
+		kSMBProcessorInformationCurrentClockKey, NULL, NULL},					// SMcpucurrentclock
 
 	{kSMBTypeProcessorInformation,	kSMBByte,	getFieldOffset(SMBProcessorInformation, processorUpgrade),
-		kSMBProcessorInformationUpgradeKey, NULL, NULL}, // SMcpuupgrade
+		kSMBProcessorInformationUpgradeKey, NULL, NULL},					// SMcpuupgrade
 	//
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, serialNumber),
 		kSMBProcessorInformationSerialNumberKey, NULL, NULL},
 
 	// Bungo
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, assetTag),
-		kSMBProcessorInformationAssetTagKey, NULL, NULL}, // SMcpuassettag
+		kSMBProcessorInformationAssetTagKey, NULL, NULL},					// SMcpuassettag
 	//
 	{kSMBTypeProcessorInformation,	kSMBString,	getFieldOffset(SMBProcessorInformation, partNumber),
 		kSMBProcessorInformationPartNumberKey, NULL, NULL},
@@ -372,17 +372,17 @@ SMBValueSetter SMBSetters[] =
 	// Apple Specific
 	//-------------------------------------------------------------------------------------------------------------------------
 	// OEM Processor Type (Apple Specific - Type 131)
-	{kSMBTypeOemProcessorType,		kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),			kSMBOemProcessorTypeKey,		
+	{kSMBTypeOemProcessorType,	kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),	kSMBOemProcessorTypeKey,		
 		getSMBOemProcessorType,			NULL},
 
 	// OEM Processor Bus Speed (Apple Specific - Type 132)
 	{kSMBTypeOemProcessorBusSpeed,	kSMBWord,	getFieldOffset(SMBOemProcessorBusSpeed, ProcessorBusSpeed),	kSMBOemProcessorBusSpeedKey,	
-		getSMBOemProcessorBusSpeed,		NULL}
+		getSMBOemProcessorBusSpeed,	NULL}
 
 	// OEM Platform Feature (Apple Specific - Type 133)
 	/*
 	{kSMBTypeOemPlatformFeature,	kSMBWord,	getFieldOffset(SMBOemPlatformFeature, PlatformFeature),	kSMBOemPlatformFeatureKey,
-		getSMBOemPlatformFeature,		NULL}
+		getSMBOemPlatformFeature,	NULL}
 	*/
 };
 
@@ -390,8 +390,8 @@ int numOfSetters = sizeof(SMBSetters) / sizeof(SMBValueSetter);
 
 uint64_t smbios_p = 0;
 
-SMBEntryPoint *origeps			= 0;
-SMBEntryPoint *neweps			= 0;
+SMBEntryPoint *origeps		= 0;
+SMBEntryPoint *neweps		= 0;
 
 static uint8_t stringIndex;	// increament when a string is added and set the field value accordingly
 static uint8_t stringsSize;	// add string size
@@ -565,7 +565,7 @@ static SMBWord structureCount	= 0;
 //#define KDefauktMacProBoardAssetTagNumber		"Pro-Enclosure"
 //#define kDefaultMacProBoardType			"0xB" // 11
 
-#define kDefaultMacPro                      "MacPro3,1"
+#define kDefaultMacPro					"MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
 #define kDefaultMacProBIOSReleaseDate			"08/03/2010"
 //#define kDefaultMacProSystemVersion			"1.3"
@@ -617,9 +617,9 @@ static SMBWord structureCount	= 0;
 
 /* ============================================ */
 
-bool useSMBIOSdefaults = true;  // Bungo
+bool   useSMBIOSdefaults        = true;	// Bungo
 /** FIXED
-SMBByte PlatformType			= 1;  // Bungo: same as Platfom.Type in platform.h. Because can't get from ACPI FADT PM profile and platformCPUFeature(CPU_FEATURE_MOBILE)) doesn't work as expect, FIXING NEEDED.
+SMBByte PlatformType		= 1;	// Bungo: same as Platfom.Type in platform.h. Because can't get from ACPI FADT PM profile and platformCPUFeature(CPU_FEATURE_MOBILE)) doesn't work as expect, FIXING NEEDED.
 **/
 /* Rewrite this function */
 void setDefaultSMBData(void)  // Bungo: setting data from real Macs
@@ -707,8 +707,8 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultChassis.chassisType      = kSMBchassisAllInOne;
 								break;
 
-							case CPUID_MODEL_SANDYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (32nm)
-							case CPUID_MODEL_IVYBRIDGE:			// Intel Core i3, i5, i7 LGA1155 (22nm)
+							case CPUID_MODEL_SANDYBRIDGE:		// Intel Core i3, i5, i7 LGA1155 (32nm)
+							case CPUID_MODEL_IVYBRIDGE:		// Intel Core i3, i5, i7 LGA1155 (22nm)
 								defaultBIOSInfo.version         = kDefaultiMacSandyBIOSVersion;
 								defaultBIOSInfo.releaseDate     = kDefaultiMacSandyBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultiMacSandy;
@@ -720,11 +720,11 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 
 							case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 							case CPUID_MODEL_NEHALEM_EX:		// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
-								defaultBIOSInfo.version         = kDefaultMacProNehalemBIOSVersion;
-								defaultBIOSInfo.releaseDate     = kDefaultMacProNehalemBIOSReleaseDate;
+								defaultBIOSInfo.version		= kDefaultMacProNehalemBIOSVersion;
+								defaultBIOSInfo.releaseDate	= kDefaultMacProNehalemBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProNehalem;
 								defaultSystemInfo.version       = kDefaultMacProNahWestSystemVersion;
-								defaultSystemInfo.family        = kDefaultMacProFamily;
+								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProNehalemBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
 								defaultChassis.chassisType      = kSMBchassisTower;
@@ -734,21 +734,21 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 							case CPUID_MODEL_WESTMERE_EX:		// Intel Xeon E7
 							case CPUID_MODEL_JAKETOWN:		// Intel Core i7, Xeon E5 LGA2011 (32nm)
 							case CPUID_MODEL_IVYBRIDGE_EP:	// Intel Core i7, Xeon E5 v2 LGA2011 (22nm)
-								defaultBIOSInfo.version         = kDefaultMacProWestmereBIOSVersion;
-								defaultBIOSInfo.releaseDate     = kDefaultMacProWestmereBIOSReleaseDate;
+								defaultBIOSInfo.version		= kDefaultMacProWestmereBIOSVersion;
+								defaultBIOSInfo.releaseDate	= kDefaultMacProWestmereBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacProWestmere;
 								defaultSystemInfo.version       = kDefaultMacProNahWestSystemVersion;
-								defaultSystemInfo.family        = kDefaultMacProFamily;
+								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProWestmereBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
 								defaultChassis.chassisType      = kSMBchassisTower;
 								break;
 
 							default:
-								defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
-								defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
+								defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
+								defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
 								defaultSystemInfo.productName	= kDefaultMacPro;
-								defaultSystemInfo.family        = kDefaultMacProFamily;
+								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 								defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -757,10 +757,10 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						break;
 					}
 					default:
-						defaultBIOSInfo.version         = kDefaultMacProBIOSVersion;
-						defaultBIOSInfo.releaseDate     = kDefaultMacProBIOSReleaseDate;
-						defaultSystemInfo.productName   = kDefaultMacPro;
-						defaultSystemInfo.family        = kDefaultMacProFamily;
+						defaultBIOSInfo.version		= kDefaultMacProBIOSVersion;
+						defaultBIOSInfo.releaseDate	= kDefaultMacProBIOSReleaseDate;
+						defaultSystemInfo.productName	= kDefaultMacPro;
+						defaultSystemInfo.family	= kDefaultMacProFamily;
 						defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 						defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
 						defaultChassis.chassisType      = kSMBchassisUnknown;
@@ -780,19 +780,25 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 	int len;
 	char key[24];
 
-	if (current != structHeader->handle) {
+	if (current != structHeader->handle)
+	{
 		idx++;
 		current = structHeader->handle;
 	}
 
 	sprintf(key, "%s%d", keyString, idx);
 
-	if (value) {
-		if (getIntForKey(key, (int *)&(value->dword), SMBPlist)) {
+	if (value)
+	{
+		if (getIntForKey(key, (int *)&(value->dword), SMBPlist))
+		{
 			return true;
 		}
-	} else {
-		if (getValueForKey(key, string, &len, SMBPlist)) {
+	}
+	else
+	{
+		if (getValueForKey(key, string, &len, SMBPlist))
+		{
 			return true;
 		}
 	}
@@ -801,11 +807,12 @@ bool getSMBValueForKey(SMBStructHeader *structHeader, const char *keyString, con
 
 char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field)
 {
-	if (!field || !structHeader) {
+	if (!field || !structHeader)
+	{
 		return NULL;
 	}
-    
-    uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
+
+	uint8_t *stringPtr = (uint8_t *)structHeader + structHeader->length;
 
 	for (field--; (field > 0) && (*stringPtr > 0) &&(*(uint16_t *)stringPtr != 0);
 		field--, stringPtr = (uint8_t *)((uint32_t)stringPtr + strlen((char *)stringPtr) + 1));
@@ -817,11 +824,13 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 {
 	int strSize;
 
-	if (!field) {
+	if (!field)
+	{
 		return;
 	}
 
-	if (!string) {
+	if (!string)
+	{
 		*field = 0;
 		return;
 	}
@@ -829,13 +838,16 @@ void setSMBStringForField(SMBStructHeader *structHeader, const char *string, uin
 	strSize = strlen(string);
 
 	// remove any spaces found at the end but only in MemoryDevice avoiding errors
-	if (structHeader->type == kSMBTypeMemoryDevice) {
-		while ((strSize != 0) && (string[strSize - 1] == ' ')) {
+	if (structHeader->type == kSMBTypeMemoryDevice)
+	{
+		while ((strSize != 0) && (string[strSize - 1] == ' '))
+		{
 			strSize--;
 		}
 	}
 
-	if (strSize == 0) {
+	if (strSize == 0)
+	{
 		*field = 0;
 		return;
 	}
@@ -854,11 +866,13 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	bool parsed;
 	int val;
 
-	if (numOfSetters <= idx) {
+	if (numOfSetters <= idx)
+	{
 		return false;
 	}
 
-	switch (SMBSetters[idx].valueType) {
+	switch (SMBSetters[idx].valueType)
+	{
 		case kSMBString:
 		{
 			if (SMBSetters[idx].keyString)
@@ -866,7 +880,9 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				if (getValueForKey(SMBSetters[idx].keyString, &string, &len, SMBPlist))
 				{
 					break;
-				} else {
+				}
+				else
+				{
 					if (structPtr->orig->type == kSMBTypeMemoryDevice)	// MemoryDevice only
 					{
 						if (getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, &string, NULL))
@@ -877,33 +893,42 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				}
 
 			}
-			if (SMBSetters[idx].getSMBValue) {
-				if (SMBSetters[idx].getSMBValue((returnType *)&string)) {
+			if (SMBSetters[idx].getSMBValue)
+			{
+				if (SMBSetters[idx].getSMBValue((returnType *)&string))
+				{
 					break;
 				}
 			}
 			// if ((SMBSetters[idx].defaultValue) && *(SMBSetters[idx].defaultValue))  Bungo
-			if (useSMBIOSdefaults && SMBSetters[idx].defaultValue && *(SMBSetters[idx].defaultValue)) {
+			if (useSMBIOSdefaults && SMBSetters[idx].defaultValue && *(SMBSetters[idx].defaultValue))
+			{
 				string = *(SMBSetters[idx].defaultValue);
 				break;
 			}
 			string = getSMBStringForField(structPtr->orig, *(uint8_t *)value);
 			break;
 		}
+
 		case kSMBByte:
 		case kSMBWord:
 		case kSMBDWord:
 		case kSMBQWord:
-			if (SMBSetters[idx].keyString) 	{
+			if (SMBSetters[idx].keyString)
+			{
 				parsed = getIntForKey(SMBSetters[idx].keyString, &val, SMBPlist);
 				if (!parsed)
 				{
-					if (structPtr->orig->type == kSMBTypeMemoryDevice) { // MemoryDevice only
+					if (structPtr->orig->type == kSMBTypeMemoryDevice) // MemoryDevice only
+					{
 						parsed = getSMBValueForKey(structPtr->orig, SMBSetters[idx].keyString, NULL, (returnType *)&val);
 					}
 				}
-				if (parsed) {
-					switch (SMBSetters[idx].valueType) {
+
+				if (parsed)
+				{
+					switch (SMBSetters[idx].valueType)
+					{
 						case kSMBByte:
 							value->byte = (uint8_t)val;
 							break;
@@ -922,14 +947,17 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 				}
 			}
 
-			if (SMBSetters[idx].getSMBValue) {
-				if (SMBSetters[idx].getSMBValue(value)) {
+			if (SMBSetters[idx].getSMBValue)
+			{
+				if (SMBSetters[idx].getSMBValue(value))
+				{
 					return true;
 				}
 			}
 // #if 0  Bungo: enables code below
 			// if (*(SMBSetters[idx].defaultValue))  Bungo
-			if (useSMBIOSdefaults && SMBSetters[idx].defaultValue && *(SMBSetters[idx].defaultValue)) {
+			if (useSMBIOSdefaults && SMBSetters[idx].defaultValue && *(SMBSetters[idx].defaultValue))
+			{
 			// value->dword = *(uint32_t *)(SMBSetters[idx].defaultValue);  Bungo
 			switch (SMBSetters[idx].valueType) {
 				case kSMBByte:
@@ -953,7 +981,8 @@ bool setSMBValue(SMBStructPtrs *structPtr, int idx, returnType *value)
 	}
 
 	// if (SMBSetters[idx].valueType == kSMBString && string)  Bungo: use null string too -> "Not Specified"
-	if ((SMBSetters[idx].valueType == kSMBString) && string) {
+	if ((SMBSetters[idx].valueType == kSMBString) && string)
+	{
 		setSMBStringForField(structPtr->new, string, &value->byte);
 	}
 	return true;
@@ -1005,9 +1034,11 @@ bool addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 {
 	SMBOemProcessorBusSpeed *p = (SMBOemProcessorBusSpeed *)structPtr->new;
 
-    if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL)
-        return false;
-        
+	if (Platform.CPU.Vendor != CPUID_VENDOR_INTEL)
+	{
+		return false;
+	}
+
 	switch (Platform.CPU.Family)
 	{
 		case 0x06:
@@ -1029,34 +1060,36 @@ bool addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 				case CPUID_MODEL_HASWELL_SVR:
 				case CPUID_MODEL_HASWELL_ULT:
 				case CPUID_MODEL_CRYSTALWELL:
-                    p->header.type		= kSMBTypeOemProcessorBusSpeed;
-                    p->header.length	= sizeof(SMBOemProcessorBusSpeed);
-                    p->header.handle	= handle++;
-                    
-                    setSMBValue(structPtr, numOfSetters - 1, (returnType *)&(p->ProcessorBusSpeed));
-                    
-                    structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
-                    tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
-                    structureCount++;
-                    
+					p->header.type		= kSMBTypeOemProcessorBusSpeed;
+					p->header.length	= sizeof(SMBOemProcessorBusSpeed);
+					p->header.handle	= handle++;
+
+					setSMBValue(structPtr, numOfSetters - 1, (returnType *)&(p->ProcessorBusSpeed));
+
+					structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
+					tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
+					structureCount++;
+
 					return true;
 
 				default:
 					break;
 			}
-            break;
-            
-        default:
-            break;
+			break;
+
+		default:
+			break;
 	}
-    
-    return false;
+
+	return false;
 }
 
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
- /*void addSMBOemPlatformFeature(SMBStructPtrs *structPtr) {
+/*
+void addSMBOemPlatformFeature(SMBStructPtrs *structPtr)
+{
 	SMBOemPlatformFeature *p = (SMBOemPlatformFeature *)structPtr->new;
 
 	p->header.type		= kSMBTypeOemPlatformFeature;
@@ -1068,7 +1101,8 @@ bool addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPPlatformFeature) + 2);
 	tableLength += sizeof(SMBOemPlatformFeature) + 2;
 	structureCount++;
- }*/
+ }
+*/
 
 //-------------------------------------------------------------------------------------------------------------------------
 // EndOfTable
@@ -1096,9 +1130,11 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	// http://forge.voodooprojects.org/p/chameleon/issues/361/
 	bool forceFullMemInfo = false;
 
-	if (structPtr->orig->type == kSMBTypeMemoryDevice) {
+	if (structPtr->orig->type == kSMBTypeMemoryDevice)
+	{
 		getBoolForKey(kMemFullInfo, &forceFullMemInfo, &bootInfo->chameleonConfig);
-		if (forceFullMemInfo) {
+		if (forceFullMemInfo)
+		{
 			structPtr->orig->length = 27;
 		}
 	}*/
@@ -1106,11 +1142,13 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	stringIndex = 1;
 	stringsSize = 0;
 
-	if (handle < structPtr->orig->handle) {
+	if (handle < structPtr->orig->handle)
+	{
 		handle = structPtr->orig->handle;
 	}
 	// Bungo: fix unsuported tables lengths from original smbios: extend shorter or truncate longer - we use SMBIOS rev. 2.4 like Apple uses
-	switch (structPtr->orig->type) {
+	switch (structPtr->orig->type)
+	{
 		case kSMBTypeBIOSInformation:
 			structSize = sizeof(SMBBIOSInformation);
 			break;
@@ -1135,38 +1173,48 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 	}
 
 	// memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
-	if (structPtr->orig->length <= structSize) {
+	if (structPtr->orig->length <= structSize)
+	{
 		memcpy((void *)structPtr->new, structPtr->orig, structPtr->orig->length);
-	} else {
+	}
+	else
+	{
 		memcpy((void *)structPtr->new, structPtr->orig, structSize);
 	}
 
 	structPtr->new->length = structSize;
 
-	for (i = 0; i < numOfSetters; i++) {
+	for (i = 0; i < numOfSetters; i++)
+	{
 		// Bungo:
 		//if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structPtr->orig->length)) {
-		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structSize)) {
+		if ((structPtr->orig->type == SMBSetters[i].type) && (SMBSetters[i].fieldOffset < structSize))
+		{
 			setterFound = true;
 			setSMBValue(structPtr, i, (returnType *)((uint8_t *)structPtr->new + SMBSetters[i].fieldOffset));
 		}
 	}
 
-	if (setterFound) {
+	if (setterFound)
+	{
 		// Bungo:
 		// ptr = (uint8_t *)structPtr->new + structPtr->orig->length;
 		ptr = (uint8_t *)structPtr->new + structPtr->new->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 		structSize = ptr - (uint8_t *)structPtr->new;
-	} else {
+	}
+	else
+	{
 		ptr = (uint8_t *)structPtr->orig + structPtr->orig->length;
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 
@@ -1178,7 +1226,8 @@ void setSMBStruct(SMBStructPtrs *structPtr)
 
 	tableLength += structSize;
 
-	if (structSize > maxStructSize) {
+	if (structSize > maxStructSize)
+	{
 		maxStructSize = structSize;
 	}
 
@@ -1212,7 +1261,8 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 		ptr = (uint8_t *)((uint32_t)structPtr->orig + structPtr->orig->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 
@@ -1242,7 +1292,8 @@ uint8_t *fixSystemUUID()
 		ptr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)ptr)[0] != 0; ptr++);
 
-		if (((uint16_t *)ptr)[0] == 0) {
+		if (((uint16_t *)ptr)[0] == 0)
+		{
 			ptr += 2;
 		}
 
@@ -1251,29 +1302,32 @@ uint8_t *fixSystemUUID()
 
 	ptr = ((SMBSystemInformation *)structHeader)->uuid;
 
-	if (!sysId || !ret) { // no or bad custom uuid,...
+	if (!sysId || !ret) // no or bad custom uuid,...
+	{
 		sysId = 0;
 		ret = Platform.UUID; // ...use original (factory) system uuid
 	}
 
 	for (i = 0, isZero = 1, isOnes = 1; i < UUID_LEN; i++) // check if empty (zeroed) or setable (FFed), means: no uuid present
 	{
-		if (ret[i] != 0x00) {
+		if (ret[i] != 0x00)
+		{
 			isZero = 0;
 		}
 
-		if (ret[i] != 0xff) {
+		if (ret[i] != 0xff)
+		{
 			isOnes = 0;
 		}
 	}
 
 	if (isZero || isOnes)  { // if empty or setable...
-        verbose("System UUID: incorrect or not present. Fixing [00112233-4455-6677-8899-AABBCCDDEEFF]\n");
-        ret = fixedUUID; // ...set a fixed value for system uuid: <00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF>
+		verbose("System UUID: incorrect or not present. Fixing [00112233-4455-6677-8899-AABBCCDDEEFF]\n");
+		ret = fixedUUID; // ...set a fixed value for system uuid: <00 11 22 33 44 55 66 77 88 99 AA BB CC DD EE FF>
 	}
 
 	memcpy(ptr, ret, UUID_LEN); // save uuid into the patched SMBIOS Table 1
-    
+
 	return ptr;
 }  // Bungo: end fix
 
@@ -1283,19 +1337,22 @@ void setupSMBIOS(void)
 	uint8_t *buffer;
 	// bool setSMB = true; Bungo: now we use useSMBIOSdefaults
 
-	if (!origeps) {
+	if (!origeps)
+	{
 		return;
 	}
 
 	neweps = origeps;
 
 	structPtr = (SMBStructPtrs *)malloc(sizeof(SMBStructPtrs));
-	if (!structPtr) {
+	if (!structPtr)
+	{
 		return;
 	}
 	
 	buffer = (uint8_t *)malloc(SMB_ALLOC_SIZE);
-	if (!buffer) {
+	if (!buffer)
+	{
 		free(structPtr);
 		return;
 	}
@@ -1304,7 +1361,7 @@ void setupSMBIOS(void)
 	structPtr->new = (SMBStructHeader *)buffer;
 
 	//Bungo:
-    //getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);
+	//getBoolForKey(kSMBIOSdefaults, &setSMB, &bootInfo->chameleonConfig);
 	getBoolForKey(kSMBIOSdefaults, &useSMBIOSdefaults, &bootInfo->chameleonConfig);
 	// if (setSMB)
 	setDefaultSMBData();
@@ -1312,7 +1369,8 @@ void setupSMBIOS(void)
 	setupNewSMBIOSTable(origeps, structPtr);
 
 	neweps = (SMBEntryPoint *)AllocateKernelMemory(sizeof(SMBEntryPoint));
-	if (!neweps) {
+	if (!neweps)
+	{
 		free(buffer);
 		free(structPtr);
 		return;
@@ -1339,7 +1397,8 @@ void setupSMBIOS(void)
 	neweps->dmi.structureCount	= structureCount;
 	neweps->dmi.bcdRevision		= 0x24;                 // ... and 2.4 DMI rev. as real Macs
 
-	if (!neweps->dmi.tableAddress) {
+	if (!neweps->dmi.tableAddress)
+	{
 		free(buffer);
 		free(structPtr);
 		return;
@@ -1357,21 +1416,23 @@ void setupSMBIOS(void)
 
 	free(buffer);
 	free(structPtr);
-    
-    verbose("\n");
+
+	verbose("\n");
 	verbose("SMBIOS orig: rev.: %d.%d, DMI rev.: %d.%d, @%08X\n", origeps->majorVersion, origeps->minorVersion, origeps->dmi.bcdRevision >> 4, origeps->dmi.bcdRevision & 0x0F, origeps);
-    verbose("SMBIOS new: rev.: %d.%d, DMI rev.: %d.%d, @%08X\n", neweps->majorVersion, neweps->minorVersion, neweps->dmi.bcdRevision >> 4, neweps->dmi.bcdRevision & 0x0F, neweps);
+	verbose("SMBIOS new: rev.: %d.%d, DMI rev.: %d.%d, @%08X\n", neweps->majorVersion, neweps->minorVersion, neweps->dmi.bcdRevision >> 4, neweps->dmi.bcdRevision & 0x0F, neweps);
 
 	decodeSMBIOSTable(neweps);
-    
-    smbios_p = (EFI_PTR32)neweps; // save a patched smbios ptr for efi config table
+
+	smbios_p = (EFI_PTR32)neweps; // save a patched smbios ptr for efi config table
 }
 
 void *getSmbios(int which)
 {
-	switch (which) {
+	switch (which)
+	{
 		case SMBIOS_ORIGINAL:
-			if (!origeps) {
+			if (!origeps)
+			{
 				origeps = getAddressOfSmbiosTable();
 			}
 			return origeps;
@@ -1402,20 +1463,21 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 				break;
 
 			case kSMBTypeSystemEnclosure: // Bungo: determine platform type
-				switch (((SMBSystemEnclosure *)structHeader)->chassisType) {
+				switch (((SMBSystemEnclosure *)structHeader)->chassisType)
+				{
 					case kSMBchassisPortable:
 					case kSMBchassisLaptop:
 					case kSMBchassisNotebook:
 					case kSMBchassisHandHeld:
 					case kSMBchassisSubNotebook:
 						Platform.Type = 2; // notebook (MacBooks/Pros)
-					    break;
-                    case kSMBchassisMiniTower:
-                    case kSMBchassisTower:
-                    case kSMBchassisBlade:
-                    case kSMBchassisBladeEnclosing:
-                        Platform.Type = 3; // workstation (Mac Pro, Xserve)
-                        break;
+						break;
+					case kSMBchassisMiniTower:
+					case kSMBchassisTower:
+					case kSMBchassisBlade:
+					case kSMBchassisBladeEnclosing:
+						Platform.Type = 3; // workstation (Mac Pro, Xserve)
+						break;
 					default:
 						Platform.Type = 1; // defulting to 1 desktop (iMac, MacMini)
 						break;
@@ -1428,10 +1490,12 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 
 			case kSMBTypeMemoryDevice:
 				Platform.DMI.CntMemorySlots++;
-				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)	{
+				if (((SMBMemoryDevice *)structHeader)->memorySize != 0)
+				{
 					Platform.DMI.MemoryModules++;
 				}
-				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)	{
+				if (((SMBMemoryDevice *)structHeader)->memorySpeed > 0)
+				{
 					Platform.RAM.DIMM[dimmnbr].Frequency = ((SMBMemoryDevice *)structHeader)->memorySpeed;
 				}
 				dimmnbr++;
@@ -1443,7 +1507,8 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 		structPtr = (uint8_t *)((uint32_t)structHeader + structHeader->length);
 		for (; ((uint16_t *)structPtr)[0] != 0; structPtr++);
 
-		if (((uint16_t *)structPtr)[0] == 0) {
+		if (((uint16_t *)structPtr)[0] == 0)
+		{
 			structPtr += 2;
 		}
 

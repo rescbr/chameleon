@@ -31,33 +31,35 @@
  */
 //#include "exfat.h"
 
-#define BYTE_ORDER_MARK     0xFEFF
+#define BYTE_ORDER_MARK		0xFEFF
 
 #include "ntfs_private.h"
 
-#define FS_TYPE             "ntfs"
+#define FS_TYPE			"ntfs"
 #define FS_NAME_FILE		"NTFS"
 
 #define MAX_BLOCK_SIZE		2048
 #define MAX_CLUSTER_SIZE	32768
 
-#define LABEL_LENGTH        1024
-#define UNKNOWN_LABEL       "Untitled NTFS"
+#define LABEL_LENGTH		1024
+#define UNKNOWN_LABEL		"Untitled NTFS"
 
-#define FSUR_IO_FAIL        -1
-#define FSUR_UNRECOGNIZED   -1
-#define FSUR_RECOGNIZED     0
+#define FSUR_IO_FAIL		-1
+#define FSUR_UNRECOGNIZED	-1
+#define FSUR_RECOGNIZED		0
 
-#define ERROR               -1
+#define ERROR			-1
 
 /*
  * Process per-sector "fixups" that NTFS uses to detect corruption of
  * multi-sector data structures, like MFT records.
  */
-static int ntfs_fixup(char *buf,
-                      size_t len,
-                      u_int32_t magic,
-                      u_int32_t bytesPerSector)
+static int
+ntfs_fixup(
+            char *buf,
+            size_t len,
+            u_int32_t magic,
+            u_int32_t bytesPerSector)
 {
 	struct fixuphdr *fhp = (struct fixuphdr *) buf;
 	int             i;
@@ -104,10 +106,11 @@ static int ntfs_fixup(char *buf,
  * Find a resident attribute of a given type.  Returns a pointer to the
  * attribute data, and its size in bytes.
  */
-static int ntfs_find_attr(char *buf,
-                          u_int32_t attrType,
-                          void **attrData,
-                          size_t *attrSize)
+static int ntfs_find_attr(
+                char *buf,
+                u_int32_t attrType,
+                void **attrData,
+                size_t *attrSize)
 {
     struct filerec *filerec;
     struct attr *attr;
@@ -160,7 +163,7 @@ void NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 	buf = (char *)malloc(MAX_CLUSTER_SIZE);
 	if (buf == 0)
 	{
-        verbose("NTFS: can't allocate memory [%d] for buffer, exiting.\n", MAX_CLUSTER_SIZE);
+		verbose("NTFS: can't allocate memory [%d] for buffer, exiting.\n", MAX_CLUSTER_SIZE);
 		goto error;
 	}
 
@@ -184,7 +187,7 @@ void NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 	 */
 	if (boot->reserved1[0] != 0xE9 && (boot->reserved1[0] != 0xEB || boot->reserved1[2] != 0x90))
 	{
-        verbose("NTFS: wrong jpm instruction [%02X %02X %02X], exiting.\n", boot->reserved1[0], boot->reserved1[1], boot->reserved1[2]);
+		verbose("NTFS: wrong jpm instruction [%02X %02X %02X], exiting.\n", boot->reserved1[0], boot->reserved1[1], boot->reserved1[2]);
 		goto error;
 	}
 
@@ -290,7 +293,7 @@ void NTFSGetDescription(CICell ih, char *str, long strMaxLen)
 	str[0] = '\0';
 
 	utf_encodestr( nameAttr, nameSize / 2, (u_int8_t *)str, strMaxLen, OSLittleEndian );
-    //verbose("NTFS: label=%s\n", str);
+	//verbose("NTFS: label=%s\n", str);
 
 	free(buf);
 	return;
@@ -313,6 +316,7 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	{
 		return -1;
 	}
+	bzero(buf,MAX_BLOCK_SIZE);
 
 	/*
 	 * Read the boot sector, check signatures, and do some minimal
@@ -329,26 +333,29 @@ long NTFSGetUUID(CICell ih, char *uuidStr)
 	if ( memcmp((void*)boot->bf_sysid, NTFS_BBID, NTFS_BBIDLEN) != 0 )
 	{
 		// If not NTFS, maybe it is EXFAT
+		free(buf);
 		//return EXFATGetUUID(ih, uuidStr);
-        return -1;
+		return -1;
 	}
 
 	// Check for non-null volume serial number
 	if( !boot->bf_volsn )
 	{
+		free(buf);
 		return -1;
 	}
 
 	// Use UUID like the one you get on Windows
 	sprintf(uuidStr, "%04X-%04X",	(unsigned short)(boot->bf_volsn >> 16) & 0xFFFF, (unsigned short)boot->bf_volsn & 0xFFFF);
 
-    //verbose("NTFSGetUUID: %x:%x = %s\n", ih->biosdev, ih->part_no, uuidStr);
+	//verbose("NTFSGetUUID: %x:%x = %s\n", ih->biosdev, ih->part_no, uuidStr);
 	return 0;
 }
 
 bool NTFSProbe(const void *buffer)
 {
-	bool                   result = false;
+	bool result = false;
+
 	const struct bootfile *part_bootfile = buffer;	// NTFS boot sector structure
 
 	// Looking for NTFS signature.

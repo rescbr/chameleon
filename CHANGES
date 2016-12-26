@@ -1,4 +1,3 @@
-- Zenith432 : Use caching with ExFat filesystem
 - Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff)
 - ErmaC : C6 & C7 States credits to Clover Team.
 - ErmaC : define recursive cpu series for BrandString

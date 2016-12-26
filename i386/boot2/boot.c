@@ -72,7 +72,11 @@
  */
 #define kBootErrorTimeout 5
 
-bool		gOverrideKernel, gEnableCDROMRescan, gScanSingleDrive, useGUI;
+bool		gOverrideKernel;
+bool		gEnableCDROMRescan;
+bool		gScanSingleDrive;
+bool		useGUI;
+
 static bool	gUnloadPXEOnExit = false;
 
 static char	gCacheNameAdler[64 + 256];
@@ -80,10 +84,14 @@ char		*gPlatformName = gCacheNameAdler;
 
 char		gRootDevice[ROOT_DEVICE_SIZE];
 char		gMKextName[512];
-int         bvCount = 0, gDeviceCount = 0;
+int		bvCount = 0;
+int		gDeviceCount = 0;
 //int		menucount = 0;
 long		gBootMode; /* defaults to 0 == kBootModeNormal */
-BVRef		bvr, menuBVR, bvChain;
+
+BVRef		bvr;
+BVRef		menuBVR;
+BVRef		bvChain;
 
 static unsigned long	Adler32(unsigned char *buffer, long length);
 //static void			selectBiosDevice(void);
@@ -134,12 +142,12 @@ static int ExecKernel(void *binary)
 
 	bootArgs->kaddr = bootArgs->ksize = 0;
 	execute_hook("ExecKernel", (void *)binary, NULL, NULL, NULL);
-    
+
 	ret = DecodeKernel(binary,
 					   &kernelEntry,
 					   (char **) &bootArgs->kaddr,
 					   (int *)&bootArgs->ksize);
-    
+
 	if ( ret != 0 )
 	{
 		return ret;
@@ -156,7 +164,7 @@ static int ExecKernel(void *binary)
 	// Load boot drivers from the specifed root path.
 	//if (!gHaveKernelCache)
 	{
-	LoadDrivers("/");
+		LoadDrivers("/");
 	}
 
 	execute_hook("DriversLoaded", (void *)binary, NULL, NULL, NULL);
@@ -202,21 +210,23 @@ static int ExecKernel(void *binary)
 	{
 		drawBootGraphics();
 	}
-    
-    getCurrentEDID();
-    
-    verbose("GUI Graphics: %dx%dx%d.\n", gui.screen.width, gui.screen.height, bootArgs->Video.v_depth);
-    verbose("Boot Graphics: %dx%dx%d, mode=0x%04X.\n", bootArgs->Video.v_width, bootArgs->Video.v_height, bootArgs->Video.v_depth, getCurrentGraphicsMode());
-    
+
+	getCurrentEDID();
+
+	verbose("GUI Graphics: %dx%dx%d.\n", gui.screen.width, gui.screen.height, bootArgs->Video.v_depth);
+	verbose("Boot Graphics: %dx%dx%d, mode=0x%04X.\n", bootArgs->Video.v_width, bootArgs->Video.v_height, bootArgs->Video.v_depth, getCurrentGraphicsMode());
+
 	verbose("Starting Mac OS X %s [0x%08X], %s\n", gBootVolume->OSVersion, MacOSVerCurrent, gDarwinBuildVerStr);
 	verbose("Boot Args: %s\n", bootArgs->CommandLine);
-
+#if DEBUG
+    pause("\n[DEBUG] ");
+#endif
 	setupBooterLog();
 
 	finalizeBootStruct();
-    
+
 	// Jump to kernel's entry point. There's no going back now.
-    if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
+	if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
 	//if (!((checkOSVersion("10.4")) || (checkOSVersion("10.5")) || (checkOSVersion("10.6"))) )
 	{
 		// Notify modules that the kernel is about to be started
@@ -225,14 +235,14 @@ static int ExecKernel(void *binary)
 		// Masking out so that Lion doesn't doublefault
 		outb(0x21, 0xff);	/* Maskout all interrupts Pic1 */
 		outb(0xa1, 0xff);	/* Maskout all interrupts Pic2 */
-
-        if (gVerboseMode) pause("");
+        
 		startprog( kernelEntry, bootArgs );
-	} else {
+	}
+	else
+	{
 		// Notify modules that the kernel is about to be started
 		execute_hook("Kernel Start", (void *)kernelEntry, (void*)bootArgsPreLion, NULL, NULL);
 
-        if (gVerboseMode) pause("");
 		startprog( kernelEntry, bootArgsPreLion );
 	}
 
@@ -252,7 +262,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	unsigned long adler32;
 	u_int32_t time, cachetime, kerneltime, exttime;
 
-	if ((gBootMode & kBootModeSafe) != 0) {
+	if((gBootMode & kBootModeSafe) != 0)
+	{
 		verbose("Kernel Cache ignored.\n");
 		return -1;
 	}
@@ -273,43 +284,43 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 		}
 		// Snow Leopard prelink kernel cache file
 		else
-        {
-            if (MacOSVerCurrent >= MacOSVer2Int("10.6"))  // OSX is Snow (10.6)
-            {
-                snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
-                         (archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
-                
-                int lnam = strlen(kernelCacheFile) + 9; //with adler32
-                char* name;
-			u_int32_t prev_time = 0;
-                
-                struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
-                
-                /* TODO: handle error? */
-                if (cacheDir)
-                {
-                    while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
-                    {
-                        if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
-                            && strstr(name, kernelCacheFile) && (name[lnam] != '.'))
-                        {
-                            snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s%s", kDefaultCachePathSnow, name);
-                            prev_time = time;
-                        }
-                    }
-                    verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
-                }
-                closedir(cacheDir);
-            }
-            else
-            {
-                // Reset cache name.
-                bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
-                snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
-                adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
-                snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
-                verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);
-            }
+		{
+			if (MacOSVerCurrent >= MacOSVer2Int("10.6"))  // OSX is Snow (10.6)
+			{
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "kernelcache_%s",
+					(archCpuType == CPU_TYPE_I386) ? "i386" : "x86_64");
+
+				int	lnam = strlen(kernelCacheFile) + 9; //with adler32
+				char	*name;
+				u_int32_t prev_time = 0;
+
+				struct dirstuff* cacheDir = opendir(kDefaultCachePathSnow);
+
+				/* TODO: handle error? */
+				if (cacheDir)
+				{
+					while(readdir(cacheDir, (const char**)&name, &flags, &time) >= 0)
+					{
+						if (((flags & kFileTypeMask) != kFileTypeDirectory) && time > prev_time
+							&& strstr(name, kernelCacheFile) && (name[lnam] != '.'))
+						{
+							snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s%s", kDefaultCachePathSnow, name);
+							prev_time = time;
+						}
+					}
+					verbose("Kernel Cache file path (Mac OS X 10.6.X): %s\n", kernelCacheFile);
+				}
+				closedir(cacheDir);
+			}
+			else
+			{
+				// Reset cache name.
+				bzero(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64);
+				snprintf(gCacheNameAdler + 64, sizeof(gCacheNameAdler) - 64, "%s,%s", gRootDevice, bootInfo->bootFile);
+				adler32 = Adler32((unsigned char *)gCacheNameAdler, sizeof(gCacheNameAdler));
+				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%s.%08lX", kDefaultCachePathLeo, adler32);
+				verbose("Reseted kernel cache file path: %s\n", kernelCacheFile);
+			}
 		}
 	}
 
@@ -359,7 +370,8 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	}
 
 	// Exit if kernel cache file wasn't found
-	if (ret == -1) {
+	if (ret == -1)
+	{
 		verbose("No Kernel Cache File '%s' found\n", kernelCacheFile);
 		return -1;
 	}
@@ -369,20 +381,18 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	ret = GetFileInfo(NULL, bootInfo->bootFile, &flags, &kerneltime);
 
 	// Check if the kernel file is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat)
-		&& (kerneltime > cachetime)) {
-		verbose("Kernel file '%s' is more recent than Kernel Cache '%s'! Ignoring Kernel Cache.\n",
-				bootInfo->bootFile, kernelCacheFile);
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeFlat) && (kerneltime > cachetime))
+	{
+		verbose("Kernel file '%s' is more recent than Kernel Cache '%s'! Ignoring Kernel Cache.\n", bootInfo->bootFile, kernelCacheFile);
 		return -1;
 	}
 
 	ret = GetFileInfo("/System/Library/", "Extensions", &flags, &exttime);
 
 	// Check if the S/L/E directory time is more recent than the cache file
-	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory)
-		&& (exttime > cachetime)) {
-		verbose("Folder '/System/Library/Extensions' is more recent than Kernel Cache file '%s'! Ignoring Kernel Cache.\n",
-				kernelCacheFile);
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory) && (exttime > cachetime))
+	{
+		verbose("Folder '/System/Library/Extensions' is more recent than Kernel Cache file '%s'! Ignoring Kernel Cache.\n", kernelCacheFile);
 		return -1;
 	}
 
@@ -390,7 +400,10 @@ long LoadKernelCache(const char* cacheFile, void **binary)
 	verbose("Loading Kernel Cache from: '%s%s' (%s)\n", gBootVolume->label, gBootVolume->altlabel, gBootVolume->type_name);
 
 	ret = LoadThinFatFile(kernelCachePath, binary);
-    if (gVerboseMode) pause("");
+#if DEBUG
+    pause("\n[DEBUG] ");
+#endif
+
 	return ret; // ret contain the length of the binary
 }
 
@@ -484,20 +497,19 @@ void common_boot(int biosdev)
 	{
 		gEnableCDROMRescan = true;
 	}
-    
-    // Disable rescanPrompt option by default
-    rescanPrompt = false;
+
+	// Disable rescanPrompt option by default
+	rescanPrompt = false;
 
 	// Ask the user for Rescan option by setting "Rescan Prompt"=y in system config.
-	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig)
-		&& rescanPrompt && biosDevIsCDROM(gBIOSDev))
+	if (getBoolForKey(kRescanPromptKey, &rescanPrompt , &bootInfo->chameleonConfig) && rescanPrompt && biosDevIsCDROM(gBIOSDev))
 	{
 		gEnableCDROMRescan = promptForRescanOption();
 	}
 
-    // Disable ScanSingleDrive option by default
-    gScanSingleDrive = false;
-    
+	// Disable ScanSingleDrive option by default
+	gScanSingleDrive = false;
+
 	// Enable touching a single BIOS device only if "Scan Single Drive"=y is set in system config.
 	if (getBoolForKey(kScanSingleDriveKey, &gScanSingleDrive, &bootInfo->chameleonConfig) && gScanSingleDrive)
 	{
@@ -523,18 +535,18 @@ void common_boot(int biosdev)
 	init_module_system();
 
 #if DEBUG
-    if (gBootVolume) {
-        verbose("Default: %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n",
-                gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
-    }
-    else {
-        verbose("Boot Volume not selected yet.\n");
-    }
-	verbose("bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n",
-            gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
-	pause("");
+	if (gBootVolume)
+	{
+		verbose("Default: %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n", gBootVolume, gBootVolume->biosdev, gBootVolume->part_no, gBootVolume->flags);
+	}
+	else
+	{
+		verbose("Boot Volume not selected yet.\n");
+	}
+	verbose("bt(0,0): %d, ->biosdev: %d, ->part_no: %d ->flags: 0x%08X\n", gBIOSBootVolume, gBIOSBootVolume->biosdev, gBIOSBootVolume->part_no, gBIOSBootVolume->flags);
+	pause("\n[DEBUG] ");
 #endif
-    
+
 	useGUI = true;
 	// Override useGUI default
 	getBoolForKey(kGUIKey, &useGUI, &bootInfo->chameleonConfig);
@@ -543,7 +555,7 @@ void common_boot(int biosdev)
 		// initGUI() returned with an error, disabling GUI.
 		useGUI = false;
 	}
-    
+
 	setBootGlobals(bvChain);
 
 	// Parse args, load and start kernel.
@@ -557,7 +569,7 @@ void common_boot(int biosdev)
 		u_int32_t	sleeptime, time;
 		void		*binary = (void *)kLoadAddr;
 
-		char        bootFile[sizeof(bootInfo->bootFile)];
+		char		bootFile[sizeof(bootInfo->bootFile)];
 		char		bootFilePath[512];
 		char		kernelCacheFile[512];
 
@@ -568,7 +580,7 @@ void common_boot(int biosdev)
 		status = getBootOptions(firstRun);
 		firstRun = false;
 		if (status == -1) continue;
-        
+
 		status = processBootOptions();
 		// Status == 1 means to chainboot
 		if ( status ==	1 ) break;
@@ -685,50 +697,61 @@ void common_boot(int biosdev)
 		}
 
 		getBoolForKey(kUseKernelCache, &useKernelCache, &bootInfo->chameleonConfig);
-		if (useKernelCache) {
-            do {
-                // Determine the name of the Kernel Cache
-                if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig)) {
-                    if (val[0] == '\\')
-                    {
-                        len--;
-                        val++;
-                    }
-                    /* FIXME: check len vs sizeof(kernelCacheFile) */
-                    strlcpy(kernelCacheFile, val, len + 1);
-			}
-			else
+		if (useKernelCache)
+		{
+			do
 			{
-                    kernelCacheFile[0] = 0; // Use default kernel cache file
-                }
-                
-                if (gOverrideKernel && kernelCacheFile[0] == 0) {
-                    verbose("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n", bootInfo->bootFile);
-                    useKernelCache = false;
-                    break;
-                }
-                if (gMKextName[0] != 0) {
-                    verbose("Using a specific MKext Cache (%s), KernelCache will not be used\n",
-                            gMKextName);
-                    useKernelCache = false;
-                    break;
-                }
-                if (gBootFileType != kBlockDeviceType)
-                    useKernelCache = false;
-                
-            } while(0);
-        } else {
-            verbose("Kernel Cache using disabled by user.");
-        }
+				// Determine the name of the Kernel Cache
+				if (getValueForKey(kKernelCacheKey, &val, &len, &bootInfo->bootConfig))
+				{
+					if (val[0] == '\\')
+					{
+						len--;
+						val++;
+					}
+					/* FIXME: check len vs sizeof(kernelCacheFile) */
+					strlcpy(kernelCacheFile, val, len + 1);
+				}
+				else
+				{
+					kernelCacheFile[0] = 0; // Use default kernel cache file
+				}
 
-		do {
+				if (gOverrideKernel && kernelCacheFile[0] == 0)
+				{
+					verbose("Using a non default kernel (%s) without specifying 'Kernel Cache' path, KernelCache will not be used\n", bootInfo->bootFile);
+					useKernelCache = false;
+					break;
+				}
+
+				if (gMKextName[0] != 0)
+				{
+					verbose("Using a specific MKext Cache (%s), KernelCache will not be used\n", gMKextName);
+					useKernelCache = false;
+					break;
+				}
+
+				if (gBootFileType != kBlockDeviceType)
+				{
+					useKernelCache = false;
+				}
+
+			} while(0);
+		}
+		else
+		{
+			verbose("Kernel Cache using disabled by user.");
+		}
+
+		do
+		{
 			if (useKernelCache)
-        {
+			{
 				ret = LoadKernelCache(kernelCacheFile, &binary);
 				if (ret >= 0)
 				{
-                break;
-			}
+					break;
+				}
 			}
 
 			bool bootFileWithDevice = false;
@@ -742,19 +765,23 @@ void common_boot(int biosdev)
 			if (!bootFileWithDevice && (bootInfo->bootFile)[0] != '/')
 			{
 				if (MacOSVerCurrent >= MacOSVer2Int("10.10")) // OSX is 10.10 or newer
+				{
 					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathForYos "%s", bootInfo->bootFile); // Yosemite: '/System/Library/Kernels/'
-                else
+				}
+				else
+				{
 					snprintf(bootFile, sizeof(bootFile), kDefaultKernelPathPreYos "%s", bootInfo->bootFile); // append a leading '/'
+				}
 			}
-            else
-            {
+			else
+			{
 				strlcpy(bootFile, bootInfo->bootFile, sizeof(bootFile));
 			}
 
 			// Try to load kernel image from alternate locations on boot helper partitions.
 			ret = -1;
 			if ((gBootVolume->flags & kBVFlagBooter) && !bootFileWithDevice)
-            {
+			{
 				snprintf(bootFilePath, sizeof(bootFilePath), "com.apple.boot.P%s", bootFile);
 				ret = GetFileInfo(NULL, bootFilePath, &flags, &time);
 				if (ret == -1)
@@ -769,7 +796,7 @@ void common_boot(int biosdev)
 				}
 			}
 			if (ret == -1)
-            {
+			{
 				// No alternate location found, using the original kernel image path.
 				strlcpy(bootFilePath, bootFile, sizeof(bootFilePath));
 			}
@@ -790,7 +817,8 @@ void common_boot(int biosdev)
 		sleep(8);
 #endif
 
-		if (ret <= 0) {
+		if (ret <= 0)
+		{
 			error("Can't find boot file: '%s'\n", bootFile);
 			sleep(1);
 
@@ -800,7 +828,9 @@ void common_boot(int biosdev)
 				gUnloadPXEOnExit = false;
 				break;
 			}
-			pause("");
+#if DEBUG
+			pause("\n[DEBUG] ");
+#endif
 
 		}
 		else
@@ -864,8 +894,8 @@ bool checkOSVersion(const char * version)
 
 uint32_t getMacOSVerCurrent()
 {
-    MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
-    return MacOSVerCurrent;
+	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);
+	return MacOSVerCurrent;
 }
 
 #define BASE 65521L /* largest prime smaller than 65536 */

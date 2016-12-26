@@ -107,7 +107,8 @@ static char *conf_expand_value(const char *in)
 	const char *src;
 	*res_ptr = 0;
 	res_ptr[SYMBOL_MAXLENGTH] = 0;
-	while ((src = strchr(in, '$'))) {
+	while ((src = strchr(in, '$')))
+	{
 		struct symbol *sym;
 		const char *symval;
 		char *name_ptr = name;

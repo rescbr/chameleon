@@ -58,7 +58,7 @@ long ThinFatFile(void **binary, unsigned long *length)
 	cpu_type_t fapcputype;
 	uint32_t fapoffset;
 	uint32_t fapsize;	
-  
+
 	if (fhp->magic == FAT_MAGIC)/* 0xcafebabe */
 	{
 		nfat = fhp->nfat_arch;
@@ -145,7 +145,8 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 		case CPU_TYPE_X86_64:
 /*
-			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC) {
+			if (mH->magic != MH_MAGIC_64 && mH->magic == MH_MAGIC)
+			{
 				return -1;
 			}
 */
@@ -200,14 +201,14 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 #endif
 			break;
 		}
-        
+
 
 	if (ret != 0)
 	{
-            return -1;
-        }
-        
-        cmdBase += cmdsize;
+		return -1;
+	}
+
+	cmdBase += cmdsize;
 	}
 
 	*rentry = (entry_t)( (unsigned long) entry & 0x3fffffff );
@@ -287,14 +288,14 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 		return 0;
 	}
 
-		if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
-			 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
-			stop("Kernel overflows available space");
-		}
+	if (! ((vmaddr >= KERNEL_ADDR && (vmaddr + vmsize) <= (KERNEL_ADDR + KERNEL_LEN)) ||
+		 (vmaddr >= HIB_ADDR && (vmaddr + vmsize) <= (HIB_ADDR + HIB_LEN)))) {
+		stop("Kernel overflows available space");
+	}
 
-		if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
-			gHaveKernelCache = true;
-		}
+	if (vmsize && ((strcmp(segname, "__PRELINK_INFO") == 0) || (strcmp(segname, "__PRELINK") == 0))) {
+		gHaveKernelCache = true;
+	}
 
 	// Copy from file load area.
 	if (vmsize>0 && filesize > 0) {

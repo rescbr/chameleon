@@ -110,9 +110,9 @@ static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_32[] = {0xb8, 0x03, 0x00, 0x00,
 static uint8_t const UNSUPPORTEDRET_INSTRUCTIONS_64[] = {0x48, 0xb8, 0x03, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0xc3};
 
 /* EFI Guides */
-EFI_GUID const gEfiSmbiosTableGuid = EFI_SMBIOS_TABLE_GUID;
-EFI_GUID const gEfiAcpiTableGuid = EFI_ACPI_TABLE_GUID;
-EFI_GUID const gEfiAcpi20TableGuid = EFI_ACPI_20_TABLE_GUID;
+EFI_GUID const gEfiSmbiosTableGuid	= EFI_SMBIOS_TABLE_GUID;
+EFI_GUID const gEfiAcpiTableGuid	= EFI_ACPI_TABLE_GUID;
+EFI_GUID const gEfiAcpi20TableGuid	= EFI_ACPI_20_TABLE_GUID;
 
 EFI_SYSTEM_TABLE_32 *gST32 = NULL;
 EFI_SYSTEM_TABLE_64 *gST64 = NULL;
@@ -167,17 +167,17 @@ EFI_STATUS addConfigurationTable(EFI_GUID const *pGuid, void *table, char const 
 		{
 			DT__AddProperty(tableNode, "alias", strlen(alias)+1, (void *)alias);
 		}
-        
-        i++;
-        
-        if (archCpuType == CPU_TYPE_I386)
-        {
-            gST32->NumberOfTableEntries = i;
-        }
-        else
-        {
-            gST64->NumberOfTableEntries = i;
-        }
+
+		i++;
+
+		if (archCpuType == CPU_TYPE_I386)
+		{
+			gST32->NumberOfTableEntries = i;
+		}
+		else
+		{
+			gST64->NumberOfTableEntries = i;
+		}
 
 		return EFI_SUCCESS;
 	}
@@ -460,7 +460,7 @@ static const char MODEL_PROP[] = "Model";
 static const char BOARDID_PROP[] = "board-id";
 static const char DEV_PATHS_SUP_PROP[] = "DevicePathsSupported";
 static const char MACHINE_SIG_PROP[] = "machine-signature";
-static EFI_UINT32 const ZERO_U32 = 0;
+//static EFI_UINT32 const ZERO_U32 = 0;
 static EFI_UINT32 const ONE_U32 = 1;
 //static EFI_UINT32 const *VALUE[] = { &ZERO_U32 , &ONE_U32 };
 static const char RANDOM_SEED_PROP[] = "random-seed";
@@ -581,96 +581,111 @@ void setupSystemType()
 
 bool getKernelCompat(EFI_UINT8 *compat)
 {
-    int kernelFileRef;
-    EFI_UINT8 readBytes;
-    char kernelFilePath[512], kernelHeaderBuf[sizeof(struct fat_header) + 4*sizeof(struct fat_arch)];
-    
-    //strlcpy(kernelFilePath, bootInfo->bootFile, sizeof(kernelFilePath)); // user defined path
-    snprintf(kernelFilePath, sizeof(kernelFilePath), "%s", bootInfo->bootFile); // user defined path
+	int kernelFileRef;
+	EFI_UINT8 readBytes;
+	char kernelFilePath[512], kernelHeaderBuf[sizeof(struct fat_header) + 4*sizeof(struct fat_arch)];
+
+	//strlcpy(kernelFilePath, bootInfo->bootFile, sizeof(kernelFilePath)); // user defined path
+	snprintf(kernelFilePath, sizeof(kernelFilePath), "%s", bootInfo->bootFile); // user defined path
 	if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
 	{
 	}
 	else
 	{
-        snprintf(kernelFilePath, sizeof(kernelFilePath), "/%s", bootInfo->bootFile); // append a leading '/'
+		snprintf(kernelFilePath, sizeof(kernelFilePath), "/%s", bootInfo->bootFile); // append a leading '/'
 		if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
 		{
 		}
 		else
 		{
-            snprintf(kernelFilePath, sizeof(kernelFilePath), "/System/Library/Kernels/%s", bootInfo->bootFile); // Yosemite path
+			snprintf(kernelFilePath, sizeof(kernelFilePath), "/System/Library/Kernels/%s", bootInfo->bootFile); // Yosemite path
 			if ((kernelFileRef = open(kernelFilePath, 0)) >= 0)
 			{
 			}
 			else
 			{
-                verbose("EfiKernelCompat: can't find any kernel file!\n");
-                return false;
-            }
-        }
-    }
-    
-    verbose("EfiKernelCompat: reading kernel header from file: %s ... ", kernelFilePath);
-    if ((readBytes = read(kernelFileRef, kernelHeaderBuf, sizeof(struct fat_header) + 4*sizeof(struct fat_arch))) > 0) {
-        verbose("OK, read %d bytes.\n", readBytes);
+				verbose("EfiKernelCompat: can't find any kernel file!\n");
+				return false;
+			}
+		}
+	}
+
+	verbose("EfiKernelCompat: reading kernel header from file: %s ... ", kernelFilePath);
+	if ((readBytes = read(kernelFileRef, kernelHeaderBuf, sizeof(struct fat_header) + 4*sizeof(struct fat_arch))) > 0) {
+		verbose("OK, read %d bytes.\n", readBytes);
 	}
 	else
 	{
-        verbose("EROR, can't read kernel file!\n");
-        return false;
-    }
-    
-    struct fat_header  *fatHeaderPtr = (struct fat_header *)kernelHeaderBuf;
+		verbose("EROR, can't read kernel file!\n");
+		return false;
+	}
+
+	struct fat_header  *fatHeaderPtr = (struct fat_header *)kernelHeaderBuf;
 	struct fat_arch    *fatArchPtr = (struct fat_arch *)(kernelHeaderBuf + sizeof(struct fat_header));
-    struct mach_header *thinHeaderPtr = (struct mach_header *)kernelHeaderBuf;
-    bool swapit = false;
-    
+	struct mach_header *thinHeaderPtr = (struct mach_header *)kernelHeaderBuf;
+	bool swapit = false;
+
 	switch (fatHeaderPtr->magic)
 	{
-        case FAT_CIGAM:
-            swapit = true;
-            fatHeaderPtr->nfat_arch = OSSwapInt32(fatHeaderPtr->nfat_arch);
-        case FAT_MAGIC:
-            *compat = 0;
-            verbose("EfiKernelCompat: kernel file is a fat binary: %d archs compatibility [", fatHeaderPtr->nfat_arch);
-            if (fatHeaderPtr->nfat_arch > 4) fatHeaderPtr->nfat_arch = 4;
-            for (; fatHeaderPtr->nfat_arch > 0; fatHeaderPtr->nfat_arch--, fatArchPtr++) {
-                if (swapit) fatArchPtr->cputype = OSSwapInt32(fatArchPtr->cputype);
-                switch(fatArchPtr->cputype) {
-                    case CPU_TYPE_I386:
-                        verbose(" i386");
-                        break;
-                    case CPU_TYPE_X86_64:
-                        verbose(" x86_64");
-                        break;
-                    case CPU_TYPE_POWERPC:
-                        verbose(" PPC");
-                        break;
-                    case CPU_TYPE_POWERPC64:
-                        verbose(" PPC64");
-                        break;
-                    default:
-                        verbose(" 0x%x", fatArchPtr->cputype);
-                }
-                if (fatHeaderPtr->nfat_arch - 1 > 0) verbose(" | ");
-                *compat |= (!(fatArchPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(fatArchPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
-            }
-            verbose(" ]\n");
-            break;
-        case MH_CIGAM:
-        case MH_CIGAM_64:
-            thinHeaderPtr->cputype = OSSwapInt32(thinHeaderPtr->cputype);
-        case MH_MAGIC:
-        case MH_MAGIC_64:
-            *compat = (!(thinHeaderPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
-            verbose("EfiKernelCompat: kernel file is a thin binary: 1 arch compatibility found [ %s ].\n", !((thinHeaderPtr->cputype & 0x000000FF) ^ 0x00000007) ? (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "x86_64" : "i386") : (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "PPC64" : "PPC"));
-            break;
-        default:
-            verbose("EfiKernelCompat: unknown kernel file '%s'. Can't determine arch compatibility!\n", kernelFilePath);
-            return false;
-    }
-    
-    return true;
+		case FAT_CIGAM:
+			swapit = true;
+			fatHeaderPtr->nfat_arch = OSSwapInt32(fatHeaderPtr->nfat_arch);
+		case FAT_MAGIC:
+			*compat = 0;
+			verbose("EfiKernelCompat: kernel file is a fat binary: %d archs compatibility [", fatHeaderPtr->nfat_arch);
+			if (fatHeaderPtr->nfat_arch > 4)
+			{
+				fatHeaderPtr->nfat_arch = 4;
+			}
+
+			for (; fatHeaderPtr->nfat_arch > 0; fatHeaderPtr->nfat_arch--, fatArchPtr++)
+			{
+				if (swapit)
+				{
+					fatArchPtr->cputype = OSSwapInt32(fatArchPtr->cputype);
+				}
+
+				switch(fatArchPtr->cputype)
+				{
+					case CPU_TYPE_I386:
+						verbose(" i386");
+						break;
+					case CPU_TYPE_X86_64:
+						verbose(" x86_64");
+						break;
+					case CPU_TYPE_POWERPC:
+						verbose(" PPC");
+						break;
+					case CPU_TYPE_POWERPC64:
+						verbose(" PPC64");
+						break;
+					default:
+						verbose(" 0x%x", fatArchPtr->cputype);
+				}
+
+				if (fatHeaderPtr->nfat_arch - 1 > 0)
+				{
+					verbose(" | ");
+				}
+
+				*compat |= (!(fatArchPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(fatArchPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(fatArchPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
+			}
+			verbose(" ]\n");
+			break;
+		case MH_CIGAM:
+		case MH_CIGAM_64:
+			thinHeaderPtr->cputype = OSSwapInt32(thinHeaderPtr->cputype);
+		case MH_MAGIC:
+		case MH_MAGIC_64:
+			*compat = (!(thinHeaderPtr->cputype ^ CPU_TYPE_I386) << 0) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_X86_64) << 1) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC) << 2) | (!(thinHeaderPtr->cputype ^ CPU_TYPE_POWERPC64) << 3);
+			verbose("EfiKernelCompat: kernel file is a thin binary: 1 arch compatibility found [ %s ].\n", !((thinHeaderPtr->cputype & 0x000000FF) ^ 0x00000007) ? (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "x86_64" : "i386") : (!((thinHeaderPtr->cputype & 0xFF000000) ^ 0x01000000) ? "PPC64" : "PPC"));
+			break;
+		default:
+			verbose("EfiKernelCompat: unknown kernel file '%s'. Can't determine arch compatibility!\n", kernelFilePath);
+			return false;
+	}
+
+	return true;
 }
 
 /*
@@ -679,26 +694,32 @@ bool getKernelCompat(EFI_UINT8 *compat)
 static void setupEfiConfigurationTable()
 {
 	// smbios_p = (EFI_PTR32)getSmbios(SMBIOS_PATCHED);
-	if (smbios_p) {
-        if (EFI_SUCCESS == addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL)) {
-            verbose("Fake EFI: sucesfuly added %sbit configuration table for SMBIOS: guid {EB9D2D31-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
-        }
-    }
-    
+	if (smbios_p)
+	{
+		if (EFI_SUCCESS == addConfigurationTable(&gEfiSmbiosTableGuid, &smbios_p, NULL))
+		{
+			verbose("Fake EFI: sucesfuly added %sbit configuration table for SMBIOS: guid {EB9D2D31-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+		}
+	}
+
 	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	//setupAcpi();
-    
-    if (acpi10_p) {
-        if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI")) {
-            verbose("Fake EFI: sucesfuly added %sbit configuration table for ACPI: guid {EB9D2D30-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
-        }
-    }
-    if (acpi20_p) {
-        if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20")) {
-            verbose("Fake EFI: sucesfuly added %sbit configuration table for ACPI_20: guid {8868E871-E4F1-11D3-BC22-0080C73C8881}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
-        }
-    }
-    
+
+	if (acpi10_p)
+	{
+		if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpiTableGuid, &acpi10_p, "ACPI"))
+		{
+			verbose("Fake EFI: sucesfuly added %sbit configuration table for ACPI: guid {EB9D2D30-2D88-11D3-9A16-0090273FC14D}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+		}
+	}
+
+	if (acpi20_p)
+	{
+		if (EFI_SUCCESS == addConfigurationTable(&gEfiAcpi20TableGuid, &acpi20_p, "ACPI_20")) {
+			verbose("Fake EFI: sucesfuly added %sbit configuration table for ACPI_20: guid {8868E871-E4F1-11D3-BC22-0080C73C8881}.\n", (archCpuType == CPU_TYPE_I386) ? "32":"64");
+		}
+	}
+
 	// We've obviously changed the count.. so fix up the CRC32
 	if (archCpuType == CPU_TYPE_I386)
 	{
@@ -716,24 +737,28 @@ void setupEfiNode(void)
 {
 	EFI_CHAR16*	 ret16 = 0;
 	size_t		 len = 0;
-    
+
 	Node *efiNode = DT__FindNode("/efi", true);
-    if (efiNode == 0)
+	if (efiNode == 0)
 	{
 		stop("Couldn't get '/efi' node");
 	}
 
-/* Bungo: we have 64 bit ability fake efi but mode may be changed 32/64, like in Macs
-	if (archCpuType == CPU_TYPE_I386) {
+/* Bungo: we have 64 bit ability fake efi but mode may be changed 32/64, like Macs
+	if (archCpuType == CPU_TYPE_I386)
+	{
 		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_32_PROP_VALUE), (EFI_CHAR8 *)FIRMWARE_ABI_32_PROP_VALUE);
-	} else { */
+	}
+	else
+	{
+*/
 		DT__AddProperty(efiNode, FIRMWARE_ABI_PROP, sizeof(FIRMWARE_ABI_64_PROP_VALUE), (EFI_CHAR8 *)FIRMWARE_ABI_64_PROP_VALUE);
 //	}
 // So, added 'efi-mode' property to tell us what mode we use 32 or 64 bit
 	DT__AddProperty(efiNode, EFI_MODE_PROP, sizeof(EFI_UINT8), (EFI_UINT8 *)&bootArgs->efiMode);
 
 	DT__AddProperty(efiNode, FIRMWARE_REVISION_PROP, sizeof(FIRMWARE_REVISION), (EFI_UINT32 *)&FIRMWARE_REVISION);
-	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)FIRMWARE_VENDOR);
+	DT__AddProperty(efiNode, FIRMWARE_VENDOR_PROP, sizeof(FIRMWARE_VENDOR), (EFI_CHAR16 *)&FIRMWARE_VENDOR);
 
 	// TODO: Fill in other efi properties if necessary
 
@@ -741,13 +766,16 @@ void setupEfiNode(void)
 	// is set up.  That is, name and table properties
 	Node *runtimeServicesNode = DT__AddChild(efiNode, "runtime-services");
 
-	if (archCpuType == CPU_TYPE_I386) {
+	if (archCpuType == CPU_TYPE_I386)
+	{
 		// The value of the table property is the 32-bit physical address for the RuntimeServices table.
 		// Since the EFI system table already has a pointer to it, we simply use the address of that pointer
 		// for the pointer to the property data.  Warning.. DT finalization calls free on that but we're not
 		// the only thing to use a non-malloc'd pointer for something in the DT
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(EFI_UINT64), &gST32->RuntimeServices);
-	} else {
+	}
+	else
+	{
 		DT__AddProperty(runtimeServicesNode, "table", sizeof(EFI_UINT64), &gST64->RuntimeServices);
 	}
 
@@ -758,14 +786,29 @@ void setupEfiNode(void)
 	// Set up the /efi/kernel-compatibility node only if 10.7 or better
 	if (MacOSVerCurrent >= MacOSVer2Int("10.7"))
 	{
-        Node *EfiKernelCompatNode = DT__AddChild(efiNode, "kernel-compatibility");
-        EFI_UINT8 compat = (archCpuType == CPU_TYPE_I386) ? 0b00000001 : 0b00000010;
-        getKernelCompat(&compat);
-        if (compat & 0b00000001) DT__AddProperty(EfiKernelCompatNode, "i386", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
-        if (compat & 0b00000010) DT__AddProperty(EfiKernelCompatNode, "x86_64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
-        if (compat & 0b00000100) DT__AddProperty(EfiKernelCompatNode, "PPC", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
-        if (compat & 0b00001000) DT__AddProperty(EfiKernelCompatNode, "PPC64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
-    }
+		Node *EfiKernelCompatNode = DT__AddChild(efiNode, "kernel-compatibility");
+		EFI_UINT8 compat = (archCpuType == CPU_TYPE_I386) ? 0b00000001 : 0b00000010;
+		getKernelCompat(&compat);
+		if (compat & 0b00000001)
+		{
+			DT__AddProperty(EfiKernelCompatNode, "i386", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+		}
+
+		if (compat & 0b00000010)
+		{
+			DT__AddProperty(EfiKernelCompatNode, "x86_64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+		}
+
+		if (compat & 0b00000100)
+		{
+			DT__AddProperty(EfiKernelCompatNode, "PPC", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+		}
+
+		if (compat & 0b00001000)
+		{
+			DT__AddProperty(EfiKernelCompatNode, "PPC64", sizeof(EFI_UINT32), (EFI_UINT32 *)&ONE_U32);
+		}
+	}
 
 	// Now fill in the /efi/platform Node
 	Node *efiPlatformNode = DT__AddChild(efiNode, "platform");
@@ -774,16 +817,19 @@ void setupEfiNode(void)
 	// the value in the fsbFrequency global and not an malloc'd pointer
 	// because the DT_AddProperty function does not copy its args.
 
-	if (Platform.CPU.FSBFrequency != 0) {
+	if (Platform.CPU.FSBFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, FSB_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.FSBFrequency);
 	}
 
 	// Export TSC and CPU frequencies for use by the kernel or KEXTs
-	if (Platform.CPU.TSCFrequency != 0) {
+	if (Platform.CPU.TSCFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, TSC_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.TSCFrequency);
 	}
 
-	if (Platform.CPU.CPUFrequency != 0) {
+	if (Platform.CPU.CPUFrequency != 0)
+	{
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(EFI_UINT64), (EFI_UINT64 *)&Platform.CPU.CPUFrequency);
 	}
 
@@ -791,26 +837,29 @@ void setupEfiNode(void)
 
 	// Bungo
 	/* Export system-id. Can be disabled with SystemId=No in com.apple.Boot.plist
-	if ((ret=getSystemID())) {
+	if ((ret=getSystemID()))
+	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32*) ret);
 	}
 	*/
 	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, Platform.UUID);
 
 	// Export SystemSerialNumber if present
-	if ((ret16=getSmbiosChar16("SMserial", &len))) {
+	if ((ret16=getSmbiosChar16("SMserial", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, SYSTEM_SERIAL_PROP, len, ret16);
 	}
 
 	// Export Model if present
-	if ((ret16=getSmbiosChar16("SMproductname", &len))) {
+	if ((ret16=getSmbiosChar16("SMproductname", &len)))
+	{
 		DT__AddProperty(efiPlatformNode, MODEL_PROP, len, ret16);
 	}
 
 	// Fill /efi/device-properties.
 	setupDeviceProperties(efiNode);
-    
-    // Add configuration table entries to both the services table and the device tree
+
+	// Add configuration table entries to both the services table and the device tree
 	setupEfiConfigurationTable();
 }
 
@@ -828,7 +877,7 @@ void setupBoardId()
 	const char *boardid = getStringForKey("SMboardproduct", &bootInfo->smbiosConfig);
 	if (boardid)
 	{
-		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16 *)boardid);
+		DT__AddProperty(node, BOARDID_PROP, strlen(boardid)+1, (EFI_CHAR16*)boardid);
 	}
 }
 
@@ -837,7 +886,7 @@ void setupBoardId()
  *
 setupRootNode()
 {
-    
+
 }
 */
 /*
@@ -863,113 +912,120 @@ void setupChosenNode()
 	length = strlen(bootInfo->bootFile);
 	if (length)
 	{
-        DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
-    }
+		DT__AddProperty(chosenNode, "boot-file", length + 1, bootInfo->bootFile);
+	}
 //  TODO:
 //	DT__AddProperty(chosenNode, "boot-device-path", bootDPsize, gBootDP);
 //	DT__AddProperty(chosenNode, "boot-file-path", bootFPsize, gBootFP);
 //	DT__AddProperty(chosenNode, "boot-kernelchache-adler32", sizeof(adler32), adler32);
-    
+
 	DT__AddProperty(chosenNode, MACHINE_SIG_PROP, sizeof(Platform.HWSignature), (EFI_UINT32 *)&Platform.HWSignature);
-    
-    // add if Yosemite or better only
-    if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
-    {
-        //
-        // Pike R. Alpha - 12 October 2014
-        //
-        UInt8 index = 0;
-        EFI_UINT16 PMTimerValue = 0;
-        EFI_UINT32 randomValue, tempValue, cpuTick;
-        EFI_UINT32 ecx, esi, edi;
-        EFI_UINT32 rcx, rdx, rsi, rdi;
-        
-        randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
-        cpuTick = rcx = rdx = rsi = rdi = 0;
-        
-        // LEAF_1 - Feature Information (Function 01h).
-        if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
-        {
-            //
-            // i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
-            //
-            // EFI_UINT32 seedBuffer[16] = {0};
-            //
-            // Main loop to get 16 qwords (four bytes each).
-            //
-            EFI_UINT32 *seedPtr = (EFI_UINT32 *)RANDOM_SEED_PROP_VALUE;
-            
-            for (index = 0; index < 16; index++)					// 0x17e12:
-            {
-                randomValue = computeRand();					// callq	0x18e20
-                cpuTick = getCPUTick();						// callq	0x121a7
-                randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
-                seedPtr[index] = randomValue;				// mov		%rax,(%r15,%rsi,8)
-            }									// jb		0x17e12
-        }
-        else
-        {
-            //
-            // All other processors without RDRAND support.
-            //
-            // EFI_UINT8 seedBuffer[64] = {0};
-            //
-            // Main loop to get the 64 bytes.
-            //
-            EFI_UINT8 *seedPtr = (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE;
-            
-            do									// 0x17e55:
-            {
-                PMTimerValue = inw(0x408);					// in		(%dx),	%ax
-                esi = PMTimerValue;						// movzwl	%ax,	%esi
-                
-                if (esi < ecx)							// cmp		%ecx,	%esi
-                {
-                    continue;						// jb		0x17e55		(retry)
-                }
-                
-                cpuTick = getCPUTick();						// callq	0x121a7
-                rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
-                // shr		$0x8,	%rcx
-                rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
-                // shr		$0x10,	%rdx
-                rdi = rsi;							// mov		%rsi,	%rdi
-                rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
-                rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
-                rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
-                
-                //RANDOM_SEED_PROP_VALUE[index] = (EFI_UINT8)(rdi & 0xff);	// mov		%dil,	(%r15,%r12,1)
-                seedPtr[index] = (EFI_UINT8)(rdi & 0xff);
-                
-                edi = (edi & 0x2f);						// and		$0x2f,	%edi
-                edi = (edi + esi);						// add		%esi,	%edi
-                index++;							// inc		r12
-                ecx = (edi & 0xffff);						// movzwl	%di,	%ecx
-                
-            } while (index < 64);							// cmp		%r14d,	%r12d
-            // jne		0x17e55		(next)
-        }
-        DT__AddProperty(chosenNode, RANDOM_SEED_PROP, sizeof(RANDOM_SEED_PROP_VALUE), (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE);
-    }
-    
-    // setup '/chosen/memory-map' node
-    Node *memoryMapNode = DT__FindNode("/chosen/memory-map", false);
+
+	// add if Yosemite or better only
+	if (MacOSVerCurrent >= MacOSVer2Int("10.10"))
+	{
+		//
+		// Pike R. Alpha - 12 October 2014
+		//
+		UInt8 index = 0;
+		EFI_UINT16 PMTimerValue = 0;
+		EFI_UINT32 randomValue, tempValue, cpuTick;
+		EFI_UINT32 ecx, esi, edi;
+		EFI_UINT32 rcx, rdx, rsi, rdi;
+
+		randomValue = tempValue = ecx = esi = edi = 0;					// xor		%ecx,	%ecx
+		cpuTick = rcx = rdx = rsi = rdi = 0;
+
+		// LEAF_1 - Feature Information (Function 01h).
+		if (Platform.CPU.CPUID[CPUID_1][2] & 0x40000000)				// Checking ecx:bit-30
+		{
+			//
+			// i5/i7 Ivy Bridge and Haswell processors with RDRAND support.
+			//
+			// EFI_UINT32 seedBuffer[16] = {0};
+			//
+			// Main loop to get 16 qwords (four bytes each).
+			//
+			EFI_UINT32 *seedPtr = (EFI_UINT32 *)RANDOM_SEED_PROP_VALUE;
+
+			for (index = 0; index < 16; index++)					// 0x17e12:
+			{
+				randomValue = computeRand();					// callq	0x18e20
+				cpuTick = getCPUTick();						// callq	0x121a7
+				randomValue = (randomValue ^ cpuTick);				// xor		%rdi,	%rax
+				seedPtr[index] = randomValue;					// mov		%rax,(%r15,%rsi,8)
+			}									// jb		0x17e12
+		}
+		else
+		{
+			//
+			// All other processors without RDRAND support.
+			//
+			//EFI_UINT8 seedBuffer[64] = {0};
+			//
+			// Main loop to get the 64 bytes.
+			//
+			EFI_UINT8 *seedPtr = (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE;
+
+			do									// 0x17e55:
+			{
+				PMTimerValue = inw(0x408);					// in		(%dx),	%ax
+				esi = PMTimerValue;						// movzwl	%ax,	%esi
+
+				if (esi < ecx)							// cmp		%ecx,	%esi
+				{
+					continue;						// jb		0x17e55		(retry)
+				}
+
+				cpuTick = getCPUTick();						// callq	0x121a7
+//				printf("value: 0x%llx\n", getCPUTick());
+				rcx = (cpuTick >> 8);						// mov		%rax,	%rcx
+				// shr		$0x8,	%rcx
+				rdx = (cpuTick >> 10);						// mov		%rax,	%rdx
+				// shr		$0x10,	%rdx
+				rdi = rsi;							// mov		%rsi,	%rdi
+				rdi = (rdi ^ cpuTick);						// xor		%rax,	%rdi
+				rdi = (rdi ^ rcx);						// xor		%rcx,	%rdi
+				rdi = (rdi ^ rdx);						// xor		%rdx,	%rdi
+
+				//RANDOM_SEED_PROP_VALUE[index] = (EFI_UINT8)(rdi & 0xff);	// mov		%dil,	(%r15,%r12,1)
+				seedPtr[index] = (EFI_UINT8)(rdi & 0xff);
+
+				edi = (edi & 0x2f);						// and		$0x2f,	%edi
+				edi = (edi + esi);						// add		%esi,	%edi
+				index++;							// inc		r12
+				ecx = (edi & 0xffff);						// movzwl	%di,	%ecx
+
+			} while (index < 64);							// cmp		%r14d,	%r12d
+			// jne		0x17e55		(next)
+		}
+		DT__AddProperty(chosenNode, RANDOM_SEED_PROP, sizeof(RANDOM_SEED_PROP_VALUE), (EFI_UINT8 *)RANDOM_SEED_PROP_VALUE);
+	}
+
+	// setup '/chosen/memory-map' node
+	Node *memoryMapNode = DT__FindNode("/chosen/memory-map", false);
 	if (memoryMapNode == NULL)
 	{
 		verbose("setupChosenNode:Couldn't get '/chosen/memory-map' node\n");
-	} else { /*
-        static EFI_UINT64 BootClutPropValue = 0;
-        static EFI_UINT64 FailedBootPictPropValue = 0;
-        BootClutPropValue = ((EFI_UINT64)sizeof(appleClut8) << 32) | (EFI_UINT64)(EFI_UINT8 *)&appleClut8;
-        FailedBootPictPropValue = ((EFI_UINT64)(sizeof(gFailedBootPict) + 32) << 32) | (EFI_UINT64)(EFI_UINT8 *)&gFailedBootPict;
-        if (MacOSVerCurrent < MacOSVer2Int("10.7.3")) {
-            DT__AddProperty(node, "BootCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
-            DT__AddProperty(node, "Pict-FailedBoot", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
-        } else {
-            DT__AddProperty(node, "FailedCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
-            DT__AddProperty(node, "FailedImage", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
-        } */
-    }
+	}
+	else
+	{
+	/*
+		static EFI_UINT64 BootClutPropValue = 0;
+		static EFI_UINT64 FailedBootPictPropValue = 0;
+		BootClutPropValue = ((EFI_UINT64)sizeof(appleClut8) << 32) | (EFI_UINT64)(EFI_UINT8 *)&appleClut8;
+		FailedBootPictPropValue = ((EFI_UINT64)(sizeof(gFailedBootPict) + 32) << 32) | (EFI_UINT64)(EFI_UINT8 *)&gFailedBootPict;
+		if (MacOSVerCurrent < MacOSVer2Int("10.7.3")) {
+			DT__AddProperty(node, "BootCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
+			DT__AddProperty(node, "Pict-FailedBoot", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
+		}
+		else
+		{
+			DT__AddProperty(node, "FailedCLUT", sizeof(EFI_UINT64), (EFI_UINT64 *)&BootClutPropValue);
+			DT__AddProperty(node, "FailedImage", sizeof(EFI_UINT64), (EFI_UINT64 *)&FailedBootPictPropValue);
+		}
+	*/
+	}
 }
 
 /*
@@ -1003,7 +1059,7 @@ static void setupSmbiosConfigFile()
 
 	if (err)
 	{
-        verbose("setupSmbiosConfigFile: no SMBIOS replacement found.\n");
+		verbose("setupSmbiosConfigFile: No SMBIOS replacement found.\n");
 	}
 
 	// get a chance to scan mem dynamically if user asks for it while having the config options
@@ -1028,14 +1084,14 @@ void saveOriginalSMBIOS(void)
 	origeps = getSmbios(SMBIOS_ORIGINAL);
 	if (!origeps)
 	{
-        verbose("saveOriginalSMBIOS: original SMBIOS not found\n");
+		verbose("saveOriginalSMBIOS: original SMBIOS not found\n");
 		return;
 	}
 
 	tableAddress = (void *)AllocateKernelMemory(origeps->dmi.tableLength);
 	if (!tableAddress)
 	{
-        verbose("saveOriginalSMBIOS: can not allocate memory for original SMBIOS\n");
+		verbose("saveOriginalSMBIOS: can not allocate memory for original SMBIOS\n");
 		return;
 	}
 
@@ -1045,208 +1101,253 @@ void saveOriginalSMBIOS(void)
 
 char saveOriginalACPI()
 {
-    verbose("\nsaveOriginalACPI: Saving OEM tables into IODT:/chosen/acpi...\n");
-    
-    Node *node = DT__FindNode("/chosen/acpi", true);
+	verbose("\nsaveOriginalACPI: Saving OEM tables into IODT:/chosen/acpi...\n");
+
+	Node *node = DT__FindNode("/chosen/acpi", true);
 	if (!node)
 	{
-        verbose("saveOriginalACPI: node '/chosen/acpi' not found, can't save any OEM tables.\n\n");
-        return 0;
-    }
+		verbose("saveOriginalACPI: node '/chosen/acpi' not found, can't save any OEM tables.\n\n");
+		return 0;
+	}
 
-    struct acpi_2_rsdp *RSDP = getRSDPaddress();
-    
-    if (!RSDP) {
-        verbose("saveOriginalACPI: OEM RSDP not found or incorrect, can't save any OEM tables.\n\n");
-        return 0;
-    }
-    
-    uint8_t r,
-            total_number = 1,
-            ssdt_number = 0,
-            nameLen = strlen("XXXX@XXXXXXXX");
-    uint32_t length = RSDP->Revision ? RSDP->Length : 20;
-    char *nameBuf = malloc(nameLen);
-    
-    sprintf(nameBuf, "RSDP@%08X", (uint32_t)RSDP);
-    verbose("saveOriginalACPI: OEM table %s found, length=%d: saving.\n", nameBuf, length);
-    DT__AddProperty(node, nameBuf, length, RSDP);
-    uint32_t total_length = length;
-    
-    struct acpi_2_header    *RSDT = (struct acpi_2_header *)(RSDP->RsdtAddress),
-                            *XSDT = (struct acpi_2_header *)(uint32_t)(RSDP->XsdtAddress);
-    
-                    void    *origTable  = NULL,
-                            *origTable2 = NULL,
-                            *origTable3 = NULL,
-                            *origTable4 = NULL;
-    
-    if ((RSDP->RsdtAddress > 0) && (RSDP->RsdtAddress < 0xFFFFFFFF) && tableSign(RSDT->Signature, "RSDT")) {
-        origTable = (void *)(RSDT + 1);
-        nameBuf = malloc(nameLen + 1);
-        sprintf(nameBuf, "RSDT@%08X", (uint32_t)RSDT);
-        verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, RSDT->Length);
-        DT__AddProperty(node, nameBuf, RSDT->Length, RSDT);
-        total_length += RSDT->Length;
-        total_number++;
-        for ( ; origTable < ((void *)RSDT + RSDT->Length); origTable += 4) {
-            origTable2 = (void *)(*(uint32_t *)origTable);
-            length = ((struct acpi_2_header *)origTable2)->Length;
-            total_length += length;
-            total_number++;
-            if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "SSDT")) {
-                ssdt_number++;
-                if (strcmp(((struct acpi_2_header *)origTable2)->OEMTableId, "CpuPm") == 0) {
-                    nameLen = strlen("SSDT@XXXXXXXX");
-                    nameBuf = malloc(nameLen + 1);
-                    sprintf(nameBuf, "SSDT@%08X", (uint32_t)origTable2);
-                    verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                    DT__AddProperty(node, nameBuf, length, origTable2);
-                    origTable2 += sizeof(struct acpi_2_header) + 15;
-                    r = *((uint8_t *)origTable2 - 2) / 3; // e.g: Name (SSDT, Package (0x0C) -> 0x0C / 3 = 4 is number of sub SSDTs
-                    for (; r > 0; r--, origTable2 += sizeof(struct ssdt_pmref)) {
-                        origTable3 = (void *)(((struct ssdt_pmref *)origTable2)->addr);
-                        if (!((uint32_t)origTable3 > 0) && !((uint32_t)origTable3 < 0xFFFFFFFF)) continue; // incorrect, dropping
-                        length = ((struct acpi_2_header *)origTable3)->Length;
-                        nameLen = strlen("SSDT_@XXXXXXXX") + strlen((char *)((struct acpi_2_header *)origTable3)->OEMTableId);
-                        nameBuf = malloc(nameLen + 1);
-                        sprintf(nameBuf, "SSDT_%s@%08X", (char *)((struct acpi_2_header *)origTable3)->OEMTableId, (uint32_t)origTable3);
-                        verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                        DT__AddProperty(node, nameBuf, length, origTable3);
-                        total_length += length;
-                        total_number++;
-                    }
-                } else {
-                    nameLen = strlen("SSDT-@XXXXXXXX") + ((ssdt_number < 10)? 1:2);
-                    nameBuf = malloc(nameLen + 1);
-                    sprintf(nameBuf, "SSDT-%d@%08X", ssdt_number, (uint32_t)origTable2);
-                    verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                    DT__AddProperty(node, nameBuf, length, origTable2);
-                }
-            } else {
-                nameLen = strlen("XXXX@XXXXXXXX");
-                nameBuf = malloc(nameLen + 1);
-                sprintf(nameBuf, "%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2);
-                verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                DT__AddProperty(node, nameBuf, length, origTable2);
-                if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP")) {
-                    origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->FACS);
-                    length = ((struct acpi_2_header *)origTable3)->Length;
-                    nameLen = strlen("FACS@XXXXXXXX");
-                    nameBuf = malloc(nameLen + 1);
-                    sprintf(nameBuf, "FACS@%08X", (uint32_t)origTable3);
-                    verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                    DT__AddProperty(node, nameBuf, length, origTable3);
-                    total_length += length;
-                    total_number++;
-                    origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->DSDT);
-                    length = ((struct acpi_2_header *)origTable3)->Length;
-                    nameLen = strlen("DSDT@XXXXXXXX");
-                    nameBuf = malloc(nameLen + 1);
-                    sprintf(nameBuf, "DSDT@%08X", (uint32_t)origTable3);
-                    verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                    DT__AddProperty(node, nameBuf, length, origTable3);
-                    total_length += length;
-                    total_number++;
-                }
-            }
-        }
-    } else {
-        verbose("saveOriginalACPI: OEM table RSDT@%08x not found or incorrect.\n", RSDP->RsdtAddress);
-    }
-    if (gVerboseMode) pause("");
-    
-    if (RSDP->Revision > 0) {
-        verbose("\n");
-        if ((RSDP->XsdtAddress > 0) && (RSDP->XsdtAddress < 0xFFFFFFFF) && tableSign(XSDT->Signature, "XSDT")) {
-            verbose("saveOriginalACPI: OEM table XSDT@%016X found, lenght=%d: saving.\n", (uint32_t)XSDT, XSDT->Length);
-            nameLen = strlen("XSDT@XXXXXXXX");
-            nameBuf = malloc(nameLen + 1);
-            sprintf(nameBuf, "XSDT@%08X", (uint32_t)XSDT);
-            DT__AddProperty(node, nameBuf, XSDT->Length, XSDT);
-            total_number++;
-            total_length += XSDT->Length;
-            for (origTable = (void *)(RSDT + 1), origTable4 = (void *)(XSDT + 1); origTable4 < ((void *)XSDT + XSDT->Length); origTable += 4, origTable4 += 8) {
-                origTable2 = (void *)(uint32_t)(*(uint64_t *)origTable4);
-                length = ((struct acpi_2_header *)origTable2)->Length;
-                verbose("saveOriginalACPI: OEM table X_%c%c%c%c@%016X found, lenght=%d: ", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2, length);
-                if (*(uint32_t *)origTable != (uint32_t)origTable2) { // already saved?
-                    verbose("saving.\n");
-                    nameLen = strlen("X_XXXX@XXXXXXXX");
-                    nameBuf = malloc(nameLen + 1);
-                    sprintf(nameBuf, "X_%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2);
-                    DT__AddProperty(node, nameBuf, length, origTable2);
-                    total_length += length;
-                    total_number++;
-                    
-                    if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "SSDT") && (strcmp(((struct acpi_2_header *)origTable2)->OEMTableId, "CpuPm") == 0)) {
-                        // Get rest of ssdts from ssdt_pmref
-                        r = *((uint8_t *)origTable2 - 2) / 3; // e.g: Name (SSDT, Package (0x0C) -> 0x0C / 3 = 4 is number of sub SSDTs
-                        for (; r > 0; r--, origTable2 += sizeof(struct ssdt_pmref)) {
-                            origTable3 = (void *)(((struct ssdt_pmref *)origTable2)->addr);
-                            if (!((uint32_t)origTable3 > 0) && !((uint32_t)origTable3 < 0xFFFFFFFF)) continue; // incorrect, dropping
-                            length = ((struct acpi_2_header *)origTable3)->Length;
-                            nameLen = strlen("SSDT_@XXXXXXXX") + strlen((char *)((struct acpi_2_header *)origTable3)->OEMTableId);
-                            nameBuf = malloc(nameLen + 1);
-                            sprintf(nameBuf, "SSDT_%s@%08X", (char *)((struct acpi_2_header *)origTable3)->OEMTableId, (uint32_t)origTable3);
-                            verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
-                            DT__AddProperty(node, nameBuf, length, origTable3);
-                            total_length += length;
-                            total_number++;
-                        }
-                        continue;
-                    }
-                    
-                    if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP")) {
-                        origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_FACS); // take x_facs assuming facs (from x_facp) should be equal to it
-                        length = ((struct acpi_2_rsdt *)origTable3)->Length;
-                        verbose("saveOriginalACPI: OEM table X_FACS@%016X found, lenght=%d: ", (uint32_t)origTable3, length);
-                        if (origTable3 != (void *)(((struct acpi_2_fadt *)origTable2)->FACS)) {
-                            verbose("saving.\n");
-                            nameLen = strlen("X_FACS@XXXXXXXX");
-                            nameBuf = malloc(nameLen + 1);
-                            sprintf(nameBuf, "X_FACS@%08X", (uint32_t)origTable3);
-                            DT__AddProperty(node, nameBuf, length, origTable3);
-                            total_length += length;
-                            total_number++;
-                        } else {
-                            verbose("already saved.\n");
-                        }
-                        // assuming only one dsdt in system, so x_facp should contain pointer to it same as facp
-                        origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_DSDT);
-                        length = ((struct acpi_2_rsdt *)origTable3)->Length;
-                        verbose("saveOriginalACPI: OEM table X_DSDT@%016X found, lenght=%d: ", origTable3, length);
-                        if (origTable3 != (void *)(((struct acpi_2_fadt *)origTable2)->DSDT)) {
-                            verbose("saving.\n");
-                            nameLen = strlen("X_DSDT@XXXXXXXX");
-                            nameBuf = malloc(nameLen + 1);
-                            sprintf(nameBuf, "X_DSDT@%08X", origTable3);
-                            DT__AddProperty(node, nameBuf, length, origTable3);
-                            total_length += length;
-                            total_number++;
-                        } else {
-                            verbose("already saved.\n");
-                        }
-                        continue;
-                    }
-                } else {
-                    verbose("already saved.\n");
-                }
-            }
-        } else {
-            verbose("saveOriginalACPI: OEM table XSDT@%08X%08X not found or incorrect.\n", (uint32_t)(RSDP->XsdtAddress >> 32), (uint32_t)(RSDP->XsdtAddress & 0xFFFFFFFF));
-        }
-    }
-    
-    if (!RSDT && !XSDT) {
-        verbose("saveOriginalACPI: OEM RSDT & XSDT not found or incorrect, can't save any tables.\n\n");
-        return 0;
-    }
-    
-    verbose("saveOriginalACPI: %d OEM table%s found and saved, total lenght=%d.\n\n", total_number, (total_number != 1) ? "s" : "", total_length);
-    if (gVerboseMode) pause("");
-    
-    return total_number;
+	struct acpi_2_rsdp *RSDP = getRSDPaddress();
+
+	if (!RSDP)
+	{
+		verbose("saveOriginalACPI: OEM RSDP not found or incorrect, can't save any OEM tables.\n\n");
+		return 0;
+	}
+
+	uint8_t r;
+	uint8_t total_number = 1;
+	uint8_t ssdt_number = 0;
+	uint8_t nameLen = strlen("XXXX@XXXXXXXX");
+	uint32_t length = RSDP->Revision ? RSDP->Length : 20;
+	char *nameBuf = malloc(nameLen);
+
+	sprintf(nameBuf, "RSDP@%08X", (uint32_t)RSDP);
+	verbose("saveOriginalACPI: OEM table %s found, length=%d: saving.\n", nameBuf, length);
+	DT__AddProperty(node, nameBuf, length, RSDP);
+	uint32_t total_length = length;
+
+	struct acpi_2_header    *RSDT = (struct acpi_2_header *)(RSDP->RsdtAddress);
+	struct acpi_2_header    *XSDT = (struct acpi_2_header *)(uint32_t)(RSDP->XsdtAddress);
+
+	void    *origTable  = NULL;
+	void    *origTable2 = NULL;
+	void    *origTable3 = NULL;
+	void    *origTable4 = NULL;
+
+	if ((RSDP->RsdtAddress > 0) && (RSDP->RsdtAddress < 0xFFFFFFFF) && tableSign(RSDT->Signature, "RSDT"))
+	{
+		origTable = (void *)(RSDT + 1);
+		nameBuf = malloc(nameLen + 1);
+		sprintf(nameBuf, "RSDT@%08X", (uint32_t)RSDT);
+		verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, RSDT->Length);
+		DT__AddProperty(node, nameBuf, RSDT->Length, RSDT);
+		total_length += RSDT->Length;
+		total_number++;
+		for ( ; origTable < ((void *)RSDT + RSDT->Length); origTable += 4)
+		{
+			origTable2 = (void *)(*(uint32_t *)origTable);
+			length = ((struct acpi_2_header *)origTable2)->Length;
+			total_length += length;
+			total_number++;
+			if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "SSDT"))
+			{
+				ssdt_number++;
+				if (strcmp(((struct acpi_2_header *)origTable2)->OEMTableId, "CpuPm") == 0)
+				{
+					nameLen = strlen("SSDT@XXXXXXXX");
+					nameBuf = malloc(nameLen + 1);
+					sprintf(nameBuf, "SSDT@%08X", (uint32_t)origTable2);
+					verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+					DT__AddProperty(node, nameBuf, length, origTable2);
+					origTable2 += sizeof(struct acpi_2_header) + 15;
+					r = *((uint8_t *)origTable2 - 2) / 3; // e.g: Name (SSDT, Package (0x0C) -> 0x0C / 3 = 4 is number of sub SSDTs
+					for (; r > 0; r--, origTable2 += sizeof(struct ssdt_pmref))
+					{
+						origTable3 = (void *)(((struct ssdt_pmref *)origTable2)->addr);
+						if (!((uint32_t)origTable3 > 0) && !((uint32_t)origTable3 < 0xFFFFFFFF)) // incorrect, dropping
+						{
+							continue;
+						}
+
+						length = ((struct acpi_2_header *)origTable3)->Length;
+						nameLen = strlen("SSDT_@XXXXXXXX") + strlen((char *)((struct acpi_2_header *)origTable3)->OEMTableId);
+						nameBuf = malloc(nameLen + 1);
+						sprintf(nameBuf, "SSDT_%s@%08X", (char *)((struct acpi_2_header *)origTable3)->OEMTableId, (uint32_t)origTable3);
+						verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+						DT__AddProperty(node, nameBuf, length, origTable3);
+						total_length += length;
+						total_number++;
+					}
+				}
+				else
+				{
+					nameLen = strlen("SSDT-@XXXXXXXX") + ((ssdt_number < 10)? 1:2);
+					nameBuf = malloc(nameLen + 1);
+					sprintf(nameBuf, "SSDT-%d@%08X", ssdt_number, (uint32_t)origTable2);
+					verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+					DT__AddProperty(node, nameBuf, length, origTable2);
+				}
+			}
+			else
+			{
+				nameLen = strlen("XXXX@XXXXXXXX");
+				nameBuf = malloc(nameLen + 1);
+				sprintf(nameBuf, "%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2);
+				verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+				DT__AddProperty(node, nameBuf, length, origTable2);
+				if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP"))
+				{
+					origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->FACS);
+					length = ((struct acpi_2_header *)origTable3)->Length;
+					nameLen = strlen("FACS@XXXXXXXX");
+					nameBuf = malloc(nameLen + 1);
+					sprintf(nameBuf, "FACS@%08X", (uint32_t)origTable3);
+					verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+					DT__AddProperty(node, nameBuf, length, origTable3);
+					total_length += length;
+					total_number++;
+					origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->DSDT);
+					length = ((struct acpi_2_header *)origTable3)->Length;
+					nameLen = strlen("DSDT@XXXXXXXX");
+					nameBuf = malloc(nameLen + 1);
+					sprintf(nameBuf, "DSDT@%08X", (uint32_t)origTable3);
+					verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+					DT__AddProperty(node, nameBuf, length, origTable3);
+					total_length += length;
+					total_number++;
+				}
+			}
+		}
+	}
+	else
+	{
+		verbose("saveOriginalACPI: OEM table RSDT@%08x not found or incorrect.\n", RSDP->RsdtAddress);
+	}
+
+#if DEBUG
+    pause("\n[DEBUG_FAKEEFI] ");
+#endif
+
+	if (RSDP->Revision > 0)
+	{
+		verbose("\n");
+		if ((RSDP->XsdtAddress > 0) && (RSDP->XsdtAddress < 0xFFFFFFFF) && tableSign(XSDT->Signature, "XSDT"))
+		{
+			verbose("saveOriginalACPI: OEM table XSDT@%016X found, lenght=%d: saving.\n", (uint32_t)XSDT, XSDT->Length);
+			nameLen = strlen("XSDT@XXXXXXXX");
+			nameBuf = malloc(nameLen + 1);
+			sprintf(nameBuf, "XSDT@%08X", (uint32_t)XSDT);
+			DT__AddProperty(node, nameBuf, XSDT->Length, XSDT);
+			total_number++;
+			total_length += XSDT->Length;
+			for (origTable = (void *)(RSDT + 1), origTable4 = (void *)(XSDT + 1); origTable4 < ((void *)XSDT + XSDT->Length); origTable += 4, origTable4 += 8)
+			{
+				origTable2 = (void *)(uint32_t)(*(uint64_t *)origTable4);
+				length = ((struct acpi_2_header *)origTable2)->Length;
+				verbose("saveOriginalACPI: OEM table X_%c%c%c%c@%016X found, lenght=%d: ", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2, length);
+				if (*(uint32_t *)origTable != (uint32_t)origTable2) // already saved?
+				{
+					verbose("saving.\n");
+					nameLen = strlen("X_XXXX@XXXXXXXX");
+					nameBuf = malloc(nameLen + 1);
+					sprintf(nameBuf, "X_%c%c%c%c@%08X", ((char *)origTable2)[0], ((char *)origTable2)[1], ((char *)origTable2)[2], ((char *)origTable2)[3], (uint32_t)origTable2);
+					DT__AddProperty(node, nameBuf, length, origTable2);
+					total_length += length;
+					total_number++;
+
+					if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "SSDT") && (strcmp(((struct acpi_2_header *)origTable2)->OEMTableId, "CpuPm") == 0))
+					{
+						// Get rest of ssdts from ssdt_pmref
+						r = *((uint8_t *)origTable2 - 2) / 3; // e.g: Name (SSDT, Package (0x0C) -> 0x0C / 3 = 4 is number of sub SSDTs
+						for (; r > 0; r--, origTable2 += sizeof(struct ssdt_pmref))
+						{
+							origTable3 = (void *)(((struct ssdt_pmref *)origTable2)->addr);
+							if (!((uint32_t)origTable3 > 0) && !((uint32_t)origTable3 < 0xFFFFFFFF)) // incorrect, dropping
+							{
+								continue;
+							}
+
+							length = ((struct acpi_2_header *)origTable3)->Length;
+							nameLen = strlen("SSDT_@XXXXXXXX") + strlen((char *)((struct acpi_2_header *)origTable3)->OEMTableId);
+							nameBuf = malloc(nameLen + 1);
+							sprintf(nameBuf, "SSDT_%s@%08X", (char *)((struct acpi_2_header *)origTable3)->OEMTableId, (uint32_t)origTable3);
+							verbose("saveOriginalACPI: OEM table %s found, lenght=%d: saving.\n", nameBuf, length);
+							DT__AddProperty(node, nameBuf, length, origTable3);
+							total_length += length;
+							total_number++;
+						}
+						continue;
+					}
+
+					if (tableSign(((struct acpi_2_header *)origTable2)->Signature, "FACP"))
+					{
+						origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_FACS); // take x_facs assuming facs (from x_facp) should be equal to it
+						length = ((struct acpi_2_rsdt *)origTable3)->Length;
+						verbose("saveOriginalACPI: OEM table X_FACS@%016X found, lenght=%d: ", (uint32_t)origTable3, length);
+						if (origTable3 != (void *)(((struct acpi_2_fadt *)origTable2)->FACS))
+						{
+							verbose("saving.\n");
+							nameLen = strlen("X_FACS@XXXXXXXX");
+							nameBuf = malloc(nameLen + 1);
+							sprintf(nameBuf, "X_FACS@%08X", (uint32_t)origTable3);
+							DT__AddProperty(node, nameBuf, length, origTable3);
+							total_length += length;
+							total_number++;
+						}
+						else
+						{
+							verbose("already saved.\n");
+						}
+
+						// assuming only one dsdt in system, so x_facp should contain pointer to it same as facp
+						origTable3 = (void *)(((struct acpi_2_fadt *)origTable2)->X_DSDT);
+						length = ((struct acpi_2_rsdt *)origTable3)->Length;
+						verbose("saveOriginalACPI: OEM table X_DSDT@%016X found, lenght=%d: ", origTable3, length);
+						if (origTable3 != (void *)(((struct acpi_2_fadt *)origTable2)->DSDT))
+						{
+							verbose("saving.\n");
+							nameLen = strlen("X_DSDT@XXXXXXXX");
+							nameBuf = malloc(nameLen + 1);
+							sprintf(nameBuf, "X_DSDT@%08X", origTable3);
+							DT__AddProperty(node, nameBuf, length, origTable3);
+							total_length += length;
+							total_number++;
+						}
+						else
+						{
+							verbose("already saved.\n");
+						}
+						continue;
+					}
+				}
+				else
+				{
+					verbose("already saved.\n");
+				}
+			}
+		}
+		else
+		{
+			verbose("saveOriginalACPI: OEM table XSDT@%08X%08X not found or incorrect.\n", (uint32_t)(RSDP->XsdtAddress >> 32), (uint32_t)(RSDP->XsdtAddress & 0xFFFFFFFF));
+		}
+	}
+
+	if (!RSDT && !XSDT)
+	{
+		verbose("saveOriginalACPI: OEM RSDT & XSDT not found or incorrect, can't save any tables.\n\n");
+		return 0;
+	}
+
+	verbose("saveOriginalACPI: %d OEM table%s found and saved, total lenght=%d.\n\n", total_number, (total_number != 1) ? "s" : "", total_length);
+#if DEBUG
+    pause("\n[DEBUG_FAKEEFI] ");
+#endif
+
+	return total_number;
 }
 
 /*
@@ -1261,22 +1362,22 @@ void setupFakeEfi(void)
 
 	// load smbios.plist file if any
 	setupSmbiosConfigFile();
-    
-    // Setup ACPI with DSDT overrides (mackerintel's patch)
+
+	// Setup ACPI with DSDT overrides (mackerintel's patch)
 	setupAcpi();
-    
-    setupSMBIOS();
-    
-    // Setup board-id: need to be called after getSmbios!
-    setupBoardId();
-    
-    // Setup system-type: We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
+
+	setupSMBIOS();
+
+	// Setup board-id: need to be called after getSmbios!
+	setupBoardId();
+
+	// Setup system-type: We now have to write the systemm-type in ioregs: we cannot do it before in setupDeviceTree()
 	// because we need to take care of FACP original content, if it is correct.
 	setupSystemType();
-    
-    // Setup the '/' node
+
+	// Setup the '/' node
 	//setupRootNode();
-    
+
 	// Setup the '/chosen' node
 	setupChosenNode();
 
@@ -1290,10 +1391,10 @@ void setupFakeEfi(void)
 		setupEfiTables64();
 	}
 
-    // Setup efi node
+	// Setup efi node
 	setupEfiNode();
 
-    saveOriginalSMBIOS();
-    
-    saveOriginalACPI();
+	saveOriginalSMBIOS();
+
+	saveOriginalACPI();
 }

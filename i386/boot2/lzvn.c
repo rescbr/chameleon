@@ -38,23 +38,23 @@ static short Llzvn_tableref[256] =
 // jmpq   *(%rbx,%r9,8)
 
 #define LABEL_JUMP                               \
-do {                                         \
-r8 = *(uint64_t *)rdx;                   \
-r9 = r8 & 0xFF;                          \
-switch (Llzvn_tableref[r9]) {            \
-case 0:  goto Llzvn_table0;  break;  \
-case 1:  goto Llzvn_table1;  break;  \
-case 2:  return rax;                 \
-case 3:  goto Llzvn_table3;  break;  \
-case 4:  goto Llzvn_table4;  break;  \
-case 5:  return 0;                   \
-case 6:  goto Llzvn_table6;  break;  \
-case 7:  goto Llzvn_table7;  break;  \
-case 8:  goto Llzvn_table8;  break;  \
-case 9:  goto Llzvn_table9;  break;  \
-case 10: goto Llzvn_table10; break;  \
-}                                        \
-} while (0)
+	do {                                         \
+		r8 = *(uint64_t *)rdx;                   \
+		r9 = r8 & 0xFF;                          \
+		switch (Llzvn_tableref[r9]) {            \
+			case 0:  goto Llzvn_table0;  break;  \
+			case 1:  goto Llzvn_table1;  break;  \
+			case 2:  return rax;                 \
+			case 3:  goto Llzvn_table3;  break;  \
+			case 4:  goto Llzvn_table4;  break;  \
+			case 5:  return 0;                   \
+			case 6:  goto Llzvn_table6;  break;  \
+			case 7:  goto Llzvn_table7;  break;  \
+			case 8:  goto Llzvn_table8;  break;  \
+			case 9:  goto Llzvn_table9;  break;  \
+			case 10: goto Llzvn_table10; break;  \
+		}                                        \
+	} while (0)
 
 
 size_t lzvn_decode(void * dst,
@@ -74,22 +74,22 @@ size_t lzvn_decode(void * dst,
     uint64_t r10 = 0;
     uint64_t r11 = 0;
     uint64_t r12 = 0;
-    
+
     uint64_t addr           = 0;
     unsigned char byte_data = 0;
-    
+
     short jmp = 0;
-    
+   
     // lea    Llzvn_tableref(%rip),%rbx
     //
     //    this will load the address of the tableref label into the %rbx
     //    register. in our code, this is the 'Llzvn_tableref' array
     //
     //  for clearness, it will be used directly.
-    
+
     rax = 0;    // xor    %rax,%rax
     r12 = 0;    // xor    %r12,%r12
-    
+
     // sub    $0x8,%rsi
     // jb     Llzvn_exit
     jmp = rsi < 0x8 ? 1 : 0;
@@ -97,7 +97,7 @@ size_t lzvn_decode(void * dst,
     if (jmp) {
         return 0;
     }
-    
+
     // lea    -0x8(%rdx,%rcx,1),%rcx
     // cmp    %rcx,%rdx
 	// ja     Llzvn_exit
@@ -108,7 +108,7 @@ size_t lzvn_decode(void * dst,
     
     LABEL_JUMP;
     
-    
+
     
 Llzvn_table0:
     r9 >>= 0x6;           // shr    $0x6,%r9
@@ -126,7 +126,7 @@ Llzvn_table0:
     r10 >>= 0x3;    // shr    $0x3,%r10
     r10 += 0x3;     // add    $0x3,%r10
     goto Llzvn_l10; // jmp    Llzvn_l10
-    
+
 Llzvn_table1:
     r9 >>= 0x6;            // shr    $0x6,%r9
     rdx = rdx + r9 + 0x2;  // lea    0x2(%rdx,%r9,1),%rdx
@@ -147,7 +147,7 @@ Llzvn_table1:
     r10 += 0x3;              // add    $0x3,%r10
     r8  >>= 0x10;            // shr    $0x10,%r8
     goto Llzvn_l10;
-    
+
     
 Llzvn_table3:
     r9 >>= 0x6;           // shr    $0x6,%r9
@@ -168,7 +168,7 @@ Llzvn_table3:
     r8 >>= 0x10;    // shr    $0x10,%r8
     r10 += 0x3;     // add    $0x3,%r10
     goto Llzvn_l10; // jmp    Llzvn_l10
-    
+
     
 Llzvn_table4:
     // add    $0x1,%rdx
@@ -208,7 +208,7 @@ Llzvn_table6:
     r12 &= r8;      // and    %r8,%r12
     r8 >>= 0xE;     // shr    $0xe,%r8
     goto Llzvn_l10; // jmp    Llzvn_l10
-    
+ 
     
 Llzvn_table7:
     r8 >>= 0x8;           // shr    $0x8,%r8
@@ -223,7 +223,7 @@ Llzvn_table8:
     rdx = rdx + r8 + 0x1; // lea    0x1(%rdx,%r8,1),%rdx
     goto Llzvn_l0;        // jmp    Llzvn_l0
     
-    
+
 Llzvn_table9:
     rdx += 0x2; // add    $0x2,%rdx
     
@@ -238,8 +238,8 @@ Llzvn_table9:
     r10 &= 0xFF; // and    $0xff,%r10
     r10 += 0x10; // add    $0x10,%r10
     goto Llzvn_l11;
-    
-    
+
+
 Llzvn_table10:
     rdx += 1; // add    $0x1,%rdx
     
@@ -346,7 +346,7 @@ Llzvn_l8:
         }
         while (jmp);
     }
-    
+
     // mov    %rax,%r8
 	r8 = rax;
     

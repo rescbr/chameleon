@@ -69,13 +69,13 @@ char *cursor = 0;
 
 // Bungo:
 typedef struct {
-    uint16_t year;
-    uint8_t  mon;
-    uint8_t  day;
-    uint8_t  hour;
-    uint8_t  mins;
-    uint8_t  secs;
-    uint8_t  dlight;
+	uint16_t year;
+	uint8_t  mon;
+	uint8_t  day;
+	uint8_t  hour;
+	uint8_t  mins;
+	uint8_t  secs;
+	uint8_t  dlight;
 } datetime_t;
 static datetime_t datetime;
 
@@ -100,27 +100,27 @@ sputc(int c, struct putc_info * pi) //Azi: same as above
 
 uint64_t getRTCdatetime() // 0xYYYYMMDDHHMMSS0L in decimal
 {
-    biosBuf_t bb;
-    
-    bb.intno = 0x1a;
+	biosBuf_t bb;
+
+	bb.intno = 0x1a;
 	bb.eax.r.h = 0x04; // get RTC date
-    //bb.flags.cf = 0;
-    bios(&bb);
-    if (bb.flags.cf) return 0;
-    datetime.year = (bb.ecx.r.h >> 4) * 1000 + (bb.ecx.r.h & 0x0F) * 100 + (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
-    datetime.mon = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
-    datetime.day = (bb.edx.r.l >> 4) * 10 + (bb.edx.r.l & 0x0F) * 1;
-    
-    bb.intno = 0x1a;
-	bb.eax.r.h = 0x02; // get RTC time
-    //bb.flags.cf = 0;
+	//bb.flags.cf = 0;
 	bios(&bb);
-    if (bb.flags.cf) return 0;
-    datetime.dlight = bb.edx.r.l & 0x0F;
-    datetime.hour = (bb.ecx.r.h >> 4) * 10 + (bb.ecx.r.h & 0x0F) * 1;
-    datetime.mins = (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
-    datetime.secs = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
-    return *(uint64_t *)&datetime;
+	if (bb.flags.cf) return 0;
+	datetime.year = (bb.ecx.r.h >> 4) * 1000 + (bb.ecx.r.h & 0x0F) * 100 + (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+	datetime.mon = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+	datetime.day = (bb.edx.r.l >> 4) * 10 + (bb.edx.r.l & 0x0F) * 1;
+
+	bb.intno = 0x1a;
+	bb.eax.r.h = 0x02; // get RTC time
+	//bb.flags.cf = 0;
+	bios(&bb);
+	if (bb.flags.cf) return 0;
+	datetime.dlight = bb.edx.r.l & 0x0F;
+	datetime.hour = (bb.ecx.r.h >> 4) * 10 + (bb.ecx.r.h & 0x0F) * 1;
+	datetime.mins = (bb.ecx.r.l >> 4) * 10 + (bb.ecx.r.l & 0x0F) * 1;
+	datetime.secs = (bb.edx.r.h >> 4) * 10 + (bb.edx.r.h & 0x0F) * 1;
+	return *(uint64_t *)&datetime;
 }
 
 void initBooterLog(void)
@@ -129,8 +129,8 @@ void initBooterLog(void)
 	bzero(msgbuf, BOOTER_LOG_SIZE);
 	cursor = msgbuf;
 	verbose("%s\n", "Chameleon v" I386BOOT_CHAMELEONVERSION " (Bungo branch) r" I386BOOT_CHAMELEONREVISION " [" I386BOOT_BUILDDATE "]");
-    getRTCdatetime();
-    verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
+	getRTCdatetime();
+	verbose("Logging started: %04d/%02d/%02d, %02d:%02d:%02d (+/- offset)\n", datetime.year, datetime.mon, datetime.day, datetime.hour, datetime.mins, datetime.secs);
 }
 
 int msglog(const char * fmt, ...)
@@ -138,11 +138,13 @@ int msglog(const char * fmt, ...)
 	va_list ap;
 	struct putc_info pi;
 
-	if (!msgbuf) {
+	if (!msgbuf)
+	{
 		return 0;
 	}
 
-	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE))) {
+	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
+	{
 		return 0;
 	}
 
@@ -152,13 +154,14 @@ int msglog(const char * fmt, ...)
 	prf(fmt, ap, sputc, &pi);
 	va_end(ap);
 	cursor += strlen((char *)cursor);
-    
-    return 0;
+
+	return 0;
 }
 
 void setupBooterLog(void)
 {
-	if (!msgbuf) {
+	if (!msgbuf)
+	{
 		return;
 	}
 
@@ -215,7 +218,7 @@ int getchar()
 int printf(const char * fmt, ...)
 {
 	va_list ap;
-    
+
 	va_start(ap, fmt);
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
@@ -299,23 +302,23 @@ int error(const char * fmt, ...)
 		vprf(fmt, ap);
 	}
 
-		// Kabyl: BooterLog
-		struct putc_info pi;
+	// Kabyl: BooterLog
+	struct putc_info pi;
 
 	if (!msgbuf)
 	{
-			return 0;
-		}
+		return 0;
+	}
 
 	if (((cursor - msgbuf) > (BOOTER_LOG_SIZE - SAFE_LOG_SIZE)))
 	{
-			return 0;
-		}
+		return 0;
+	}
 
-		pi.str = cursor;
-		pi.last_str = 0;
-		prf(fmt, ap, sputc, &pi);
-		cursor +=  strlen((char *)cursor);
+	pi.str = cursor;
+	pi.last_str = 0;
+	prf(fmt, ap, sputc, &pi);
+	cursor +=  strlen((char *)cursor);
 
 	va_end(ap);
 	return(0);
@@ -344,17 +347,20 @@ void stop(const char * fmt, ...)
 /** Print user message and a "Press a key to continue..." message and wait for a key press. */
 void pause(const char * fmt, ...) // replace getchar() by pause() were useful.
 {
-    va_list ap;
-    
+	va_list ap;
+
 	va_start(ap, fmt);
-	if (bootArgs->Video.v_display == VGA_TEXT_MODE) {
+	if (bootArgs->Video.v_display == VGA_TEXT_MODE)
+	{
 		prf(fmt, ap, putchar, 0);
-	} else {
+	}
+	else
+	{
 		vprf(fmt, ap);
 	}
 	va_end(ap);
     
-    printf("Press a key to continue...");
+	printf("Press a key to continue...");
 	getchar();
-    printf("\n");
+	printf("\n");
 }

@@ -40,25 +40,25 @@ char *acpi_cpu_name[32];
 void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
 {
 	uint32_t i;
-    
+
 	verbose("ACPIpatcher: start finding cpu names. Length %d\n", length);
-    
+
 	for (i=0; i<length-7; i++)
 	{
 		if (dsdt[i] == 0x5B && dsdt[i+1] == 0x83) // ProcessorOP
 		{
 			verbose("ACPIpatcher: DSDT[%X%X]\n", dsdt[i], dsdt[i+1]);
-            
+
 			uint32_t offset = i + 3 + (dsdt[i+2] >> 6);
-            
+
 			bool add_name = true;
-            
+
 			uint8_t j;
-            
+
 			for (j=0; j<4; j++)
 			{
 				char c = dsdt[offset+j];
-                
+
 				if (!aml_isvalidchar(c))
 				{
 					add_name = false;
@@ -66,25 +66,25 @@ void get_acpi_cpu_names(unsigned char *dsdt, uint32_t length)
 					break;
 				}
 			}
-            
+
 			if (add_name)
 			{
 				acpi_cpu_name[acpi_cpu_count] = malloc(4);
 				memcpy(acpi_cpu_name[acpi_cpu_count], dsdt+offset, 4);
 				i = offset + 5;
-                
+
 				if (acpi_cpu_count == 0)
 					acpi_cpu_p_blk = dsdt[i] | (dsdt[i+1] << 8);
-                
+
 				verbose("ACPIpatcher: found ACPI CPU [%c%c%c%c]\n", acpi_cpu_name[acpi_cpu_count][0], acpi_cpu_name[acpi_cpu_count][1], acpi_cpu_name[acpi_cpu_count][2], acpi_cpu_name[acpi_cpu_count][3]);
-                
+
 				if (++acpi_cpu_count == 32) {
 					return;
 				}
 			}
 		}
 	}
-    
+
 	verbose("ACPIpatcher: finished finding cpu names. Found: %d.\n", acpi_cpu_count);
 }
 
@@ -526,7 +526,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 				aml_add_byte(tmpl, 0x06);			// C6
 				aml_add_word(tmpl, 0x0046);			// Latency
 				aml_add_dword(tmpl, 0x0000015E);		// Power
-		}
+			}
 			if (c7_enabled) //C7
 			{
 				p_blk_lo = (acpi_cpu_p_blk + 6) & 0xff;
@@ -592,7 +592,7 @@ struct acpi_2_ssdt *generate_cst_ssdt(struct acpi_2_fadt *fadt)
 				aml_add_byte(tmpl, 0x06);			// C6
 				aml_add_word(tmpl, 0x0046);			// Latency as in MacPro6,1
 				aml_add_dword(tmpl, 0x0000015E);	// Power
-		}
+			}
 			if (c7_enabled) // C7
 			{
 				tmpl = aml_add_package(pack);

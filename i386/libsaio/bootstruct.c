@@ -45,10 +45,10 @@
  * the kernel by the booter.
  */
 
-boot_args			*bootArgs;
+boot_args		*bootArgs;
 boot_args_pre_lion	*bootArgsPreLion;
 PrivateBootInfo_t	*bootInfo;
-Node				*gMemoryMapNode;
+Node			*gMemoryMapNode;
 
 static char platformName[64];
 
@@ -83,22 +83,22 @@ void initKernBootStruct( void )
 			// BIOS did not provide a memory map, systems with
 			// discontiguous memory or unusual memory hole locations
 			// may have problems.
-			
-			bootInfo->convmem = getConventionalMemorySize();
-			bootInfo->extmem  = getExtendedMemorySize();
+
+			bootInfo->convmem	= getConventionalMemorySize();
+			bootInfo->extmem	= getExtendedMemorySize();
 		}
-		
-		bootInfo->configEnd	   = bootInfo->config;
-		bootArgs->Video.v_display = VGA_TEXT_MODE;
-		
-        // DeviceTree init
+
+		bootInfo->configEnd		= bootInfo->config;
+		bootArgs->Video.v_display	= VGA_TEXT_MODE;
+
+		// DeviceTree init
 		//DT__Initialize();
 		//node = DT__FindNode("/", true);
-        node = DT__Initialize();
+		node = DT__Initialize();
 		if (node == 0) {
 			stop("Couldn't create root node");
 		}
-        
+
 		getPlatformName(platformName);
 		nameLen = strlen(platformName) + 1;
 		DT__AddProperty(node, "compatible", nameLen, platformName);
@@ -144,7 +144,7 @@ void finalizeBootStruct(void)
 	EfiMemoryRange *memoryMap;
 	MemoryRange *range;
 	int memoryMapCount = bootInfo->memoryMapCount;
-	
+
 	if (memoryMapCount == 0)
 	{
 		// XXX could make a two-part map here
@@ -154,11 +154,11 @@ void finalizeBootStruct(void)
 	// convert memory map to boot_args memory map
 	memoryMap = (EfiMemoryRange *)AllocateKernelMemory(sizeof(EfiMemoryRange) * memoryMapCount);
 
-	bootArgs->MemoryMap = (uint32_t)memoryMap;
-	bootArgs->MemoryMapSize = sizeof(EfiMemoryRange) * memoryMapCount;
-	bootArgs->MemoryMapDescriptorSize = sizeof(EfiMemoryRange);
-	bootArgs->MemoryMapDescriptorVersion = 0;
-	
+	bootArgs->MemoryMap						= (uint32_t)memoryMap;
+	bootArgs->MemoryMapSize						= sizeof(EfiMemoryRange) * memoryMapCount;
+	bootArgs->MemoryMapDescriptorSize				= sizeof(EfiMemoryRange);
+	bootArgs->MemoryMapDescriptorVersion				= 0;
+
 	for (i = 0; i < memoryMapCount; i++, memoryMap++)
 	{
 		range = &bootInfo->memoryMap[i];
@@ -184,10 +184,10 @@ void finalizeBootStruct(void)
 				break;
 		}
 
-		memoryMap->PhysicalStart = range->base;
-		memoryMap->VirtualStart = range->base;
-		memoryMap->NumberOfPages = range->length >> I386_PGSHIFT;
-		memoryMap->Attribute = 0;
+		memoryMap->PhysicalStart	= range->base;
+		memoryMap->VirtualStart		= range->base;
+		memoryMap->NumberOfPages	= range->length >> I386_PGSHIFT;
+		memoryMap->Attribute		= 0;
 	}
 
 	// copy bootFile into device tree
@@ -224,7 +224,7 @@ void finalizeBootStruct(void)
 
 	bootArgsPreLion->kaddr = bootArgs->kaddr;
 	bootArgsPreLion->ksize = bootArgs->ksize;
-	
+
 	bootArgsPreLion->efiRuntimeServicesPageStart = bootArgs->efiRuntimeServicesPageStart;
 	bootArgsPreLion->efiRuntimeServicesPageCount = bootArgs->efiRuntimeServicesPageCount;
 	bootArgsPreLion->efiSystemTable = bootArgs->efiSystemTable;

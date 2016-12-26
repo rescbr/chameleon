@@ -40,13 +40,13 @@
 
 extern void scan_cpu(PlatformInfo_t *);
 
-#define bit(n)              (1ULL << (n))
+#define bit(n)			(1ULL << (n))
 #define bitmask(h,l)		((bit(h) | (bit(h)-1)) & ~(bit(l)-1))
 #define bitfield(x,h,l)		(((x) & bitmask(h,l)) >> l)
-#define hbit(n)             (1ULL << ((n)+32))
-#define min(a,b)            ((a) < (b) ? (a) : (b))
-#define quad32(hi,lo)       ((((uint32_t)(hi)) << 16) | (((uint32_t)(lo)) & 0xFFFF))
-#define quad64(hi,lo)       ((((uint64_t)(hi)) << 32) | (((uint64_t)(lo)) & 0xFFFFFFFFUL))
+#define hbit(n)			(1ULL << ((n)+32))
+#define min(a,b)		((a) < (b) ? (a) : (b))
+#define quad32(hi,lo)		((((uint32_t)(hi)) << 16) | (((uint32_t)(lo)) & 0xFFFF))
+#define quad64(hi,lo)		((((uint64_t)(hi)) << 32) | (((uint64_t)(lo)) & 0xFFFFFFFFUL))
 
 #define	CPUID_VID_INTEL         "GenuineIntel"
 #define	CPUID_VID_AMD           "AuthenticAMD"
@@ -191,7 +191,7 @@ extern void scan_cpu(PlatformInfo_t *);
 #define IA32_ENERGY_PERF_BIAS		0x01B0
 #define MSR_PACKAGE_THERM_STATUS	0x01B1
 #define IA32_PLATFORM_DCA_CAP		0x01F8
-#define MSR_POWER_CTL               0x01FC   // MSR 000001FC  0000-0000-0004-005F
+#define MSR_POWER_CTL			0x01FC   // MSR 000001FC  0000-0000-0004-005F
 
 // Sandy Bridge & JakeTown specific 'Running Average Power Limit' MSR's.
 #define MSR_RAPL_POWER_UNIT			0x606     /* R/O */

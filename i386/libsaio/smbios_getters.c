@@ -30,7 +30,8 @@ bool getProcessorInformationExternalClock(returnType *value)
 		switch (Platform.CPU.Family)
 		{
 			case 0x06:
-				switch (Platform.CPU.Model) {
+				switch (Platform.CPU.Model)
+				{
 					// set external clock to 0 for SANDY
 					// removes FSB info from system profiler as on real mac's.
 					case CPUID_MODEL_SANDYBRIDGE:
@@ -41,17 +42,18 @@ bool getProcessorInformationExternalClock(returnType *value)
 					case CPUID_MODEL_HASWELL_SVR:
 					case CPUID_MODEL_HASWELL_ULT:
 					case CPUID_MODEL_CRYSTALWELL:
+
 						value->word = 0;
 						break;
 					default:
 						value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
-                        break;
+						break;
 				}
 				break;
 
 			default:
 				value->word = (uint16_t)(Platform.CPU.FSBFrequency/1000000LL);
-                break;
+				break;
 		}
 	}
 	else
@@ -90,7 +92,7 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPUID_MODEL_NEHALEM:	// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
 					case CPUID_MODEL_FIELDS:	// Intel Core i5, i7, Xeon X34xx LGA1156 (45nm)
 					case CPUID_MODEL_DALES:
-                    case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
+					case CPUID_MODEL_NEHALEM_EX:	// Intel Xeon X75xx, Xeon X65xx, Xeon E75xx, Xeon E65x
 					case CPUID_MODEL_DALES_32NM:	// Intel Core i3, i5 LGA1156 (32nm)
 					case CPUID_MODEL_WESTMERE:	// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
 					case CPUID_MODEL_WESTMERE_EX:	// Intel Xeon E7
@@ -99,54 +101,54 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 					case CPUID_MODEL_IVYBRIDGE:	// Intel Core i3, i5, i7 LGA1155 (22nm)
 					case CPUID_MODEL_IVYBRIDGE_EP:
 					case CPUID_MODEL_HASWELL:
-                        {
-                            // thanks to dgobe for i3/i5/i7 bus speed detection
-                            int nhm_bus = 0x3F;
-                            static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
-                            unsigned long did, vid;
-                            unsigned int i;
-                            
-                            // Nehalem supports Scrubbing
-                            // First, locate the PCI bus where the MCH is located
+					{
+						// thanks to dgobe for i3/i5/i7 bus speed detection
+						int nhm_bus = 0x3F;
+						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
+						unsigned long did, vid;
+						unsigned int i;
+						
+						// Nehalem supports Scrubbing
+						// First, locate the PCI bus where the MCH is located
 						for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++)
 						{
-                                vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
-                                did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
-                                vid &= 0xFFFF;
-                                did &= 0xFF00;
-                                
+							vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
+							did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
+							vid &= 0xFFFF;
+							did &= 0xFF00;
+							
 							if(vid == 0x8086 && did >= 0x2C00)
 							{
-                                    nhm_bus = possible_nhm_bus[i];
-                                }
-                            }
-                            
-                            unsigned long qpimult, qpibusspeed;
-                            qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
-                            qpimult &= 0x7F;
-                            verbose("qpimult %d\n", qpimult);
-                            qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
-                            // Rek: rounding decimals to match original mac profile info
+								nhm_bus = possible_nhm_bus[i];
+							}
+						}
+
+						unsigned long qpimult, qpibusspeed;
+						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
+						qpimult &= 0x7F;
+						verbose("qpimult %d\n", qpimult);
+						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
+						// Rek: rounding decimals to match original mac profile info
 						if (qpibusspeed%100 != 0)
 						{
-                                qpibusspeed = ((qpibusspeed+50)/100)*100;
-                            }
-                            verbose("qpibusspeed %d\n", qpibusspeed);
-                            value->word = qpibusspeed;
-                            return true;
-                        }
-                        break;
-                        
+							qpibusspeed = ((qpibusspeed+50)/100)*100;
+						}
+						verbose("qpibusspeed %d\n", qpibusspeed);
+						value->word = qpibusspeed;
+						return true;
+					}
+					break;
+
 					default:
 						break;
 				}
-                break;
-                
+				break;
+
 			default:
 				break;
 		}
 	}
-    
+
 	return false; //Unsupported CPU type
 }
 
@@ -186,7 +188,7 @@ bool getSMBOemProcessorType(returnType *value)
 				{
 					case CPUID_MODEL_PENTIUM_M:
 					case CPUID_MODEL_DOTHAN:			// 0x0D - Intel Pentium M model D
-                    case CPUID_MODEL_NOCONA:
+					case CPUID_MODEL_NOCONA:
 					case CPUID_MODEL_IRWINDALE:
 						if (strstr(Platform.CPU.BrandString, "Xeon"))
 						{
@@ -206,7 +208,7 @@ bool getSMBOemProcessorType(returnType *value)
 						if (strstr(Platform.CPU.BrandString, XEON))
 						{
 							value->word = 0x402;		// 1026 - Xeon
-                            return true;
+							return true;
 						}
 						if (Platform.CPU.NoCores <= 2)
 						{
@@ -381,9 +383,9 @@ bool getSMBOemProcessorType(returnType *value)
 					default:
 						break; // Unsupported CPU type
 				}
-                break;
-                
-            default:
+				break;
+
+			default:
 				break;
 		}
 	}

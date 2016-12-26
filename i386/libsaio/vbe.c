@@ -268,84 +268,84 @@ uint8_t generateCRTCTiming( unsigned short     width,
 
 uint8_t setVBEMode(unsigned short mode, const VBECRTCInfoBlock * timing)
 {
-    bb.intno  = 0x10;
-    bb.eax.rr = funcSetMode;
-    bb.ebx.rr = mode;
+	bb.intno  = 0x10;
+	bb.eax.rr = funcSetMode;
+	bb.ebx.rr = mode;
 	if (timing)
 	{
-        bb.es     = SEG(timing);
-        bb.edi.rr = OFF(timing);
-    }
-    bios(&bb);
-    return(bb.eax.r.h);
+		bb.es     = SEG(timing);
+		bb.edi.rr = OFF(timing);
+	}
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 uint8_t setVBEPalette(void *palette)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetSetPaletteData;
-    bb.ebx.r.l = subfuncSet;
-    bb.ecx.rr = 256;
-    bb.edx.rr = 0;
-    bb.es = SEG(palette);
-    bb.edi.rr = OFF(palette);
-    bios(&bb);
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetSetPaletteData;
+	bb.ebx.r.l = subfuncSet;
+	bb.ecx.rr = 256;
+	bb.edx.rr = 0;
+	bb.es = SEG(palette);
+	bb.edi.rr = OFF(palette);
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 uint8_t getVBEPalette(void *palette)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetSetPaletteData;
-    bb.ebx.r.l = subfuncGet;
-    bb.ecx.rr = 256;
-    bb.edx.rr = 0;
-    bb.es = SEG(palette);
-    bb.edi.rr = OFF(palette);
-    bios(&bb);
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetSetPaletteData;
+	bb.ebx.r.l = subfuncGet;
+	bb.ecx.rr = 256;
+	bb.edx.rr = 0;
+	bb.es = SEG(palette);
+	bb.edi.rr = OFF(palette);
+	bios(&bb);
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 uint8_t getVBECurrentMode(unsigned short *mode)
 {
-    bb.intno = 0x10;
-    bb.eax.rr = funcGetCurrentMode;
-    bios(&bb);
-    *mode = bb.ebx.rr;
-    return(bb.eax.r.h);
+	bb.intno = 0x10;
+	bb.eax.rr = funcGetCurrentMode;
+	bios(&bb);
+	*mode = bb.ebx.rr;
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 uint8_t getVBEPixelClock(unsigned short mode, unsigned long * pixelClock)
 {
-    bb.intno   = 0x10;
-    bb.eax.rr  = funcGetSetPixelClock;
-    bb.ebx.r.l = 0;
-    bb.ecx.rx  = *pixelClock;
-    bb.edx.rr  = mode;
-    bios(&bb);
-    *pixelClock = bb.ecx.rx;
-    return(bb.eax.r.h);
+	bb.intno   = 0x10;
+	bb.eax.rr  = funcGetSetPixelClock;
+	bb.ebx.r.l = 0;
+	bb.ecx.rx  = *pixelClock;
+	bb.edx.rr  = mode;
+	bios(&bb);
+	*pixelClock = bb.ecx.rx;
+	return(bb.eax.r.h);
 }
 
 //==============================================================================
 
 uint8_t getVBEEDID(void *edidBlock)
 {
-    bzero(&bb, sizeof(bb));
-    bb.intno   = 0x10;
-    bb.eax.rr  = 0x4F15;
+	bzero(&bb, sizeof(bb));
+	bb.intno   = 0x10;
+	bb.eax.rr  = 0x4F15;
 	bb.ebx.r.l = 0x01;
-    //bb.edx.rr  = 0x01;
-    bb.es      = SEG(edidBlock);
-    bb.edi.rr  = OFF(edidBlock);
-    bios(&bb);
-    return(bb.eax.r.h);
+	//bb.edx.rr  = 0x01;
+	bb.es      = SEG(edidBlock);
+	bb.edi.rr  = OFF(edidBlock);
+	bios(&bb);
+	return(bb.eax.r.h);
 }
