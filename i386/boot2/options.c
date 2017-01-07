@@ -37,10 +37,11 @@
 #else
 #define DBG(x...)	msglog(x)
 #endif
-
+// Bungo:
 char		gMacOSVersion[OSVERSTRLEN];
 uint32_t	MacOSVerCurrent = 0;
-bool		showBootBanner = true; //Azi:showinfo
+//Azi: showinfo
+bool		showBootBanner = true;
 static bool	shouldboot = false;
 
 extern int multiboot_timeout;
@@ -66,8 +67,7 @@ extern char *msgbuf;
 void showTextBuffer(char *buf_orig, int size);
 
 //==========================================================================
-
-// MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
+// Bungo: MacOSVer2Int - converts OS ver. string to uint32 (e.g "10.9.5" -> 0x0A090500) for easy comparing
 uint32_t MacOSVer2Int(const char *osver)
 {
 	uint32_t    result = 0;

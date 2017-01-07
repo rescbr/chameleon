@@ -892,6 +892,7 @@ bool checkOSVersion(const char * version)
 	}
 }
 
+// Bungo
 uint32_t getMacOSVerCurrent()
 {
 	MacOSVerCurrent = MacOSVer2Int(gBootVolume->OSVersion);

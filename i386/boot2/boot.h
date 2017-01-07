@@ -233,7 +233,7 @@ enum {
 extern void initialize_runtime();
 extern void common_boot(int biosdev);
 extern bool checkOSVersion(const char * version);
-extern uint32_t getMacOSVerCurrent();
+extern uint32_t getMacOSVerCurrent(); // Bungo
 
 /*
  * acpi_patcher.c

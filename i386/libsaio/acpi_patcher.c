@@ -154,14 +154,14 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 {
 	int fd = 0;
 	static char dirSpec[512];
-
+    
 	// Try finding 'filename' in the usual places
 	// Start searching any potential location for ACPI Table
-	snprintf(dirSpec, sizeof(dirSpec), "%s", filename); 
+	snprintf(dirSpec, sizeof(dirSpec), "%s", filename);
 	fd = open(dirSpec, 0);
 	if (fd < 0)
 	{
-		snprintf(dirSpec, sizeof(dirSpec), "/Extra/%s", filename); 
+		snprintf(dirSpec, sizeof(dirSpec), "/Extra/ACPI/%s", filename);
 		fd = open(dirSpec, 0);
 		if (fd < 0)
 		{
@@ -169,23 +169,33 @@ int search_and_get_acpi_fd(const char *filename, const char **outDirspec)
 			fd = open(dirSpec, 0);
 			if (fd < 0)
 			{
-				snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/%s", filename);
-				fd = open(dirSpec, 0);
-				if (fd < 0)
-				{
-					snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/Acpi/%s", filename);
-					fd = open(dirSpec, 0);
-					if (fd < 0)
-					{
-						// NOT FOUND:
-						dirSpec[0] = 0;
-					}
-				}
-			}
-		}
+                snprintf(dirSpec, sizeof(dirSpec), "/Extra/%s", filename);
+                fd = open(dirSpec, 0);
+                if (fd < 0)
+                {
+                    snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/ACPI/%s", filename);
+                    fd = open(dirSpec, 0);
+                    if (fd < 0)
+                    {
+                        snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/Acpi/%s", filename);
+                        fd = open(dirSpec, 0);
+                        if (fd < 0)
+                        {
+                            snprintf(dirSpec, sizeof(dirSpec), "bt(0,0)/Extra/%s", filename);
+                            fd = open(dirSpec, 0);
+                            if (fd < 0)
+                            {
+                                // NOT FOUND:
+                                dirSpec[0] = 0;
+                            }
+                        }
+                    }
+                }
+            }
+        }
 	}
-
-	if (outDirspec) *outDirspec = dirSpec; 
+    
+	if (outDirspec) *outDirspec = dirSpec;
 	return fd;
 }
 
@@ -281,7 +291,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 			case 1:
 			case 2:
 			case 3:
-				verbose(": using.\n");
+				verbose(", using.\n");
 				break;
 			default:
 				// use SMBIOS chassisType to determine PM Profile (saved previously for us)
@@ -329,18 +339,18 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	}
 
 	// Bungo: FACS table fix and load
-	verbose("\tOEM table FACS@%08X, length=%d: ", fadt_mod->FACS, ((struct acpi_2_facs *)fadt_mod->FACS)->Length);
+	verbose("\tOEM table FACS@%08X, length=%d, ", fadt_mod->FACS, ((struct acpi_2_facs *)fadt_mod->FACS)->Length);
 	if ((fadt_mod->FACS > 0) && (fadt_mod->FACS < 0xFFFFFFFF) && (((struct acpi_2_facs *)fadt_mod->FACS)->Length >= 64))
 	{
 		verbose("using.\n");
 	}
 	else
 	{
-		verbose(" incorrect!\n");
+		verbose(" Incorrect!\n");
 	}
 	if (ver_20 && (((uint32_t)(&(fadt_mod->X_FACS)) - (uint32_t)fadt_mod + 8) <= fadt_mod->Length))
 	{
-		verbose("\tOEM table X_FACS@%08X%08X, length=%d: ", (uint32_t)(fadt_mod->X_FACS >> 32), (uint32_t)(fadt_mod->X_FACS & 0xFFFFFFFF), ((struct acpi_2_facs *)fadt_mod->X_FACS)->Length);
+		verbose("\tOEM table X_FACS@%08X%08X, length=%d, ", (uint32_t)(fadt_mod->X_FACS >> 32), (uint32_t)(fadt_mod->X_FACS & 0xFFFFFFFF), ((struct acpi_2_facs *)fadt_mod->X_FACS)->Length);
 		if (fadt_mod->FACS != fadt_mod->X_FACS)
 		{
 			verbose("differes from FACS - fixing");
@@ -365,7 +375,7 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 	if ((fadt_mod->FACS > 0) && (fadt_mod->FACS < 0xFFFFFFFF) && (((struct acpi_2_facs *)fadt_mod->FACS)->Length >= 64))
 	{
 		Platform.HWSignature = ((struct acpi_2_facs *)fadt_mod->FACS)->HWSignature;
-		verbose("\tHardware Signature=0x%08X: using.\n", Platform.HWSignature);
+		verbose("\tHardware Signature=0x%08X, using.\n", Platform.HWSignature);
 	}
 	else
 	{
@@ -373,10 +383,10 @@ struct acpi_2_fadt *patch_fadt(struct acpi_2_fadt *fadt, struct acpi_2_dsdt *new
 		verbose("\tFixing Hardware Signature=0x%08X.\n", Platform.HWSignature);
 	}
 
-	verbose("\tOEM table DSDT@%08X, length=%d: %susing.\n", fadt_mod->DSDT, ((struct acpi_2_dsdt *)fadt_mod->DSDT)->Length, new_dsdt ? "not " : "");
+	verbose("\tOEM table DSDT@%08X, length=%d, %susing.\n", fadt_mod->DSDT, ((struct acpi_2_dsdt *)fadt_mod->DSDT)->Length, new_dsdt ? "not " : "");
 	if (ver_20 && (((uint32_t)(&(fadt_mod->X_DSDT)) - (uint32_t)fadt_mod + 8) <= fadt_mod->Length))
 	{
-		verbose("\tOEM table X_DSDT@%08X%08X, length=%d: %susing.\n", (uint32_t)(fadt_mod->X_DSDT >> 32), (uint32_t)(fadt_mod->X_DSDT & 0xFFFFFFFF), ((struct acpi_2_dsdt *)fadt_mod->X_DSDT)->Length, new_dsdt ? "not " : "");
+		verbose("\tOEM table X_DSDT@%08X%08X, length=%d, %susing.\n", (uint32_t)(fadt_mod->X_DSDT >> 32), (uint32_t)(fadt_mod->X_DSDT & 0xFFFFFFFF), ((struct acpi_2_dsdt *)fadt_mod->X_DSDT)->Length, new_dsdt ? "not " : "");
 	}
 	// Patch DSDT address if we have loaded DSDT.aml
 	if (new_dsdt)
@@ -434,7 +444,7 @@ int setupAcpi(void)
 
 	if (new_dsdt != NULL)
 	{
-		verbose("ACPIpatcher: custom table DSDT already loaded @%08X, length=%d: using.\n", new_dsdt, ((struct acpi_2_header *)new_dsdt)->Length);
+		verbose("ACPIpatcher: custom table DSDT already loaded @%08X, length=%d, using.\n", new_dsdt, ((struct acpi_2_header *)new_dsdt)->Length);
 	}
 	else
 	{
@@ -448,7 +458,7 @@ int setupAcpi(void)
 			sprintf(dirSpec, "DSDT.aml");
 		}
         
-		verbose("ACPIpatcher: attempting to load custom table DSDT...\n", dirSpec);
+		verbose("ACPIpatcher: attempting to load custom table DSDT...\n");
 		if ((new_dsdt = loadACPITable(dirSpec)))
 		{
 			verbose("ACPIpatcher: custom table DSDT loaded @%08X, length=%d.\n", new_dsdt, ((struct acpi_2_header *)new_dsdt)->Length);
@@ -477,14 +487,13 @@ int setupAcpi(void)
 	// Load ECDT table
 	if (new_ecdt != NULL)
 	{
-		verbose("ACPIpatcher: custom table ECDT already loaded @%08X, length=%d: using.\n", new_ecdt, ((struct acpi_2_header *)new_ecdt)->Length);
+		verbose("ACPIpatcher: custom table ECDT already loaded @%08X, length=%d, using.\n", new_ecdt, ((struct acpi_2_header *)new_ecdt)->Length);
 	}
 	else
 	{
 		sprintf(dirSpec, "ECDT.aml");
-		filename = "ECDT.aml";
 		verbose("ACPIpatcher: attempting to load custom table ECDT...\n");
-		if ((new_ecdt = loadACPITable(filename)))
+		if ((new_ecdt = loadACPITable(dirSpec)))
 		{
 			verbose("ACPIpatcher: custom table ECDT loaded @%08X, length=%d.\n", new_ecdt, ((struct acpi_2_header *)new_ecdt)->Length);
 		}
@@ -567,7 +576,7 @@ int setupAcpi(void)
 
 		int rsdplength = version ? rsdp->Length : 20;
 		int l = version ? 20 : 0;
-		verbose("ACPIpatcher: OEM table RSDP@%08X, length=%d. ACPI version %d.0: patching.\n", rsdp, rsdplength, version + 1);
+		verbose("ACPIpatcher: OEM table RSDP@%08X, length=%d. ACPI version %d.0. Patching.\n", rsdp, rsdplength, version + 1);
 
 		/* FIXME: no check that memory allocation succeeded 
 		 * Copy and patch RSDP, RSDT, XSDT and FADT
@@ -578,7 +587,7 @@ int setupAcpi(void)
 		memcpy(rsdp_mod, rsdp, rsdplength);
 
 		rsdt = (struct acpi_2_rsdt *)rsdp->RsdtAddress;
-		verbose("ACPIpatcher: OEM table RSDT@%08X, length=%d: ", rsdp->RsdtAddress, rsdt->Length);
+		verbose("ACPIpatcher: OEM table RSDT@%08X, length=%d, ", rsdp->RsdtAddress, rsdt->Length);
 
 		if ((rsdp->RsdtAddress > 0) && (rsdp->RsdtAddress < 0xFFFFFFFF) && (rsdt->Length < 0x10000))
 		{
@@ -596,11 +605,11 @@ int setupAcpi(void)
 			for (i = 0; i < rsdt_entries_num; i++)
 			{
 				struct acpi_2_header *oemTable = (struct acpi_2_header *)rsdt_entries[i];
-				verbose("ACPIpatcher: OEM table %c%c%c%c@%08X, length=%d: ", oemTable->Signature[0], oemTable->Signature[1], oemTable->Signature[2], oemTable->Signature[3], oemTable, oemTable->Length);
+				verbose("ACPIpatcher: OEM table %c%c%c%c@%08X, length=%d, ", oemTable->Signature[0], oemTable->Signature[1], oemTable->Signature[2], oemTable->Signature[3], oemTable, oemTable->Length);
 
 				if (!(rsdt_entries[i] > 0) || !(rsdt_entries[i] < 0xFFFFFFFF))
 				{
-					verbose("incorrect! Dropping.\n");
+					verbose("Incorrect! Dropping.\n");
 					dropoffset++;
 					continue;
 				}
@@ -617,7 +626,7 @@ int setupAcpi(void)
 						verbose("using.\n");
 						rsdt_entries[i-dropoffset] = rsdt_entries[i];
 						// get rest of ssdt tables from inside ssdt_pmref
-						if (getSubSSDT) { // prevent from extracting originals if user choosed generatind PSS and/or CSS tables
+						if (getSubSSDT) { // prevent from extracting originals if user choosed generating PSS and/or CSS tables
 							struct ssdt_pmref *subSSDT = (struct ssdt_pmref *)(rsdt_entries[i] + sizeof(struct acpi_2_header) + 15);
 							uint8_t tabNum = *((uint8_t *)subSSDT - 2) / 3; // e.g Name (SSDT, Package (0x0C) -> 0x0C / 3 = number of sub SSDTs
 							for (j = 0; (j < tabNum) && (ssdtotal_number < 30); j++)
@@ -625,7 +634,7 @@ int setupAcpi(void)
 								verbose("ACPIpatcher: OEM table SSDT_%s@%08X, length=%d: ", ((struct acpi_2_ssdt *)subSSDT[j].addr)->OEMTableId, subSSDT[j].addr, ((struct acpi_2_ssdt *)subSSDT[j].addr)->Length);
 								if (!(subSSDT[j].addr > 0) || !(subSSDT[j].addr < 0xFFFFFFFF))
 								{
-									verbose("incorrect! Dropping.\n");
+									verbose("Incorrect! Dropping.\n");
 									continue;
 								}
 								verbose("using.\n");
@@ -648,15 +657,22 @@ int setupAcpi(void)
 					}
 					continue;
 				}
+				*/
 
-				So, suggest to drop, it should be in FACP */
-
-				if (tableSign(oemTable, "DSDT"))
-				{
-					verbose("dropping.\n");
-					dropoffset++;
-					continue;
-				}
+                // Suggest to drop OEM DSDT here if present, it should be in FACP, if custom DSDT present ocourse
+                if (tableSign(oemTable, "DSDT") && new_dsdt)
+                {
+                    verbose("dropping.\n");
+                    dropoffset++;
+                    continue;
+                }
+                // Dropping DMAR (DMA Remapping table) table to fix stuck on "waitForSystemMapper" or "PCI configuration begin" cause nothing wokrked for me
+                if (tableSign(oemTable, "DMAR"))
+                {
+                    verbose("dropping.\n");
+                    dropoffset++;
+                    continue;
+                }
 
 				if (tableSign(oemTable, "ECDT") && new_ecdt)
 				{
@@ -669,7 +685,7 @@ int setupAcpi(void)
 				{
 					if (oemTable->Length > 0x10000)
 					{
-						verbose("incorrect. Not modifying.\n");
+						verbose("Incorrect. Not modifying.\n");
 						continue;
 					}
 
@@ -700,13 +716,10 @@ int setupAcpi(void)
 			}
 
 			// For moded rsdt calculate new lenght
+            rsdt_mod->Length += 4*ssdtotal_number - 4*dropoffset;
 			if (new_ecdt)
 			{
-				rsdt_mod->Length += 4*ssdtotal_number - 4*dropoffset + 4;  // custom - dropped + ECDT
-			}
-			else
-			{
-				rsdt_mod->Length += 4*ssdtotal_number - 4*dropoffset;
+				rsdt_mod->Length += 4;  // + ECDT
 			}
 
 			// Allocate moded rsdt in Kernel memory area
@@ -740,7 +753,7 @@ int setupAcpi(void)
 		else
 		{
 			rsdp_mod->RsdtAddress = 0;
-			verbose("not found or incorrect!\n");
+			verbose("Not found or incorrect!\n");
 		}
 		verbose("\n");
 
@@ -752,7 +765,7 @@ int setupAcpi(void)
 		{
 			// FIXME: handle 64-bit address correctly
 			xsdt = (struct acpi_2_xsdt *)(uint32_t)rsdp->XsdtAddress;
-			verbose("ACPIpatcher: OEM table XSDT@%08X%08X, length=%d: ", (uint32_t)(rsdp->XsdtAddress >> 32), (uint32_t)(rsdp->XsdtAddress & 0xFFFFFFFF), xsdt->Length);
+			verbose("ACPIpatcher: OEM table XSDT@%08X%08X, length=%d, ", (uint32_t)(rsdp->XsdtAddress >> 32), (uint32_t)(rsdp->XsdtAddress & 0xFFFFFFFF), xsdt->Length);
 
 			if ((rsdp->XsdtAddress > 0) && (rsdp->XsdtAddress < 0xFFFFFFFF) && (xsdt->Length < 0x10000))
 			{
@@ -772,30 +785,30 @@ int setupAcpi(void)
 				{
 					struct acpi_2_header *oemTable = (struct acpi_2_header *)(uint32_t)xsdt_entries[i];
 					verbose("ACPIpatcher: OEM table %c%c%c%c@%08X%08X, length=%d", oemTable->Signature[0], oemTable->Signature[1], oemTable->Signature[2], oemTable->Signature[3], (uint32_t)(xsdt_entries[i] >> 32), (uint32_t)(xsdt_entries[i] & 0xFFFFFFFF), oemTable->Length);
-
+                    
 					if (!(xsdt_entries[i] > 0) || !(xsdt_entries[i] < 0xFFFFFFFF))
 					{
-						verbose(": incorrect! Dropping.\n");
+						verbose(", Incorrect! Dropping.\n");
 						dropoffset++;
 						continue;
 					}
-
+                    
 					bool inRSDT = (uint32_t)oemTable == ((uint32_t *)(rsdt + 1))[i]; // check if already in RSDT
 					if (inRSDT)
 					{
 						verbose(" (already in RSDT)");
 					}
-
+                    
 					if (tableSign(oemTable, "SSDT") && !inRSDT)
 					{
 						if (drop_ssdt)
 						{
-							verbose(": dropping.\n");
+							verbose(", dropping.\n");
 							dropoffset++;
 						}
 						else
 						{
-							verbose(": using.\n");
+							verbose(", using.\n");
 							xsdt_entries[i - dropoffset] = xsdt_entries[i];
 							// Get rest of ssdts from ssdt_pmref
 							if (getSubSSDT)
@@ -807,80 +820,92 @@ int setupAcpi(void)
 									verbose("ACPIpatcher: OEM table SSDT_%s@%08X, length=%d", ((struct acpi_2_ssdt *)subSSDT[j].addr)->OEMTableId, subSSDT[j].addr, ((struct acpi_2_ssdt *)subSSDT[j].addr)->Length);
 									if (!(subSSDT[j].addr > 0) || !(subSSDT[j].addr < 0xFFFFFFFF))
 									{
-										verbose(": incorrect! Dropping.\n");
+										verbose(", Incorrect! Dropping.\n");
 										continue;
 									}
 									new_ssdt[ssdtotal_number] = (struct acpi_2_ssdt *)subSSDT[j].addr;
 									ssdtotal_number++;
-									verbose(": using.\n");
+									verbose(", using.\n");
 								}
 							}
 						}
-					continue;
-				}
-
-				// Bungo: According to ACPI Spec. no DSDT in RSDT, so what this for?
-				/*
-				if (tableSign(oemTable, "DSDT"))
-				{
-					if (new_dsdt)
-					{
-						xsdt_entries[i-dropoffset] = (uint64_t)new_dsdt;
-						verbose("custom table added.\n");
-					}
-					continue;
-				}
-				*/
-				// Suggest to drop, it should be in FACP
-				if (tableSign(oemTable, "DSDT") && !inRSDT)
-				{
-					verbose(": dropping.\n");
-					dropoffset++;
-					continue;
-				}
-
-				if (tableSign(oemTable, "FACP") && !inRSDT)
-				{
-					if (oemTable->Length > 0x10000)
-					{
-						goto drop_xsdt;
-					}
-
-					verbose(": patching.\n");
-					fadt_mod = patch_fadt((struct acpi_2_fadt *)oemTable, new_dsdt);
-					xsdt_entries[i - dropoffset] = (uint64_t)fadt_mod;
-
-					// Generate _CST SSDT
-					if (generate_cstates && (new_ssdt[ssdtotal_number] = generate_cst_ssdt(fadt_mod)))
-					{
-						verbose("\tC-States generated\n");
-						generate_cstates = false; // Generate SSDT only once!
-						ssdtotal_number++;
-					}
-
-					// Generating _PSS SSDT
-					if (generate_pstates && (new_ssdt[ssdtotal_number] = generate_pss_ssdt((void *)fadt_mod->DSDT)))
-					{
-						verbose("\tP-States generated\n");
-						generate_pstates = false; // Generate SSDT only once!
-						ssdtotal_number++;
-					}
+                        continue;
+                    }
+                    
+                    // Bungo: According to ACPI Spec. no DSDT in RSDT, so what this for?
+                    /*
+                     if (tableSign(oemTable, "DSDT"))
+                     {
+                     if (new_dsdt)
+                     {
+                     xsdt_entries[i-dropoffset] = (uint64_t)new_dsdt;
+                     verbose("custom table added.\n");
+                     }
+                     continue;
+                     }
+                     */
+                    // Suggest to drop OEM DSDT here if present, it should be in FACP, if custom DSDT present ocourse
+                    if (tableSign(oemTable, "DSDT") && new_dsdt)
+                    {
+                        verbose(", dropping.\n");
+                        dropoffset++;
+                        continue;
+                    }
+                    // Dropping DMAR (DMA Remapping table) table to fix stuck on "waitForSystemMapper" or "PCI configuration begin" cause nothing wokrked for me
+                    if (tableSign(oemTable, "DMAR"))
+                    {
+                        verbose(", dropping.\n");
+                        dropoffset++;
+                        continue;
+                    }
+                    
+                    if (tableSign(oemTable, "ECDT") && new_ecdt)
+                    {
+                        verbose(", dropping.\n");
+                        dropoffset++;
+                        continue;
+                    }
+                    
+                    if (tableSign(oemTable, "FACP") && !inRSDT)
+                    {
+                        if (oemTable->Length > 0x10000)
+                        {
+                            goto drop_xsdt;
+                        }
+                        
+                        verbose(", patching.\n");
+                        fadt_mod = patch_fadt((struct acpi_2_fadt *)oemTable, new_dsdt);
+                        xsdt_entries[i - dropoffset] = (uint64_t)fadt_mod;
+                        
+                        // Generate _CST SSDT
+                        if (generate_cstates && (new_ssdt[ssdtotal_number] = generate_cst_ssdt(fadt_mod)))
+                        {
+                            verbose("\tC-States generated\n");
+                            generate_cstates = false; // Generate SSDT only once!
+                            ssdtotal_number++;
+                        }
+                        
+                        // Generating _PSS SSDT
+                        if (generate_pstates && (new_ssdt[ssdtotal_number] = generate_pss_ssdt((void *)fadt_mod->DSDT)))
+                        {
+                            verbose("\tP-States generated\n");
+                            generate_pstates = false; // Generate SSDT only once!
+                            ssdtotal_number++;
+                        }
 						continue;
 					}
-
-					verbose(": using.\n");
+                    
+					verbose(", using.\n");
 					xsdt_entries[i - dropoffset] = xsdt_entries[i];
 				}
-
+                
 				// For moded xsdt calculate new lenght
+                xsdt_mod->Length += 8*ssdtotal_number - 8*dropoffset;
 				if (new_ecdt)
 				{
-					xsdt_mod->Length += 8*ssdtotal_number - 8*dropoffset + 8;  // custom - dropped + ECDT
+					xsdt_mod->Length += 8;  // + ECDT
 				}
-				else
-				{
-					xsdt_mod->Length += 8*ssdtotal_number - 8*dropoffset;
-				}
+                
 				// Allocate xsdt in Kernel memory area
 				struct acpi_2_xsdt *xsdt_copy = (struct acpi_2_xsdt *)AllocateKernelMemory(xsdt_mod->Length);
 				memcpy(xsdt_copy, xsdt_mod, xsdt_mod->Length); // should be: rsdt_mod->Length - 8*ssdtotal_number - 8 but don't care
@@ -915,7 +940,7 @@ int setupAcpi(void)
 				/*FIXME: Now we just hope that if MacOS doesn't find XSDT it reverts to RSDT. 
 				 * A Better strategy would be to generate
 				 */
-				verbose("not found or incorrect!\n");
+				verbose("Not found or incorrect!\n");
 				rsdp_mod->XsdtAddress=0xffffffffffffffffLL;
 			}
 
