@@ -99,9 +99,14 @@ typedef enum {
 	CHIP_FAMILY_HAWAII,
 	/* ... */
 	CHIP_FAMILY_MULLINS,
-	CHIP_FAMILY_TOPAS,
+	CHIP_FAMILY_TOPAZ,
 	CHIP_FAMILY_AMETHYST,
 	CHIP_FAMILY_TONGA,
+	CHIP_FAMILY_FIJI,
+	CHIP_FAMILY_CARRIZO,
+	CHIP_FAMILY_TOBAGO,
+	CHIP_FAMILY_ELLESMERE, /* Polaris 10 */
+	CHIP_FAMILY_BAFFIN,   /* Polaris 11 */
 	CHIP_FAMILY_LAST
 } ati_chip_family_t;
 
@@ -172,6 +177,8 @@ typedef enum {
 	kSpikerush,
 	kTypha,
 	/* AMD7000Controller */
+	kRamen,
+	kTako,
 	kNamako,
 	kAji,
 	kBuri,
@@ -194,9 +201,21 @@ typedef enum {
 	kBaladi,
 	/* AMD9000Controller */
 	kExmoor,
+	kMalteseS,
+	kLagotto,
+	kGreyhoundS,
+	kMaltese,
 	kBasset,
 	kGreyhound,
 	kLabrador,
+	/* AMD9500Controller */
+	kElqui,
+	kAcre,
+	kBerbice,
+	kCaroni,
+	kFlorin,
+	kDayman,
+	kGuariba,
 	kCfgEnd
 } config_name_t;
 
