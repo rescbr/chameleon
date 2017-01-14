@@ -184,6 +184,8 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_NVIDIA_GK106,	"GK106" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK107,	"GK107" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK104,	"GK104" /*, 0, ? */ },
+	{ HDA_NVIDIA_GP104_2,	"Pascal GP104-200" /*, 0, ? */ },
+	{ HDA_NVIDIA_GM204_2,	"Maxwell GP204-200" /*, 0, ? */ },
 
 	//1002  Advanced Micro Devices [AMD] nee ATI Technologies Inc
 	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
@@ -625,13 +627,13 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 			name_format = "ATI %s HDA Controller (HDMi)"; break;
 
 		case INTEL_VENDORID:
-			name_format = "Intel %s High Definition Audio Controller"; break;
+			name_format = "Intel %s HDA Controller"; break;
 
 		case NVIDIA_VENDORID:
 			name_format = "nVidia %s HDA Controller (HDMi)"; break;
 
 		case RDC_VENDORID:
-			name_format = "RDC %s High Definition Audio Controller"; break;
+			name_format = "RDC %s HDA Controller"; break;
 
 		case SIS_VENDORID:
 			name_format = "SiS %s HDA Controller"; break;
@@ -656,7 +658,7 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 	}
 
 	/* Not in table */
-	snprintf(desc, sizeof(desc), "Unknown HD Audio device, vendor %04x, model %04x",
+	snprintf(desc, sizeof(desc), "Unknown HDA device, vendor %04x, model %04x",
 		controller_vendor_id, controller_device_id);
 	return desc;
 }

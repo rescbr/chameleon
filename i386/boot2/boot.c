@@ -1120,7 +1120,7 @@ void setupBooterArgs()
 	}
 
 	// OS X El Capitan 10.11
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Up!
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Sierra!
 	{
 		// ErmaC
 		verbose("\n");

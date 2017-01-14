@@ -20,6 +20,9 @@
 
 #define XEON "Xeon"
 #define CORE_M "Core(TM) M"
+#define CORE_M3 "Core(TM) m3"
+#define CORE_M5 "Core(TM) m5"
+#define CORE_M7 "Core(TM) m7"
 #define CORE_I3 "Core(TM) i3"
 #define CORE_I5 "Core(TM) i5"
 #define CORE_I7 "Core(TM) i7"
@@ -384,7 +387,6 @@ bool getSMBOemProcessorType(returnType *value)
 						return true;
 
 						case CPUID_MODEL_HASWELL_U5:		// 0x3D -
-						case CPUID_MODEL_SKYLAKE_S:		// 0x5E
 
 						if (strstr(Platform.CPU.BrandString, CORE_M))
 						{
@@ -424,14 +426,15 @@ bool getSMBOemProcessorType(returnType *value)
 						value->word = 0xA01;			// 2561 - Xeon
 						return true;
 
-					case CPUID_MODEL_ATOM_3700:			// 0x37 -
-					case CPUID_MODEL_HASWELL:			// 0x3C -
-					case CPUID_MODEL_HASWELL_SVR:			// 0x3F -
-					case CPUID_MODEL_HASWELL_ULT:			// 0x45 -
-					case CPUID_MODEL_HASWELL_ULX:			// 0x46 -
+					case CPUID_MODEL_ATOM_3700:			// 0x37
+					case CPUID_MODEL_HASWELL:			// 0x3C
+					case CPUID_MODEL_HASWELL_SVR:			// 0x3F
+					case CPUID_MODEL_HASWELL_ULT:			// 0x45
+					case CPUID_MODEL_HASWELL_ULX:			// 0x46
 					case CPUID_MODEL_BROADWELL_HQ:			// 0x47
-					case CPUID_MODEL_SKYLAKE:
-					case CPUID_MODEL_SKYLAKE_AVX:
+					case CPUID_MODEL_SKYLAKE:			// 0x4E
+					case CPUID_MODEL_SKYLAKE_AVX:			// 0x55
+					case CPUID_MODEL_SKYLAKE_S:			// 0x5E
 
 						if (strstr(Platform.CPU.BrandString, XEON))
 						{
@@ -453,6 +456,30 @@ bool getSMBOemProcessorType(returnType *value)
 						if (strstr(Platform.CPU.BrandString, CORE_I7))
 						{
 							value->word = 0x705;		// 1797 - Core i7
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_M))
+						{
+							value->word = 0xB06;		// 2822
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_M3))
+						{
+							value->word = 0xC05;
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_M5))
+						{
+							value->word = 0xD05;
+							return true;
+						}
+
+						if (strstr(Platform.CPU.BrandString, CORE_M7))
+						{
+							value->word = 0xE05;
 							return true;
 						}
 

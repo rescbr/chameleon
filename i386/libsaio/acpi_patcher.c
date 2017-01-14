@@ -16,8 +16,8 @@
 #include "state_generator.h"
 
 #ifndef DEBUG_ACPI
-#define DEBUG_ACPI 0
-	#endif
+	#define DEBUG_ACPI 0
+#endif
 
 #if DEBUG_ACPI==2
 	#define DBG(x...)  {printf(x); sleep(1);}
