@@ -335,6 +335,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC898, 0,          "ALC898" },
 //	{ HDA_CODEC_ALC899, 0,		"ALC899" },
 	{ HDA_CODEC_ALC900, 0,          "ALC1150" },
+	{ HDA_CODEC_ALC1220, 0,         "ALC1220" },
 
 	{ HDA_CODEC_AD1882, 0,          "AD1882" },
 	{ HDA_CODEC_AD1882A, 0,         "AD1882A" },

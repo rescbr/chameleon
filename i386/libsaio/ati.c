@@ -2203,7 +2203,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 void get_vram_size(void)
 {
 	ati_chip_family_t chip_family = card->info->chip_family;
-	
+
 	card->vram_size = 0;
 
 	if (chip_family >= CHIP_FAMILY_CEDAR)
