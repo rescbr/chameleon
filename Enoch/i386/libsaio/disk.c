@@ -1710,7 +1710,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	char *MavPattern    = "Install%20OS%20X%20Mavericks";
 	char *YosPattern    = "Install%20OS%20X%20Yosemite";
 	char *ECPattern     = "Install%20OS%20X%20El%20Capitan";
-	char *SierraPattern = "Install%10.12";
+	char *SierraPattern = "Install%20macOS%20Sierra";
 
 	/*
 	 * Only look for OS Version on HFS+
