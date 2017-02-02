@@ -164,7 +164,7 @@ static int ExecKernel(void *binary)
 
 	gMacOSVersion[0] = 0;
 	// TODO identify sierra as macOS
-	verbose("Booting on %s %s (%s)\n", (MacOSVerCurrent < MacOSVer2Int("10.8")) ? "Mac OS X" : "OS X", gBootVolume->OSFullVer, gBootVolume->OSBuildVer );
+	verbose("Booting on %s %s (%s)\n", (MacOSVerCurrent < MacOSVer2Int("10.8")) ? "Mac OS X" : (MacOSVerCurrent < MacOSVer2Int("10.12")) ? "OS X" : "macOS", gBootVolume->OSFullVer, gBootVolume->OSBuildVer );
 
 	setupBooterArgs();
 

@@ -43,15 +43,15 @@
 #pragma mark -
 
 #ifndef DEBUG_EXFAT
-#define DEBUG_EXFAT 0
+	#define DEBUG_EXFAT 0
 #endif
 
 #if DEBUG_EXFAT
-#define DBG(x...)		printf(x)
-#define PAUSE()			getchar()
+	#define DBG(x...)		printf(x)
+	#define PAUSE()			getchar()
 #else
-#define DBG(x...)
-#define PAUSE()
+	#define DBG(x...)
+	#define PAUSE()
 #endif
 
 #define	EXFAT_BBID	&gExfatID[0]
