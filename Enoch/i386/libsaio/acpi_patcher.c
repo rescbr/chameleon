@@ -467,6 +467,14 @@ int setupAcpi(void)
 
 				rsdt_entries[i-dropoffset]=rsdt_entries[i];
 
+				// Dropping DMAR (DMA Remapping table) table can fix stuck on "waitForSystemMapper" or "PCI configuration begin" if nothing wokrks except rolling old AppleACPIplatform.kext back. Needs testing with current OEM AppleACPIplatform.kext not with old rolled back one
+				if (tableSign(table, "DMAR"))
+				{
+					DBG("\tOEM DMAR table was dropped\n");
+					dropoffset++;
+					continue;
+				}
+
 				if (drop_ssdt && tableSign(table, "SSDT"))
 				{
 					DBG("\tOEM SSDT tables was dropped\n");
@@ -591,6 +599,14 @@ int setupAcpi(void)
 						continue;
 					}
 					xsdt_entries[i - dropoffset] = xsdt_entries[i];
+
+					// Dropping DMAR (DMA Remapping table) table can fix stuck on "waitForSystemMapper" or "PCI configuration begin" if nothing wokrks except rolling old AppleACPIplatform.kext back. Needs testing with current OEM AppleACPIplatform.kext not with old rolled back one
+					if (tableSign(table, "DMAR"))
+					{
+						DBG("\tOEM DMAR table was dropped\n");
+						dropoffset++;
+						continue;
+					}
 
 					if (drop_ssdt && tableSign(table, "SSDT"))
 					{
