@@ -20,7 +20,6 @@
 	#define DBG(x...)
 #endif
 
-
 #define UI_CPUFREQ_ROUNDING_FACTOR	10000000
 
 clock_frequency_info_t gPEClockFrequencyInfo;
@@ -590,16 +589,25 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_JAKETOWN:
 				case CPUID_MODEL_SANDYBRIDGE:
 				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE_XEON:
 				case CPUID_MODEL_HASWELL_U5:
 				case CPUID_MODEL_HASWELL:
 				case CPUID_MODEL_HASWELL_SVR:
-				//case CPUID_MODEL_HASWELL_H:
 				case CPUID_MODEL_HASWELL_ULT:
 				case CPUID_MODEL_HASWELL_ULX:
 				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_BRASWELL:
+				case CPUID_MODEL_AVOTON:
+				case CPUID_MODEL_SKYLAKE:
 				case CPUID_MODEL_BRODWELL_SVR:
+				case CPUID_MODEL_BRODWELL_MSVR:
+				case CPUID_MODEL_KNIGHT:
+				case CPUID_MODEL_ANNIDALE:
+				case CPUID_MODEL_GOLDMONT:
+				case CPUID_MODEL_VALLEYVIEW:
 				case CPUID_MODEL_SKYLAKE_S:
-				//case CPUID_MODEL_:
+				case CPUID_MODEL_SKYLAKE_AVX:
+				case CPUID_MODEL_CANNONLAKE:
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
@@ -613,6 +621,9 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);
 					break;
 				case CPUID_MODEL_ATOM_3700:
+					p->CPU.NoCores		= 4;
+					p->CPU.NoThreads	= 4;
+					break;
 				case CPUID_MODEL_ATOM:
 					p->CPU.NoCores		= 2;
 					p->CPU.NoThreads	= 2;
@@ -621,21 +632,6 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoCores		= 0;
 					break;
 			}
-
-			if (p->CPU.NoCores == 0)
-			{
-				p->CPU.NoCores		= cores_per_package;
-				p->CPU.NoThreads	= logical_per_package;
-			}
-
-			// MSR is *NOT* available on the Intel Atom CPU
-			// workaround for N270. I don't know why it detected wrong
-			if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
-			{
-				p->CPU.NoCores		= 1;
-				p->CPU.NoThreads	= 2;
-			}
-
 
 			// workaround for Xeon Harpertown and Yorkfield
 			if ((p->CPU.Model == CPUID_MODEL_PENRYN) &&
@@ -660,6 +656,20 @@ void scan_cpu(PlatformInfo_t *p)
 					p->CPU.NoCores		= 0;
 					p->CPU.NoThreads	= 0;
 				}
+			}
+
+			if (p->CPU.NoCores == 0)
+			{
+				p->CPU.NoCores		= cores_per_package;
+				p->CPU.NoThreads	= logical_per_package;
+			}
+
+			// MSR is *NOT* available on the Intel Atom CPU
+			// workaround for N270. I don't know why it detected wrong
+			if ((p->CPU.Model == CPUID_MODEL_ATOM) && (strstr(p->CPU.BrandString, "270")))
+			{
+				p->CPU.NoCores		= 1;
+				p->CPU.NoThreads	= 2;
 			}
 
 			// workaround for Quad

@@ -184,6 +184,8 @@ static hda_controller_devices know_hda_controller[] = {
 	{ HDA_NVIDIA_GK106,	"GK106" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK107,	"GK107" /*, 0, ? */ },
 	{ HDA_NVIDIA_GK104,	"GK104" /*, 0, ? */ },
+	{ HDA_NVIDIA_GP104_2,	"Pascal GP104-200" /*, 0, ? */ },
+	{ HDA_NVIDIA_GM204_2,	"Maxwell GP204-200" /*, 0, ? */ },
 
 	//1002  Advanced Micro Devices [AMD] nee ATI Technologies Inc
 	{ HDA_ATI_SB450,	"SB4x0" /*, 0, 0 */ },
@@ -274,6 +276,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC221, 0,          "ALC221" },
 	{ HDA_CODEC_ALC231, 0,          "ALC231" },
 	{ HDA_CODEC_ALC233, 0,          "ALC233" },
+	{ HDA_CODEC_ALC233, 0x0003,	"ALC3236" },
 	{ HDA_CODEC_ALC235, 0,          "ALC235" },
 	{ HDA_CODEC_ALC255, 0,          "ALC255" },
 	{ HDA_CODEC_ALC256, 0,          "ALC256" },
@@ -297,6 +300,7 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC288, 0,          "ALC288" },
 	{ HDA_CODEC_ALC290, 0,          "ALC290" },
 	{ HDA_CODEC_ALC292, 0,          "ALC292" },
+	{ HDA_CODEC_ALC292, 0x0001,     "ALC3232" },
 	{ HDA_CODEC_ALC293, 0,          "ALC293" },
 	{ HDA_CODEC_ALC298, 0,          "ALC298" },
 	{ HDA_CODEC_ALC660, 0,          "ALC660-VD" },
@@ -329,8 +333,9 @@ static hdacc_codecs know_codecs[] = {
 	{ HDA_CODEC_ALC889, 0,          "ALC889" },
 	{ HDA_CODEC_ALC892, 0,          "ALC892" },
 	{ HDA_CODEC_ALC898, 0,          "ALC898" },
-	{ HDA_CODEC_ALC899, 0,		"ALC899" },
+//	{ HDA_CODEC_ALC899, 0,		"ALC899" },
 	{ HDA_CODEC_ALC900, 0,          "ALC1150" },
+	{ HDA_CODEC_ALC1220, 0,         "ALC1220" },
 
 	{ HDA_CODEC_AD1882, 0,          "AD1882" },
 	{ HDA_CODEC_AD1882A, 0,         "AD1882A" },
@@ -623,13 +628,13 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 			name_format = "ATI %s HDA Controller (HDMi)"; break;
 
 		case INTEL_VENDORID:
-			name_format = "Intel %s High Definition Audio Controller"; break;
+			name_format = "Intel %s HDA Controller"; break;
 
 		case NVIDIA_VENDORID:
 			name_format = "nVidia %s HDA Controller (HDMi)"; break;
 
 		case RDC_VENDORID:
-			name_format = "RDC %s High Definition Audio Controller"; break;
+			name_format = "RDC %s HDA Controller"; break;
 
 		case SIS_VENDORID:
 			name_format = "SiS %s HDA Controller"; break;
@@ -654,7 +659,7 @@ static char *get_hda_controller_name(uint16_t controller_device_id, uint16_t con
 	}
 
 	/* Not in table */
-	snprintf(desc, sizeof(desc), "Unknown HD Audio device, vendor %04x, model %04x",
+	snprintf(desc, sizeof(desc), "Unknown HDA device, vendor %04x, model %04x",
 		controller_vendor_id, controller_device_id);
 	return desc;
 }

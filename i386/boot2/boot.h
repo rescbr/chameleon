@@ -30,6 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
+#define SIERRA          checkOSVersion("10.12") // Sierra
 #define ELCAPITAN       checkOSVersion("10.11") // El Capitan
 #define YOSEMITE        checkOSVersion("10.10") // Yosemite
 #define MAVERICKS       checkOSVersion("10.9")  // Mavericks
@@ -47,14 +48,16 @@
 #define kDefaultCachePathLeo		"/System/Library/Caches/com.apple.kernelcaches/"
 #define kDefaultCachePathSnow		"/System/Library/Caches/com.apple.kext.caches/Startup/"
 #define kDefaultCachePathYosemite	"/System/Library/PrelinkedKernels/"
+#define kDefaultCacheRecoveryHD		"/com.apple.recovery.boot/"
 
-// Lion installer
+// Lion installer ??
 #define kLionInstallerDataFolder	"/Mac OS X Install Data/"
-#define kLionInstallerPlist		kLionInstallerDataFolder "com.apple.Boot.plist"
 
-// Mountain Lion installer
+// Mountain Lion installer ??
 #define kMLionInstallerDataFolder	"/OS X Install Data/"
-#define kMLionInstallerPlist		kMLionInstallerDataFolder "com.apple.Boot.plist"
+
+// Installer new
+#define kDefaultCacheInstallerNew	"/.IABootFiles/"
 
 //kernel path
 #define kDefaultKernelPathPreYos	"/"
@@ -188,7 +191,11 @@
 #define kHDAEnabler			"HDAEnabler"			/* pci_setup.c */
 #define kHDEFLayoutID			"HDEFLayoutID"			/* hda.c */
 #define kHDAULayoutID			"HDAULayoutID"			/* hda.c */
-#define KCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
+#define kCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
+#define kProductBuildVersion		"ProductBuildVersion"		/* boot.c */
+
+uint32_t kernelOSVer; /* boot.c */
+
 
 /* Pike R. Alpha: added this key */
 #define kBlackMode			"BlackMode"
@@ -295,6 +302,12 @@ typedef long (*FileLoadDrivers_t)(char *dirSpec, long plugin);
 // Bungo:
 extern char gDarwinBuildVerStr[256];
 
+// Micky1979
+int gDarwinMajor;
+int gDarwinMinor;
+int gDarwinRev;
+bool useDarwinVersion;
+
 /*!
     Hookable function pointer called during the driver loading phase that
     allows other code to cause additional drivers to be loaded.
@@ -339,6 +352,15 @@ extern size_t lzvn_encode(void		*dst,
                           size_t	src_size,
                           void		*work);
 */
+
+/*
+ * boot.c
+ */
+bool FlagBlackOption; // <-- This is first set in boot.c into setupBooterArgs function
+bool HiDPIOption;
+
+void setupBooterArgs(void);
+void csrInfo(int csrValue, bool custom);
 
 struct compressed_kernel_header {
 	u_int32_t signature;

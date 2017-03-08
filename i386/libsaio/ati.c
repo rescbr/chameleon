@@ -63,10 +63,10 @@ static card_config_t card_configs[] = {
 	{"Galago",	2},
 	{"Colobus",	2},
 	{"Mangabey",	2},
-	{"Nomascus",	4}, // 5
+	{"Nomascus",	5},
 	{"Orangutan",	2},
 	/* AMD6000Controller */
-	{"Pithecia",	2}, // 3
+	{"Pithecia",	3},
 	{"Bulrushes",	6},
 	{"Cattail",	4},
 	{"Hydrilla",	5},
@@ -84,6 +84,8 @@ static card_config_t card_configs[] = {
 	{"Spikerush",   4},
 	{"Typha",       5},
 	/* AMD7000Controller */
+	{"Ramen",	6},
+	{"Tako",	6},
 	{"Namako",	4},
 	{"Aji",		4},
 	{"Buri",	4},
@@ -93,7 +95,7 @@ static card_config_t card_configs[] = {
 	{"Gari",	5},
 	{"Futomaki",	5},
 	{"Hamachi",	4},
-	{"OPM",         6},
+	{"OPM",         5},
 	{"Ikura",	1},
 	{"IkuraS",	6},
 	{"Junsai",	6},
@@ -105,10 +107,22 @@ static card_config_t card_configs[] = {
 	/* AMD8000Controller */
 	{"Baladi",      6},
 	/* AMD9000Controller */
-	{"Exmoor",	4},
+	{"Exmoor",	6},
+	{"MalteseS",	1},
+	{"Lagotto",	4},
+	{"GreyhoundS",	1},
+	{"Maltese",	6},
 	{"Basset",	4},
 	{"Greyhound",	6},
-	{"Labrador",	6}
+	{"Labrador",	6},
+	/* AMD9500Controller */
+	{"Elqui",	5},
+	{"Acre",	3},
+	{"Berbice",	5},
+	{"Caroni",	5},
+	{"Florin",	6},
+	{"Dayman",	6},
+	{"Guariba",	6}
 };
 
 static radeon_card_info_t radeon_cards[] = {
@@ -1209,6 +1223,29 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x67BA,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67BE,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 
+	// Polaris 10
+	{ 0x67C0, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C1, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C2, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C4, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C7, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C8, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67C9, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67CA, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67CC, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67CF, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon Polaris 10",    kNull },
+	{ 0x67DF, 0x00000000, CHIP_FAMILY_ELLESMERE, "AMD Radeon RX480",         kDayman },
+
+	// Polaris 11
+	{ 0x67E0, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon RX460",             kAcre },
+	{ 0x67E1, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67E3, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67E7, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67E8, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67E9, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67EB, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67EF, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon RX460",             kAcre },
+	{ 0x67FF, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
 	// PITCAIRN
 	{ 0x6800,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7970M",	kBuri	}, // Mobile
 	{ 0x6801,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 8970M Series",	kFutomaki	}, // Mobile
@@ -1309,7 +1346,7 @@ static radeon_card_info_t radeon_cards[] = {
 
 	// CEDAR
 	{ 0x68E0,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 5470 Series",	kGalago		},
-	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230",		kGalago		},
+	{ 0x68E1,	0x00000000, CHIP_FAMILY_CEDAR,	"AMD Radeon HD 6230/6350/8350",		kGalago		},
 	{ 0x68E4,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6370M Series",	kGalago		},
 	{ 0x68E5,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD 6300M Series",	kGalago		},
 //	{ 0x68E8,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
@@ -1322,8 +1359,8 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x68FE,	0x00000000, CHIP_FAMILY_CEDAR,	"ATI Radeon HD ??? Series",	kNull		},
 
 	// 
-	{ 0x6900,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R7 M260/M265",  kExmoor	},
-	{ 0x6901,	0x00000000, CHIP_FAMILY_TOPAS,		"ATI Radeon R5 M255",       kExmoor	},
+	{ 0x6900,	0x00000000, CHIP_FAMILY_TOPAZ,		"ATI Radeon R7 M260/M265",  kExmoor	},
+	{ 0x6901,	0x00000000, CHIP_FAMILY_TOPAZ,		"ATI Radeon R5 M255",       kExmoor	},
 	{ 0x6920,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M395X",      kLabrador	},
 	{ 0x6921,	0x00000000, CHIP_FAMILY_AMETHYST,	"ATI Radeon R9 M295X",      kExmoor	},
 	{ 0x692B,	0x00000000, CHIP_FAMILY_TONGA,		"ATI Firepro W7100",        kBaladi	},
@@ -1767,6 +1804,7 @@ static const char *chip_family_name[] = {
 	"Hemlock",
 	"Juniper",
 	"Redwood",
+	// "Broadway",
 	/* Northern Islands */
 	"Barts",
 	"Caicos",
@@ -1788,9 +1826,14 @@ static const char *chip_family_name[] = {
 	"Hawaii",
 	/* ... */
 	"Mullins",
-	"Topas",
+	"Topaz",
 	"Amethyst",
 	"Tonga",
+	"Fiji",
+	"Carrizo",
+	"Tobago",
+	"Ellesmere",
+	"Baffin",
 	""
 };
 
@@ -2160,7 +2203,7 @@ bool load_vbios_file(const char *key, uint16_t vendor_id, uint16_t device_id, ui
 void get_vram_size(void)
 {
 	ati_chip_family_t chip_family = card->info->chip_family;
-	
+
 	card->vram_size = 0;
 
 	if (chip_family >= CHIP_FAMILY_CEDAR)

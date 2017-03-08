@@ -73,12 +73,16 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_MODEL_BRODWELL_SVR	0x4F			// Broadwell Server **BDX
 #define CPUID_MODEL_SKYLAKE_AVX		0x55			// Skylake with AVX-512 support.
 #define CPUID_MODEL_BRODWELL_MSVR	0x56			// Broadwell Micro Server, Future Xeon **BDX-DE
-//#define CPUID_MODEL_KNIGHT		0x57
+#define CPUID_MODEL_KNIGHT		0x57			// Knights Landing
 #define CPUID_MODEL_ANNIDALE		0x5A			// Silvermont, Future Atom E3000, Z3000 (Annidale)
-//#define CPUID_MODEL_GOLDMONT		0x5C
+#define CPUID_MODEL_GOLDMONT		0x5C
 #define CPUID_MODEL_VALLEYVIEW		0x5D			// Silvermont, Future Atom E3000, Z3000
 #define CPUID_MODEL_SKYLAKE_S		0x5E			// Skylake **SKL
-//#define CPUID_MODEL_CANNONLAKE	0x66
+#define CPUID_MODEL_CANNONLAKE		0x66
+#define CPUID_MODEL_DENVERTON		0x5F			// Goldmont Microserver
+#define CPUID_MODEL_XEON_MILL		0x85			// Knights Mill
+#define CPUID_MODEL_KABYLAKE1		0x8E			// Kabylake Mobile
+#define CPUID_MODEL_KABYLAKE2		0x9E			// Kabylake Dektop
 
 /* CPUID Vendor */
 #define	CPUID_VID_INTEL			"GenuineIntel"

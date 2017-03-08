@@ -155,8 +155,8 @@ void finalizeBootStruct(void)
 	/* Memory size to use for defaults calculations (cparm) */
 	uint64_t	sane_size = 0;
 
-	EfiMemoryRange *memoryMap	= NULL;
-	MemoryRange *range		= NULL;
+	EfiMemoryRange	*memoryMap	= NULL;
+	MemoryRange	*range		= NULL;
 	int memoryMapCount = bootInfo->memoryMapCount;
 
 	if (memoryMapCount == 0)
@@ -257,8 +257,12 @@ void finalizeBootStruct(void)
 		 * For user visible memory size, round up to 128 Mb - accounting for the various stolen memory
 		 * not reported by EFI. (cparm)
 		 */
-
+#if DEBUG_BOOTSTRUCT
 		sane_size = (sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1));
+		DBG( "Total amount of physical RAM in the system : %d\n", ((sane_size + 128 * MEG - 1) & ~((uint64_t)(128 * MEG - 1))) );
+#else
+		DBG( "Total amount of RAM in the system : %d\n", sane_size );
+#endif
 		bootArgs->PhysicalMemorySize = sane_size;
 	}
 

@@ -92,7 +92,7 @@ enum {
 
 long (*LoadExtraDrivers_p)(FileLoadDrivers_t FileLoadDrivers_p);
 
-/*static*/ unsigned long Adler32( unsigned char * buffer, long length );
+static inline unsigned long Adler32( unsigned char * buffer, long length );
 
 long FileLoadDrivers(char *dirSpec, long plugin);
 long NetLoadDrivers(char *dirSpec);
@@ -119,7 +119,7 @@ static char	*gFileName;
 // Bungo:
 char gDarwinBuildVerStr[256] = "Darwin Kernel Version";
 
-/*static*/ unsigned long Adler32( unsigned char *buffer, long length )
+static inline unsigned long Adler32( unsigned char *buffer, long length )
 {
 	long          cnt;
 	unsigned long result, lowHalf, highHalf;
@@ -176,6 +176,8 @@ long LoadDrivers( char *dirSpec )
 		return 0;
 	}
 
+	// ========================================
+
 	// Load extra drivers if a hook has been installed.
 	if (LoadExtraDrivers_p != NULL)
 	{
@@ -200,6 +202,11 @@ long LoadDrivers( char *dirSpec )
 		}
 		verbose("Attempting to loading drivers from \"Extra\" repository:\n");
 
+		// =====================================================================
+		// Firstly try to load drivers from Common folder
+		sprintf(dirSpecExtra, "bt(0,0)/Extra/Common/");
+		FileLoadDrivers(dirSpecExtra, 0);
+		// =====================================================================
 
 		// Next try to load Extra extensions from the selected root partition.
 		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
@@ -254,7 +261,7 @@ long LoadDrivers( char *dirSpec )
 			{
 				verbose("Attempting to loading drivers from standard repositories:\n");
 
-				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || gMacOSVersion[4] == '1' ) )) // issue 352
+				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || (gMacOSVersion[4] == '1') || (gMacOSVersion[4] == '2') ) )) // issue 352
 				{
 					verbose("\t- Third party extensions search path: /Library/Extensions\n");
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */
@@ -998,6 +1005,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	}
 
 	// Bungo: scan binary for Darwin Kernel Version string
+	useDarwinVersion = true;
 	uint32_t offset = 0;
 	strncpy(gDarwinBuildVerStr, "Darwin Kernel Version", sizeof(gDarwinBuildVerStr));
 
@@ -1012,6 +1020,213 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 	else
 	{
 		strcat(gDarwinBuildVerStr, ": Unknown");
+		useDarwinVersion = false;
+	}
+	// Micky1979 use Bungo gDarwinBuildVerStr and split into gDarwinMajor, gDarwinMinor and gDarwinRev
+	if (useDarwinVersion)
+	{
+		useDarwinVersion = false;
+		const char *pattern = strstr(gDarwinBuildVerStr, "Darwin Kernel Version ")+22;
+		const char *until = strstr(pattern, ":");
+		size_t vlen = until - pattern;
+		char *ver = (char *)malloc(sizeof(char)*(len+1));
+		strncpy(ver, pattern, vlen);
+		ver[vlen] = '\0';
+		char *delim;
+		char *temp;
+		gDarwinMajor = -1; gDarwinMinor = -1; gDarwinRev = -1;
+		if (ver != NULL)
+		{
+			temp = ver;
+			int count = 1;
+			while ((delim = strsep_c(&ver, ".")) != NULL)
+			{
+				switch (count)
+				{
+					case 1: gDarwinMajor = atoi(delim); break;
+					case 2: gDarwinMinor = atoi(delim); break;
+					case 3: gDarwinRev   = atoi(delim); break;
+					default: break;
+				}
+				count ++;
+			}
+			free(temp);
+		}
+
+		if (gDarwinMajor >= 0 && gDarwinMinor >= 0 && gDarwinRev >= 0)
+		{
+			useDarwinVersion = true;
+		}
+
+		switch (gDarwinMajor)
+		{
+			case 10:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA060000; break;
+					case 1: kernelOSVer = 0xA060100; break;
+					case 2: kernelOSVer = 0xA060200; break;
+					case 3: kernelOSVer = 0xA060300; break;
+					case 4: kernelOSVer = 0xA060400; break;
+					case 5: kernelOSVer = 0xA060500; break;
+					case 6: kernelOSVer = 0xA060600; break;
+					case 7: kernelOSVer = 0xA060700; break;
+					case 8: kernelOSVer = 0xA060800; break;
+					default:kernelOSVer = 0xA060800; break; //Last known kernel
+				}
+				break;
+			case 11:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA070000; break;
+					case 1: kernelOSVer = 0xA070100; break;
+					case 2: kernelOSVer = 0xA070200; break;
+					case 3: kernelOSVer = 0xA070300; break;
+					case 4:
+						switch (gDarwinRev)
+						{
+							case 0: kernelOSVer = 0xA070400; break;
+							case 1: kernelOSVer = 0xA070400; break;
+							case 2: kernelOSVer = 0xA070500; break;
+							default:kernelOSVer = 0xA070500; break; //Last known kernel
+						}
+					default:kernelOSVer = 0xA070500; break; //Last known kernel
+				}
+				break;
+			case 12:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA080000; break;
+					case 1: kernelOSVer = 0xA080100; break;
+					case 2: kernelOSVer = 0xA080200; break;
+					case 3: kernelOSVer = 0xA080300; break;
+					case 4: kernelOSVer = 0xA080400; break;
+					case 5: kernelOSVer = 0xA080500; break; // 10.8.5
+					case 6: kernelOSVer = 0xA080500; break; // 10.8.5 update
+					default:kernelOSVer = 0xA080500; break; //Last known kernel
+				}
+				break;
+			case 13:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA090000;
+					switch (gDarwinRev)
+					{
+						case 0: kernelOSVer = 0xA090000; break;
+						case 1: kernelOSVer = 0xA090000; break; // never exist (or released)
+						case 2: kernelOSVer = 0xA090100; break;
+						default:kernelOSVer = 0xA090100; break; //Last known kernel
+					}
+						break;
+					case 1: kernelOSVer = 0xA090100; break; // never exist (or released)
+					case 2: kernelOSVer = 0xA090200; break;
+					case 3: kernelOSVer = 0xA090300; break;
+					case 4: kernelOSVer = 0xA090400; break;
+					case 5: kernelOSVer = 0xA090500; break;
+					default:kernelOSVer = 0xA090500; break; //Last known kernel
+				}
+				break;
+			case 14:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA0A0000; break; // same kernel of 10.10.1
+					case 1: kernelOSVer = 0xA0A0100; break; // same kernel of 10.10
+					case 2: kernelOSVer = 0xA0A0200; break;
+					case 3: kernelOSVer = 0xA0A0300; break;
+					case 4: kernelOSVer = 0xA0A0400; break;
+					case 5: kernelOSVer = 0xA0A0500; break;
+					default:kernelOSVer = 0xA0A0500; break; //Last known kernel
+				}
+				break;
+			case 15:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA0B0000; break;
+					case 1: kernelOSVer = 0xA0B0100; break;
+					case 2: kernelOSVer = 0xA0B0200; break;
+					case 3: kernelOSVer = 0xA0B0300; break;
+					case 4: kernelOSVer = 0xA0B0400; break;
+					case 5: kernelOSVer = 0xA0B0500; break;
+					case 6: kernelOSVer = 0xA0B0600; break;
+					default:kernelOSVer = 0xA0B0600; break; //Last known kernel (add here updates)
+				}
+				break;
+			case 16:
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA0C0000; break;
+					case 1: kernelOSVer = 0xA0C0100; break;
+					case 2: kernelOSVer = 0xA0C0200; break;
+					case 3: kernelOSVer = 0xA0C0200; break;
+					case 4: kernelOSVer = 0xA0C0300; break;
+					case 5: kernelOSVer = 0xA0C0400; break;
+					default:kernelOSVer = 0xA0C0400; break; //Last known kernel (add here updates)
+				}
+				break;
+			default:
+				kernelOSVer = 0xA0C0400;
+				break;
+			}
+		}
+		else
+		{
+			switch (MacOSVerCurrent)
+			{
+			// Snow
+			case 0xA060000: gDarwinMajor = 10; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.6
+			case 0xA060100: gDarwinMajor = 10; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.6.1
+			case 0xA060200: gDarwinMajor = 10; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.6.2
+			case 0xA060300: gDarwinMajor = 10; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.6.3
+			case 0xA060400: gDarwinMajor = 10; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.6.4
+			case 0xA060500: gDarwinMajor = 10; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.6.5
+			case 0xA060600: gDarwinMajor = 10; gDarwinMinor =  6; gDarwinRev = 0; break; // 10.6.6
+			case 0xA060700: gDarwinMajor = 10; gDarwinMinor =  7; gDarwinRev = 0; break; // 10.6.7
+			case 0xA060800: gDarwinMajor = 10; gDarwinMinor =  8; gDarwinRev = 0; break; // 10.6.8
+			// Lion
+			case 0xA070000: gDarwinMajor = 11; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.7
+			case 0xA070100: gDarwinMajor = 11; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.7.1
+			case 0xA070200: gDarwinMajor = 11; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.7.2
+			case 0xA070300: gDarwinMajor = 11; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.7.3
+			case 0xA070400: gDarwinMajor = 11; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.7.4
+			case 0xA070500: gDarwinMajor = 11; gDarwinMinor =  4; gDarwinRev = 2; break; // 10.7.5
+			// ML
+			case 0xA080000: gDarwinMajor = 12; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.8
+			case 0xA080100: gDarwinMajor = 12; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.8.1
+			case 0xA080200: gDarwinMajor = 12; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.8.2
+			case 0xA080300: gDarwinMajor = 12; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.8.3
+			case 0xA080400: gDarwinMajor = 12; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.8.4
+			case 0xA080500: gDarwinMajor = 12; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.8.5
+			// Mavericks
+			case 0xA090000: gDarwinMajor = 13; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.9
+			case 0xA090100: gDarwinMajor = 13; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.9.1
+			case 0xA090200: gDarwinMajor = 13; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.9.2
+			case 0xA090300: gDarwinMajor = 13; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.9.3
+			case 0xA090400: gDarwinMajor = 13; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.9.4
+			case 0xA090500: gDarwinMajor = 13; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.9.5
+			// Yosemite
+			case 0xA0A0000: gDarwinMajor = 14; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.10
+			case 0xA0A0100: gDarwinMajor = 14; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.10.1
+			case 0xA0A0200: gDarwinMajor = 14; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.10.2
+			case 0xA0A0300: gDarwinMajor = 14; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.10.3
+			case 0xA0A0400: gDarwinMajor = 14; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.10.4
+			case 0xA0A0500: gDarwinMajor = 14; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.10.5
+			// El Capitan
+			case 0xA0B0000: gDarwinMajor = 15; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.11
+			case 0xA0B0100: gDarwinMajor = 15; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.11.1
+			case 0xA0B0200: gDarwinMajor = 15; gDarwinMinor =  2; gDarwinRev = 0; break; // 10.11.2
+			case 0xA0B0300: gDarwinMajor = 15; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.11.3
+			case 0xA0B0400: gDarwinMajor = 15; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.11.4
+			case 0xA0B0500: gDarwinMajor = 15; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.11.5
+			case 0xA0B0600: gDarwinMajor = 15; gDarwinMinor =  6; gDarwinRev = 0; break; // 10.11.6
+			// Sierra
+			case 0xA0C0000: gDarwinMajor = 16; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.12
+			case 0xA0C0100: gDarwinMajor = 16; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.12.1
+			case 0xA0C0200: gDarwinMajor = 16; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.12.2
+			case 0xA0C0300: gDarwinMajor = 16; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.12.3
+			case 0xA0C0400: gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4
+			// default = last known kernel
+			default:        gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4;
+		}
 	}
 
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded

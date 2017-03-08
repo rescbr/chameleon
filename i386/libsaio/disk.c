@@ -1700,8 +1700,19 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int *countPtr)
 static bool getOSVersion(BVRef bvr, char *str)
 {
 	bool valid = false;
-	config_file_t systemVersion;
+	config_file_t configFile;
 	char  dirSpec[512];
+	const char *val; int len;
+
+	const char *fakeOSVersion;
+	int fakeOSVersionInt;
+	// our pattern: avoiding to use full path. this help if the app is named as Beta or DP..
+	char *LionPattern   = "Install%20Mac%20OS%20X%20Lion";
+	char *MLPattern     = "Install%20OS%20X%20Mountain%20Lion";
+	char *MavPattern    = "Install%20OS%20X%20Mavericks";
+	char *YosPattern    = "Install%20OS%20X%20Yosemite";
+	char *ECPattern     = "Install%20OS%20X%20El%20Capitan";
+	char *SierraPattern = "Install%20macOS%20Sierra";
 
 	/*
 	 * Only look for OS Version on HFS+
@@ -1711,23 +1722,232 @@ static bool getOSVersion(BVRef bvr, char *str)
 		return valid;
 	}
 
-	// OS X Recovery
-	sprintf(dirSpec, "hd(%d,%d)/com.apple.recovery.boot/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+	/*
+	 * Micky1979, let it search for the right Version *.plist
+	 *
+	 * NOTE:
+	 * order is important because vanilla installer (createinstallermedia method 10.9 +) has both /.IABootFilesSystemVersion.plist and
+	 * /System/Library/CoreServices/SystemVersion.plist otherwise fail to recognize it as Installer!
+	 *
+	 * OS X Installer made by the Vanilla app for Lion and newer.
+	 * This kind of Installer can be a guest in a already working System, and produces some temporary files:
+	 * 1) ".IABootFiles" folder is created in the root of the same partition where the app reside.
+	 * 2) "Mac OS X Install Data" or "OS X Install Data" in the target partition
+	 * 3) The presence of ".IABootFilesSystemVersion.plist" file if present or not, distinguishes this installer 
+	 *   by the one create with "createinstallmedia" method (is present), so we know what kind of installer is.
+	 */
 
-	if (!loadConfigFile(dirSpec, &systemVersion))
+	// is an installer or a system to Upgrade OSX?
+	snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
+
+	if (!loadConfigFile(dirSpec, &configFile))
+	{
+		valid = true;
+	}
+
+	if (valid)
+	{
+		// is createinstallmedia?
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IABootFilesSystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		if (!loadConfigFile(dirSpec, &configFile))
+		{
+			valid = false;
+		}
+		else
+		{
+			// if not exist probably is a vanilla installer made w/o createinstallermedia method
+			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IABootFiles/com.apple.Boot.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+			if (!loadConfigFile(dirSpec, &configFile))
+			{
+				valid = true;
+			}
+			else
+			{
+				valid = false;
+			}
+		}
+	}
+
+	if (valid)
+	{
+		/*
+		 * we don't know the real OS version, but "Kernel Flags" key contain the URL path to the app..
+		 * and we try to see if contain a match for our patterns ("Install%20OS%20X%20El%20Capitan" = 10.11)
+		 */
+		if (getValueForKey("Kernel Flags", &val, &len, &configFile))
+		{
+			if(strstr(val, LionPattern))
+			{
+				fakeOSVersion = "10.7";
+				fakeOSVersionInt = 7;
+				valid = true;
+			}
+			else if(strstr(val, MLPattern))
+			{
+				fakeOSVersion = "10.8";
+				fakeOSVersionInt = 8;
+				valid = true;
+			}
+			else if(strstr(val, MavPattern))
+			{
+				fakeOSVersion = "10.9";
+				fakeOSVersionInt = 9;
+				valid = true;
+			}
+			else if(strstr(val, YosPattern))
+			{
+				fakeOSVersion = "10.10";
+				fakeOSVersionInt = 10;
+				valid = true;
+			}
+			else if(strstr(val, ECPattern))
+			{
+				fakeOSVersion = "10.11";
+				fakeOSVersionInt = 11;
+				valid = true;
+			}
+			else if(strstr(val, SierraPattern))
+			{
+				fakeOSVersion = "10.12";
+				fakeOSVersionInt = 12;
+				valid = true;
+			}
+			else
+			{
+				valid = false;
+			}
+		}
+		else
+		{
+			valid = false;
+		}
+	}
+
+	if (valid)
+	{
+		/* 
+		 * if we are here that is an createinstallmedia Installer!
+		 * fake the OS version so we can find the right path to the kernelcache/prelinked!
+		 * To patch the kernelcache we aquire the "Darwin versionn" later..
+		 */
+		strncpy( bvr->OSFullVer, fakeOSVersion, strlen(fakeOSVersion) );
+		bvr->OSisInstaller = true;
+		// no SystemVersion.plist ...so no build...
+		strncpy( bvr->OSBuildVer, "INSTALLER", strlen("INSTALLER") );
+		return true;
+	}
+
+	/*
+	 * Not valid? But we have the "/.IAProductInfo" in the root so this is not a conventional installer
+	 * and probably this is an Upgrade made by the "Install OS X app"
+	 */
+	if (!valid)
+	{
+		len = 0; val = 0;
+		// 10.9 and later use "/OS X Install Data" folder
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/OS X Install Data/com.apple.Boot.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		if (!loadConfigFile(dirSpec, &configFile))
+		{
+			/*
+			 * bad is that we can't find what is the exactly Major OS version..
+			 * but what we need is the right path to the kernel cache:
+			 * kernelcache = 10.9 and 10.10
+			 * prelinkedkernel = 10.11 and later
+
+			 * so we fake the OS version just to find the correct path!
+			 * .. later the right "Darwin Version" will use to patch the kernel cache!
+			 */
+
+			if (getValueForKey("Kernel Cache", &val, &len, &configFile))
+			{
+				if(strstr(val, "prelinkedkernel")) // /OS X Install Data/prelinkedkernel
+				{
+					fakeOSVersion = "10.11"; // fake OS to find prelinkedkernel on newer OSes
+
+					switch (fakeOSVersionInt)
+					{
+						case 11:
+							fakeOSVersion = "10.11";
+							break;
+						case 12:
+							fakeOSVersion = "10.12";
+							break;
+						default:
+							fakeOSVersion = "10.12";
+							break;
+					}
+
+					valid = true;
+				}
+				else if(strstr(val, "kernelcache")) // /OS X Install Data/kernelcache
+				{
+					fakeOSVersion = "10.10"; // fake OS to find prelinkedkernel on 10.9 and 10.10
+					valid = true;
+				}
+				else
+				{
+					valid = false;
+				}
+
+				if (valid)
+				{
+					strncpy( bvr->OSFullVer, fakeOSVersion, strlen(fakeOSVersion) );
+					bvr->OSisOSXUpgrade = true;
+					strncpy( bvr->OSBuildVer, "UPGRADE", strlen("UPGRADE") );
+					return true;
+				}
+			}
+			else
+			{
+				valid = false;
+			}
+
+		}
+		else
+		{
+			valid = false;
+		}
+	}
+
+	if (!valid)
+	{
+		/*
+		 * Not valid? 10.8 and older use "/Mac OS X Install Data" folder..
+		 */
+		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/Mac OS X Install Data/com.apple.Boot.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+		if (!loadConfigFile(dirSpec, &configFile))
+		{
+			fakeOSVersion = "10.8"; // fake the OS version using 10.8.. just to find the kernelcache path for 10.7 and 10.8..
+			strncpy( bvr->OSFullVer, fakeOSVersion, strlen(fakeOSVersion) );
+			bvr->OSisMacOSXUpgrade = true;
+			// again no SystemVersion.plist, so no build version.. but is usefull to know that is a System upgrade..
+			strncpy( bvr->OSBuildVer, "UPGRADE", strlen("UPGRADE") );
+			return true;
+		}
+		else
+		{
+			valid = false;
+		}
+	}
+
+	len = 0; val = 0;
+
+	// OS X Installer createinstallermedia method for 10.9 and newer.
+	snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IABootFilesSystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+
+	if (!loadConfigFile(dirSpec, &configFile))
 	{
 		bvr->OSisInstaller = true;
 		valid = true;
 	}
 
+	// OS X Standard
 	if (!valid)
 	{
-		// OS X Standard
 		snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
-		if (!loadConfigFile(dirSpec, &systemVersion))
+		if (!loadConfigFile(dirSpec, &configFile))
 		{
-			bvr->OSisInstaller = false;
 			valid = true;
 		}
 		else
@@ -1735,75 +1955,31 @@ static bool getOSVersion(BVRef bvr, char *str)
 			// OS X Server
 			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/System/Library/CoreServices/ServerVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
 
-			if (!loadConfigFile(dirSpec, &systemVersion))
+			if (!loadConfigFile(dirSpec, &configFile))
 			{
-				bvr->OSisServer = false;
+				bvr->OSisServer = true;
 				valid = true;
 			}
-/*			else
-			{
-				snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAProductInfo", BIOS_DEV_UNIT(bvr), bvr->part_no);
-
-				if (!loadConfigFile(dirSpec, &systemVersion))
-				{
-
-				}
-			}
-*/
 		}
+	}
 
-		if ( LION )
+	if (!valid)
+	{
+		// OS X Recovery
+		sprintf(dirSpec, "hd(%d,%d)/com.apple.recovery.boot/SystemVersion.plist", BIOS_DEV_UNIT(bvr), bvr->part_no);
+
+		if (!loadConfigFile(dirSpec, &configFile))
 		{
-			int fh = -1;
-			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.PhysicalMediaInstall", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			fh = open(dirSpec, 0);
-
-			if (fh >= 0)
-			{
-				valid = true;
-				bvr->OSisInstaller = true;
-				strcpy(bvr->OSVersion, "10.7"); // 10.7 +
-				close(fh);
-			}
-			else
-			{
-				close(fh);
-			}
+			bvr->OSisRecovery = true;
+			valid = true;
 		}
-
-//		if ( MOUNTAIN_LION ){}
-
-		if ( MAVERICKS )
-		{
-			int fh = -1;
-			snprintf(dirSpec, sizeof(dirSpec), "hd(%d,%d)/.IAPhysicalMedia", BIOS_DEV_UNIT(bvr), bvr->part_no);
-			fh = open(dirSpec, 0);
-
-			if (fh >= 0)
-			{
-				valid = true;
-				bvr->OSisInstaller = true;
-				strcpy(bvr->OSVersion, "10.9"); // 10.9 +
-			}
-			else
-			{
-				close(fh);
-			}
-		}
-
-//		if ( YOSEMITE ){}
-
-//		if ( ELCAPITAN ){}
-
 	}
 
 	if (valid)
 	{
-		const char *val;
-		int len;
 
 		// ProductVersion
-		if  (getValueForKey(kProductVersion, &val, &len, &systemVersion))
+		if  (getValueForKey(kProductVersion, &val, &len, &configFile))
 		{
 			// Copy the complete value into OSFullVer
 			strncpy( bvr->OSFullVer, val, len );
@@ -1817,6 +1993,14 @@ static bool getOSVersion(BVRef bvr, char *str)
 			{
 				str[4] = '\0';
 			}
+
+			// ProductBuildVersion
+			if  (getValueForKey(kProductBuildVersion, &val, &len, &configFile))
+			{
+				strncpy( bvr->OSBuildVer, val, len );
+				bvr->OSBuildVer[len] = '\0';   /* null character manually added */
+			}
+
 		}
 		else
 		{
