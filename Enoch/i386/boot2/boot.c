@@ -766,7 +766,9 @@ void common_boot(int biosdev)
 				freeFilteredBVChain(bvChain);
 
 				if (gEnableCDROMRescan)
+				{
 					rescanBIOSDevice(gBIOSDev);
+				}
 
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);

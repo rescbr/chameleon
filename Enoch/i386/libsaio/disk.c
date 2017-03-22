@@ -2227,25 +2227,19 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 		val = XMLDecode(raw);  
 	}
 
-	/*
-	 * Traverse gDISKBVmap to get references for
-	 * individual bvr chains of each drive.
-	 */
+	// Traverse gDISKBVmap to get references for
+	// individual bvr chains of each drive.
 	for (map = gDiskBVMap; map; map = map->next)
 	{
 		for (bvr = map->bvr; bvr; bvr = bvr->next)
 		{
-			/*
-			 * Save the last bvr.
-			 */
+			// Save the last bvr.
 			if (newBVR)
 			{
 				prevBVR = newBVR;
 			}
 
-			/*
-			 * Allocate and copy the matched bvr entry into a new one.
-			 */
+			// Allocate and copy the matched bvr entry into a new one.
 			newBVR = (BVRef) malloc(sizeof(*newBVR));
 			if (!newBVR)
 			{
@@ -2255,9 +2249,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 
 			bcopy(bvr, newBVR, sizeof(*newBVR));
 
-			/*
-			 * Adjust the new bvr's fields.
-			 */
+			// Adjust the new bvr's fields.
 			newBVR->next = NULL;
 			newBVR->filtered = true;
 
@@ -2269,11 +2261,8 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 				newBVR->visible = true;
 			}
 
-			/*
-			 * Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
-			 * to be able to hide foreign partitions from the boot menu.
-			 *
-			 */
+			// Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
+			// to be able to hide foreign partitions from the boot menu.
 			if ( (newBVR->flags & kBVFlagForeignBoot) )
 			{
 				char *start, *next = val;
@@ -2289,17 +2278,13 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 				while ( next && *next );
 			}
 
-			/*
-			 * Use the first bvr entry as the starting chain pointer.
-			 */
+			// Use the first bvr entry as the starting chain pointer.
 			if (!chain)
 			{
 				chain = newBVR;
 			}
 
-			/*
-			 * Update the previous bvr's link pointer to use the new memory area.
-			 */
+			// Update the previous bvr's link pointer to use the new memory area.
 			if (prevBVR)
 			{
 				prevBVR->next = newBVR;

@@ -361,8 +361,8 @@ const char *getStringForKey(const char *key,  config_file_t *config)
  */
 bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 {
-    const char *key_val;
-    int size;
+	const char *key_val;
+	int size;
     
 	if (getValueForKey(key, &key_val, &size, config))
 	{
@@ -703,7 +703,7 @@ int loadChameleonConfig(config_file_t *config, BVRef chain)
 {
 	char *dirspec[] = {
 		"/Extra/org.chameleon.Boot.plist",
-		"/Extra/com.apple.Boot.plist",           /* DEPRECIATED */
+		"/Extra/com.apple.Boot.plist",           /* DEPRECATED */
 	};
 
 	int i;
@@ -755,7 +755,7 @@ int loadChameleonConfigForDevice(config_file_t *config, const char *device, cons
 	{
 		// Check for depreciated file names and annoy the user about it.
 		if(strstr(full_path, "com.apple.Boot.plist")) {
-			printf("%s is depreciated.\n", full_path);
+			printf("%s is deprecated.\n", full_path);
 			full_path[strlen(full_path) - strlen("com.apple.Boot.plist")] = 0;
 			printf("Please use the file %sorg.chameleon.Boot.plist instead.\n", full_path);
 			pause();
@@ -849,7 +849,7 @@ int loadHelperConfig(config_file_t *config)
 			else
 			{
 				// use rfd
-                		fixedsize = MIN(file_size(rfd), IO_CONFIG_DATA_SIZE);
+				fixedsize = MIN(file_size(rfd), IO_CONFIG_DATA_SIZE);
 				count = read(rfd, config->plist, fixedsize);
 				close(rfd);
 				if (count != fixedsize) return -1;

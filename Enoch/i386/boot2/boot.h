@@ -225,7 +225,6 @@ uint32_t kernelOSVer; /* boot.c */
 /* Bungo: added this key */
 #define kPrivateData			"PrivateData"			/* smbios_decode.c */
 
-
 /*
  * Flags to the booter or kernel
  */

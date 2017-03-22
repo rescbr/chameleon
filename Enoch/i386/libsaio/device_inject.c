@@ -170,30 +170,30 @@ DevPropDevice *devprop_add_device(DevPropString *string, char *path)
 		free(device);
 		return NULL;
 	}
-	
+
 	device->numentries = 0x00;
-	
+
 	device->acpi_dev_path.length	= 0x0c;
 	device->acpi_dev_path.type	= 0x02;
 	device->acpi_dev_path.subtype	= 0x01;
 	device->acpi_dev_path._HID	= 0xd041030a; // 0x0a0341d0
-	
+
 	device->num_pci_devpaths = numpaths;
 	device->length = 24 + (6*numpaths);
-	
+
 	int		i;
-	
+
 	for(i = 0; i < numpaths; i++)
 	{
 		device->pci_dev_path[i].length = 0x06;
 		device->pci_dev_path[i].type = 0x01;
 		device->pci_dev_path[i].subtype = 0x01;
 	}
-	
+
 	device->path_end.length = 0x04;
 	device->path_end.type = 0x7f;
 	device->path_end.subtype = 0xff;
-	
+
 	device->string = string;
 	device->data = NULL;
 

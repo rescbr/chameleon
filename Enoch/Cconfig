@@ -1,6 +1,6 @@
 #
-# Chameleon Configuration
+# Enoch Configuration
 #
-mainmenu "Chameleon Configuration"
+mainmenu "Enoch Configuration"
 
 source "i386/Cconfig"

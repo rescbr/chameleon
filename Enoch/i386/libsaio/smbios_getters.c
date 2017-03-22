@@ -110,16 +110,15 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 						int nhm_bus = 0x3F;
 						static long possible_nhm_bus[] = {0xFF, 0x7F, 0x3F};
 						unsigned long did, vid;
-						unsigned int i;
+						unsigned long qpimult, qpibusspeed = 0;
+						int i;
 						
 						// Nehalem supports Scrubbing
 						// First, locate the PCI bus where the MCH is located
 						for(i = 0; i < (sizeof(possible_nhm_bus)/sizeof(possible_nhm_bus[0])); i++)
 						{
-							vid = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00);
-							did = pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02);
-							vid &= 0xFFFF;
-							did &= 0xFF00;
+							vid = (pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x00) & 0xFFFF);
+							did = (pci_config_read16(PCIADDR(possible_nhm_bus[i], 3, 4), 0x02) & 0xFF00);
 							
 							if(vid == 0x8086 && did >= 0x2C00)
 							{
@@ -127,15 +126,13 @@ bool getSMBOemProcessorBusSpeed(returnType *value)
 							}
 						}
 
-						unsigned long qpimult, qpibusspeed;
-						qpimult = pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50);
-						qpimult &= 0x7F;
+						qpimult = (pci_config_read32(PCIADDR(nhm_bus, 2, 1), 0x50) & 0x7F);
 						DBG("qpimult %d\n", qpimult);
 						qpibusspeed = (qpimult * 2 * (Platform.CPU.FSBFrequency/1000000LL));
 						// Rek: rounding decimals to match original mac profile info
-						if (qpibusspeed%100 != 0)
+						if (qpibusspeed % 100 != 0)
 						{
-							qpibusspeed = ((qpibusspeed+50)/100)*100;
+							qpibusspeed = ((qpibusspeed + 50) / 100) * 100;
 						}
 						DBG("qpibusspeed %d\n", qpibusspeed);
 						value->word = qpibusspeed;
@@ -651,11 +648,11 @@ bool getSMBMemoryDevicePartNumber(returnType *value)
 	return true;
 }
 
-
 // getting smbios addr with fast compare ops, late checksum testing ...
 #define COMPARE_DWORD(a,b) ( *((uint32_t *) a) == *((uint32_t *) b) )
-static const char * const SMTAG = "_SM_";
-static const char* const DMITAG = "_DMI_";
+static const char *const SMTAG = "_SM_";
+//static const char *const SM3TAG = "_SM3_"; // smbios3_decode
+static const char *const DMITAG = "_DMI_";
 
 SMBEntryPoint *getAddressOfSmbiosTable(void)
 {
@@ -680,4 +677,3 @@ SMBEntryPoint *getAddressOfSmbiosTable(void)
 	pause();
 	return NULL;
 }
-

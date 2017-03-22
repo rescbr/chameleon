@@ -912,7 +912,7 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagData
-static long ParseTagData( char *buffer, TagPtr *tag )
+static long ParseTagData( char *buffer, TagPtr *tag)
 {
 	int		actuallen = 0;
 	long		length = 0;

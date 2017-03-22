@@ -70,7 +70,8 @@ msgstr "%PKGDEV%"
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
 msgstr ""
-"Pacote construída por:% WHOBUILD%, língua traduzida por: artur-pt e FurtiF"
+"Pacote construída por:% WHOBUILD%, língua traduzida por: oldnapalm, kyndder, "
+"artur-pt e FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -1295,7 +1296,10 @@ msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
-msgstr "Kext assinatura: Introduzido em 10,9, reforçada em 10,10 (assinatura kext necessária para todas as kexts), agora se tornou parte de desenraizada (SIP)."
+msgstr ""
+"Kext assinatura: Introduzido em 10,9, reforçada em 10,10 (assinatura kext "
+"necessária para todas as kexts), agora se tornou parte de desenraizada "
+"(SIP)."
 
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
@@ -1307,7 +1311,9 @@ msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
-msgstr "Proteção do sistema de arquivos: arquivos de sistema importantes são protegidos e não pode ser modificado."
+msgstr ""
+"Proteção do sistema de arquivos: arquivos de sistema importantes são "
+"protegidos e não pode ser modificado."
 
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
@@ -3175,7 +3181,11 @@ msgstr "rootless=0"
 #: Resources/templates/Localizable.strings:823
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
-msgstr "Rootless é um novo recurso introduzido no OS X 10.11 (El Capitan), e ele não permite modificações nos arquivos do sistema. Para contornar esta restrição, esse recurso pode ser desativado adicionando um 'rootless = 0' boot arg. ('rootless = 1' habilitá-lo)"
+msgstr ""
+"Rootless é um novo recurso introduzido no OS X 10.11 (El Capitan), e ele não "
+"permite modificações nos arquivos do sistema. Para contornar esta "
+"restrição, esse recurso pode ser desativado adicionando um 'rootless = 0' "
+"boot arg. ('rootless = 1' habilitá-lo)"
 
 #. type: "Dart0_title"
 #: Resources/templates/Localizable.strings:825
@@ -3581,7 +3591,9 @@ msgstr "KernelHaswell"
 #: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
-msgstr "Patch para Haswell  \\\"E\\\"  e support \\\"ULT\\ em sistemas operacionais mais antigos."
+msgstr ""
+"Patch para Haswell  \\\"E\\\"  e support \\\"ULT\\ em sistemas operacionais mais "
+"antigos."
 
 #. type: "KernelcpuFamily_title"
 #: Resources/templates/Localizable.strings:972
@@ -3593,7 +3605,9 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
-msgstr "Corrigir o endereço cpuid_family para remover o _cpuid_set_info _panic e _tsc_init _panic. Para CPUs sem suporte"
+msgstr ""
+"Corrigir o endereço cpuid_family para remover o _cpuid_set_info _panic e "
+"_tsc_init _panic. Para CPUs sem suporte"
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
@@ -3605,7 +3619,9 @@ msgstr "KernelSSE3"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
-msgstr "Patch para permitir mais instruções SSE3 em CPUs mais velhos para executar sistemas operacionais mais recentes."
+msgstr ""
+"Patch para permitir mais instruções SSE3 em CPUs mais velhos para executar "
+"sistemas operacionais mais recentes."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982

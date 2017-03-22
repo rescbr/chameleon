@@ -91,7 +91,7 @@ static const char *SMBChassisTypes[] =  // Bungo: strings for chassis type (Tabl
 	"Sub Notebook",         /* 0Eh */
 	"Space-saving",         /* 0Fh */
 	"Lunch Box",		/* 10h */
-	"Main Server Chassis",	/* 11h */
+	"Main Server Chassis",	/* 11h */ /* CIM_Chassis.ChassisPackageType says "Main System Chassis" */
 	"Expansion Chassis",	/* 12h */
 	"SubChassis",		/* 13h */
 	"Bus Expansion Chassis",/* 14h */
@@ -103,7 +103,10 @@ static const char *SMBChassisTypes[] =  // Bungo: strings for chassis type (Tabl
 	"Compact PCI",		/* 1Ah */
 	"Advanced TCA",		/* 1Bh */
 	"Blade",		/* 1Ch */ // An SMBIOS implementation for a Blade would contain a Type 3 Chassis structure
-	"Blade Enclosing"	/* 1Dh */ // A Blade Enclosure is a specialized chassis that contains a set of Blades.
+	"Blade Enclosing",	/* 1Dh */ // A Blade Enclosure is a specialized chassis that contains a set of Blades.
+	"Tablet",		/* 1Eh */
+	"Convertible",		/* 1Fh */
+	"Detachable"		/* 0x20h */
 };
 
 /*====
@@ -167,7 +170,11 @@ static const char *SMBProcessorUpgrades[] =  // ErmaC: strings for processor upg
 	"Socket FM1",
 	"Socket FM2",
 	"Socket LGA2011-3",
-	"Socket LGA1356-3"              /* 2Ch */
+	"Socket LGA1356-3",             /* 2Ch */
+	"Socket LGA1150",
+	"Socket BGA1168",
+	"Socket BGA1234",
+	"Socket BGA1364"                /* 0x30h */
 };
 
 static const char *SMBMemoryDeviceFormFactors[] =    // Bungo: strings for form factor (Table Type 17 - Memory Device)
@@ -220,7 +227,11 @@ static const char *SMBMemoryDeviceTypes[] =
 	"RAM",		/* 17h  unused */
 	"DDR3",		/* 18h  DDR3, chosen in [5776134] */
 	"FBD2",		/* 19h  FBD2 */
-	"DDR4"		/* 1Ah  DDR4 */
+	"DDR4",		/* 1Ah  DDR4 */
+	"LPDDR",	/* 1Bh  LPDDR */
+	"LPDDR2",	/* 1Ch  LPDDR2 */
+	"LPDDR3",	/* 1Dh  LPDDR3 */
+	"LPDDR4"	/* 1Eh  LPDDR5 */
 };
 
 static const int kSMBMemoryDeviceTypeCount = sizeof(SMBMemoryDeviceTypes) / sizeof(SMBMemoryDeviceTypes[0]);

@@ -172,7 +172,7 @@ static nvidia_pci_info_t nvidia_card_vendors[] = {
 };
 
 static nvidia_pci_info_t nvidia_card_generic[] = {
-	// 0000 - 0040	
+	// 0000 - 0040
 	{ 0x10DE0000,	"Unknown" },
 	// 0040 - 004F
 /*
@@ -1927,10 +1927,10 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 		{
 			if (nvidia_card_generic[i].device == device_id)
 			{
-				return nvidia_card_generic[i].name;
+				return nvidia_card_generic[i].name_model;
 			}
 		}
-	return nvidia_card_generic[0].name;
+	return nvidia_card_generic[0].name_model;
 	}
 
 	// Then check the exceptions table
@@ -1940,7 +1940,7 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 		{
 			if ((nvidia_card_exceptions[i].device == device_id) && (nvidia_card_exceptions[i].subdev == subsys_id))
 			{
-				return nvidia_card_exceptions[i].name;
+				return nvidia_card_exceptions[i].name_model;
 			}
 		}
 	}
@@ -1957,15 +1957,15 @@ static char *get_nvidia_model(uint32_t device_id, uint32_t subsys_id)
 					if (nvidia_card_vendors[j].device == (subsys_id & 0xffff0000))
 					{
 						snprintf(generic_name, 128, "%s %s", // sizeof(generic_name), "%s %s",
-							nvidia_card_vendors[j].name, nvidia_card_generic[i].name);
+							nvidia_card_vendors[j].name_model, nvidia_card_generic[i].name_model);
 						return &generic_name[0];
 					}
 				}
 			}
-			return nvidia_card_generic[i].name;
+			return nvidia_card_generic[i].name_model;
 		}
 	}
-	return nvidia_card_generic[0].name;
+	return nvidia_card_generic[0].name_model;
 }
 
 static int devprop_add_nvidia_template(DevPropDevice *device)
@@ -2146,7 +2146,7 @@ uint64_t mem_detect(volatile uint8_t *regs, uint16_t nvCardType, pci_dt_t *nvda_
 			break;
 	}
 
-	DBG("mem_detected %ld\n", vram_size);
+	DBG("mem_detected %ldMb\n", (vram_size >> 20));
 	return vram_size;
 }
 

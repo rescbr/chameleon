@@ -13,13 +13,13 @@
 #include "convert.h"
 
 #ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
+    #define DEBUG_SMBIOS 0
 #endif
 
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+    #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+    #define DBG(x...)	msglog(x)
 #endif
 
 #define SMBPlist			&bootInfo->smbiosConfig
@@ -108,9 +108,13 @@
 // Bungo:
 #define kSMBMemoryDeviceAssetTagKey			"SMmemassettag"         //
 
-/* ===========================================
- Memory SPD Data   (Apple Specific - Type 130)
- ============================================= */
+/* =====================================================
+ Firmware Volume Description (Apple Specific - Type 128)
+ ======================================================= */
+
+/* =========================================
+ Memory SPD Data (Apple Specific - Type 130)
+ =========================================== */
 
 /* ============================================
  OEM Processor Type (Apple Specific - Type 131)
@@ -126,6 +130,12 @@
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
 //#define kSMBOemPlatformFeatureKey			"SMoemplatformfeature"
+
+/* ==========================================
+ OEM Platform SMC (Apple Specific - Type 134)
+ ============================================ */
+//#define kSMBOemSMCKey                     "SMoemsmc"
+
 
 /* ==================================================*/
 #define getFieldOffset(struct, field)	((uint8_t)(uint32_t)&(((struct *)0)->field))
@@ -372,6 +382,12 @@ SMBValueSetter SMBSetters[] =
 	 Apple Specific
 	 ============== */
 
+	// Firmware Volume Description (Apple Specific - Type 128)
+	// kSMBTypeFirmwareVolume
+
+	// Memory SPD Data   (Apple Specific - Type 130)
+	// kSMBTypeMemorySPD
+
 	// OEM Processor Type (Apple Specific - Type 131)
 	{kSMBTypeOemProcessorType,	kSMBWord,	getFieldOffset(SMBOemProcessorType, ProcessorType),	kSMBOemProcessorTypeKey,		
 		getSMBOemProcessorType,			NULL},
@@ -384,7 +400,13 @@ SMBValueSetter SMBSetters[] =
 	/*
 	{kSMBTypeOemPlatformFeature,	kSMBWord,	getFieldOffset(SMBOemPlatformFeature, PlatformFeature),	kSMBOemPlatformFeatureKey,
 		getSMBOemPlatformFeature,	NULL}
+
+	// OEM Platform Feature (Apple Specific - Type 134)
+
+	{kSMBTypeOemSMCVersion,	kSMBWord,	getFieldOffset(SMBOemSMCVersion, SMCVersion),	kSMBOemSMCVersionKey,
+		getSMBOemSMCVersion,	NULL}
 	*/
+
 };
 
 int numOfSetters = sizeof(SMBSetters) / sizeof(SMBValueSetter);
@@ -418,40 +440,16 @@ static SMBWord structureCount	= 0;
 //#define kDefaultBoardProcessorType			"11" // 0xB
 #define kDefaultSystemVersion				"1.0"
 #define kDefaultBIOSRelease				256 // 256 = 0x0100 -> swap bytes: 0x0001 -> Release: 0.1 (see SMBIOS spec. table Type 0)
-//#define kDefaultLocatioInChassis			"Part Component"
-//#define KDefaultBoardSerialNumber			"C02140302D5DMT31M" // new C07019501PLDCVHAD - C02032101R5DC771H
 
 //=========== Mac mini ===========
 #define kDefaultMacMiniFamily				"Napa Mac"  // Macmini2,1 family = "Napa Mac" not "Mac mini"
-//#define kDefaultMacMiniBoardAssetTagNumber		"Mini-Aluminum"
-
 #define kDefaultMacMini					"Macmini2,1"
 #define kDefaultMacMiniBIOSVersion			"    MM21.88Z.009A.B00.0706281359"
 #define kDefaultMacMiniBIOSReleaseDate			"06/28/07"
 #define kDefaultMacMiniBoardProduct			"Mac-F4208EAA"
 
-// MacMini5,1 Mac-8ED6AF5B48C039E1 - MM51.88Z.0077.B0F.1110201309
-
-// MacMini5,2 Mac-4BC72D62AD45599E
-
-// MacMini5,3
-// Bios: MM51.88Z.0077.B10.1201241549
-// Board: Mac-F65AE981FFA204ED
-// Data: 01/24/2012
-
-// MacMini 6,1
-// Bios: MM61.88Z.0106.B03.1211161202
-// Board: Mac-F65AE981FFA204ED
-// Data: 10/14/2012
-
-// MacMini 6,2
-// Bios: MM61.88Z.0106.B03.1211161202
-// Board: Mac-FC02E91DDD3FA6A4
-// Data: 10/14/2012
-
 //=========== MacBook ===========
 #define kDefaultMacBookFamily				"MacBook"
-//#define kDefaultMacBookBoardAssetTagNumber		"MacBook-Black"
 
 #define kDefaultMacBook					"MacBook4,1"
 #define kDefaultMacBookBIOSVersion			"    MB41.88Z.00C1.B00.0802091535"
@@ -461,60 +459,22 @@ static SMBWord structureCount	= 0;
 //=========== MacBookAir ===========
 #define kDefaultMacBookAirFamily			"MacBook Air"
 
-// MacBookAir4,1 - Mac-C08A6BB70A942AC2
-// MacBookAir4,2 - Mac-742912EFDBEE19B3
-
 // MacBookAir5,2
 #define kDefaultMacBookAir				"MacBookAir5,2"
 #define kDefaultMacBookAirBIOSVersion			"    MBA51.88Z.00EF.B00.1205221442"
 #define kDefaultMacBookAirBIOSReleaseDate		"05/10/12"
 #define kDefaultMacBookBoardAirProduct			"Mac-2E6FAB96566FE58C"
 
-// MacBookAir6,1
-// Bios: MBA61.88Z.0099.B04.1309271229
-// Board: Mac-35C1E88140C3E6CF
-// Data: 24/06/13
-
-// MacBookAir6,2
-// Bios: MBA62.88Z.00EF.B00.1205221442
-// Board: Mac-7DF21CB3ED6977E5
-// Data: 24/06/13
-
 //=========== MacBookPro ===========
 #define kDefaultMacBookProFamily			"MacBook Pro"
-//#define kDefaultMacBookProBoardAssetTagNumber		"MacBook-Aluminum"
 
 #define kDefaultMacBookPro				"MacBookPro4,1"
 #define kDefaultMacBookProBIOSVersion			"    MBP41.88Z.00C1.B03.0802271651"
 #define kDefaultMacBookProBIOSReleaseDate		"02/27/08"
 #define kDefaultMacBookProBoardProduct			"Mac-F42C89C8"
 
-// MacBookPro8,1
-// Bios: MBP81.88Z.0047.B24.1110141131
-// Board: Mac-94245B3640C91C81
-// Data: 10/14/11
-
-// MacBookPro8,2
-// Bios:
-// Board: Mac_94245A3940C91C80
-// Data: 10/14/11
-
-// MacBookPro8,3
-// Bios:
-// Board: Mac-942459F5819B171B
-// Data: 10/31/11
-
-// MacBookPro10,2
-// Bios: MBP102.88Z.0106.B01.1208311637
-// Board: Mac-AFD8A9D944EA4843
-// Data: 10/02/2012
-
-// MacBookPro11,2 - Mac-3CBD00234E554E41 - MBP112.88Z.0138.B03.1310291227
-// MacBookPro11,3 - Mac-2BD1B31983FE1663 - MBP112.88Z.0138.B02.1310181745
-
 //=========== iMac ===========
 #define kDefaultiMacFamily				"iMac"
-//#define kDefaultiMacBoardAssetTagNumber		"iMac-Aluminum"
 
 #define kDefaultiMac					"iMac8,1"
 #define kDefaultiMacBIOSVersion				"    IM81.88Z.00C1.B00.0903051113"
@@ -528,8 +488,6 @@ static SMBWord structureCount	= 0;
 #define kDefaultiMacNehalemBIOSVersion			"    IM111.88Z.0034.B02.1003171314"
 #define kDefaultiMacNehalemBIOSReleaseDate		"03/17/10"
 #define kDefaultiMacNehalemBoardProduct			"Mac-F2268DAE"
-// iMac11,2
-// iMac11,3
 
 // iMac12,1
 #define kDefaultiMacSandy				"iMac12,1"
@@ -537,40 +495,13 @@ static SMBWord structureCount	= 0;
 #define kDefaultiMacSandyBIOSReleaseDate		"04/22/11"
 #define kDefaultiMacSandyBoardProduct			"Mac-942B5BF58194151B"
 
-// iMac12,2
-// Bios: IM121.88Z.0047.B1D.1110171110"
-// Data: 10/17/11
-// Board: Mac-942B59F58194171B"
-
-// iMac13,1
-// Bios: IM131.88Z.010A.B05.1211151146
-// Data: 11/15/2012
-// Board: Mac-00BE6ED71E35EB86
-
-// iMac13,2
-// Bios: IM131.88Z.00CE.B00.1203281326
-// Data: 03/28/2012
-// Board: Mac-FC02E91DDD3FA6A4
-
-// iMac14,1
-// iMac14,2
-// iMac14,3
-// iMac14,4
-// Bios: IM144.88Z.0179.B03.1405241029
-// Data: 05/20/2014
-// Board: Mac-81E3E92DD6088272
-
 //=========== MacPro ===========
 #define kDefaultMacProFamily				"MacPro" // MacPro's family = "MacPro" not "Mac Pro"
-//#define KDefauktMacProBoardAssetTagNumber		"Pro-Enclosure"
-//#define kDefaultMacProBoardType			"0x0B" // 11
 
 #define kDefaultMacPro					"MacPro3,1"
 #define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
 #define kDefaultMacProBIOSReleaseDate			"08/03/2010"
-//#define kDefaultMacProSystemVersion			"1.3"
 #define kDefaultMacProBoardProduct			"Mac-F42C88C8"
-//#define KDefaultMacProBoardSerialNumber		"J593902RA4MFE"
 
 // Mac Pro 4,1 core i7/Xeon
 #define kDefaultMacProNahWestSystemVersion		"0.0"
@@ -578,42 +509,19 @@ static SMBWord structureCount	= 0;
 #define kDefaultMacProNehalem				"MacPro4,1"
 #define kDefaultMacProNehalemBIOSVersion		"    MP41.88Z.0081.B07.0910130729"
 #define kDefaultMacProNehalemBIOSReleaseDate		"10/13/09"
-//#define kDefaultMacProNehalemSystemVersion		"1.4"
 #define kDefaultMacProNehalemBoardProduct		"Mac-F221BEC8"
-//#define KDefaultMacProNehalemBoardSerialNumber	"J593004RB1LUE"
-//							"J591302R61LUC     " // 2-cpu board
-//							"J591002JV4MFB     " // 1-cpu board
 
 // Mac Pro 5,1 core i7/Xeon
 #define kDefaultMacProWestmere				"MacPro5,1"
 #define kDefaultMacProWestmereBIOSVersion		"    MP51.88Z.007F.B03.1010071432"
 #define kDefaultMacProWestmereBIOSReleaseDate		"10/07/10"
-//#define kDefaultMacProWestmereSystemVersion		"1.2"
 #define kDefaultMacProWestmereBoardProduct		"Mac-F221BEC8"
-//#define KDefaultMacProWestmereBoardSerialNumber	"J522700H7BH8C"
-//							"J503104H1BH8A     " // 2-cpu board
 
 // Mac Pro 6,1
 #define kDefaultMacProHaswell				"MacPro6,1"
 #define kDefaultMacProHaswellBIOSVersion		"MP61.88Z.0116.B04.1312061508"
 #define kDefaultMacProHaswellBIOSReleaseDate		"12/06/2013"
-//#define kDefaultMacProHaswellSystemVersion		"1.?"
 #define kDefaultMacProHaswellBoardProduct		"Mac-F60DEB81FF30ACF6"
-//#define KDefaultMacProHaswellBoardSerialNumber	"F5K3474008JFNN215"
-
-//#define KDefaultBoardSerialNumber			"C02140302D5DMT31M"
-//                                          "C07019501PLDCVHAD"
-//                                          "C02032101R5DC771H"
-
-// J593902RA4MFE 3,1
-// J5031046RCZJA 5,1
-// J521101A5CZJC 3,1
-// J593004RB1LUE MacPro4,1
-// J513401PZBH8C 5,1
-// J590802LC4ACB 3,1
-// J594900AH1LUE 4,1
-// J512500HZBH8C 5,1
-// J522700H7BH8C MacPro5,1
 
 /* ============================================ */
 
@@ -1091,12 +999,30 @@ void addSMBOemPlatformFeature(SMBStructPtrs *structPtr)
 
 	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->PlatformFeature));
 
-	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPPlatformFeature) + 2);
+	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemPlatformFeature) + 2);
 	tableLength += sizeof(SMBOemPlatformFeature) + 2;
 	structureCount++;
  }
 */
-
+/* =========================================
+ OEM SMC Version (Apple Specific - Type 134)
+ =========================================== */
+/*
+void addSMBOemSMCVersion(SMBStructPtrs *structPtr)
+{
+    SMBOemSMCVersion *p = (SMBOemSMCVersion *)structPtr->new;
+    
+    p->header.type		= kSMBTypeOemSMCVersion;
+    p->header.length	= sizeof(SMBOemSMCVersion);
+    p->header.handle	= handle++;
+    
+    setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->SMCVersion));
+    
+    structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemSMCVersion) + 2);
+    tableLength += sizeof(SMBOemSMCVersion) + 2;
+    structureCount++;
+}
+*/
 
 /* ==============================================
  EndOfTable
@@ -1241,7 +1167,8 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 			case kSMBTypeOemProcessorType:
 			case kSMBTypeOemProcessorBusSpeed:
 //			case kSMBTypeOemPlatformFeature:
-				/* And this one too, to be added at the end */
+//			case kSMBTypeOemSMCVersion:
+			/* And this one too, to be added at the end */
 			case kSMBTypeEndOfTable:
 				break;
 
@@ -1269,6 +1196,7 @@ void setupNewSMBIOSTable(SMBEntryPoint *eps, SMBStructPtrs *structPtr)
 	addSMBOemProcessorType(structPtr);
 	addSMBOemProcessorBusSpeed(structPtr);
 //	addSMBOemPlatformFeature(structPtr);
+//	addSMBOemSMCVersion(structPtr);
 	addSMBEndOfTable(structPtr);
 }
 
