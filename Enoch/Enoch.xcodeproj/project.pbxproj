@@ -342,6 +342,7 @@
 		52DF7A2F17EDFA5900A88D32 /* kernel_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = kernel_patcher.h; path = KernelPatcher/kernel_patcher.h; sourceTree = "<group>"; };
 		52DF7A3017EDFA5900A88D32 /* KernelPatcher.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = KernelPatcher.dylib; path = KernelPatcher/KernelPatcher.dylib; sourceTree = "<group>"; };
 		52DF7A3117EDFA5900A88D32 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = KernelPatcher/Makefile; sourceTree = "<group>"; };
+		54EE60B01E83478900D682EB /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		6DBAFD1813B0D4590047ED33 /* _structs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _structs.h; sourceTree = "<group>"; };
 		6DBAFD1913B0D4590047ED33 /* _types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _types.h; sourceTree = "<group>"; };
 		6DBAFD1B13B0D4590047ED33 /* alignment.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = alignment.h; sourceTree = "<group>"; };
@@ -3294,6 +3295,7 @@
 				3617E24617503A9300AE753C /* boot.c */,
 				3617E24717503A9300AE753C /* boot.h */,
 				3617E24817503A9300AE753C /* boot2.s */,
+				54EE60B01E83478900D682EB /* config.h */,
 				3617E24917503A9300AE753C /* Cconfig */,
 				3617E24A17503A9300AE753C /* drivers.c */,
 				3617E24B17503A9300AE753C /* graphic_utils.c */,
@@ -4088,17 +4090,17 @@
 /* End PBXGroup section */
 
 /* Begin PBXLegacyTarget section */
-		D28A88AD04BDD90700651E21 /* Chameleon */ = {
+		D28A88AD04BDD90700651E21 /* Enoch */ = {
 			isa = PBXLegacyTarget;
 			buildArgumentsString = "$(ACTION)";
-			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "Chameleon" */;
+			buildConfigurationList = 1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "Enoch" */;
 			buildPhases = (
 			);
 			buildToolPath = /usr/bin/make;
 			buildWorkingDirectory = "";
 			dependencies = (
 			);
-			name = Chameleon;
+			name = Enoch;
 			passBuildSettingsInEnvironment = 1;
 			productName = Chameleon;
 		};
@@ -4110,7 +4112,7 @@
 			attributes = {
 				LastUpgradeCheck = 0620;
 			};
-			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */;
+			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Enoch" */;
 			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
@@ -4160,7 +4162,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				D28A88AD04BDD90700651E21 /* Chameleon */,
+				D28A88AD04BDD90700651E21 /* Enoch */,
 			);
 		};
 /* End PBXProject section */
@@ -4772,7 +4774,7 @@
 				GCC_OPTIMIZATION_LEVEL = 0;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = Chameleon;
+				PRODUCT_NAME = Enoch;
 			};
 			name = Debug;
 		};
@@ -4783,7 +4785,7 @@
 				COPY_PHASE_STRIP = YES;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = Chameleon;
+				PRODUCT_NAME = Enoch;
 			};
 			name = Release;
 		};
@@ -4809,7 +4811,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "Chameleon" */ = {
+		1DEB918F08733D9F0010E9CD /* Build configuration list for PBXLegacyTarget "Enoch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB919008733D9F0010E9CD /* Debug */,
@@ -4818,7 +4820,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Chameleon" */ = {
+		1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Enoch" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				1DEB919408733D9F0010E9CD /* Debug */,
