@@ -13,6 +13,16 @@
 #define DEBUG_BOOT2 0
 #define DEBUG_INTERRUPTS 0
 
+////////////////////////////////// ati.c
+#define DEBUG_ATI 0
+
+////////////////////////////////// nvidia.c
+#define DEBUG_NVIDIA 0
+
+////////////////////////////////// gma.c
+#define DEBUG_GMA 0
+#define REPLACE_DEVICE_ID 0
+
 ////////////////////////////////// cpu.c
 #define DEBUG_CPU 0
 

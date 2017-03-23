@@ -47,6 +47,7 @@
  *	SOFTWARE.
  */
 
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
@@ -55,10 +56,6 @@
 #include "convert.h"
 #include "nvidia.h"
 #include "nvidia_helper.h"
-
-#ifndef DEBUG_NVIDIA
-	#define DEBUG_NVIDIA 0
-#endif
 
 #if DEBUG_NVIDIA
 	#define DBG(x...)	printf(x)

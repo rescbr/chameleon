@@ -33,6 +33,7 @@
 	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
 */
 
+#include "config.h"
 #include "libsa.h"
 #include "saio_internal.h"
 #include "bootstruct.h"
@@ -43,14 +44,6 @@
 #include "gma.h"
 #include "vbe.h"
 #include "graphics.h"
-
-#ifndef DEBUG_GMA
-	#define DEBUG_GMA 0
-#endif
-
-#ifndef REPLACE_DEVICE_ID
-	#define REPLACE_DEVICE_ID 0
-#endif
 
 #if DEBUG_GMA
 	#define DBG(x...)	printf(x)

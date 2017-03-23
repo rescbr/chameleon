@@ -5,12 +5,9 @@
  *
  */
 
+#include "config.h"
 #include "ati.h"
 #include "convert.h"
-
-#ifndef DEBUG_ATI
-	#define DEBUG_ATI 0
-#endif
 
 #if DEBUG_ATI
 	#define DBG(x...)	printf(x)
