@@ -4,15 +4,12 @@
  * Bronya:   2015 Improve AMD support, cleanup and bugfix
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
 #include "bootstruct.h"
 #include "boot.h"
-
-#ifndef DEBUG_CPU
-	#define DEBUG_CPU 0
-#endif
 
 #if DEBUG_CPU
 	#define DBG(x...)		printf(x)

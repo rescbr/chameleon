@@ -45,6 +45,7 @@
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
 
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "fake_efi.h"
@@ -56,13 +57,6 @@
 #include "modules.h"
 #include "device_tree.h"
 
-#ifndef DEBUG_BOOT2
-	#define DEBUG_BOOT2 0
-#endif
-
-#ifndef DEBUG_INTERRUPTS
-	#define DEBUG_INTERRUPTS 0
-#endif
 
 #if DEBUG_BOOT2
 	#define DBG(x...)	printf(x)
