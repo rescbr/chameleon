@@ -2,6 +2,8 @@
 /*
  * Copyright 2007 David F. Elliott.	 All rights reserved.
  */
+
+#include "config.h"
 #include "saio_types.h"
 #include "libsaio.h"
 #include "boot.h"
@@ -18,14 +20,6 @@
 #include "pci.h"
 #include "sl.h"
 #include "vers.h"
-
-#ifndef DEBUG_EFI
-	#define DEBUG_EFI 0
-#endif
-
-#ifndef RANDOMSEED
-	#define RANDOMSEED 0
-#endif
 
 #if DEBUG_EFI
 	#define DBG(x...)	printf(x)

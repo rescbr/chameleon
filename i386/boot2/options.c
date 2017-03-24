@@ -33,9 +33,9 @@
 #include "modules.h"
 
 #if DEBUG
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 char		gMacOSVersion[OSVERSTRLEN];

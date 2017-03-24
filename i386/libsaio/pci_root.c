@@ -2,18 +2,15 @@
  * Copyright 2009 netkas
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
 
-#ifndef DEBUG_PCIROOT
-#define DEBUG_PCIROOT 1
-#endif
-
 #if DEBUG_PCIROOT
-#define DBG(x...)  printf(x)
+	#define DBG(x...)  printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 static int rootuid = 10; //value means function wasnt ran yet

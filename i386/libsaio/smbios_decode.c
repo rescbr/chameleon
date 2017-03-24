@@ -5,20 +5,17 @@
  *
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "smbios.h"
 // Bungo:
 #include "boot.h"
 #include "bootstruct.h"
 
-#ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
-#endif
-
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 extern char *getSMBStringForField(SMBStructHeader *structHeader, uint8_t field);

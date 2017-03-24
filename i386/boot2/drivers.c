@@ -46,8 +46,6 @@
 	#define DBG(x...)	msglog(x)
 #endif
 
-// extern char gMacOSVersion[8];
-
 struct Module {  
 	struct Module *nextModule;
 	long          willLoad;
@@ -226,6 +224,7 @@ long LoadDrivers( char *dirSpec )
 				}
 			}
 		}
+
 		if(!gHaveKernelCache)
 		{
 			// Don't load main driver (from /System/Library/Extentions) if gHaveKernelCache is set.
@@ -259,7 +258,7 @@ long LoadDrivers( char *dirSpec )
 			}
 			else
 			{
-				verbose("Attempting to loading drivers from standard repositories:\n");
+				verbose("Attempting to load drivers from standard repositories:\n");
 
 				if ( (gMacOSVersion[3] == '9') || ((gMacOSVersion[3] == '1') && ((gMacOSVersion[4] == '0') || (gMacOSVersion[4] == '1') || (gMacOSVersion[4] == '2') ) )) // issue 352
 				{
@@ -496,13 +495,13 @@ long LoadDriverMKext( char *fileSpec )
 // LoadDriverPList
 long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 {
-	long      length, executablePathLength, bundlePathLength;
-	ModulePtr module;
-	TagPtr    personalities;
-	char *    buffer = 0;
-	char *    tmpExecutablePath = 0;
-	char *    tmpBundlePath = 0;
-	long      ret = -1;
+	long		length, executablePathLength, bundlePathLength;
+	ModulePtr	module;
+	TagPtr		personalities;
+	char		*buffer = 0;
+	char		*tmpExecutablePath = 0;
+	char		*tmpBundlePath = 0;
+	long		ret = -1;
 
 	do{
 	// Save the driver path.
@@ -686,12 +685,6 @@ long LoadMatchedModules( void )
 
 			if ((length != -1) && executableAddr)
 			{
-//				driverModuleAddr = (void *)kLoadAddr;
-//				if (length != 0)
-//				{
-//					ThinFatFile(&driverModuleAddr, &length);
-//				}
-
 				// Make make in the image area.
                 
 				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
@@ -1138,7 +1131,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					default:kernelOSVer = 0xA0A0500; break; //Last known kernel
 				}
 				break;
-			case 15:
+			case 15: /* El Capitan */
 				switch (gDarwinMinor)
 				{
 					case 0: kernelOSVer = 0xA0B0000; break;
@@ -1151,7 +1144,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					default:kernelOSVer = 0xA0B0600; break; //Last known kernel (add here updates)
 				}
 				break;
-			case 16:
+			case 16:  /* Sierra */
 				switch (gDarwinMinor)
 				{
 					case 0: kernelOSVer = 0xA0C0000; break;
@@ -1165,7 +1158,7 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 				break;
 			default:
 				kernelOSVer = 0xA0C0400;
-				break;
+				break; //Last known kernel is Sierra 10.12.4
 			}
 		}
 		else

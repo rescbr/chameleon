@@ -5,21 +5,17 @@
  *
  */
 
-
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "smbios_getters.h"
 // Bungo
 #include "convert.h"
 
-#ifndef DEBUG_SMBIOS
-#define DEBUG_SMBIOS 0
-#endif
-
 #if DEBUG_SMBIOS
-#define DBG(x...)	printf(x)
+    #define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+    #define DBG(x...)	msglog(x)
 #endif
 
 #define SMBPlist			&bootInfo->smbiosConfig

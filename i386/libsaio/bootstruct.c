@@ -26,13 +26,10 @@
  * All rights reserved.
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
-
-#ifndef DEBUG_BOOTSTRUCT
-	#define DEBUG_BOOTSTRUCT 0
-#endif
 
 #if DEBUG_BOOTSTRUCT
 	#define DBG(x...)	printf(x)

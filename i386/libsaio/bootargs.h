@@ -140,14 +140,14 @@ typedef struct boot_icon_element boot_icon_element;
 
 /* Rootless configuration flags */
 // http://www.idelta.info/archives/kext-to-check-sip-rootless-status-on-el-capitan/
-#define CSR_ALLOW_UNTRUSTED_KEXTS	(1 << 0) /* Allow untrusted kexts */
-#define CSR_ALLOW_UNRESTRICTED_FS	(1 << 1) /* Allow unrestricted file system. */
-#define CSR_ALLOW_TASK_FOR_PID		(1 << 2) /* Allow test_for_pid() */
-#define CSR_ALLOW_KERNEL_DEBUGGER	(1 << 3)
-#define CSR_ALLOW_APPLE_INTERNAL	(1 << 4)
-#define CSR_ALLOW_UNRESTRICTED_DTRACE	(1 << 5) /* Allow unrestricted dtrace */
-#define CSR_ALLOW_UNRESTRICTED_NVRAM	(1 << 6) /* Allow unrestricted NVRAM */
-#define CSR_ALLOW_DEVICE_CONFIGURATION	(1 << 7) /* Allow device configuration */
+#define CSR_ALLOW_UNTRUSTED_KEXTS		(1 << 0) /* Allow untrusted kexts */
+#define CSR_ALLOW_UNRESTRICTED_FS		(1 << 1) /* Allow unrestricted file system. */
+#define CSR_ALLOW_TASK_FOR_PID			(1 << 2) /* Allow test_for_pid() */
+#define CSR_ALLOW_KERNEL_DEBUGGER		(1 << 3)
+#define CSR_ALLOW_APPLE_INTERNAL		(1 << 4)
+#define CSR_ALLOW_UNRESTRICTED_DTRACE		(1 << 5) /* Allow unrestricted dtrace */
+#define CSR_ALLOW_UNRESTRICTED_NVRAM		(1 << 6) /* Allow unrestricted NVRAM */
+#define CSR_ALLOW_DEVICE_CONFIGURATION		(1 << 7) /* Allow device configuration */
 
 #define CSR_VALID_FLAGS (CSR_ALLOW_UNTRUSTED_KEXTS | \
 		CSR_ALLOW_UNRESTRICTED_FS | \
@@ -155,8 +155,8 @@ typedef struct boot_icon_element boot_icon_element;
 		CSR_ALLOW_KERNEL_DEBUGGER | \
 		CSR_ALLOW_APPLE_INTERNAL | \
 		CSR_ALLOW_UNRESTRICTED_DTRACE | \
-        CSR_ALLOW_UNRESTRICTED_NVRAM | \
-        CSR_ALLOW_DEVICE_CONFIGURATION)
+		CSR_ALLOW_UNRESTRICTED_NVRAM | \
+		CSR_ALLOW_DEVICE_CONFIGURATION)
 
 typedef struct boot_args
 {

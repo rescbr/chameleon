@@ -47,6 +47,7 @@
  *	SOFTWARE.
  */
 
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
@@ -55,10 +56,6 @@
 #include "convert.h"
 #include "nvidia.h"
 #include "nvidia_helper.h"
-
-#ifndef DEBUG_NVIDIA
-	#define DEBUG_NVIDIA 0
-#endif
 
 #if DEBUG_NVIDIA
 	#define DBG(x...)	printf(x)
@@ -172,7 +169,7 @@ static nvidia_pci_info_t nvidia_card_vendors[] = {
 };
 
 static nvidia_pci_info_t nvidia_card_generic[] = {
-	// 0000 - 0040	
+	// 0000 - 0040
 	{ 0x10DE0000,	"Unknown" },
 	// 0040 - 004F
 /*

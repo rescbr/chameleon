@@ -60,6 +60,7 @@
  *
  ******************************************************************************/
 
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "cpu.h"
@@ -75,18 +76,10 @@
 
 #define HEADER      __FILE__ " [" TOSTRING(__LINE__) "]: "
 
-#ifndef DEBUG_HDA
-	#define DEBUG_HDA 0
-#endif
-
 #if DEBUG_HDA
 	#define DBG(x...)  verbose(x)
 #else
 	#define DBG(x...)
-#endif
-
-#ifndef DEBUG_CODEC
-	#define DEBUG_CODEC 0
 #endif
 
 #if DEBUG_CODEC
