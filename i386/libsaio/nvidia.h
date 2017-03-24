@@ -55,14 +55,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev);
 struct nvidia_pci_info_t;
 typedef struct {
 	uint32_t    device; // VendorID + DeviceID
-	char        *name;
+	char        *name_model;
 } nvidia_pci_info_t;
 
 struct nvidia_card_info_t;
 typedef struct {
 	uint32_t    device; // VendorID + DeviceID
 	uint32_t    subdev; // SubdeviceID + SubvendorID
-	char        *name;
+	char        *name_model;
 	//bool        kEnableHDMIAudio   //	HDMi
 	//VRAM
 } nvidia_card_info_t;
