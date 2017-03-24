@@ -1,0 +1,99 @@
+#!/bin/bash
+
+# $1 = Full path to the installation package the installer app is processing
+# $2 = Full path to the installation destination
+# $3 = Installation volume (mountpoint) to receive the payload
+# $4 = Root directory for the system
+
+logName="@LOG_FILENAME@"
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+
+if [ "$3" == "/" ]
+then
+    targetVolume="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
+    # really need to do that?? Unix "component" path assume are between "/"
+    # ie current volume can be also /// or ///Volumes///MyVolume w/o problem!
+else
+    targetVolume="$3"
+fi
+
+configFile='/private/tmp/InstallConfig.plist'
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                     sed -e 's/^ *//' | sed -e 's/ *$//')
+
+targetDevice=$( /usr/libexec/PlistBuddy -c "Print :targetdev" ${configFile} )
+choicedVolume=$( LC_ALL=C diskutil info ${targetDevice} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                            sed -e 's/^ *//' | sed -e 's/ *$//' )
+backupRootDir="${targetVolume}/Chameleon.Backups"
+backupDir=$( /usr/libexec/PlistBuddy -c "Print :backupDir" ${configFile} )
+
+# Check target exists
+if [ ! -d "${v_mntpt}" ]; then
+    echo "Ram disk volume does not exist !"
+    exit 1
+fi
+
+exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+if [ ! -d "${targetVolume}" ]; then
+    echo "Target volume does not exist !"
+    exit 1
+fi
+
+if [ ! -d "${choicedVolume}" ]; then
+    echo "${choicedVolume} volume does not exist !"
+    exit 1
+fi
+
+echo "$mainLine"
+echo "Running Post postinstall script"
+echo "Target volume = ${choicedVolume}"
+echo "$subLine"
+
+# Replace/Copying the Extra folder
+echo "Moving Extra folder to ${choicedVolume}"
+cp -R "${v_mntpt}/Extra" "${choicedVolume}"/
+
+echo "$subLine"
+echo "Post postinstall script complete"
+echo "$mainLine"
+
+# Update Rights
+chmod 777 "${choicedVolume}"/Extra            2>/dev/null
+chmod 666 "${choicedVolume}"/Extra/*.plist    2>/dev/null
+chmod 666 "${choicedVolume}/Extra/${logName}" 2>/dev/null
+# if an Extra/Extensions exist... we can repair the permission???
+
+# Check Backup folder (is always on the target Volume)
+
+if [ -d "${backupRootDir}/${backupDir}" ]; then
+    # Remove empty directories
+    find "${backupRootDir}" -type d -depth -empty -exec rmdir {} \;
+fi
+
+# copying the installer log inside the Extra folder
+if [[ $( /usr/libexec/PlistBuddy -c "Print bootloader" ${configFile} ) == "true" ]];then
+    # if we have installed the bootloader, this is a new log
+    echo "NOTE: any Themes or modules you have must be there since this now"
+    echo "      is the boot partition. ACPI tables, SMBios.plist and the"
+    echo "      org.chameleon.Boot.plist (with custom settings for the target"
+    echo "      OSX must be in each partition that contain it.)"
+    echo "$mainLine"
+    cat "${v_mntpt}/${logName}" > "${choicedVolume}/Extra/${logName}"
+else
+    # ..otherwise adding the new log to the existing one (if exist)
+    cat "${v_mntpt}/${logName}" >> "${choicedVolume}/Extra/${logName}"
+fi
+
+
+# Umount the Ram Disk & cleaning
+rm -f /private/tmp/InstallConfig.plist
+rm -f "${targetVolume}/EXTRAROOTDIR"
+exec 1<&- # Restore stdout and close file descriptor #1 before umount the Ram Disk
+umount -f $v_mntptDev > /dev/null
+hdiutil detach $v_mntptDev
+
+
+

@@ -1,0 +1,17 @@
+#
+# Chameleon Modules
+#
+
+menu "Modules"
+source "i386/modules/Resolution/Cconfig"
+source "i386/modules/klibc/Cconfig"
+source "i386/modules/uClibcxx/Cconfig"
+source "i386/modules/HelloWorld/Cconfig"
+source "i386/modules/Sata/Cconfig"
+source "i386/modules/Keylayout/Cconfig"
+source "i386/modules/AcpiCodec/Cconfig"
+source "i386/modules/KernelPatcher/Cconfig"
+#source "i386/modules/KextPatcher/Cconfig"
+source "i386/modules/FileNVRAM/Cconfig"
+#source "i386/modules/HDAEnabler/Cconfig"
+endmenu

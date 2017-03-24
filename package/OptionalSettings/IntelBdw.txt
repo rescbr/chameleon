@@ -1,0 +1,47 @@
+# ---------------------------------------------
+# Chameleon Optional Settings List.
+# ---------------------------------------------
+# Add boot options or kernel flags to the bottom of this file.
+# They will appear under the package installer's Settings menu
+# in a sub menu named with the filename of this file.
+# Use one file or many files - it's flexible to make it easy
+# to group different options under separate sub menus.
+# ---------------------------------------------
+# To add boot option: Structure is:
+#     type@name:key=value
+# example1: Bool@InstantMenu:Instant Menu=Yes
+# example2: Text@1024x600x32:Graphics Mode=1024x600x32
+# example3: List@Npci:Kernel Flags=npci=0x2000
+# ---------------------------------------------
+# type can be: Bool, Text or List
+# ---------------------------------------------
+# The package installer has a setting which controls what
+# the user is allowed to choose.
+# A) User can select every option from the list.
+# B) User can select only one of the options from the list.
+# Set Exclusive=False for A, or Exclusive=True for B.
+#
+Exclusive=True
+# ---------------------------------------------
+# Note: There must be a carriage return at end of last line
+# ---------------------------------------------
+Text@IntelBroadwellx00:IntelBdwFB=0
+Text@IntelBroadwellx01:IntelBdwFB=1
+Text@IntelBroadwellx02:IntelBdwFB=2
+Text@IntelBroadwellx03:IntelBdwFB=3
+Text@IntelBroadwellx04:IntelBdwFB=4
+Text@IntelBroadwellx05:IntelBdwFB=5
+Text@IntelBroadwellx06:IntelBdwFB=6
+Text@IntelBroadwellx07:IntelBdwFB=7
+Text@IntelBroadwellx08:IntelBdwFB=8
+Text@IntelBroadwellx09:IntelBdwFB=9
+Text@IntelBroadwellx10:IntelBdwFB=10
+Text@IntelBroadwellx11:IntelBdwFB=11
+Text@IntelBroadwellx12:IntelBdwFB=12
+Text@IntelBroadwellx13:IntelBdwFB=13
+Text@IntelBroadwellx14:IntelBdwFB=14
+Text@IntelBroadwellx15:IntelBdwFB=15
+Text@IntelBroadwellx16:IntelBdwFB=16
+Text@IntelBroadwellx17:IntelBdwFB=17
+Text@IntelBroadwellx18:IntelBdwFB=18
+Text@IntelBroadwellx19:IntelBdwFB=19

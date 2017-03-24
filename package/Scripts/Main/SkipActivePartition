@@ -1,0 +1,8 @@
+#!/bin/bash
+
+configFile="/private/tmp/InstallConfig.plist"
+
+# adding option to declare that we are installing the bootloader w/o activate the partition
+/usr/libexec/PlistBuddy -c "Add :SkipActivePartition bool true" ${configFile}
+
+exit 0

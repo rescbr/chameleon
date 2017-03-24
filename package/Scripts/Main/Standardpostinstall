@@ -1,0 +1,417 @@
+#!/bin/bash
+
+# --------------------------------------------------------------------------------------------------------
+# Install.sh v1.6, script to install Chameleon
+# Created by Miky1979 on December 8th, 2014
+# --------------------------------------------------------------------------------------------------------
+targetVolume="${3}"
+InstallToESP="0"
+InstallBootloader="0"
+espmtp="/Volumes/ESP"
+WINDOWS_EXIST="0"
+opt="u"
+configFile="/private/tmp/InstallConfig.plist"
+
+if [ "${InstallToESP}" == "1" ]; then TYPE="ESP"; else TYPE="Standard"; fi
+if [[ $( /usr/libexec/PlistBuddy -c "Print bootloader" ${configFile} ) == "true" ]];then
+    # installing stage 0, 1 and 2 only if user want this:
+    # ie only if have no selected noboot choice
+    InstallBootloader="1"
+fi
+# --------------------------------------------------------------------------------------------------------
+if [ ! -d "${targetVolume}" ]; then echo "target Volume not found, aborting!"; exit 1; fi
+# --------------------------------------------------------------------------------------------------------
+i386Dir="${targetVolume}/usr/standalone/i386"
+usrLocalBin="${targetVolume}/usr/local/bin"
+# --------------------------------------------------------------------------------------------------------
+choicedVolume="${targetVolume}"
+ESP_MOUNTED="0"
+# --------------------------------------------------------------------------------------------------------
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
+backupRootDir="${targetVolume}/Chameleon.Backups"
+backupDir=$( /usr/libexec/PlistBuddy -c "Print :backupDir" ${configFile} )
+logName="Chameleon_Installer_Log.txt"
+logFile="${v_mntpt}/${logName}"
+# --------------------------------------------------------------------------------------------------------
+stage1LoaderHFS="boot1h"
+stage1LoaderFAT="boot1f32"
+stage1LoaderExFAT="boot1x"
+stage2Loader="boot"
+versionToInstall=$(cat "${i386Dir}/Boot" | grep -a 'Darwin/x86 boot v' )
+# --------------------------------------------------------------------------------------------------------
+SS="${usrLocalBin}/sectorsize"
+# --------------------------------------------------------------------------------------------------------
+# Scanning all Variables. We are switching to the target Volume or its ESP.
+# This function is usefull to rescan the new target "at need"
+SCAN() {
+    bootDevice=$( LC_ALL=C diskutil info / | grep -i 'Device Node:' | awk '{print $NF}' )
+    targetDevice=$( LC_ALL=C diskutil info "${choicedVolume}" | grep -i 'Device Node:' | awk '{print $NF}' )
+    targetDeviceRaw=${targetDevice/disk/rdisk}
+    targetDisk=${targetDevice%s*}
+    targetDiskRaw=${targetDisk/disk/rdisk}
+    targetSlice=${targetDevice#*disk*s}
+    IOContent=$( LC_ALL=C diskutil info "${targetDisk}" | grep -i 'Content (IOContent)' | awk '{print $NF}' )
+    FS=$( LC_ALL=C diskutil info ${targetDevice} | grep -i 'Type (Bundle)' | \
+                                awk '{print $NF}' | awk '{print tolower($0)}' )
+    disksignature=$( dd 2>/dev/null if="${targetDisk}" count=1 | dd 2>/dev/null count=4 bs=1 skip=440 | \
+                                                         perl -ne '@a=split"";for(@a){printf"%02x",ord}' )
+
+    if  [ $InstallBootloader = "1" ];then
+        blocksize=$( "${SS}" "${targetDeviceRaw}" | awk '{ print $2 }' )
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# lines
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+# --------------------------------------------------------------------------------------------------------
+# Debug for Chameleon.
+# Create a folder inside the Desktop called "DebugChameleon", and the log will be full
+DEBUG() {
+    echo "$mainLine"
+    echo "DEBUG: display script variables (${TYPE}postinstall)"
+    echo "$mainLine"
+    echo "DEBUG: stage0Loader: Disk loader is ${stage0Loader}"
+    echo "DEBUG: stage1LoaderHFS: Partition loader is ${stage1LoaderHFS}" 
+    echo "DEBUG: stage1LoaderFat: Partition loader is ${stage1LoaderFAT}" 
+    echo "DEBUG: stage1LoaderExFAT: Partition loader is ${stage1LoaderExFAT}" 
+    echo "DEBUG: stage2Loader: Filesystem loader is ${stage2Loader}" 
+    echo "DEBUG: targetVolume: Volume is ${targetVolume}" 
+    echo "DEBUG: targetDevice: Volume device is ${targetDevice}" 
+    echo "DEBUG: targetDeviceRaw: Volume raw device is ${targetDeviceRaw}" 
+    echo "DEBUG: targetDisk: Disk device is ${targetDisk}" 
+    echo "DEBUG: targetDiskRaw: Disk raw device is ${targetDiskRaw}" 
+    echo "DEBUG: targetSlice: Volume slice is ${targetSlice}"
+    echo "DEBUG: bootDevice: Current Volume device is ${bootDevice}"
+    echo "DEBUG: versionToInstall: version to install is ${versionToInstall}" 
+    echo "DEBUG: IOContent: partition scheme is ${IOContent}" 
+    echo "DEBUG: FS: file System is ${FS}"
+    if  [ $InstallBootloader = "1" ];then
+        echo "DEBUG: blocksize: block size detected = ${blocksize}-bytes"
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Checking for unsupported FAT16 filesystem
+CHECK_FAT16() {
+    pers=$( LC_ALL=C diskutil info "${targetDeviceRaw}" | grep -i 'File System Personality' | \
+                                                 awk '{print $NF}' | awk '{print tolower($0)}' )
+
+    case $pers in
+        fat16)
+            echo "** ERROR: Can't Install to a device using FAT16!"
+            exit 1
+        ;;
+        *)
+            echo "First Check Passed (not Fat16)!"
+        ;;
+    esac
+}
+# --------------------------------------------------------------------------------------------------------
+# Mount or umount the ESP..or leave as is if already mounted..
+UMOUNT_ESP_DISK() {
+    # umount the ESP by its dev
+    umount -f $espDisk
+}
+
+CHECK_ESP_MOUNTPOINT() {
+    # umount the ESP by its Mount Point
+    # and checking it if is busy by another ESP
+    if [ $( df | awk '{$1=$2=$3=$4=$5=$6=$7=$8=""; print $0}' | sed -e 's/^ *//' | sed -e 's/ *$//' | \
+                                                                                 grep -x "${espmtp}" ) ]; then
+        umount -f ${espmtp}
+        ESP_MOUNTED="0"
+    fi
+}
+
+MOUNT_ESP() {
+    ESP_MOUNTED="1" # ..assuming that the ESP can be already mounted..
+    if [ $( df | grep "${espDisk}" | awk '{print $1}' | grep -x "${espDisk}" ) ];then
+        # ESP is already mounted, so now we aquire the Mount Point
+        espmtp=$( LC_ALL=C diskutil info ${espDisk} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                        sed -e 's/^ *//' | sed -e 's/ *$//' )
+        if [ -d "${espmtp}" ];then
+            echo "ESP Mount Point is:${espmtp}, using that as target Volume!"
+            choicedVolume="${espmtp}"
+            SCAN
+        else
+            echo "The mount point was not found, try to umount it to get the standard one.."
+            UMOUNT_ESP_DISK
+            CHECK_ESP_MOUNTPOINT
+        fi
+    else
+        # ESP is not mounted..
+        ESP_MOUNTED="0"
+    fi
+
+    if [ $ESP_MOUNTED = "0" ];then
+        mkdir -p "${espmtp}"
+        case $( fstyp $espDisk ) in
+            hfs)
+                echo "Mounting $espDisk on $espmtp as hfs Volume.."
+                mount -t hfs $espDisk "${espmtp}"
+            ;;
+            msdos)
+                echo "Mounting $espDisk on $espmtp as msdos Volume.."
+                mount -t msdos $espDisk "${espmtp}"
+            ;;
+            *)
+                echo "ESP fileSystem unsupported, Installing to ${targetVolume}!"
+                choicedVolume="${targetVolume}"
+            ;;
+        esac
+        sleep 0.3
+
+        if [ $( df | awk '{$1=$2=$3=$4=$5=$6=$7=$8=""; print $0}' | sed -e 's/^ *//' | sed -e 's/ *$//' | \
+                                                                                     grep -x "${espmtp}" ) ]; then
+            echo "EFI System Partition mounted!"
+            ESP_MOUNTED="1"
+            choicedVolume="${espmtp}"
+            SCAN
+        else
+            echo "ESP can't be mounted, Installing to ${targetVolume}!"
+            choicedVolume="${targetVolume}"
+        fi
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+PARTITION_ACTIVE_IF() {
+    if  [ $InstallBootloader = "1" ];then
+        echo -e "${mainLine}\nSET PARTITION ACTIVE:"
+        # if Windows was detected, don't activate the partition..
+        # if the stage 0 loader is boo0hfs, don't activate the partition
+        if [ WINDOWS_EXIST = "0" ] || [ "${stage0Loader}" != "boot0hfs" ];then
+            partitionactive=$( fdisk -d ${targetDiskRaw} | grep -n "*" | awk -F: '{print $1}')
+            if [ "${partitionactive}" ] && [ "${partitionactive}" = "${targetSlice}" ]; then
+                echo "${targetDiskRaw#/dev/r}, slice "${targetSlice}" is already set active. No need to change it."
+            else
+                echo "Setting ${choicedVolume} partition active."
+                if [[ $( /usr/libexec/PlistBuddy -c "Print SkipActivePartition" ${configFile} 2> /dev/null ) == "true" ]];then
+                    # Skip writing Stage 0 (user wants this)
+                    echo "user chose to skip activation, partition not activated!"
+                    else
+                        # BadAxe requires EFI partition to be flagged active.
+                        # but it doesn't' hurt to do it for any non-windows partition.
+
+# leave left aligned the follow code:
+fdisk -e ${targetDiskRaw} <<-MAKEACTIVE
+print
+flag ${targetSlice}
+write
+y
+quit
+MAKEACTIVE
+                fi
+            fi
+        else
+            echo "Partition will not activate when Windows is detected or stage 0 is boot0hfs"
+        fi
+        echo ""
+        echo "$mainLine"
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Writing stage 0
+CHECK_WINDOWS() {
+    if [ "${disksignature}" = "00000000" ]; then
+        echo "Windows installation not found on ${targetDisk}."
+    else
+        echo "Windows installation found on  ${targetDisk}."
+        WINDOWS_EXIST="1"
+    fi
+}
+
+WRITE_STAGE0() {
+    if  [ $InstallBootloader = "1" ];then
+        echo -e "${mainLine}\nWRITING STAGE 0:"
+        if [[ $( /usr/libexec/PlistBuddy -c "Print SkipStage0" ${configFile} 2> /dev/null ) == "true" ]];then
+            # Skip writing Stage 0 (user wants this)
+            echo "user chose to skip stage0, not written!"
+        else
+            "${usrLocalBin}/fdisk440" -u -f "${i386Dir}/${1}" -y ${targetDisk}
+            echo "${1} written to ${targetDisk}"
+        fi
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Writing stage 1
+WRITE_STAGE1() {
+    if  [ $InstallBootloader = "1" ];then
+        echo -e "${mainLine}\nWRITING STAGE 1 ${2}:"
+        if [[ $( /usr/libexec/PlistBuddy -c "Print SkipStage1" ${configFile} 2> /dev/null ) == "true" ]];then
+            # Skip writing Stage 0 (user wants this)
+            echo "user chose to skip stage1, not written!"
+        else
+            cp -R "${usrLocalBin}/boot1-install" "${v_mntpt}"/
+            cp -R "${i386Dir}/${1}" "${v_mntpt}"/
+            "${v_mntpt}/boot1-install" -y "-${3}" -f "${v_mntpt}/${1}" ${targetDeviceRaw}
+            echo "${stage1Loader} (${2}) written to ${targetDeviceRaw}."
+        fi
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Writing stage 2
+WRITE_STAGE2() {
+    if  [ $InstallBootloader = "1" ];then
+        echo -e "${mainLine}\nWRITING STAGE 2:"
+        cp -R "${i386Dir}/${stage2Loader}" "${choicedVolume}/"
+        chflags hidden "${choicedVolume}/${stage2Loader}"
+        echo "Stage 2 (${stage2Loader}) written to ${choicedVolume}."
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Waiting for targhet Volume was re-mounted before proceeding..
+# Note: the target Volume is umonted by boot1-install that also take the step to remount it (only waiting..).
+# exception is the EFI partition: in Mavericks autoremount...in Yosemite not..
+REMOUNT() {
+    if  [ $InstallBootloader = "1" ];then
+        if [ "${InstallToESP}" == "1" ]; then
+            if [ ! -d "${choicedVolume}" ]; then
+                MOUNT_ESP
+            fi
+        else
+            if [ ! -d "${choicedVolume}" ]; then
+                echo -e "${mainLine}\nWAITING TO RE-MOUNT ${choicedVolume}:"
+                until [ -d "${choicedVolume}" ]; do
+                    sleep 0.3
+                done
+                echo "${choicedVolume} is mounted!"
+            fi
+        fi
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Extra folder...
+EXTRA() {
+    echo -e "${mainLine}\nEXTRA FOLDER:"
+    if [ ! -d "${choicedVolume}/Extra" ]; then
+        echo "Extra not found on ${choicedVolume}, creating.."
+        mkdir -p "${v_mntpt}/Extra"
+        /usr/libexec/PlistBuddy -c "Add :'Kernel Flags'  string -v" "${v_mntpt}/Extra/org.chameleon.Boot.plist"
+    else
+        echo "Extra folder already exist on ${choicedVolume}, copying to the Ram Disk.."
+        cp -R "${choicedVolume}/Extra" "${v_mntpt}"/
+        ./clean_bootplist.pl "${v_mntpt}" org.chameleon.Boot.plist
+        ./clean_bootplist.pl "${v_mntpt}" kernel.plist
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+# Preparing Backing up of Chameleon files
+BACKUP() {
+    echo -e "${mainLine}\nBACKUP CHAMELEON FILES:"
+    # Backup Stage 2
+    if  [ $InstallBootloader = "1" ];then
+        if [ -f "${choicedVolume}/boot" ]; then
+            echo "Backup stage2 file ${choicedVolume}/boot to ${backupRootDir}/${backupDir}/boot"
+            cp "${choicedVolume}/boot" "${backupRootDir}/${backupDir}/boot"
+        else
+            echo "No stage 2 (boot) was found, nothing to be saved."
+        fi
+    fi
+
+    # Backup /Extra directory
+    if [[ -d "${choicedVolume}/Extra" ]];then
+        echo "Backing up ${choicedVolume}/Extra folder to ${backupRootDir}/${backupDir}/Extra"
+        cp -pR "${choicedVolume}/Extra" "${backupRootDir}/${backupDir}"/
+    else
+        echo "No Extra folder was found, nothing to be saved."
+    fi
+}
+# --------------------------------------------------------------------------------------------------------
+if [ ! -d "${v_mntpt}" ]; then
+    echo "Ram Disk not found!"
+    exit
+fi
+
+exec > >(tee -a "${logFile}") 2>&1
+
+echo "$mainLine"
+echo "Main ${TYPE} Post-Install Script"
+echo "Chameleon installer log - $( date )"
+if  [ $InstallBootloader = "1" ];then echo "$versionToInstall"; else echo "no boot session"; fi
+echo ""
+
+SCAN
+
+# (adjusted from Clover)
+if [ ! "${targetDevice#*disk*s}" ]; then
+    echo
+    echo "*** ERROR: Volume does not use slices!"
+    echo
+    exit 1
+fi
+
+if [ "${InstallToESP}" == "1" ]; then
+    echo "$mainLine"
+    echo "SEARCHING ESP PARTITION:"
+    case "$IOContent" in
+        GUID_partition_scheme)
+            echo "GPT partition Scheme detected.."
+            espDisk="${targetDisk}s1"
+            if [ $( LC_ALL=C diskutil info ${espDisk} | grep -i 'Partition Type:' | \
+                             awk '{print $NF}' | sed -e 's/^ *//' | sed -e 's/ *$//' ) = "EFI" ]; then
+                echo "EFI partition found is ${espDisk}, try to mount it.."
+                MOUNT_ESP
+            else
+                echo "EFI was not fount, continue installing to ${targetVolume}"
+                choicedVolume="${targetVolume}"
+            fi
+            ;;
+        *)
+            InstallToESP = "0"
+            echo "Can't install on the ESP, because does not exist.."
+            echo "..continue installing to ${targetVolume}"
+            ;;
+    esac
+else
+    SCAN
+fi
+
+# adding the chosen Volume dev id to the InstallConfig.plist
+/usr/libexec/PlistBuddy -c "Add :targetdev  string ${targetDevice}" $configFile
+
+BACKUP
+EXTRA
+
+echo "${mainLine}"
+CHECK_FAT16
+CHECK_WINDOWS
+case "$FS" in
+    hfs)
+        echo "${targetDevice} is HFS formatted"
+        if [ $WINDOWS_EXIST = "1" ];then stage0Loader="boot0hfs"; else stage0Loader="boot0"; fi
+        stage1Loader="${stage1LoaderHFS}"
+        ;;
+    msdos)
+        echo "${targetDevice} is FAT32 formatted"
+        if [ $WINDOWS_EXIST = "1" ];then stage0Loader="boot0md"; else stage0Loader="boot0"; fi
+        stage1Loader="${stage1LoaderFAT}"
+        ;;
+    exfat)
+        echo "${targetDevice} is ExFAT formatted"
+        stage0Loader="boot0"
+        stage1Loader="${stage1LoaderExFAT}"
+        ;;
+     *)
+        echo "FileSystem unsupported, aborting!"
+        exit 0
+        ;;
+esac
+
+# Debug mode: create a "DebugChameleon" folder on your Desktop to debug this script
+if [ -d "${HOME}/Desktop/DebugChameleon" ]; then DEBUG; fi
+# if the target device is equal to the boot device keep the Volume mounted using boot1-install
+if [ "${bootDevice}" = "${targetDevice}" ]; then opt="M"; fi
+
+WRITE_STAGE0 "${stage0Loader}"
+WRITE_STAGE1 "${stage1Loader}" "${FS}" "${opt}"
+if [ "${bootDevice}" != "${targetDevice}" ]; then REMOUNT; fi
+WRITE_STAGE2
+PARTITION_ACTIVE_IF
+
+echo "$mainLine"
+echo "END - ${TYPE} Post-Install Script"
+# --------------------------------------------------------------------------------------------------------
+
+exit 0

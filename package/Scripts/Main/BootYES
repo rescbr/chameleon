@@ -1,0 +1,8 @@
+#!/bin/bash
+
+configFile="/private/tmp/InstallConfig.plist"
+
+# adding option to declare that we are NOT installing the binary of the bootloader
+# to the InstallConfig.plist
+/usr/libexec/PlistBuddy -c "Add :bootloader bool true" ${configFile}
+

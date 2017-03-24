@@ -1,0 +1,37 @@
+#!/bin/bash
+
+set -u
+
+configFile='/private/tmp/InstallConfig.plist'
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
+
+moduleName="@moduleName@"
+moduleFile="@moduleFile@"
+logName="@LOG_FILENAME@"
+
+# Check if target volume exists
+if [[ ! -d "${v_mntpt}" ]]; then
+    echo "Ram Disk not found volume does not exist!" >&2
+#    exit 1
+fi
+
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+
+exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+echo "$mainLine"
+echo "Installing $moduleFile"
+echo "$subLine"
+
+if [[ -f  "${v_mntpt}/Extra/modules/$moduleFile" ]]; then
+    echo "$moduleName installed to Ram disk"
+else
+    echo "*** ERROR:$moduleName not installed"
+fi
+
+echo "$subLine"
+
+exit 0

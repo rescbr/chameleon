@@ -1,0 +1,228 @@
+- Micky1979 : Added support for Sierra
+- Zenith432 : HDA bus scans and codecs enumeration.
+- Pike R. Alpha : Add support for (LZVN) grey logo.
+- Slice : Added NvidiaSingle
+- cparm : Rock - Paper - Scissors algo
+- Bronya : Improve support for AMD CPU.
+- Bungo : Added "machine-signature"
+- Zenith432 : Protect timing code in scan_cpu() from interrupts, use bios for sleep()
+- Zenith432 : Fix setupChosenNode, Tweak asm.s
+- Zenith432 : Change identity snprintf to strncpy + misc printf issues
+- cparm : Implement strlcat()
+- Zenith432 : Sanitize 16-bit assembly
+- Zenith432 : Fix bug in malloc_init, use bios for enableA20()
+- meklort : Slightly improve decive selection name - add os version.
+- Zenith432 : Interrupt Management
+- Bungo : Added ability to auto-select last booted partition as the boot volume.
+- Bungo : Added MacOSVerCurrent and MacOSVer2Int function to use instead of macros.
+- Bungo : Fixed bug in gDarwinBuildVerStr extracting.
+- Bungo : Fixed fixedUUID function (convert.c smbios.c).
+- Bungo : Added Logging start time.
+- Bungo : Added getRTCdatetime() Int 1Ah function 02h - RTC service.
+- Zenith432 : Use caching with ExFat filesystem.
+- Zenith432 : Add turning off USB legacy for XHCI (XHCILegacyOff).
+- ErmaC : C6 & C7 States credits to Clover Team.
+- ErmaC : define recursive cpu series for BrandString.
+- Zenith432 : saio_types.h, biosfn.c - minor typo in bios-defined data structure that isn't actually used.
+fake_efi.c - eliminate redundant scan of bt(0,0) in setupSmbiosConfigFile.  loadConfigFile already does a fall-back scan of bt(0,0), so another scan isn't needed.
+sys.c - While scanning a volume, getOSVersion looks for 5 files and switches back-n-forth between hd(X,Y)/....SystemVersion.plist on the newly scanned volume and bt(0,0)/hd(X,Y)/...SystemVersion.plist - which is an invalid path - should always return an error.
+- Zenith432 : Change to disk.c - Prevent getOSVersion from looking for SystemVersion.plist on FAT32 or exFAT file systems - since those filesystems never serve as system volumes.
+UFS may serve as system volume, but there's no driver to read from it.
+Change to sys.c - Eliminate a dubious recursion in diskScanBootVolumes().  It recognises the filesystem, then calls getOSVersion, which attempts to open 5 files in order to find SystemVersion - then when parsing the device name - calls diskScanBootVolumes() - as a form of on-demand scanning.  This doesn't result in an infinite recursion - because the volume is already in the map.  However, this auto-scan is only useful if user enters an explicit hd(X,Y) device-spec that has never been scanned before - an unlikely occurrence.
+- Zenith432 : Patch from Issue 388, init_module_system() in modules.c dereferences NULL pointer
+- Zenith432 : Full implementation of exfat support for Chameleon's boot2 stage.
+- Micky1979 : Incorporated force umount option -u (boot1-install.c)
+- Zenith432 : Replace boot0 with boot0xg. Now boot0xg has all features of previous boot0. ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
+- Zenith432 : Completed patch for ExFAT support ( http://www.insanelymac.com/forum/topic/302938-exfat-volume-boot-record-for-chameleon )
+- Zenith432 : add EXFAT boot support by Zenith432
+- zenith432 : Merge patch from issue 386 (boot2 does not know how to read files from FAT partitions on GPT)
+- meklort : Update laoder.h to latest, declare gMI global, Load modules passed in via the multiboot header / first bootloader,
+		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
+- ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name
+- ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
+- ErmaC : Add more chameleon UI stuff (default) made by blackosx
+- ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
+- ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
+- bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
+- bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (MakeInc.dir)
+- bitshoveler : CacheInit(), CacheRead() prototypes: use u_int32_t instead of long where appropriate (saio_internal.h)
+- bitshoveler : Improved defensiveness against malloc failure (disk.c)
+- bitshoveler : Use u_int32_t instead of long where appropriate (cache.c)
+- bitshoveler : Make some constant arrays static; other minor fixes (acpi_patcher.c)
+- bitshoveler : Make 'buffer' arg to aml_add_buffer 'const char *', was just 'char *' (aml_generator)
+- bitshoveler : Various fixes to problems exposed by Clang static analyzer (picopng.c)
+- ErmaC : Rollback changes for msdos.c (2327) thx to bltz
+- bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (/i386/modules/MakeInc.dir) 
+- bitshoveler : Comment out some unused functions by expanding "#if UNUSED" conditional (stringTable.c)
+- bitshoveler : Comment out unused static functions, which cause build to fail in "release" mode (vbe.c)
+- bitshoveler : Fix null pointer handling (nvidia.c)
+- bitshoveler : Only write terminating null char if malloc succeeded (strndup.c)
+- bitshoveler : Fix memory leak (bdmesg.c)
+- ErmaC : (re)enable klibc module
+- ErmaC : Merge Recovery Icons(png) courtesy of blackosx
+- ErmaC : Merge Yosemite patch (ready from June 2014) Thanks all involved in the test and develop;
+		Special thanks: Alex J, viv xix, zenith432 from http://forge.voodooprojects.org/p/chameleon/issues/375/
+		Testing and improvements: Pike R. Alpha, ErmaC, Bungo, blackosx, Micky1979, crazybirdy, oldnapalm, janek202, MinusZwei and Andy Vandijck.
+
+- Pike R. Alpha : dynamic "random-seed" implementation ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- ErmaC : getCPUTick() helper function ( http://www.insanelymac.com/forum/topic/301350-lets-make-random-seed-really-random/ )
+- ErmaC : Add Yosemite Icons detection for chameleon UI
+- blackosx : Add chameleon UI Icons for Yosemite
+- ErmaC : Use macro instead of full checkOSVersion
+- viv xix : Move checkOSVersion into boot header
+- ErmaC : define macro for OS X Versions
+- Slice and Clover Team : Replace "NULL" terminated strings and fit Boot2 Sectors size
+- ErmaC : Update bootargs
+- crazybirdy : Fit length for "Loading Darwin"
+- meklort : Update align directives to 2^(old_align)
+- Ermac : Bump svn to 2.3
+- ErmaC : Update efi Header
+- cparm : buffer BPS
+- cparm : devprop_generate_string optimized by cparm
+- ErmaC : Update CPUID and change conditional logic.
+- ErmaC : Typo & ID names
+- meklort : Make compile on gcc w/ errors enabled.
+- bitshoveler : Remove the '-x' option from the offending 'ld' command
+- Jief : Makefile dependency missing for boot0 and boot1h
+- ErmaC : Temp disable klibc module
+- meklort : Silence output.
+- meklort : Add --no-print-directory.
+- meklort : Replace \t with tab.
+- ErmaC : Update Chameleon.xcodeproj
+- ErmaC : Merge LZVN decompression routine by MinusZwei (C Conversion) based on works from Pike R. Alpha and AnV Software (Andy Vandijck).
+- Bungo : Loading custom ECDT.aml, Darwin version string printing, clean boot-args, change firmware rev. to real Mac (0x0001000a), added  kernel-compatibility, boot-file, boot-args, machine-signature, random-seed DT properties & some minor changes.
+- ErmaC : Merge tja's patch http://forum.voodooprojects.org/index.php/topic,5951.0.html
+- bitshoveler : Optimized basic string functions strlen, strncmp, strncat, strcat
+- ErmaC : Replaced sprintf with snprintf in spd.c.
+- bitshoveler : Fixed inadvertent text buffer overflow in getDDRSerial
+- bitshoveler : optimize get_hda_controller_name()
+- Bungo : One of the changes as of rev2284 is boot option SystemId has now been deprecated. Instead use key SMsystemuuid in smbios.plist.
+- bitshoveler : Defend against buffer overruns
+- bitshoveler : Fix memory leak, defend against buffer overruns, add a check for malloc() failure
+- bitshoveler : getMemoryInfoString: defend against buffer overruns, change O(n^2) algorithm to O(n)
+- bitshoveler : Add closedir() to match opendir() call; relocate a malloc() call to fix a memory leak on error; better defense against buffer overruns
+- bitshoveler : Improve robustness against buffer overruns
+- bitshoveler : Add closedir() for every opendir() call, make more robust against buffer overruns
+- bitshoveler : Fix memory leak
+- bitshoveler : Fix cppcheck detected memory leak and error, make more robust against buffer overrun
+- bitshoveler : get_pci_dev_path: get rid of tmp buffer, use snprintf, improved O(n) algorithm instead of O(n^2) (whoopee); dump_pci_dt: hack fix for printf format string vs. args mismatch
+- bitshoveler : Fix memory leak; use snprintf instead of sprintf to make more robust
+- bitshoveler : Fix badly formed comment inside #ifdef
+- bitshoveler : setup_gma_devprop: fix memory leak
+- bitshoveler : setup_nhm: fix cppcheck error
+- bitshoveler : Correct cppcheck detected errors, make more robust against errors
+- bitshoveler : AllocateMemoryRange: fix cppcheck detected memory leak
+- bitshoveler : search_and_get_acpi_fd: fix pointer-to-temporary return problem; use snprintf instead of sprintf to prevent buffer overflows
+- bitshoveler : sym_expand_string_value(): fix cppcheck errors; more to be done here
+- bitshoveler : append_string(): fix cppcheck errors
+- bitshoveler : conf_write_autoconf(): fix cppcheck errors
+- bitshoveler : Fix memory leak for new_layout in main()
+- bitshoveler : Implement snprintf(); implement missing zero-fill in strncpy()
+- bitshoveler : Use original *BSD source for strlcpy()
+- ErmaC: Port from Enoch the support for IVY Bridge and Haswell Intel Graphics cards. http://www.insanelymac.com/forum/topic/288241-intel-hd4000-and-haswell-inject-aaplig-platform-id/
+- 2255: ErmaC add Skip flag key for Intel/nVidia/ATi from Enoch
+- 2252: revert define processors name to match with xnu kernel name 
+- 2252: Merge from Enoch the Geoff Seeley patch http://forge.voodooprojects.org/p/chameleon/issues/59/
+- 2251: bdmesg can show Chameleon and Clover boot logs
+- 2248: Infos about lack for 32/64 bit (Credits to Pike R. Alpha)
+- 2248: Fix issue booting x86 after rev.2175 (Credits to Bronxteck, Alex Burma and Leon).
+- 2245: ErmaC : Add new CPU Model IDs
+- 2245: Add boot support to 10.9 (thx old napalm)
+- 2245: ErmaC : Update gui Icons OS detection
+- 2245: Update default theme Icon set (thx BlackOsx)
+- 2243: Add Linux GPT Partition Label
+- 2234: Fix menuBVR initialization problem
+- Implement ErmaC's HDAEnabler.dylib module
+- Fix Bug in the loop that look for an ATI card. Credits to Jief Luce
+- Fix extension without kPropOSBundleRequired property weren't loaded. Credits to Jief Luce
+- Fix Revision mismatch http://forge.voodooprojects.org/p/chameleon/issues/330/
+- ErmaC : Improve PCI info. Interface program and device revision.
+- Fix Possible bug in i386/libsaio/device_inject.c devprop_add_device() http://forge.voodooprojects.org/p/chameleon/issues/319/
+- Fix warnings/errors from new llvm/clang (xcode 4.6)
+- Fix base64 decode, fixes Issue http://forge.voodooprojects.org/p/chameleon/issues/320/
+- meklort : FileNVRAM module import
+- cparm : Added a workaroud for Xcode 4.4.x compatibility 504B030414030100630004731141000000007D0000008B00000003000B0062696E01990700020041450308001AED80DA50DF6080B0390FE095B3BC129E1FC27C104EC97897EF27CD1175766CB18C66FF42EFB7023911BDFD5E4BC9AEEC32FF3473963F70B255581D7B74DE9F
+- cparm : Fixed a buffer overflow in the plist loader
+- cparm : Ported the nvidia plist helper (less time to spend on the device id more time to code :-) )
+- cparm : Added a Sata module, known as YellowIconFixer in my branch, useful to fix yellow icon issue (can also fix an issue with the apple's dvd player application in moutain lion)
+  , for now not added in the pkg script !!! 
+
+- cparm : Ported the OS detection to the trunk, updated the default theme to v 1.1 (credit to blackosx) 
+
+- Added AtiPorts option to GraphicsEnabler, so users can override the default number of ports. It proved
+  to be useful when used to limit the number of ports that a framebuffer registers, which seems to be a
+  requirement on laptops that can only use 2 ports at the same time.
+  Thanks to Akbar for testing and AniV also for the tip:
+    http://forum.voodooprojects.org/index.php/topic,1959.msg10402.html#msg10402
+- Added NVidia ION AHCI controllers dev id to AHCIPortInjector kext.
+  Forgot to mention source on the commit: http://forum.voodooprojects.org/index.php/topic,1170.0.html
+- Renamed com.apple.Boot.plist to org.chameleon.Boot.plist.
+- Added "ShowInfo" key (enabled by default for now), which enables/disables the display of
+  partition and resolution related info, on the Gui.
+  This info may not play well with some custom themes.
+- Modules can now be selected between not compiled, compiled into chameleon, or compiled as modules.
+- New makefile + configuration system.
+- Added the BOOT2_MAX_LENGTH constant in memory.h. This is now used in mboot.c to relocate the correct
+  number of bytes for boot2.
+- Added new ATi/AMD Graphics Card Enabler.
+- Added new SMBIOS patcher.
+	Includes changes to "manufacter" keys, from SM*manufacter to SM*manufacturer.
+- Added module system.
+- Added automatic P-States & C-States generation for native power management.
+- Added Booter Log Dump Tool
+- Added Booter message Logging (":/boot-log" ioreg property)
+- Removed -x32 option, use arch=i386 instead
+- Added automatic SMBusspeed detection for lga1156 core i5/7 cpus
+- Added new iMac11,1 sbios default model for lga1156 core i5/17 mobos
+- md0 code. Notified xnu when an md ramdisk is specified
+- Added rollover image support for selected device icons.
+  Use device_<type>_o.png in theme folder. Credits goes to Blackosx.
+- Revisited theme resource embedding. Using the device_<type> icons are optional with
+  the exception of device_generic.
+- Optimized memory detection speed
+- Added displaying source device and partition number for file read operations.
+- Increased boot2's maximum size from 383.5k to 447.5k.
+  Updated stage 1 loaders for handling the new size limit.
+- Added alternate format for setting the default partition. The user can specify the selected
+  volume UUID for the "Default Partition" key.
+- Implemented SPD memory automatic detection and injection,seems to work really great ...
+- Factorized code to prepare a dynamic memory detection algorithm ...
+- Optimized smbios table address search
+- Optimized cursor spinout in textmode if no verbose mode is set
+- Added ram table structures definitions
+- Added getSmbios() a param permitting to select between orig and new smbios entries
+- Changed "Default Partition" behavior to accept only native system volumes or foreign partitions.
+- Added NVIDIA new NVCAP customization support and support for ION gfx cards from aserebln
+- Added ATI new framebuffers support and new cards from PCEFI10.6
+- improved ACPI file search algo by implementing a cache.
+- Nvidia injection fix
+- pciroot would not always return correct UID in auto detection mode
+- Fixed the hibernation problem in boot2/resume.c
+- Fixed all new booter versions with SystemType would override the facp value even if correct,
+  now keeps the facp value if correct and no override has been done, implemented a best effort algo.
+  for maximizing the chance to get the most correct value before we decide to use a fixed value (1=desktop)
+- Fixed display cosmetics of UUID, now a convert.c file contains all 
+  conversions api, to be completed by function that we should reuse.
+  
+- Fixed SystemType would be always forced to a value, now optionally changed
+  only if overridden
+- Kept SystemID as the only option to change manually the system-id 
+  For theses reasons, SystemId from bootConfig and SMUUID from smbiosConfig are now DEPRECATED.
+
+- Integrated JrCs fadt patch (kept for RC5 the existing DSDT.aml  retry algo that disappeared in his patch,
+  should be more discussed for RC6)
+- Added JrCs modified convention name change to coding_standards
+- Now malloc (ex. MALLOC in Asere patch) is renamed malloc(size) and is an alias 
+  to safe_malloc(size, file, line) with _FILE_ and _LINE_ preprocessor definitions
+- Added a new 'Rename Partition Feature', now permitting to rename partition 
+  like 'System reserved' to a more meaningful name
+- Added SystemID option permitting to change the System UUID to a fixed value.
+- Added the PciRoot auto detection feature imported from pcefi10.5
+- Added automatic "system-id" injection from dmi bios, also compatible 
+  with SystemID boot option and former SMUUID from smbios,plist
+- Added "system-type' automatic injection (1=Desktop) plus override possibility 
+  with the new system-type option in bootConfig
+- Added SMserial and SMproductname new options for smbios.plist
+- Merged with asere patch, while keeping my fake_efi.c changes, and adding a new 
+  stringForKey() API, also changed the DT__XXXX() set of functions 
+  to handle const char * values instead of char*.

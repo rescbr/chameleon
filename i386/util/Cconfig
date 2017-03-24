@@ -1,0 +1,28 @@
+config BDMESG
+	bool "bdmesg utility"
+	default y
+	help
+	  Say Y here if you want to compile the bdmesg utility.
+	  bdmesg is used to dump any messages thrown during the
+	  chameleon boot sequence.
+	  When in doubt, say "Y".
+
+source "i386/util/fdisk/Cconfig"
+
+source "i386/util/boot1-install/Cconfig"
+
+config SECTORSIZE
+	bool "sectorsize utility"
+	default y
+	help
+	  Say Y here if you want to compile the sectorsize utility.
+	  sectorsize is used to detect the Physical and logical sector size of your hard disk.
+	  When in doubt, say "N".
+
+config OPENUP
+	bool "openUp utility"
+	default n
+	help
+	  Say Y here if you want to compile the openUp utility.
+	  openUp is used to set the "first-open-window" field of a volume.
+	  When in doubt, say "N".

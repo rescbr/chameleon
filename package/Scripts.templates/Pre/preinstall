@@ -1,0 +1,95 @@
+#!/bin/bash
+
+# Creates text file named '@LOG_FILENAME@'
+# at the root of the target volume. This is to give the user
+# a record of the installation process and also to show why
+# possibly the installation process failed (even though the
+# package installer ends reading 'Installation Successful').
+
+# This script also prepares the Ram Disk and the InstallConfig.plist
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+
+if [ "$3" == "/" ]
+then
+    targetVolume="/Volumes/"$( ls -1F /Volumes | sed -n 's:@$::p' )
+else
+    targetVolume="$3"
+fi
+
+v_mntpt="/Volumes/BOOTRAMDISK"
+size='409600' # is the size of a standard EFI partition
+logName="@LOG_FILENAME@"
+configFile="/private/tmp/InstallConfig.plist"
+
+# Functions to create/umount the RAM DISK
+UMOUNT_VDISK() {
+        umount -f "${1}"
+        hdiutil detach "${1}"
+}
+
+RAM_DISK() {
+    if [ $( df | awk '{$1=$2=$3=$4=$5=$6=$7=$8=""; print $0}' | \
+        sed -e 's/^ *//' | sed -e 's/ *$//' | grep -x "${v_mntpt}" ) ]; then
+        devToUmount=$( LC_ALL=C diskutil info "${v_mntpt}" | grep -i 'Device Node:' | awk '{print $3}' )
+        UMOUNT_VDISK $devToUmount
+    fi
+    echo "CREATING RAM DISK"
+#    mkdir -p $v_mntpt
+
+    dev=$(hdiutil attach -nomount ram://${size})
+    if [ $? -eq 0 ] ; then
+        diskutil erasevolume FAT32 "BOOTRAMDISK" ${dev}
+    else
+        echo "Failed to create the Ram Disk, installation aborted!"
+        exit 1
+    fi
+
+    dev=$( echo "${dev}" | tr -d " \t\n" )
+    rm -f $configFile
+    # adding the Ram disk device to InstallConfig.plist to be shared with other packages
+    /usr/libexec/PlistBuddy -c "Add :ramdisk  string ${dev}" $configFile
+}
+
+RAM_DISK
+
+# ensure that ram disk has "/Volumes/BOOTRAMDISK" mount point
+v_mntpt=$( LC_ALL=C diskutil info ${dev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                             sed -e 's/^ *//' | sed -e 's/ *$//' )
+if [ ! -d "${v_mntpt}" ]; then
+    echo "Ram Disk not found!"
+    exit
+fi
+
+touch "${v_mntpt}/${logName}"
+exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+echo "$mainLine"
+echo "SYSTEM INFO:"
+sw_vers
+echo "$mainLine"
+echo "Pre-Install Script"
+echo "$subLine"
+
+# creating a symlink (from Clover)
+echo "Creating ${targetVolume}/EXTRAROOTDIR symlink targeting ${v_mntpt}"
+ln -sf "${v_mntpt}" "${targetVolume}/EXTRAROOTDIR"
+
+# Preparing Backing up of Chameleon files
+backupRootDir="${targetVolume}/Chameleon.Backups"
+backupDir=$( date -j "+%F-%Hh%M" )
+
+# Create the backup directory
+mkdir -p "${backupRootDir}/${backupDir}"
+
+# Remove the invisible flag of files in the backups
+chflags -R nohidden "${backupRootDir}"
+
+# adding the backupdir name to InstallConfig.plist to be shared with other packages
+/usr/libexec/PlistBuddy -c "Add :backupDir  string ${backupDir}" $configFile >/dev/null
+
+diskutil list >> "${v_mntpt}/${logName}"
+echo "$subLine"
+echo "END - Pre-Install Script"
+
+exit 0

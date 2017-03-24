@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -u
+
+configFile='/private/tmp/InstallConfig.plist'
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
+themeName="@themeName@"
+themeDir="@themeDir@"
+logName="@LOG_FILENAME@"
+
+# Check if target volume exists
+if [[ ! -d "${v_mntpt}" ]]; then
+    echo "$v_mntpt volume does not exist!" >&2
+    exit 1
+fi
+
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+
+exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+echo "$mainLine"
+echo "Installing Theme $themeName"
+echo "$subLine"
+
+if [[ -d  "${v_mntpt}/Extra/Themes/$themeDir" ]]; then
+    echo "Theme $themeName installed"
+else
+    echo "*** ERROR:$themeName not installed"
+fi
+
+echo "$subLine"
+exit 0

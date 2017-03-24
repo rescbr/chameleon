@@ -1,0 +1,64 @@
+#!/bin/bash
+
+set -u
+
+configFile='/private/tmp/InstallConfig.plist'
+v_mntptDev=$( /usr/libexec/PlistBuddy -c "Print :ramdisk" ${configFile} )
+v_mntpt=$( LC_ALL=C diskutil info ${v_mntptDev} | grep -i 'mount point' | awk '{$1=$2=""; print $0}' | \
+                                                                    sed -e 's/^ *//' | sed -e 's/ *$//' )
+
+key="@optionKey@"
+value="@optionValue@"
+type="@optionType@"
+logName="@LOG_FILENAME@"
+
+# Check if target volume exists
+if [[ ! -d "$v_mntpt" ]]; then
+    echo "$v_mntpt volume does not exist!" >&2
+    exit 1
+fi
+
+mainLine="=============================================================================="
+subLine="------------------------------------------------------------------------------"
+
+exec > >(tee -a "${v_mntpt}/${logName}") 2>&1
+
+echo "$mainLine"
+echo "Writing boot option: ${key}=${value}"
+
+key="${key// /\\ }"     # Escape spaces
+value="${value// /\\ }" # Escape spaces
+
+bootPListFile="${v_mntpt}/Extra/org.chameleon.Boot.plist"
+
+case "$type" in
+    bool|text)
+          /usr/libexec/PlistBuddy -c "Add :${key} string ${value}" "$bootPListFile"
+          ;;
+    list)
+          current_values=$( /usr/libexec/PlistBuddy -c "Print :${key}" \
+           "$bootPListFile" 2>/dev/null )
+          result=$?
+          current_values="${current_values// /\\ }"    # Escape spaces
+          current_values="${current_values//\"/\\\"}"  # Escape double quotes
+
+          if [[ $result -eq 0 ]]; then
+              # Append our new values
+              if [[ "$current_values" = "" ]]; then
+                  new_values="${value}"
+              else
+                  new_values="${current_values}\ ${value}"
+              fi
+              /usr/libexec/PlistBuddy -c "Set :${key} ${new_values}" \
+               "$bootPListFile"
+          else
+              # Create a new option
+              new_values="${value}"
+              /usr/libexec/PlistBuddy -c "Add :${key} string ${new_values}" \
+               "$bootPListFile"
+          fi
+          ;;
+esac
+
+echo "$subLine"
+exit 0
