@@ -1236,6 +1236,7 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\tCores:                   %d\n",		p->CPU.NoCores);		// Cores
 	DBG("\tLogical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
 	DBG("\tFeatures:                0x%08x\n",	p->CPU.Features);
+//	DBG("\tMicrocode version:       %d\n",		p->CPU.MCodeVersion);		// CPU microcode version
 
 	verbose("\n");
 #if DEBUG_CPU

@@ -61,11 +61,13 @@ static uint8_t spd_mem_to_smbios[] =
 #define rdtsc(low,high) \
 __asm__ __volatile__("rdtsc" : "=a" (low), "=d" (high))
 
+// Intel SMB reg offsets
 #define SMBHSTSTS 0
 #define SMBHSTCNT 2
 #define SMBHSTCMD 3
 #define SMBHSTADD 4
 #define SMBHSTDAT 5
+#define SMBHSTDAT1 6
 #define SBMBLKDAT 7
 
 int spd_indexes[] = {

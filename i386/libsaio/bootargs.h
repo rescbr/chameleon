@@ -148,6 +148,7 @@ typedef struct boot_icon_element boot_icon_element;
 #define CSR_ALLOW_UNRESTRICTED_DTRACE		(1 << 5) /* Allow unrestricted dtrace */
 #define CSR_ALLOW_UNRESTRICTED_NVRAM		(1 << 6) /* Allow unrestricted NVRAM */
 #define CSR_ALLOW_DEVICE_CONFIGURATION		(1 << 7) /* Allow device configuration */
+#define CSR_DISABLE_BASESYSTEM_VERIFICATION	(1 << 8)
 
 #define CSR_VALID_FLAGS (CSR_ALLOW_UNTRUSTED_KEXTS | \
 		CSR_ALLOW_UNRESTRICTED_FS | \
@@ -156,7 +157,8 @@ typedef struct boot_icon_element boot_icon_element;
 		CSR_ALLOW_APPLE_INTERNAL | \
 		CSR_ALLOW_UNRESTRICTED_DTRACE | \
 		CSR_ALLOW_UNRESTRICTED_NVRAM | \
-		CSR_ALLOW_DEVICE_CONFIGURATION)
+		CSR_ALLOW_DEVICE_CONFIGURATION | \
+		CSR_DISABLE_BASESYSTEM_VERIFICATION)
 
 typedef struct boot_args
 {

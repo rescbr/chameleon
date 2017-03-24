@@ -102,6 +102,7 @@ struct devsw
 // Device entries must be ordered by bios device numbers. 
 static struct devsw devsw[] =
 {
+//	{ "sd", 0x80,	kBIOSDevTypeHardDrive }, /* DEV_SD */
 	{ "hd", 0x80,	kBIOSDevTypeHardDrive }, /* DEV_HD */
 	{ "en", 0xE0,	kBIOSDevTypeNetwork   }, /* DEV_EN */
 	{ "rd", 0x100,	kBIOSDevTypeHardDrive },

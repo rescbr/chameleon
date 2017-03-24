@@ -33,7 +33,8 @@ typedef union
 extern bool getProcessorInformationExternalClock(returnType *value);
 extern bool getProcessorInformationMaximumClock(returnType *value);
 extern bool getSMBOemProcessorBusSpeed(returnType *value);
-//extern bool getSMBOemPlatformFeature(returnType *value);
+extern bool getSMBOemPlatformFeature(returnType *value);
+//external bool getSMBOemSMCVersion(returnType *value);
 extern bool getSMBOemProcessorType(returnType *value);
 extern bool getSMBMemoryDeviceMemoryType(returnType *value);
 extern bool getSMBMemoryDeviceMemoryErrorHandle(returnType *value);
