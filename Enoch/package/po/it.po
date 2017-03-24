@@ -3600,7 +3600,7 @@ msgstr ""
 #~ msgstr "Intel Azul AAPL,ig-platform-id"
 
 #~ msgid "Set one AAPL,ig-platform-id to use for your Intel HD5000."
-#~ msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD5000."
+#~ msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 5000."
 
 #~ msgid "Set 0000260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
 #~ msgstr "Imposta l'AAPL,ig-platform-id a 0000260c per schede grafiche Intel HD5000 (Mobile)."

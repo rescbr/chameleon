@@ -35,6 +35,7 @@
  * from similar ntfs.c funcs as fallback (if not NTFS, maybe it's EXFAT).
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "sl.h"
 
@@ -42,9 +43,6 @@
 #pragma mark Preprocessor Definitions
 #pragma mark -
 
-#ifndef DEBUG_EXFAT
-	#define DEBUG_EXFAT 0
-#endif
 
 #if DEBUG_EXFAT
 	#define DBG(x...)		printf(x)

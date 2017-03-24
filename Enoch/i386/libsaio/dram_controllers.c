@@ -13,15 +13,12 @@
  * http://www.canardpc.com - http://www.memtest.org
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "platform.h"
 #include "dram_controllers.h"
-
-#ifndef DEBUG_DRAM
-	#define DEBUG_DRAM 0
-#endif
 
 #if DEBUG_DRAM
 	#define DBG(x...) printf(x)

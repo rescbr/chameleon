@@ -5,6 +5,7 @@
  *	Cleaned and merged by iNDi
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
@@ -12,10 +13,6 @@
 #include "pci_root.h"
 #include "device_inject.h"
 #include "convert.h"
-
-#ifndef DEBUG_INJECT
-	#define DEBUG_INJECT 0
-#endif
 
 #if DEBUG_INJECT
 	#define DBG(x...)	printf(x)

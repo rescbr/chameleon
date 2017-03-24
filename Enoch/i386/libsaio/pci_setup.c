@@ -1,12 +1,9 @@
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "pci.h"
 #include "modules.h"
-
-#ifndef DEBUG_PCI_SETUP
-	#define DEBUG_PCI_SETUP 0
-#endif
 
 #if DEBUG_PCI_SETUP
 	#define DBG(x...)	printf(x)

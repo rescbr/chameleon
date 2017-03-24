@@ -2,6 +2,8 @@
  * Copyright 2010-2015 Evan Lojewski. All rights reserved.
  *
  */
+
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "modules.h"
@@ -12,10 +14,6 @@
 #include <string.h>
 
 #ifdef CONFIG_MODULES
-#ifndef CONFIG_MODULE_DEBUG
-#define CONFIG_MODULE_DEBUG 0
-#endif
-
 
 #if CONFIG_MODULE_DEBUG
 #define DBG(x...)	printf(x)

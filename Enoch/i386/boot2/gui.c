@@ -8,14 +8,11 @@
  *
  */
 
+#include "config.h"
 #include "gui.h"
 #include "term.h"
 #include "appleboot.h"
 #include "vers.h"
-
-#ifndef DEBUG_GUI
-	#define DEBUG_GUI 0
-#endif
 
 #if DEBUG_GUI
 	#define DBG(x...)	printf(x)

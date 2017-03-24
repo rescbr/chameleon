@@ -6,6 +6,7 @@
  * System profiler fix and other fixes by Mozodojo.
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "pci.h"
 #include "platform.h"
@@ -14,10 +15,6 @@
 #include "saio_internal.h"
 #include "bootstruct.h"
 #include "memvendors.h"
-
-#ifndef DEBUG_SPD
-	#define DEBUG_SPD 0
-#endif
 
 #if DEBUG_SPD
 	#define DBG(x...)	printf(x)
