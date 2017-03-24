@@ -261,6 +261,7 @@
 		36EBBF3A1A5D704000E30561 /* text_scroll_prev.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = text_scroll_prev.png; sourceTree = "<group>"; };
 		36EBBF3B1A5D704000E30561 /* theme.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = theme.plist; sourceTree = "<group>"; };
 		36EBBF3C1A5D704000E30561 /* thumb.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = thumb.png; sourceTree = "<group>"; };
+		547C2FA41E8593810051CFCF /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		6DBAFD1313B0D21E0047ED33 /* modules_support.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = modules_support.s; sourceTree = "<group>"; };
 		6DBAFD1413B0D21E0047ED33 /* modules.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = modules.c; sourceTree = "<group>"; };
 		6DBAFD1513B0D21E0047ED33 /* modules.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modules.h; sourceTree = "<group>"; };
@@ -3161,6 +3162,7 @@
 				B0056CF711F3868000754B65 /* boot.h */,
 				B0056CF811F3868000754B65 /* boot2.s */,
 				B4189A0214BFBE9E00ED5B0B /* Cconfig */,
+				547C2FA41E8593810051CFCF /* config.h */,
 				B0056CF911F3868000754B65 /* drivers.c */,
 				B0056CFA11F3868000754B65 /* graphic_utils.c */,
 				B0056CFB11F3868000754B65 /* graphic_utils.h */,
