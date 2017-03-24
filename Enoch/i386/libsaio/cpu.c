@@ -587,27 +587,27 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_CLARKDALE: // Intel Core i3, i5, i7 LGA1156 (32nm)
 				case CPUID_MODEL_NEHALEM_EX:
 				case CPUID_MODEL_JAKETOWN:
-				case CPUID_MODEL_SANDYBRIDGE:   // 0x2A
-				case CPUID_MODEL_IVYBRIDGE:     // 0x3A
-				case CPUID_MODEL_IVYBRIDGE_XEON:// 0x3E
-				case CPUID_MODEL_HASWELL_U5:    // 0x3D
-				case CPUID_MODEL_HASWELL:       // 0x3C
-				case CPUID_MODEL_HASWELL_SVR:   // 0x3F
-				case CPUID_MODEL_HASWELL_ULT:   // 0x45
-				case CPUID_MODEL_HASWELL_ULX:   // 0x46
-				case CPUID_MODEL_BROADWELL_HQ:  // 0x47
-				case CPUID_MODEL_BRASWELL:	// 0x4C
-				case CPUID_MODEL_AVOTON:        // 0x4D
-				case CPUID_MODEL_SKYLAKE:       // 0x4E
-				case CPUID_MODEL_BRODWELL_SVR:  // 0x4F
-				case CPUID_MODEL_BRODWELL_MSVR: // 0x56
-				case CPUID_MODEL_KNIGHT:        // 0x57
-				case CPUID_MODEL_ANNIDALE:      // 0x5A
-				case CPUID_MODEL_GOLDMONT:      // 0x5C
-				case CPUID_MODEL_VALLEYVIEW:    // 0x5D
-				case CPUID_MODEL_SKYLAKE_S:     // 0x5E
-				case CPUID_MODEL_SKYLAKE_AVX:   // 0x55
-				case CPUID_MODEL_CANNONLAKE:    // 0x66
+				case CPUID_MODEL_SANDYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE:
+				case CPUID_MODEL_IVYBRIDGE_XEON:
+				case CPUID_MODEL_HASWELL_U5:
+				case CPUID_MODEL_HASWELL:
+				case CPUID_MODEL_HASWELL_SVR:
+				case CPUID_MODEL_HASWELL_ULT:
+				case CPUID_MODEL_HASWELL_ULX:
+				case CPUID_MODEL_BROADWELL_HQ:
+				case CPUID_MODEL_BRASWELL:
+				case CPUID_MODEL_AVOTON:
+				case CPUID_MODEL_SKYLAKE:
+				case CPUID_MODEL_BRODWELL_SVR:
+				case CPUID_MODEL_BRODWELL_MSVR:
+				case CPUID_MODEL_KNIGHT:
+				case CPUID_MODEL_ANNIDALE:
+				case CPUID_MODEL_GOLDMONT:
+				case CPUID_MODEL_VALLEYVIEW:
+				case CPUID_MODEL_SKYLAKE_S:
+				case CPUID_MODEL_SKYLAKE_AVX:
+				case CPUID_MODEL_CANNONLAKE:
 					msr = rdmsr64(MSR_CORE_THREAD_COUNT); // 0x35
 					p->CPU.NoCores		= (uint32_t)bitfield((uint32_t)msr, 31, 16);
 					p->CPU.NoThreads	= (uint32_t)bitfield((uint32_t)msr, 15,  0);

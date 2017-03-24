@@ -5,8 +5,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.3\n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
+"Project-Id-Version: Chameleon 2.4\n"
+"POT-Creation-Date: 2015-11-02 15:03+0000\n"
 "PO-Revision-Date: 2015-02-13 18:19-0000\n"
 "Last-Translator: ErmaC <ErmaC@insanelymac.com>\n"
 "Language-Team: cs <cs@li.org>\n"
