@@ -233,7 +233,7 @@ static int ExecKernel(void *binary)
 	// verbose mode.
 	if (gVerboseMode)
 	{
-		setVideoMode(GRAPHICS_MODE, 0);
+		setVideoMode( GRAPHICS_MODE );
 	}
 	else
 	{
@@ -1057,7 +1057,7 @@ void common_boot(int biosdev)
 		// if we are already in graphics-mode,
 		if (getVideoMode() == GRAPHICS_MODE)
 		{
-			setVideoMode(VGA_TEXT_MODE, 0); // switch back to text mode.
+			setVideoMode( VGA_TEXT_MODE ); // switch back to text mode.
 		}
 	}
 

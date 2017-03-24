@@ -1037,7 +1037,7 @@ int initGUI(void)
 								// lets copy the screen into the back buffer
 								memcpy( gui.backbuffer->pixels, gui.screen.pixmap->pixels, gui.backbuffer->width * gui.backbuffer->height * 4 );
 
-								setVideoMode( GRAPHICS_MODE, 0 );
+								setVideoMode( GRAPHICS_MODE );
 
 								gui.initialised = true;
 								return 0;
@@ -2417,7 +2417,7 @@ void drawBootGraphics(void)
 	// Set graphics mode if the booter was in text mode or the screen resolution has changed.
 	if (bootArgs->Video.v_display == VGA_TEXT_MODE || (screen_params[0] != oldScreenWidth && screen_params[1] != oldScreenHeight) )
 	{
-		setVideoMode(GRAPHICS_MODE, 0);
+		setVideoMode(GRAPHICS_MODE );
 	}
 
 	if (getValueForKey("-checkers", &dummyVal, &length, &bootInfo->chameleonConfig))
@@ -2426,8 +2426,16 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		// Fill the background to 75% grey (same as BootX).
-		drawColorRectangle(0, 0, screen_params[0], screen_params[1], 0x01);
+		if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+		{
+			// BlackMode
+			setBackgroundColor(0xff030000);
+		}
+		else
+		{
+			// Fill the background to 75% grey (same as BootX).
+			setBackgroundColor(0xffbfbfbf);
+		}
 	}
 
 	if ((bootImageData) && (usePngImage))
@@ -2440,25 +2448,34 @@ void drawBootGraphics(void)
 	}
 	else
 	{
-		uint8_t *appleBootPict;
-		bootImageData = NULL;
-		bootImageWidth = kAppleBootWidth;
-		bootImageHeight = kAppleBootHeight;
-
-		// Prepare the data for the default Apple boot image.
-		appleBootPict = (uint8_t *) decodeRLE(gAppleBootPictRLE, kAppleBootRLEBlocks, bootImageWidth * bootImageHeight);
-		if (appleBootPict)
-		{
-			convertImage(bootImageWidth, bootImageHeight, appleBootPict, &bootImageData);
-			if (bootImageData)
-			{
-				x = (screen_params[0] - MIN(kAppleBootWidth, screen_params[0])) / 2;
-				y = (screen_params[1] - MIN(kAppleBootHeight, screen_params[1])) / 2;
-				drawDataRectangle(x, y, kAppleBootWidth, kAppleBootHeight, bootImageData);
-				free(bootImageData);
-			}
-			free(appleBootPict);
-		}
+		// Standard size (Width 84 Height 103)
+		// TODO HiDPI size (Width 168 Height 206)
+		// So still need to probe and assign HiDPIOption properly
+		chooseLogoMode();
 	}
 }
 // ====================================================================
+void chooseLogoMode()
+{
+	int logoWith	= HiDPIOption ? (APPLE_LOGO_WIDTH * 2) : APPLE_LOGO_WIDTH;
+	int logoHeight	= HiDPIOption ? (APPLE_LOGO_HEIGHT * 2) : APPLE_LOGO_HEIGHT;
+	int logoX	= HiDPIOption ? APPLE_LOGO_2X_X : APPLE_LOGO_X;
+	int logoY	= HiDPIOption ? APPLE_LOGO_2X_Y : APPLE_LOGO_Y;
+	int logoSize	= ( logoWith * logoHeight );
+
+	void *dst = malloc(logoSize);
+
+	void *logoData = ( FlagBlackOption ? (void *)AppleLogoBlackPacked : (void *)AppleLogoPacked );
+	uint32_t src_size = ( FlagBlackOption ? sizeof(AppleLogoBlackPacked) : sizeof(AppleLogoPacked) );
+
+	if (dst)
+	{
+		if (lzvn_decode(dst, logoSize, logoData, src_size) == logoSize)
+		{
+			uint8_t *bootImageData = NULL;
+			convertImage(logoWith, logoHeight, dst, &bootImageData);
+			drawDataRectangle(logoX, logoY, logoWith, logoHeight, bootImageData);
+		}
+		free(dst);
+	}
+}
