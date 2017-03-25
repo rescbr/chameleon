@@ -28,7 +28,7 @@ CPPFLAGS := $(CPPFLAGS) -nostdinc++
 INC = -I. -I$(SRCROOT) -I$(SYMROOT) -I$(LIBSADIR) -I$(BOOT2DIR) -I${SRCROOT}/i386/include
 
 SAIO_OBJS = table.o asm.o bios.o biosfn.o \
-	disk.o sys.o cache.o bootstruct.o \
+	binaryPatcher.o disk.o sys.o cache.o bootstruct.o \
 	stringTable.o load.o pci.o allocate.o misc.o \
 	befs.o freebsd.o openbsd.o \
 	vbe.o nbp.o hfs.o hfs_compare.o \

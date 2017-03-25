@@ -56,7 +56,7 @@
 #include "platform.h"
 #include "modules.h"
 #include "device_tree.h"
-
+#include "xml.h" 
 
 #if DEBUG_BOOT2
 	#define DBG(x...)	printf(x)
