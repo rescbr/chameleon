@@ -1075,10 +1075,24 @@ void common_boot(int biosdev)
 //
 void setupBooterArgs()
 {
-	bool KPRebootOption	= false;
-	bool HiDPIOption	= false;
-	bool FlagBlackOption	= false;
+	bool KPRebootOption	= false; // I don't want this by default ( It makes me angry because I do not see the reason for the panic)+
+//	bool HiDPIOption	= false; // (Disabled by default) 10.8+
+//	bool FlagBlackOption	= false; // (Disabled by default) 10.10+
 
+	// OS X Lion 10.7
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.7") ) // Lion and Up!
+	{
+		// Pike R. Alpha: Adding a 16 KB log space.
+		bootArgs->performanceDataSize		= 0;
+		bootArgs->performanceDataStart		= 0;
+
+		// Pike R. Alpha: AppleKeyStore.kext
+		bootArgs->keyStoreDataSize		= 0;
+		bootArgs->keyStoreDataStart		= 0;
+
+		bootArgs->bootMemSize			= 0;
+		bootArgs->bootMemStart			= 0;
+	}
 
 	// OS X Mountain Lion 10.8
 	if ( MacOSVerCurrent >= MacOSVer2Int("10.8") ) // Mountain Lion and Up!
@@ -1183,6 +1197,7 @@ void csrInfo(int csrValue, bool custom)
 		verbose("DTrace Restrictions: %s\n", ((csrValue & 0x20) == 0) ? "enabled":"disabled");    /* (1 << 5) Allow unrestricted dtrace */
 		verbose("NVRAM Protections: %s\n", ((csrValue & 0x40) == 0) ? "enabled":"disabled");      /* (1 << 6) Allow unrestricted NVRAM */
 //		verbose("DEVICE configuration: %s\n", ((csrValue & 0x80) == 0) ? "enabled":"disabled");   /* (1 << 7) Allow device configuration */
+//		verbose("Disable BaseSystem Verification: %s\n", ((csrValue & 0x100) == 0) ? "enabled":"disabled");   /* (1 << 8) Disable BaseSystem Verification */
 	}
 	verbose("\n");
 }
@@ -1248,7 +1263,8 @@ unsigned long Adler32(unsigned char *buf, long len)
 	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
 	unsigned long result;
 
-	while (len > 0) {
+	while (len > 0)
+	{
 		k = len < NMAX ? len : NMAX;
 		len -= k;
 		while (k >= 16)

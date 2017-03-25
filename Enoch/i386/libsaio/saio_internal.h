@@ -131,7 +131,7 @@ extern void utf_decodestr(const u_int8_t *utf8p, u_int16_t *ucsp,
 /* load.c */
 extern bool gHaveKernelCache;
 extern long ThinFatFile(void **binary, unsigned long *length);
-extern long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize);
+extern long DecodeMachO(void *binary, u_int32_t uncompressed_size, entry_t *rentry, char **raddr, int *rsize);
 
 /* memory.c */
 long AllocateKernelMemory( long inSize );

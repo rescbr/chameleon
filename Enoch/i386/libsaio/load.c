@@ -38,7 +38,7 @@
 #endif
 
 // Private functions.
-static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
+static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *load_size, void *binary, u_int32_t uncompressed_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);
 
@@ -109,7 +109,7 @@ long ThinFatFile(void **binary, unsigned long *length)
 
 //==============================================================================
 
-long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
+long DecodeMachO(void *binary, u_int32_t uncompressed_size, entry_t *rentry, char **raddr, int *rsize)
 {
 	struct mach_header *mH;
 	unsigned long  ncmds, cmdBase, cmd, cmdsize, cmdstart;
@@ -185,7 +185,7 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 		{
 			case LC_SEGMENT:
 			case LC_SEGMENT_64:
-			ret = DecodeSegment(cmdBase, &load_addr, &load_size);
+			ret = DecodeSegment(cmdBase, &load_addr, &load_size, binary, uncompressed_size);
 
 			if (ret == 0 && load_size != 0 && load_addr >= KERNEL_ADDR)
 			{
@@ -208,7 +208,6 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 #endif
 			break;
 		}
-
 
 	if (ret != 0)
 	{
@@ -247,26 +246,26 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 //==============================================================================
 // Private function.
 
-
-static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *load_size)
+static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *load_size, void *binary, u_int32_t uncompressed_size)
 {
 	char *segname;
 	long   vmsize, filesize;
-	unsigned long vmaddr, fileaddr;
+	unsigned long vmaddr, fileoff, fileaddr;
 
 	if (((long *)cmdBase)[0] == LC_SEGMENT_64)
 	{
 		struct segment_command_64 *segCmd;
-		segCmd = (struct segment_command_64 *)cmdBase;
-		vmaddr = (segCmd->vmaddr & 0x3fffffff);
-		vmsize = segCmd->vmsize;
+		segCmd   = (struct segment_command_64 *)cmdBase;
+		vmaddr   = (segCmd->vmaddr & 0x3fffffff);
+		vmsize   = segCmd->vmsize;
+		fileoff  = segCmd->fileoff;
 		fileaddr = (gBinaryAddress + segCmd->fileoff);
 		filesize = segCmd->filesize;
-		segname = segCmd->segname;
+		segname  = (char *)segCmd->segname;
 
 #ifdef DEBUG
-	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize,
+	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, fileaddr: %x, filesize: %x, nsects: %d, flags: %x.\n",
+		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, segCmd->fileoff, (unsigned)fileaddr, (unsigned)filesize,
 		(unsigned) segCmd->nsects, (unsigned)segCmd->flags);
 	getchar();
 #endif
@@ -275,17 +274,19 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	{
 		struct segment_command *segCmd;
 
-		segCmd = (struct segment_command *)cmdBase;
+		segCmd   = (struct segment_command *)cmdBase;
 
-		vmaddr = (segCmd->vmaddr & 0x3fffffff);
-		vmsize = segCmd->vmsize;
+		vmaddr   = (segCmd->vmaddr & 0x3fffffff);
+		vmsize   = segCmd->vmsize;
+		fileoff  = segCmd->fileoff;
 		fileaddr = (gBinaryAddress + segCmd->fileoff);
 		filesize = segCmd->filesize;
-		segname = segCmd->segname;
+		segname  = (char *)segCmd->segname;
 
 #ifdef DEBUG
-	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, filesize: %x, nsects: %d, flags: %x.\n",
-		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, (unsigned)fileaddr, (unsigned)filesize, (unsigned) segCmd->nsects, (unsigned)segCmd->flags);
+	printf("segname: %s, vmaddr: %x, vmsize: %x, fileoff: %x, fileaddr: %x, filesize: %x, nsects: %d, flags: %x.\n",
+		segCmd->segname, (unsigned)vmaddr, (unsigned)vmsize, segCmd->fileoff, (unsigned)fileaddr, (unsigned)filesize,
+		(unsigned) segCmd->nsects, (unsigned)segCmd->flags);
 	getchar();
 #endif
 	}

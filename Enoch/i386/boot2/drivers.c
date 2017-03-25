@@ -198,10 +198,10 @@ long LoadDrivers( char *dirSpec )
 			strcpy(dirSpecExtra, "rd(0,0)/Extra/");
 			FileLoadDrivers(dirSpecExtra, 0);
 		}
-		verbose("Attempting to loading drivers from \"Extra\" repository:\n");
+		// verbose("Attempting to loading drivers from \"Extra\" repository:\n");
 
 		// =====================================================================
-		// Firstly try to load drivers from Common folder
+		// Secondly try to load drivers from Common folder
 		sprintf(dirSpecExtra, "bt(0,0)/Extra/Common/");
 		FileLoadDrivers(dirSpecExtra, 0);
 		// =====================================================================
@@ -670,12 +670,12 @@ long LoadMatchedModules( void )
 				fileName = prop->string;
 				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
 
-				length = LoadThinFatFile(gFileSpec, &executableAddr);
-				if (length == 0)
-				{
-					length = LoadFile(gFileSpec);
-					executableAddr = (void *)kLoadAddr;
-				}
+					length = LoadThinFatFile(gFileSpec, &executableAddr);
+					if (length == 0)
+					{
+						length = LoadFile(gFileSpec);
+						executableAddr = (void *)kLoadAddr;
+					}
 //				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
 			}
 			else
@@ -686,7 +686,7 @@ long LoadMatchedModules( void )
 			if ((length != -1) && executableAddr)
 			{
 				// Make make in the image area.
-                
+
 				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
 
 				driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
@@ -864,11 +864,11 @@ static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
 
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
 
-	if ( (required == 0) || (required->type != kTagTypeString) || !strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
-	{
-		XMLFreeTag(moduleDict);
-		return -2;
-	}
+		if ( (required == 0) || (required->type != kTagTypeString) || !strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
+		{
+			XMLFreeTag(moduleDict);
+			return -2;
+		}
 
 	tmpModule = malloc(sizeof(Module));
 	if (tmpModule == 0)
@@ -1227,15 +1227,11 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 /* ================================================================ */
 
-	// Entry point
-
-/* ================================================================ */
-
-	ret = DecodeMachO(binary, rentry, raddr, rsize);
+	ret = DecodeMachO(binary, uncompressed_size, rentry, raddr, rsize);
 	if (ret < 0 && archCpuType == CPU_TYPE_X86_64)
 	{
 		archCpuType = CPU_TYPE_I386;
-		ret = DecodeMachO(binary, rentry, raddr, rsize);
+		ret = DecodeMachO(binary, uncompressed_size, rentry, raddr, rsize);
 	}
 
 	return ret;

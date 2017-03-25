@@ -592,25 +592,6 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 		}
 	}
 
-
-	/***** false ****/
-	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
-	{
-		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
-	}
-
-	/***** true ****/
-	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
-	{
-		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
-	}
-
-	/***** plist ****/
-
-
-	/***** dict ****/
-
-
 	/***** data ****/
 	else if (!strncmp(tagName, kXMLTagData, sizeof(kXMLTagData)))
 	{
@@ -631,6 +612,19 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagDate(buffer + pos, tag);
 	}
+
+	/***** false ****/
+	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
+	{
+		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
+	}
+
+	/***** true ****/
+	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
+	{
+		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
+	}
+
 	/***** array ****/
 	else if (!strncmp(tagName, kXMLTagArray, sizeof(kXMLTagArray) ))
 	{
