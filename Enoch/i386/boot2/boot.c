@@ -699,7 +699,7 @@ void common_boot(int biosdev)
 	}
 
 	// Create a separated bvr chain using the specified filters.
-	bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+	bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount, false);
 
 	gBootVolume = selectBootVolume(bvChain);
 
@@ -764,7 +764,7 @@ void common_boot(int biosdev)
 					rescanBIOSDevice(gBIOSDev);
 				}
 
-				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
+				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount, false);
 				setBootGlobals(bvChain);
 				setupDeviceList(&bootInfo->themeConfig);
 			}

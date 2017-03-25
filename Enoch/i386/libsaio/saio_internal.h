@@ -112,7 +112,7 @@ extern int    diskRead(BVRef bvr, long addr, long length);
 extern int    diskIsCDROM(BVRef bvr);
 extern int    biosDevIsCDROM(int biosdev);
 extern BVRef  getBVChainForBIOSDev(int biosdev);
-extern BVRef  newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count);
+extern BVRef  newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count, bool sch);
 extern int    freeFilteredBVChain(const BVRef chain);
 extern int    rawDiskRead(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);
 extern int    rawDiskWrite(BVRef bvr, unsigned int secno, void *buffer, unsigned int len);

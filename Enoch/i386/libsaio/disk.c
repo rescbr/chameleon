@@ -2207,7 +2207,7 @@ BVRef getBVChainForBIOSDev(int biosdev)
 }
 
 //==============================================================================
-BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count)
+BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count, bool sch)
 {
 	BVRef chain = NULL;
 	BVRef bvr = NULL;
@@ -2220,7 +2220,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 	const char *raw = 0;
 	char* val = 0;
 	int len;
-    
+
 	getValueForKey(kHidePartition, &raw, &len, &bootInfo->chameleonConfig);
 	if(raw)
 	{
