@@ -15,7 +15,9 @@
 
 ////////////////////////////////// drivers.c
 
-//////////////////////////////////
+////////////////////////////////// kernel_patcher.c
+#define DEBUG_KERNEL 0		// 0 mean NO show verbose message, 1 mean YES show verbose message
+#define KEXTPATCH_SUPPORT 0	// 1 enabled by default
 
 ////////////////////////////////// hpet.c
 #define DEBUG_HPET 0

@@ -45,7 +45,7 @@ OTHER_FILES =
 OBJS = boot2.o boot.o graphics.o \
 	drivers.o prompt.o options.o \
 	lzss.o lzvn.o mboot.o \
-	ramdisk.o \
+	ramdisk.o kernel_patcher_internal.o \
 	picopng.o resume.o \
 	bmdecompress.o graphic_utils.o gui.o \
 	modules.o \

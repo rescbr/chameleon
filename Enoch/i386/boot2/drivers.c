@@ -33,11 +33,13 @@
 #include <libkern/OSByteOrder.h>
 #include <mach/machine.h>
 
+#include "config.h"
 #include "sl.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "xml.h"
 #include "ramdisk.h"
+#include "kernel_patcher_internal.h"
 #include "modules.h"
 
 #if DEBUG
@@ -102,6 +104,7 @@ long LoadMatchedModules(void);
 
 static long MatchPersonalities(void);
 static long MatchLibraries(void);
+
 #ifdef NOTDEF
 	static ModulePtr FindModule(char *name);
 	static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
@@ -215,8 +218,6 @@ long LoadDrivers( char *dirSpec )
 			strcpy(dirSpecExtra, "rd(0,0)/Extra/");
 			FileLoadDrivers(dirSpecExtra, 0);
 		}
-		// verbose("Attempting to loading drivers from \"Extra\" repository:\n");
-
 		// =====================================================================
 		// Secondly try to load drivers from Common folder if in use
 		if (gUseCommonAndOSdir)
@@ -691,6 +692,7 @@ long LoadMatchedModules( void )
 	DriverInfoPtr	driver;
 	long		length, driverAddr, driverLength;
 	void		*executableAddr = 0;
+	void		*embedded = 0;
 
 	module = gModuleHead;
 
@@ -767,6 +769,10 @@ long LoadMatchedModules( void )
 		module = module->nextModule;
 	}
 
+	if(embedded)
+	{
+		free(embedded);
+	}
 	return 0;
 }
 

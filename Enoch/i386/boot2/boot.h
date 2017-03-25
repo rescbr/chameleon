@@ -212,9 +212,56 @@
 #define kDropAPIC			"DropAPIC"			/* acpi_patcher.c */
 #define kCsrActiveConfig		"CsrActiveConfig"		/* boot.c */
 #define kProductBuildVersion		"ProductBuildVersion"		/* boot.c */
+#define kKERNELKey			"KERNELPlist"			/* kernel_patcher.c */
+#define kKEXTKey			"KEXTPlist"			/* kext_patcher.c */
+
+/*
+ * Kernel Patcher (internal)
+ */
+#define kSkipKernelPatcher  "SkipKP"			/* drivers.c */
+#define kKernelPm           "KernelPm"			/* kernel_patcher.c */
+#define kKernelLapicError   "KernelLapicError"		/* kernel_patcher.c */
+#define kKernelLapicVersion "KernelLapicVersion"	/* kernel_patcher.c */
+#define kKernelHaswell      "KernelHaswell"		/* kernel_patcher.c */
+#define kKernelcpuFamily    "KernelcpuFamily"		/* kernel_patcher.c */
+#define kKernelSSE3         "KernelSSE3"		/* kernel_patcher.c */
+#define kKernelBooter_kexts "KernelBooter_kexts"	/* kernel_patcher.c */
+
+// Here we define our Kernel.plist
+#define KERNELPlist         &bootInfo->kernelConfig
 
 uint32_t kernelOSVer; /* boot.c */
 
+bool skipKernelPatcher;
+bool KernelPm;              // disable by default
+bool KernelLapicError;      // disable by default
+bool KernelLapicVersion;    // disable by default
+bool KernelHaswell;         // disable by default
+bool KernelcpuFamily;       // disable by default
+
+bool KernelSSE3;            // disable by default
+bool KernelBooter_kexts;    // disable by default
+
+/*
+ * Kext Patcher (internal)
+ */
+#define kSkipKextsPatcher	"SkipKextsPatcher"		/* drivers.c */
+#define kAICPMPatch		"AICPMPatch"			/* kernel_patcher.c */
+#define kAppleRTCPatch		"AppleRTCPatch"			/* kernel_patcher.c */
+#define kOrangeIconFixSata	"OrangeIconFixSata"		/* kernel_patcher.c */
+#define kTrimEnablerSata	"TrimEnablerSata"		/* kernel_patcher.c */
+#define kNVIDIAWebDrv		"NVIDIAWebDrv"			/* kernel_patcher.c */
+#define kAppleHDABinPatch	"AppleHDABinPatch"		/* kernel_patcher.c */ /* autopatcher to be implemented */
+
+// Here we define our kext.plist
+#define KEXTPlist         &bootInfo->kextConfig
+
+bool skipKextsPatcher;
+bool AICPMPatch;         // disable by default
+bool OrangeIconFixSata;  // disable by default
+bool TrimEnablerSata;    // disable by default
+bool NVIDIAWebDrv;       // disable by default
+bool AppleRTCPatch;      // disable by default
 
 /* Pike R. Alpha: added this key */
 #define kBlackMode			"BlackMode"
@@ -319,7 +366,7 @@ int gDarwinMajor;
 int gDarwinMinor;
 int gDarwinRev;
 bool useDarwinVersion;
-
+bool FakeSMCLoaded;
 /*!
     Hookable function pointer called during the driver loading phase that
     allows other code to cause additional drivers to be loaded.

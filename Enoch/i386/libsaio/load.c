@@ -30,6 +30,8 @@
 #include <mach/machine/thread_status.h>
 
 #include <sl.h>
+#include "boot.h"
+#include "kernel_patcher_internal.h"
 
 #if DEBUG
 	#define DBG(x...)	printf(x)
@@ -47,6 +49,7 @@ static unsigned long gBinaryAddress;
 bool   gHaveKernelCache;			/* XXX aserebln: uninitialized? and only set to true, never to false */
 cpu_type_t archCpuType = CPU_TYPE_I386;
 
+bool incompatibleModuleLoaded = false;
 
 //==============================================================================
 // Public function.
@@ -169,6 +172,45 @@ long DecodeMachO(void *binary, u_int32_t uncompressed_size, entry_t *rentry, cha
 
 			error("Unknown CPU type\n");
 			return -1;
+	}
+
+	if (skipKernelPatcher)
+	{
+		verbose("\nInternal kernel patcher skipped as requested\n\n");
+	}
+	else
+	{
+
+		if( is_module_loaded("KernelPatcher.dylib"))
+		{
+			verbose("\nKernelPatcher.dylib prevent the internal kernel/kexts Patcher, skipped!\n\n");
+			incompatibleModuleLoaded = true;
+		}
+		else
+		{
+			// call the kernel patcher main function
+			/*
+				if (( KernelBooter_kexts ||
+					KernelPm ||
+					KernelLapicError ||
+					KernelLapicVersion ||
+					KernelHaswell ||
+					KernelcpuFamily ||
+					KernelSSE3 ) &&
+					(MacOSVerCurrent >= MacOSVer2Int("10.6"))
+					)
+				{
+					patch_kernel_internal(binary, uncompressed_size);
+				}
+			*/
+
+			// since users can done their own patches, just ensure for the minimum OS version
+			// w/o dependencies from other patches (e.g KernelBooter_kexts)
+			if (MacOSVerCurrent >= MacOSVer2Int("10.6"))
+			{
+				patch_kernel_internal(binary, uncompressed_size);
+			}
+		}
 	}
 
 	cmdBase = cmdstart;

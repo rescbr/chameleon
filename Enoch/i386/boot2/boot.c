@@ -141,7 +141,42 @@ void initialize_runtime(void)
 }
 
 // =========================================================================
+// Load the Kernel.plist override config file if any
+static void setupKernelConfigFile(const char *filename)
+{
+	char		dirSpec[128];
+	const char	*override_pathname = NULL;
+	int		len = 0, err = 0;
 
+	// Take in account user overriding
+	if (getValueForKey(kKERNELKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
+	{
+		// Specify a path to a file, e.g. KERNELPlist=/Extra/Kernel2.plist
+		strcpy(dirSpec, override_pathname);
+		err = loadConfigFile(dirSpec, &bootInfo->kernelConfig);
+	}
+	else
+	{
+		// Check selected volume's Extra.
+		sprintf(dirSpec, "/Extra/%s", filename);
+		err = loadConfigFile(dirSpec, &bootInfo->kernelConfig);
+	}
+
+	if (!err)
+	{
+		getBoolForKey(kKernelBooter_kexts,   &KernelBooter_kexts,    KERNELPlist);
+		getBoolForKey(kKernelPm,             &KernelPm,              KERNELPlist);
+		getBoolForKey(kKernelLapicError,     &KernelLapicError,      KERNELPlist);
+		getBoolForKey(kKernelLapicVersion,   &KernelLapicVersion,    KERNELPlist);
+		getBoolForKey(kKernelHaswell,        &KernelHaswell,         KERNELPlist);
+		getBoolForKey(kKernelcpuFamily,      &KernelcpuFamily,       KERNELPlist);
+		getBoolForKey(kKernelSSE3,           &KernelSSE3,            KERNELPlist);
+	}
+	else
+	{
+		verbose("No %s replacement found.\n", filename);
+	}
+}
 
 
 //==========================================================================
@@ -820,6 +855,59 @@ void common_boot(int biosdev)
 
 		// Notify modules that we are attempting to boot
 		execute_hook("PreBoot", NULL, NULL, NULL, NULL);
+
+		//--------------------------------------
+		getBoolForKey(kSkipKernelPatcher, &skipKernelPatcher, &bootInfo->chameleonConfig);
+
+		// kernel patcher
+		if (!skipKernelPatcher)
+		{
+			const char	*key = NULL;
+			int          len = 0;
+			setupKernelConfigFile("kernel.plist");
+
+			// looking at command line for kernel patcher setting and override where needed
+			if (getValueForKey(kKernelBooter_kexts, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelBooter_kexts, &KernelBooter_kexts, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelPm, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelPm, &KernelPm, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelLapicError, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelLapicError, &KernelLapicError, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelLapicVersion, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelLapicVersion, &KernelLapicVersion, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelHaswell, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelHaswell, &KernelHaswell, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelcpuFamily, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelcpuFamily, &KernelcpuFamily, &bootInfo->chameleonConfig);
+			}
+			key = NULL; len = 0;
+
+			if (getValueForKey(kKernelSSE3, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kKernelSSE3, &KernelSSE3, &bootInfo->chameleonConfig);
+			}
+		}
 
 		if (gBootVolume->OSisInstaller)
 		{
