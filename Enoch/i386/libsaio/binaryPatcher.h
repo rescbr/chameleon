@@ -53,20 +53,12 @@ unsigned int FindAndReplace(void *sourceData,
                             UInt8 *Replace,
                             int MaxReplaces);
 
-unsigned int FindAndReplace(void *sourceData,
-                            UInt32 SourceSize,
-                            UInt32 StartLocation,
-                            UInt8 *Search,
-                            unsigned int SearchSize,
-                            UInt8 *Replace,
-                            int MaxReplaces);
-
-/*
 unsigned int FindAndCount(void *sourceData,
                           UInt32 SourceSize,
+                          UInt32 StartLocation,
                           UInt8 *Search,
                           unsigned int SearchSize);
-*/
+
 void pach_binaryUsingDictionary(void *data,
                                 UInt32 dataLen,
                                 UInt32 StartLocation,
