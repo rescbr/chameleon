@@ -1462,3 +1462,299 @@ bool XMLAddTagToDictionary(TagPtr dict, char *key, TagPtr value)
 	XMLFreeTag(tmpTag);
 	return false;
 }
+//==========================================================================
+// Micky1979
+// XMLConvertTagPtrToXMLString
+// convert back a TagPtr to a xml representation
+// Here is still w/o header and footer
+char *XMLConvertTagPtrToXMLString(TagPtr aDict, long parentType, int indent)
+{
+	indent ++;
+	// TODO check if we can use a buffer for the booter stuff already reserved somewhere
+	char *string = "";
+	char *ind = "";
+	for (int i = 0; i < indent; i++)
+	{
+		char *ind2 = malloc(strlen(ind) + strlen("\t") +1);
+		strcpy(ind2, ind);
+		ind2[strlen(ind)] = '\t';
+		ind2[strlen(ind) +1] = '\0';
+		ind = ind2;
+	}
+	unsigned long length = 0;
+	int count = XMLTagCount(aDict);
+
+	while(count)
+	{
+		// parsing only supported tags
+		char *key = NULL;
+		TagPtr sub = NULL;
+		if (!XMLIsArray(aDict))
+		{
+			key = XMLCastString(XMLGetKey(aDict, count));
+			sub = XMLGetProperty(aDict, key);
+		}
+		else
+		{
+			key = "";
+			sub = XMLGetElement( aDict, count-1);
+		}
+
+		if(sub)
+		{
+			if(XMLIsData(sub))
+			{
+				char *temp;
+				if (parentType == kTagTypeArray)
+				{
+					length = (strlen(ind) +
+						strlen(sub->string ? sub->string : "") +
+						strlen("<data>") +
+						strlen("</data>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<data>%s</data>\n", string, ind, sub->string ? sub->string : "");
+				} else {
+					length = (strlen(ind) +
+						strlen(key) +
+						strlen("<key>") +
+						strlen("</key>\n") +
+						strlen(ind) +
+						strlen(sub->string ? sub->string : "") +
+						strlen("<data>") +
+						strlen("</data>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<key>%s</key>\n%s<data>%s</data>\n",
+						string, ind, key, ind, sub->string ? sub->string : "");
+				}
+
+				temp[strlen(string) + length] = '\0';
+				string = temp;
+			}
+			else if(XMLIsString(sub))
+			{
+				char *temp;
+				if (parentType == kTagTypeArray)
+				{
+					length = (strlen(ind) +
+						strlen("<string>") +
+						strlen(XMLCastString(sub) ? XMLCastString(sub) : "") +
+						strlen("</string>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<string>%s</string>\n",
+						string, ind, XMLCastString(sub) ? XMLCastString(sub) : "");
+				} else {
+					length = (strlen(ind) +
+						strlen(key) +
+						strlen("<key>") +
+						strlen("</key>\n") +
+						strlen(ind) +
+						strlen("<string>") +
+						strlen(XMLCastString(sub) ? XMLCastString(sub) : "") +
+						strlen("</string>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<key>%s</key>\n%s<string>%s</string>\n",
+						string, ind, key, ind, XMLCastString(sub) ? XMLCastString(sub) : "");
+				}
+
+				temp[strlen(string) + length] = '\0';
+				string = temp;
+			}
+			else if(XMLIsInteger(sub))
+			{
+				// 'real' (float/dowble) cannot be parsed. only integers
+				int x = XMLCastInteger(sub);
+				char xBuf[snprintf( NULL, 0, "%d", x )];
+				snprintf( xBuf, snprintf( NULL, 0, "%d", x ) +1, "%d", x );
+				char *temp;
+				if (parentType == kTagTypeArray)
+				{
+					length = (strlen(ind) +
+						strlen("<integer>") +
+						sizeof(xBuf) +
+						strlen("</integer>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<integer>%s</integer>\n", string, ind, (char *)xBuf);
+				} else {
+					length = (strlen(ind) +
+						strlen(key) +
+						strlen("<key>") +
+						strlen("</key>\n") +
+						strlen(ind) +
+						strlen("<integer>") +
+						sizeof(xBuf) +
+						strlen("</integer>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<key>%s</key>\n%s<integer>%s</integer>\n",
+						string, ind, key, ind, (char *)xBuf);
+				}
+
+				temp[strlen(string) + length] = '\0';
+				string = temp;
+			}
+			else if(XMLIsBoolean(sub))
+			{
+				char *temp;
+				int v = XMLCastBoolean(sub);
+
+				if (parentType == kTagTypeArray)
+				{
+					length = (strlen(ind) +
+						strlen(v ? "<true/>\n" : "<false/>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s%s", string, ind, v ? "<true/>\n" : "<false/>\n");
+				} else {
+					length = (strlen(ind) +
+						strlen(key) +
+						strlen("<key>") +
+						strlen("</key>\n") +
+						strlen(ind) +
+						strlen(v ? "<true/>\n" : "<false/>\n") +
+						1);
+					temp = malloc(strlen(string) + length);
+					snprintf(temp, length+strlen(string), "%s%s<key>%s</key>\n%s%s",
+						string, ind, key, ind, v ? "<true/>\n" : "<false/>\n");
+				}
+
+				temp[strlen(string) + length] = '\0';
+				string = temp;
+			}
+			else if (XMLIsDict(sub) || XMLIsArray(sub)) // its a contenitor..
+			{
+				int subCount = XMLTagCount(sub);
+				char *otag = subCount <=0 ? "" : XMLIsDict(sub) ? "<dict>\n"  : "<array>\n";
+				char *ctag = subCount <=0 ? XMLIsDict(sub) ? "<dict/>\n" :
+					"<array/>\n" : XMLIsDict(sub) ? "</dict>\n" : "</array>\n";
+				char *dict = NULL;
+				dict = NULL;
+				dict = XMLConvertTagPtrToXMLString(sub, sub->type, indent);
+
+				length = (strlen(ind) +
+					strlen(key) +
+					strlen("<key>") +
+					strlen("</key>\n") +
+					strlen(ind) +
+					strlen(otag) +
+					strlen(dict) +
+					strlen(ind) +
+					strlen(ctag) +
+					1);
+
+				char *temp = malloc(strlen(string) + length);
+				snprintf(temp, length+strlen(string), "%s%s<key>%s</key>\n%s%s%s%s%s\n",
+					string, ind, key, ind, otag, dict, ind, ctag);
+
+				temp[strlen(string) + length] = '\0';
+				string = temp;
+			}
+		}
+	count--;
+	}
+
+	if(strlen(ind))
+	{
+		free(ind);
+	} // not mallocated if ""
+
+	return string;
+}
+
+// XMLConvertTagPtrToPropertyList_v1
+// convert back a TagPtr to a xml representation
+// with header and footer
+char *XMLConvertTagPtrToPropertyList_v1(TagPtr aDict)
+{
+	if (!aDict)
+	{
+		return NULL;
+	}
+
+	char *s = XMLConvertTagPtrToXMLString(aDict, aDict->type, 1);
+
+	if (s == NULL)
+	{
+		return NULL;
+	}
+
+	unsigned long length = ((strlen(kXMLv1) -1 /* -1 for %s included */) +
+		strlen(s) +
+		1);
+
+	char *propertyList = malloc(length);
+	snprintf(propertyList, length, kXMLv1, s);
+
+	if (strlen(s))
+	{
+		free(s);
+	}
+
+	return (char *)propertyList;
+}
+
+// XMLGenerateKextInjectorFromTag
+// generate an full Info.plist to create a kext injector
+// sDict should contains all the contents of IOKitPersonalities
+// personalityName is a funcy name. Must not be a real kext name
+
+// OSBundleRequired should be the same of the real kext you want to hack (Root, Safe Boot, Network-Root etc.)
+// can also be NULL or "" assuming the target kext does not have this key.
+char * XMLGenerateKextInjectorFromTag(TagPtr aDict, char *personalityName, char *OSBundleRequired)
+{
+	if (!aDict || personalityName == NULL)
+	{
+		return NULL;
+	}
+
+	char *IOKitPersonalities = XMLConvertTagPtrToXMLString(aDict, aDict->type, 1);
+
+	if (IOKitPersonalities == NULL)
+	{
+		return NULL;
+	}
+
+	char *OBRkey = OSBundleRequired == NULL ? "" : OSBundleRequired;
+	char *propertyList;
+	unsigned long length = 0;
+
+	if (strlen(OBRkey))
+	{
+		length = (strlen("\t<key>OSBundleRequired</key>\n\t<string>") +
+			strlen(OBRkey) +
+			strlen("</string>\n") +
+			1);
+		char temp[length];
+		snprintf(temp, length, "\t<key>OSBundleRequired</key>\n\t<string>%s</string>\n", OBRkey);
+		unsigned long mlength = ((strlen(kFakeInjectorKext) -8 /* %s x 8 */) +
+			strlen(personalityName) +
+			strlen(personalityName) +
+			strlen(IOKitPersonalities) +
+			length +
+			1);
+		propertyList = malloc(mlength);
+		snprintf(propertyList, mlength, kFakeInjectorKext, personalityName, personalityName, IOKitPersonalities, temp);
+	}
+	else
+	{
+		unsigned long mlength = ((strlen(kFakeInjectorKext) -8 /* %s x 8 */) +
+			strlen(personalityName) +
+			strlen(personalityName) +
+			strlen(IOKitPersonalities) +
+			1);
+		propertyList = malloc(mlength);
+		snprintf(propertyList, mlength, kFakeInjectorKext, personalityName, personalityName, IOKitPersonalities, "");
+	}
+
+	if (strlen(IOKitPersonalities))
+	{
+		free(IOKitPersonalities);
+	}
+
+	return propertyList;
+
+}

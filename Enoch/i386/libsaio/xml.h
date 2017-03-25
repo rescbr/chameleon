@@ -72,6 +72,48 @@ extern string_ref *ref_strings;
 #define kPropIOKitPersonalities		("IOKitPersonalities")
 #define kPropIONameMatch		("IONameMatch")
 
+// Micky1979
+// kXMLv1 require one argument
+
+#define kXMLv1  "<\?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n\
+<plist version=\"1.0\">\n\
+<dict>\n%s\n\
+</dict>\n\
+</plist>"
+
+// Micky1979
+// kFakeInjectorKext require 4 arguments (a generic name (used twice) + IOKitPersonalities + OSBundleRequired ("" if not needed)):
+// name, name, IOKitPersonalities, OSBundleRequired
+#define kFakeInjectorKext  "<\?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n\
+<plist version=\"1.0\">\n\
+<dict>\n\
+	<key>CFBundleDevelopmentRegion</key>\n\
+	<string>English</string>\n\
+	<key>CFBundleIdentifier</key>\n\
+	<string>com.Enoch.plist.%s</string>\n\
+	<key>CFBundleInfoDictionaryVersion</key>\n\
+	<string>6.0</string>\n\
+	<key>CFBundleName</key>\n\
+	<string>%s</string>\n\
+	<key>CFBundlePackageType</key>\n\
+	<string>KEXT</string>\n\
+	<key>CFBundleSignature</key>\n\
+	<string>\?\?\?\?</string>\n\
+	<key>CFBundleVersion</key>\n\
+	<string>1.0.0</string>\n\
+	<key>IOKitPersonalities</key>\n\
+	<dict>\n%s\
+	</dict>\n%s\
+</dict>\n\
+</plist>\n"
+
+// Micky1979 following 3 funtions are to convert a TagPtr to a property list v1 and to create kexts injector
+char *XMLConvertTagPtrToXMLString(TagPtr aDict, long parentType, int indent);
+char *XMLConvertTagPtrToPropertyList_v1(TagPtr aDict);
+char *XMLGenerateKextInjectorFromTag(TagPtr aDict, char *personalityName, char *OSBundleRequired);
+
 extern long  gImageFirstBootXAddr;
 extern long  gImageLastKernelAddr;
 
