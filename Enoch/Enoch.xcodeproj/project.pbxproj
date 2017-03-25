@@ -1418,6 +1418,12 @@
 		E51057C01BD174FE002FC0A7 /* IntelSkl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelSkl.txt; path = OptionalSettings/IntelSkl.txt; sourceTree = "<group>"; };
 		E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CrsActiveConfig.txt; path = OptionalSettings/CrsActiveConfig.txt; sourceTree = "<group>"; };
 		E511B6D21D187A3D00600004 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
+		E5B3BF4F1B45C86F0063920E /* kernel_patcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kernel_patcher.c; sourceTree = "<group>"; };
+		E5B3BF501B45C86F0063920E /* kernel_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kernel_patcher.h; sourceTree = "<group>"; };
+		E5B3BF511B45C8810063920E /* sse3_5_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sse3_5_patcher.h; sourceTree = "<group>"; };
+		E5B3BF521B45C8810063920E /* sse3_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sse3_patcher.h; sourceTree = "<group>"; };
+		E5EDE7221BC2F10A008602AF /* DriverFileNVRAM_bin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DriverFileNVRAM_bin.h; sourceTree = "<group>"; };
+		E5EDE7231BC2F10A008602AF /* DriverFileNVRAM_Info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DriverFileNVRAM_Info.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -3298,6 +3304,8 @@
 				3617E24817503A9300AE753C /* boot2.s */,
 				54EE60B01E83478900D682EB /* config.h */,
 				3617E24917503A9300AE753C /* Cconfig */,
+				E5EDE7221BC2F10A008602AF /* DriverFileNVRAM_bin.h */,
+				E5EDE7231BC2F10A008602AF /* DriverFileNVRAM_Info.h */,
 				3617E24A17503A9300AE753C /* drivers.c */,
 				3617E24B17503A9300AE753C /* graphic_utils.c */,
 				3617E24C17503A9300AE753C /* graphic_utils.h */,
@@ -3306,6 +3314,9 @@
 				3617E24F17503A9300AE753C /* gui.c */,
 				3617E25017503A9300AE753C /* gui.h */,
 				3617E25117503A9300AE753C /* IOHibernatePrivate.h */,
+				E5B3BF4F1B45C86F0063920E /* kernel_patcher.c */,
+				E5B3BF501B45C86F0063920E /* kernel_patcher.h */,
+				E50528B51B93E0FE001EFF67 /* kext_patcher.c */,
 				3608A84D1A42F33500602D1C /* lzvn.c */,
 				3617E25417503A9300AE753C /* lzss.c */,
 				3617E25517503A9300AE753C /* Makefile */,
@@ -3322,6 +3333,8 @@
 				3617E26017503A9300AE753C /* ramdisk.c */,
 				3617E26117503A9300AE753C /* ramdisk.h */,
 				3617E26217503A9300AE753C /* resume.c */,
+				E5B3BF511B45C8810063920E /* sse3_5_patcher.h */,
+				E5B3BF521B45C8810063920E /* sse3_patcher.h */,
 				3617E26317503A9300AE753C /* WKdm.h */,
 				3617E26417503A9300AE753C /* WKdmDecompress.c */,
 			);

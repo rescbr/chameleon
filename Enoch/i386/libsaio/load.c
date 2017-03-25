@@ -333,6 +333,24 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 #endif
 	}
 
+	// patching prelinked kexts
+	if (!strcmp(segname, "__PRELINK_TEXT") && !incompatibleModuleLoaded)
+	{
+		if (!skipKextsPatcher)
+		{
+			if (vmaddr && fileoff)
+			{
+				patch_prelinked_kexts(binary,
+					uncompressed_size,
+					vmaddr,
+					fileoff);
+			}
+		}
+		else
+		{
+			verbose("\nInternal kexts patcher skipped as requested\n\n");
+		}
+	}
 //===================================================
 
 	if (vmsize == 0 || filesize == 0)

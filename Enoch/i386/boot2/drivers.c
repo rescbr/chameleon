@@ -42,6 +42,11 @@
 #include "kernel_patcher_internal.h"
 #include "modules.h"
 
+#if FAKESMC_SUPPORT
+	#include "FakeSMC.h"
+	#include "FakeSMCInfo.plist.h"
+#endif
+
 #if DEBUG
 	#define DBG(x...)	printf(x)
 #else
@@ -101,6 +106,9 @@ long NetLoadDrivers(char *dirSpec);
 long LoadDriverMKext(char *fileSpec);
 long LoadDriverPList(char *dirSpec, char *name, long bundleType);
 
+#if FAKESMC_SUPPORT
+	void loadEmbeddedFakeSMC(void);
+#endif
 
 long LoadEmbeddedKext(  char *InjectorPlist, size_t length,  char *name );
 long LoadMatchedModules(void);
@@ -318,6 +326,12 @@ long LoadDrivers( char *dirSpec )
 		return 0;
 	}
 
+#if FAKESMC_SUPPORT
+	if (!FakeSMCLoaded && archCpuType != CPU_TYPE_I386)
+	{
+		loadEmbeddedFakeSMC();
+	}
+#endif
 
 	buildAndLoadInjectorPList();
 
@@ -613,6 +627,29 @@ void buildAndLoadInjectorPList(void)
 	}
 }
 //==========================================================================
+// loadEmbeddedFakeSMC
+#if FAKESMC_SUPPORT
+void loadEmbeddedFakeSMC(void)
+{
+	void *embedded = NULL;
+	embedded = malloc(FakeSMCInfo_plist_un_len); // don't free, will be done in LoadEmbeddedKext
+	size_t size = lzvn_decode(embedded,
+                              FakeSMCInfo_plist_un_len,
+                              FakeSMCInfo_plist,
+                              FakeSMCInfo_plist_lzvn_len);
+
+	if (FakeSMCInfo_plist_un_len != size)
+	{
+		verbose("\n\t  ERROR! FakeSMC size mismatch from lzvn (found: %zx, expected: %zx), failed!\n", size, FakeSMCInfo_plist_un_len);
+	}
+	else
+	{
+		LoadEmbeddedKext((char *)embedded, size,  "EmbeddedFakeSMC" );
+	}
+}
+#endif
+
+//==========================================================================
 // LoadEmbeddedKext
 long LoadEmbeddedKext(  char *InjectorPlist, size_t length,  char *name )
 {
@@ -760,6 +797,9 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
         
 	if(name)
 	{
+		if (!strcmp(name, "FakeSMC.kext")) {
+			FakeSMCLoaded = true;
+		}
 		snprintf(gFileSpec, 4096, "%s/%s/%s", dirSpec, name, (bundleType == kCFBundleType2) ? "Contents/MacOS/" : "");
 	}
 	else
@@ -913,6 +953,8 @@ long LoadMatchedModules( void )
 
 	module = gModuleHead;
 
+	TagPtr KextsPatches = XMLGetProperty(bootInfo->kextConfig.dictionary, (const char*)"KextsPatches");
+
 	while (module != 0)
 	{
 		if (module->willLoad)
@@ -924,13 +966,41 @@ long LoadMatchedModules( void )
 				fileName = prop->string;
 				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
 
+#if FAKESMC_SUPPORT
+        		        if (!strcmp(fileName, "EmbeddedFakeSMC"))
+				{
+					verbose("\t  Loading embedded FakeSMC: ");
+					embedded = malloc(FakeSMC_un_len);
+					size_t size = lzvn_decode(embedded, FakeSMC_un_len, FakeSMC, FakeSMC_lzvn_len );
+
+					if (FakeSMC_un_len != size)
+					{
+						verbose("\n\t  ERROR! FakeSMC size mismatch from lzvn (found: %zx, expected: %zx), failed!\n", size, FakeSMC_un_len);
+						length = -1;
+					}
+					else
+					{
+						length = size;
+						// no need to Thin this kext
+						//memcpy((void *)kLoadAddr, embedded, length);
+						//ThinFatFile(embedded, &length);
+						executableAddr = (void *)embedded;
+						verbose("%s!\n", ((length != -1) && executableAddr) ? "success" : "failed");
+					}
+				}
+				else
+				{
+#endif
 					length = LoadThinFatFile(gFileSpec, &executableAddr);
 					if (length == 0)
 					{
 						length = LoadFile(gFileSpec);
 						executableAddr = (void *)kLoadAddr;
 					}
-//				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
+#if FAKESMC_SUPPORT
+		}
+#endif
+//		printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
 			}
 			else
 			{
@@ -939,6 +1009,18 @@ long LoadMatchedModules( void )
 
 			if ((length != -1) && executableAddr)
 			{
+				// patching kexts executable
+				if (!skipKextsPatcher)
+				{
+					// chameleon patches
+					patchBooterDefinedKext(fileName, executableAddr, (UInt32)length, 0);
+					// user's patches
+					if (KextsPatches && XMLIsDict(KextsPatches))
+					{
+						pach_binaryUsingDictionary(executableAddr, (UInt32)length, 0, fileName, KextsPatches);
+					}
+				}
+
 				// Make make in the image area.
 
 				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
