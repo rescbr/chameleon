@@ -100,8 +100,11 @@ long FileLoadDrivers(char *dirSpec, long plugin);
 long NetLoadDrivers(char *dirSpec);
 long LoadDriverMKext(char *fileSpec);
 long LoadDriverPList(char *dirSpec, char *name, long bundleType);
-long LoadMatchedModules(void);
 
+
+long LoadEmbeddedKext(  char *InjectorPlist, size_t length,  char *name );
+long LoadMatchedModules(void);
+void buildAndLoadInjectorPList(void);
 static long MatchPersonalities(void);
 static long MatchLibraries(void);
 
@@ -109,7 +112,9 @@ static long MatchLibraries(void);
 	static ModulePtr FindModule(char *name);
 	static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
 #endif
-static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities);
+
+bool isKextForcedToLoad(char *kext);
+static long ParseXML(char *buffer, ModulePtr *module, TagPtr *personalities, bool forceKextToLoad);
 static long InitDriverSupport(void);
 
 ModulePtr gModuleHead, gModuleTail;
@@ -312,6 +317,9 @@ long LoadDrivers( char *dirSpec )
 	{
 		return 0;
 	}
+
+
+	buildAndLoadInjectorPList();
 
 	MatchPersonalities();
 
@@ -528,6 +536,214 @@ long LoadDriverMKext( char *fileSpec )
 }
 
 //==========================================================================
+// buildAndLoadInjectorPList
+void buildAndLoadInjectorPList(void)
+{
+	TagPtr PersTag = NULL;
+	if ((PersTag = XMLCastDict(XMLGetProperty(bootInfo->kextConfig.dictionary, (const char *)"PersonalitiesInjector"))))
+	{
+		unsigned long count = XMLTagCount(PersTag);
+		if (count)
+		{
+			verbose("Attempting to generate and load custom injectors kexts:\n");
+		}
+
+		while(count)
+		{
+			bool canLoad = false;
+			//int length = 0;
+			char *kextName = strdup(XMLCastString(XMLGetKey(PersTag, count)));
+
+			TagPtr sub = XMLGetProperty(PersTag, kextName);
+
+			if (sub && XMLIsDict(sub))
+			{
+				TagPtr IOKPTag = NULL;
+				char *MatchOS = NULL;
+				char *Comment = NULL;
+				char *OSBundleRequired = NULL;
+				IOKPTag          = XMLGetProperty(sub, (const char*)"IOKitPersonalities");
+				Comment          = XMLCastString(XMLGetProperty(sub, (const char*)"Comment"));
+				MatchOS          = XMLCastString(XMLGetProperty(sub, (const char*)"MatchOS"));
+				OSBundleRequired = XMLCastString(XMLGetProperty(sub, (const char*)"OSBundleRequired"));
+
+				Comment          = (Comment    != NULL && strlen(Comment)    >0) ? Comment    : "untitled";
+				MatchOS          = (MatchOS    != NULL && strlen(MatchOS)    >0) ? MatchOS    : "";
+				OSBundleRequired = (OSBundleRequired != NULL && strlen(OSBundleRequired)    >0) ? OSBundleRequired : "";
+				canLoad = true;
+
+				if (strlen(MatchOS))
+				{
+					// check MatchOS and disable this patch if does not match
+					canLoad = IsPatchEnabled(MatchOS, (char *)gMacOSVersion);
+				}
+				else
+				{
+					MatchOS = "not set";
+				}
+
+				if (canLoad)
+				{
+					if (XMLIsDict(IOKPTag))
+					{
+						char *inj= XMLGenerateKextInjectorFromTag(IOKPTag, kextName, OSBundleRequired);
+
+						if (inj != NULL && strlen(inj))
+						{
+							verbose("\t- Loading %s.kext (%s) MatchOS[ %s ]: ", kextName, Comment, MatchOS);
+							verbose("%s!\n", (LoadEmbeddedKext( inj, strlen(inj)+1, kextName ) == 0) ? "success" : "failed");
+						}
+						else
+						{
+							verbose("\t- Error building %s personality, skipped\n", kextName);
+						}
+					}
+					else
+					{
+						verbose("\t- skipping %s personality (%s) MatchOS[ %s ]: not a dictionary\n", kextName, Comment, MatchOS);
+					}
+				}
+				else
+				{
+					verbose("\t- skipping %s personality (%s) MatchOS[ %s ]\n", kextName, Comment, MatchOS);
+				}
+			}
+		count--;
+		}
+	}
+}
+//==========================================================================
+// LoadEmbeddedKext
+long LoadEmbeddedKext(  char *InjectorPlist, size_t length,  char *name )
+{
+	long		executablePathLength, bundlePathLength;
+	ModulePtr	module;
+	TagPtr		personalities;
+	char		*tmpExecutablePath = 0;
+	char		*tmpBundlePath = 0;
+	char		*realAddr = NULL;
+	long		ret = -1;
+
+	do {
+		snprintf(gFileSpec, 4096, "%s/%s.kext/%s", "/System/Library/Extensions", name, "Contents/MacOS/");
+		executablePathLength = strlen(gFileSpec) + 1;
+
+		tmpExecutablePath = malloc(executablePathLength);
+
+		if (tmpExecutablePath == 0)
+		{
+			break;
+		}
+
+		strlcpy(tmpExecutablePath, gFileSpec, executablePathLength);
+		snprintf(gFileSpec, 4096, "%s/%s.kext", "/System/Library/Extensions", name);
+		bundlePathLength = strlen(gFileSpec) + 1;
+
+		tmpBundlePath = malloc(bundlePathLength);
+
+		if (tmpBundlePath == 0)
+		{
+			break;
+		}
+
+		strlcpy(tmpBundlePath, gFileSpec, bundlePathLength);
+
+		// Construct the file spec to the plist, then load it.
+		snprintf(gFileSpec, 4096, "%s/%s.kext/Contents/Info.plist", "/System/Library/Extensions", name);
+
+		// bug, after ParseXML something weired happened to InjectorPlist. Making a copy
+		realAddr = malloc(length);
+		strlcpy(realAddr, InjectorPlist, length);
+		ret = ParseXML((char *)InjectorPlist, &module, &personalities, true);
+
+		if (ret != 0)
+		{
+			break;
+		}
+
+		if (!module) // cparm
+		{
+			ret = -1;
+			break;
+		} // Should never happen but it will make the compiler happy
+
+		// Allocate memory for the driver path and the plist.
+		module->executablePath = tmpExecutablePath;
+		module->bundlePath = tmpBundlePath;
+		module->bundlePathLength = bundlePathLength;
+
+		module->plistAddr = malloc(length);
+
+		if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
+		{
+			verbose("(executablePath or bundlePath or plistAddr are 0) ");
+			ret = -1;
+			break;
+		}
+
+		tmpExecutablePath = 0;
+		tmpBundlePath = 0;
+
+		strlcpy(module->plistAddr, realAddr, length);
+		module->plistLength = length;
+		// Add the module to the end of the module list.
+
+		if (gModuleHead == 0)
+		{
+			gModuleHead = module;
+		}
+		else
+		{
+			gModuleTail->nextModule = module;
+		}
+		gModuleTail = module;
+
+		// Add the persionalities to the personality list.
+		if (personalities)
+		{
+			personalities = personalities->tag;
+		}
+		while (personalities != 0)
+		{
+			if (gPersonalityHead == 0)
+			{
+				gPersonalityHead = personalities->tag;
+			}
+			else
+			{
+				gPersonalityTail->tagNext = personalities->tag;
+			}
+
+			gPersonalityTail = personalities->tag;
+			personalities = personalities->tagNext;
+		}
+		ret = 0;
+
+	}while (0);
+
+	if (realAddr)
+	{
+		free(realAddr);
+	}
+
+	if ( strlen(InjectorPlist) )
+	{
+		free( InjectorPlist );
+	}
+
+	if ( tmpExecutablePath )
+	{
+		free( tmpExecutablePath );
+	}
+
+	if ( tmpBundlePath )
+	{
+		free( tmpBundlePath );
+	}
+	return ret;
+}
+
+//==========================================================================
 // LoadDriverPList
 long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 {
@@ -606,7 +822,7 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 
 	// Parse the plist.
 
-	ret = ParseXML(buffer, &module, &personalities);
+	ret = ParseXML(buffer, &module, &personalities, isKextForcedToLoad(name));
 
 	if (ret != 0) {
 		break;
@@ -627,6 +843,7 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 
 	if ((module->executablePath == 0) || (module->bundlePath == 0) || (module->plistAddr == 0))
 	{
+		verbose("%s: executablePath or bundlePath or plistAddr are 0\n", name);
 		break;
 	}
 
@@ -868,8 +1085,43 @@ static ModulePtr FindModule( char *name )
 #endif /* NOTDEF */
 
 //==========================================================================
+// try to force loading kext.
+// this not assure the kext will be loaded by the kernel for sure,
+// but at least is forced loaded by the bootloader
+bool isKextForcedToLoad(char *kext)
+{
+	TagPtr ForceTag = NULL;
+
+	if ((ForceTag = XMLCastArray(XMLGetProperty(bootInfo->kextConfig.dictionary, (const char *)"ForceToLoad"))))
+	{
+		unsigned long count = XMLTagCount(ForceTag);
+		if (count) {
+			for (unsigned i = count ; i-- > 0 ;) /* reversed iteration since xml.c add it reversed */
+			{
+				TagPtr index = XMLGetElement( ForceTag, i );
+				if(XMLIsString(index))
+				{
+					char *forced = XMLCastString(index);
+					char buffer[strlen(forced) + strlen(".kext") +1];
+					//snprintf(buffer, strlen(forced) + strlen(".kext") +1, "%s%s", forced, ".kext");
+
+					sprintf(buffer, "%s%s", forced, ".kext");
+
+					if (!strcmp(buffer, kext))
+					{
+						verbose("- %s forced loaded\n", kext);
+						return true;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+//==========================================================================
 // ParseXML
-static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
+static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities, bool forceKextToLoad )
 {
 	long		length;
 	long		pos = 0;
@@ -905,11 +1157,14 @@ static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities )
 
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
 
+	// if forceKextToLoad is true, the kext will be force to load even if OSBundleRequired has value set to "Safe Boot" instead of "Root"
+	if (!forceKextToLoad) {
 		if ( (required == 0) || (required->type != kTagTypeString) || !strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
 		{
 			XMLFreeTag(moduleDict);
 			return -2;
 		}
+	}
 
 	tmpModule = malloc(sizeof(Module));
 	if (tmpModule == 0)

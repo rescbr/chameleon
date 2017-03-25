@@ -178,6 +178,45 @@ static void setupKernelConfigFile(const char *filename)
 	}
 }
 
+#if KEXTPATCH_SUPPORT
+// =========================================================================
+// Load the Kext.plist override config file if any
+static void setupKextConfigFile(const char *filename)
+{
+	char		dirSpec[128];
+	const char	*override_pathname = NULL;
+	int		len = 0, err = 0;
+
+	AppleRTCPatch = false;
+	AICPMPatch = false;
+	OrangeIconFixSata = false;
+	NVIDIAWebDrv = false;
+	TrimEnablerSata = false;
+
+	// Take in account user overriding
+	if (getValueForKey(kKEXTKey, &override_pathname, &len, &bootInfo->chameleonConfig) && len > 0)
+	{
+		// Specify a path to a file, e.g. KEXTPlist=/Extra/Kext2.plist
+		strcpy(dirSpec, override_pathname);
+		err = loadConfigFile(dirSpec, &bootInfo->kextConfig);
+	} else {
+		// Check selected volume's Extra.
+		sprintf(dirSpec, "/Extra/%s", filename);
+		err = loadConfigFile(dirSpec, &bootInfo->kextConfig);
+	}
+
+	if (!err)
+	{
+		getBoolForKey(kAppleRTCPatch,       &AppleRTCPatch,        KEXTPlist);
+		getBoolForKey(kAICPMPatch,          &AICPMPatch,           KEXTPlist);
+		getBoolForKey(kNVIDIAWebDrv,        &NVIDIAWebDrv,         KEXTPlist);
+		getBoolForKey(kOrangeIconFixSata,   &OrangeIconFixSata,    KEXTPlist);
+		getBoolForKey(kTrimEnablerSata,     &TrimEnablerSata,      KEXTPlist);
+	} else {
+		verbose("No %s replacement found.\n", filename);
+	}
+}
+#endif
 
 //==========================================================================
 // ExecKernel - Load the kernel image (mach-o) and jump to its entry point.
@@ -908,6 +947,55 @@ void common_boot(int biosdev)
 				getBoolForKey(kKernelSSE3, &KernelSSE3, &bootInfo->chameleonConfig);
 			}
 		}
+
+#if KEXTPATCH_SUPPORT
+		//-------------------------------------- kext patcher
+		getBoolForKey(kSkipKextsPatcher, &skipKextsPatcher, &bootInfo->chameleonConfig);
+
+		// kext patcher
+		if (!skipKextsPatcher)
+		{
+			const char	*key = NULL;
+			int		len = 0;
+			setupKextConfigFile("kexts.plist");
+
+			// looking at command line for kext patcher setting and override where needed
+			if (getValueForKey(kAICPMPatch, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kAICPMPatch, &AICPMPatch, &bootInfo->chameleonConfig);
+			}
+
+			key = NULL;
+			len = 0;
+			if (getValueForKey(kNVIDIAWebDrv, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kNVIDIAWebDrv, &NVIDIAWebDrv, &bootInfo->chameleonConfig);
+			}
+
+			key = NULL;
+			len = 0;
+			if (getValueForKey(kOrangeIconFixSata, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kOrangeIconFixSata, &OrangeIconFixSata, &bootInfo->chameleonConfig);
+			}
+
+			key = NULL;
+			len = 0;
+			if (getValueForKey(kTrimEnablerSata, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kTrimEnablerSata, &TrimEnablerSata, &bootInfo->chameleonConfig);
+			}
+
+			key = NULL;
+			len = 0;
+			if (getValueForKey(kAppleRTCPatch, &key, &len, &bootInfo->chameleonConfig) && len > 0)
+			{
+				getBoolForKey(kAppleRTCPatch, &AppleRTCPatch, &bootInfo->chameleonConfig);
+			}
+		}
+
+		// -------------------------------------- kext patcher
+#endif
 
 		if (gBootVolume->OSisInstaller)
 		{
