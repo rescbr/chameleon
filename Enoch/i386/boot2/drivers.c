@@ -46,6 +46,8 @@
 	#define DBG(x...)	msglog(x)
 #endif
 
+bool gUseCommonAndOSdir = true;
+
 struct Module {  
 	struct Module *nextModule;
 	long          willLoad;
@@ -168,12 +170,27 @@ static long InitDriverSupport( void )
 long LoadDrivers( char *dirSpec )
 {
 	char dirSpecExtra[1024];
+	long flags, ret=-1;
+	u_int32_t time;
 
 	if ( InitDriverSupport() != 0 )
 	{
 		return 0;
 	}
 
+	// ========================================
+	gUseCommonAndOSdir = false; // old behavior
+
+	ret = GetFileInfo("bt(0,0)/Extra/Extensions/", "Common", &flags, &time);
+
+	// if the boot partition contains /Extra/Extensions/Common there is no need
+	// to look else where because users will have also /Extra/Extensions/10.x
+	if ((ret == 0) && ((flags & kFileTypeMask) == kFileTypeDirectory))
+	{
+		gUseCommonAndOSdir = true;
+		verbose("/Extra/Extensions/Common and /Extra/Extensions/%s in use.\n", gBootVolume->OSVersion);
+		//getchar();
+	}
 	// ========================================
 
 	// Load extra drivers if a hook has been installed.
@@ -201,26 +218,40 @@ long LoadDrivers( char *dirSpec )
 		// verbose("Attempting to loading drivers from \"Extra\" repository:\n");
 
 		// =====================================================================
-		// Secondly try to load drivers from Common folder
-		sprintf(dirSpecExtra, "bt(0,0)/Extra/Common/");
-		FileLoadDrivers(dirSpecExtra, 0);
+		// Secondly try to load drivers from Common folder if in use
+		if (gUseCommonAndOSdir)
+		{
+			sprintf(dirSpecExtra, "bt(0,0)/Extra/Extensions/Common");
+			FileLoadDrivers(dirSpecExtra, 0);
+		}
 		// =====================================================================
 
 		// Next try to load Extra extensions from the selected root partition.
-		strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
-		if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+		if (gUseCommonAndOSdir)
 		{
-			// If failed, then try to load Extra extensions from the boot partition
-			// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
-			if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
-				|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+			sprintf(dirSpecExtra, "bt(0,0)/Extra/Extensions/%s", gBootVolume->OSVersion);
+			FileLoadDrivers(dirSpecExtra, 0);
+			//verbose("gUseCommonAndOSdir = %s\n", dirSpecExtra);
+			//getchar();
+		}
+		else
+		{
+			strlcpy(dirSpecExtra, "/Extra/", sizeof(dirSpecExtra));
+			if (FileLoadDrivers(dirSpecExtra, 0) != 0)
 			{
-				// Next try a specfic OS version folder ie 10.5
-				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion[0]);
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
-					// Next we'll try the base
-					strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
-					FileLoadDrivers(dirSpecExtra, 0);
+				// If failed, then try to load Extra extensions from the boot partition
+				// in case we have a separate booter partition or a bt(0,0) aliased ramdisk.
+				if ( !(gBIOSBootVolume->biosdev == gBootVolume->biosdev  && gBIOSBootVolume->part_no == gBootVolume->part_no)
+					|| (gRAMDiskVolume && gRAMDiskBTAliased) )
+				{
+					// Next try a specfic OS version folder ie 10.12
+					sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion[0]);
+					if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+					{
+						// Next we'll try the base
+						strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
+						FileLoadDrivers(dirSpecExtra, 0);
+					}
 				}
 			}
 		}
@@ -264,13 +295,13 @@ long LoadDrivers( char *dirSpec )
 				{
 					verbose("\t- Third party extensions search path: /Library/Extensions\n");
 					strlcpy(gExtensionsSpec, dirSpec, 4087); /* 4096 - sizeof("Library/") mean 4096 - 9 = 4087 */
-					strcat(gExtensionsSpec, "Library/");
+					strcat(gExtensionsSpec, gUseCommonAndOSdir ? "Library/Extensions" : "Library/");
 					FileLoadDrivers(gExtensionsSpec, 0);
 				}
 
 				verbose("\t- Apple extensions search path: /System/Library/Extensions\n");
 				strlcpy(gExtensionsSpec, dirSpec, 4080); /* 4096 - sizeof("System/Library/")  mean 4096 -16 = 4080 */
-				strcat(gExtensionsSpec, "System/Library/");
+				strcat(gExtensionsSpec, gUseCommonAndOSdir ? "System/Library/Extensions" : "System/Library/");
 				FileLoadDrivers(gExtensionsSpec, 0);
 			}
 
@@ -344,7 +375,11 @@ long FileLoadDrivers( char *dirSpec, long plugin )
 			return 0;
 		}
 
-		strcat(dirSpec, "Extensions");
+		if (!gUseCommonAndOSdir)
+		{
+			// means that we already provide a full path to the Extensions directory
+			strcat(dirSpec, "Extensions");
+		}
 	}
 
 	index = 0;
@@ -503,7 +538,7 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 	char		*tmpBundlePath = 0;
 	long		ret = -1;
 
-	do{
+	do {
 	// Save the driver path.
         
 	if(name)

@@ -2207,7 +2207,7 @@ BVRef getBVChainForBIOSDev(int biosdev)
 }
 
 //==============================================================================
-BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count, bool sch)
+BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags, unsigned int denyFlags, int *count)
 {
 	BVRef chain = NULL;
 	BVRef bvr = NULL;
@@ -2263,6 +2263,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 
 			// Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
 			// to be able to hide foreign partitions from the boot menu.
+
 			if ( (newBVR->flags & kBVFlagForeignBoot) )
 			{
 				char *start, *next = val;

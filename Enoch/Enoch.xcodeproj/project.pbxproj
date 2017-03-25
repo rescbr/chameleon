@@ -1417,6 +1417,7 @@
 		E51057BF1BD174E0002FC0A7 /* IntelBdw.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelBdw.txt; path = OptionalSettings/IntelBdw.txt; sourceTree = "<group>"; };
 		E51057C01BD174FE002FC0A7 /* IntelSkl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelSkl.txt; path = OptionalSettings/IntelSkl.txt; sourceTree = "<group>"; };
 		E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CrsActiveConfig.txt; path = OptionalSettings/CrsActiveConfig.txt; sourceTree = "<group>"; };
+		E511B6D21D187A3D00600004 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
