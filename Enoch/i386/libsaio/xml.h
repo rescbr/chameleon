@@ -62,6 +62,8 @@ extern string_ref *ref_strings;
 #define kXMLTagReference    "reference"
 #define kXMLStringID        "ID="
 #define kXMLStringIDRef     "IDREF="
+#define kXMLStringIDRefs    "IDREFS="
+#define kXMLTagSIZE         "size="
 
 #define kPropCFBundleIdentifier		("CFBundleIdentifier")
 #define kPropCFBundleExecutable		("CFBundleExecutable")

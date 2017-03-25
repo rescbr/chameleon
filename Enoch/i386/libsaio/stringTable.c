@@ -364,6 +364,26 @@ bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 	const char *key_val;
 	int size;
     
+	// looking for real boolean (<true/> or <false/>)
+	// if is a boolean tag, return immediately
+	TagPtr entry = XMLGetProperty(config->dictionary,key);
+
+	if(XMLIsBoolean(entry))
+	{
+		int value = XMLCastBoolean(entry);
+		if (value) {
+			*result_val = true;
+			return true;
+		}
+		else
+		{
+			*result_val = false;
+			return false;
+		}
+	}
+
+	// check if is a boolean as "string" (Yes/No)
+	// (IMHO this should be deprecated soon)
 	if (getValueForKey(key, &key_val, &size, config))
 	{
 		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y'))

@@ -650,12 +650,12 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 // LoadMatchedModules
 long LoadMatchedModules( void )
 {
-	TagPtr		  prop;
-	ModulePtr	  module;
-	char		  *fileName, segName[32];
-	DriverInfoPtr driver;
-	long		  length, driverAddr, driverLength;
-	void		  *executableAddr = 0;
+	TagPtr	prop;
+	ModulePtr	module;
+	char		*fileName, segName[32];
+	DriverInfoPtr	driver;
+	long		length, driverAddr, driverLength;
+	void		*executableAddr = 0;
 
 	module = gModuleHead;
 
