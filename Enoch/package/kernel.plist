@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>KernelPatches</key>
+	<array>
+		<dict>
+			<key>Comment</key>
+			<string>Example of kernel patch</string>
+			<key>Find</key>
+			<data>bm90ZXhpc3RpbmdwYXRjaA==</data>
+			<key>Replace</key>
+			<data>AAAAAAAAAAAAAAAAAAAA</data>
+			<key>#MatchBuild</key>
+			<string>15G1004</string>
+			<key>#MatchOS</key>
+			<string>10.7.x,10.8.x,10.9.x,10.10.x,10.11.6,10.12.x</string>
+		</dict>
+	</array>
+	<key>KernelBooter_kexts</key>
+	<string>Yes</string>
+	<key>KernelLapicError</key>
+	<string>Yes</string>
+</dict>
+</plist>

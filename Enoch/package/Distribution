@@ -43,6 +43,20 @@
 		}
 	}
 
+	var kextsPlist = null;
+	if (my.target)
+	{
+		var kexts_plist_filenames = new Array( 'kexts.plist' );
+		for ( var i = 0; i &lt; kexts_plist_filenames.length; i++ )
+		{
+			kextsPlist = system.files.plistAtPath( my.target.mountpoint + '/Extra/' + kexts_plist_filenames[i] );
+			if (kextsPlist)
+			{
+				break;
+			}
+		}
+	}
+
 	function installCheckScript()
 	{
 		var obj = system.ioregistry.matchingClass("AppleSMC");
@@ -141,6 +155,41 @@
 		if ( kernelPlist &amp;&amp; kernelPlist[ key ] )
 		{
 			var items = kernelPlist[ key ].split(" ");
+			for ( var i = 0; i &lt; items.length; i++ )
+			{
+				if (items[i] == value)
+				{
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	function check_kexts_bool_option(key, value)
+	{
+		if ( kextsPlist &amp;&amp; kextPlist[ key ] )
+		{
+			// check if the first letter (in lowercase) is the same
+			return kextsPlist[ key ].charAt(0).toLowerCase() == value.charAt(0).toLowerCase();
+		}
+		return false;
+	}
+
+	function check_kexts_text_option(key, value)
+	{
+		if ( kextsPlist &amp;&amp; kextsPlist[ key ] )
+		{
+			return kextsPlist[ key ] == value; // check if the strings are equal
+		}
+		return false;
+	}
+
+	function check_kexts_list_option(key, value)
+	{
+		if ( kextsPlist &amp;&amp; kextsPlist[ key ] )
+		{
+			var items = kextsPlist[ key ].split(" ");
 			for ( var i = 0; i &lt; items.length; i++ )
 			{
 				if (items[i] == value)

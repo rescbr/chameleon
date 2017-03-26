@@ -294,6 +294,7 @@ EXTRA() {
         cp -R "${choicedVolume}/Extra" "${v_mntpt}"/
         ./clean_bootplist.pl "${v_mntpt}" org.chameleon.Boot.plist
         ./clean_bootplist.pl "${v_mntpt}" kernel.plist
+        ./clean_bootplist.pl "${v_mntpt}" kexts.plist
     fi
 }
 # --------------------------------------------------------------------------------------------------------

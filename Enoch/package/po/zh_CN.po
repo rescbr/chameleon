@@ -3520,120 +3520,185 @@ msgstr "设置选用一个键盘布局。将会安装键盘布局模组与键盘
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, no-wrap
-msgid "Patches"
-msgstr "补丁"
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Embedded Patcher"
+msgstr "Kext Patcher"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
-#, no-wrap
-msgid "A selection of options to patch the kernel."
+#, fuzzy, no-wrap
+#| msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch the Kernel and Kexts."
 msgstr "补丁"
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:948
-#, no-wrap
-msgid "kernel Patcher"
+#: Resources/templates/Localizable.strings:949
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "Embedded Kernel Patch"
 msgstr "Kernel Patcher"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:950
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr "针对你的内核选择一个 patch。"
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:952
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "KernelBooter_kexts"
 msgstr "KernelBooter Kexts"
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:954
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr "在新系统中重新启用 /Extra/Extensions 中的 kext。"
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:956
+#: Resources/templates/Localizable.strings:957
 #, no-wrap
 msgid "KernelPm"
 msgstr "KernelPm"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:958
 #, no-wrap
 msgid "Kernel Power Management patch."
 msgstr "电源管理 patch."
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:960
+#: Resources/templates/Localizable.strings:961
 #, no-wrap
 msgid "KernelLapicError"
 msgstr "Kernel Lapic 错误"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:962
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr "移除 Local Apic 错误。"
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:964
+#: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "KernelLapicVersion"
 msgstr "KernelLapic 版本"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:966
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr "移除 Local Apic 版本错误。"
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:968
+#: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "KernelHaswell"
 msgstr "Haswell 内核"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:970
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr "Patch Haswell E 系列和 ULT 系列，以便支持旧版系统。"
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:972
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "KernelcpuFamily"
 msgstr "内核 CPU 系列"
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:974
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr "Patch cpuid_family 代码块以移除 _cpuid_set_info_panic 和 _tsc_init _panic。用于不被支持的 CPU。"
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:976
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "KernelSSE3"
 msgstr "SSE3 内核"
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:978
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr "Patch 启用更多 SSE3 指令集以便新系统使用老的 CPU。"
 
+#. type: "kextsPatcher_title"
+#: Resources/templates/Localizable.strings:987
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Embedded Kexts Patch"
+msgstr "Kext Patcher"
+
+#. type: "kextsPatcher_description"
+#: Resources/templates/Localizable.strings:988
+#, fuzzy, no-wrap
+#| msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch kexts."
+msgstr "补丁"
+
+#. type: "AppleRTCPatch_title"
+#: Resources/templates/Localizable.strings:991
+#, no-wrap
+msgid "AppleRTC Patch"
+msgstr ""
+
+#. type: "AppleRTCPatch_description"
+#: Resources/templates/Localizable.strings:992
+#, no-wrap
+msgid "Patch AppleRTC."
+msgstr ""
+
+#. type: "OrangeIconFixSata_title"
+#: Resources/templates/Localizable.strings:995
+#, no-wrap
+msgid "OrangeIcon Fix"
+msgstr ""
+
+#. type: "OrangeIconFixSata_description"
+#: Resources/templates/Localizable.strings:996
+#, no-wrap
+msgid "Fix OrangeIcon."
+msgstr ""
+
+#. type: "TrimEnablerSata_title"
+#: Resources/templates/Localizable.strings:999
+#, no-wrap
+msgid "TrimEnabler Sata"
+msgstr ""
+
+#. type: "TrimEnablerSata_description"
+#: Resources/templates/Localizable.strings:1000
+#, no-wrap
+msgid "Sata TrimEnabler."
+msgstr ""
+
+#. type: "AICPMPatch_title"
+#: Resources/templates/Localizable.strings:1003
+#, no-wrap
+msgid "AICPM Patch"
+msgstr ""
+
+#. type: "AICPMPatch_description"
+#: Resources/templates/Localizable.strings:1004
+#, no-wrap
+msgid "Patch AICPM."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:982
+#: Resources/templates/Localizable.strings:1010
 #, no-wrap
 msgid "Themes"
 msgstr "主题选项"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:983
+#: Resources/templates/Localizable.strings:1011
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -3641,6 +3706,27 @@ msgid ""
 msgstr ""
 "选集的一些主题范例。\n"
 "可在 http://forum.voodooprojects.org/index.php/board,7.0.html 找到更多的主题。"
+
+#~ msgid "Patches"
+#~ msgstr "补丁"
+
+#~ msgid "kernel Patcher"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kext Patcher"
+#~ msgid "Kexts Patcher"
+#~ msgstr "Kext Patcher"
+
+#, fuzzy
+#~| msgid "Select one patch for your kernel."
+#~ msgid "Select patch for your kext."
+#~ msgstr "针对你的内核选择一个 patch。"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Kernel Patches"
+#~ msgstr "Kernel Patcher"
 
 #, fuzzy
 #~| msgid "Intel Azul AAPL,ig-platform-id"

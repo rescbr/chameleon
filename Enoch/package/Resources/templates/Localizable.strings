@@ -942,10 +942,11 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 // ----------------------------------------------------------------------------
 
 // Patches
-"Patches_title" = "Patches";
-"Patches_description" = "A selection of options to patch the kernel.";
-// kernel Patcher
-"kernelPatcher_title" = "kernel Patcher";
+"Patches_title" = "Embedded Patcher";
+"Patches_description" = "A selection of options to patch the Kernel and Kexts.";
+
+// enbedded kernel Patcher
+"kernelPatcher_title" = "Embedded Kernel Patch";
 "kernelPatcher_description" = "Select one patch for your kernel.";
 
 // KernelBooter_kexts
@@ -975,6 +976,33 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 // KernelSSE3
 "KernelSSE3_title" = "KernelSSE3";
 "KernelSSE3_description" = "Patch to enable more SSE3 instructions on older CPUs to run newer OSes.";
+
+// ============================================================================
+// Patches - The follow options are for the internal KextsPatcher
+// In the future here we can add something else regarding any patches made
+// by the bootloader
+// ----------------------------------------------------------------------------
+
+// enbedded Kexts Patcher
+"kextsPatcher_title" = "Embedded Kexts Patch";
+"kextsPatcher_description" = "A selection of options to patch kexts.";
+
+// KernelBooter_kexts
+"AppleRTCPatch_title" = "AppleRTC Patch";
+"AppleRTCPatch_description" = "Patch AppleRTC.";
+
+// KernelPm
+"OrangeIconFixSata_title" = "OrangeIcon Fix";
+"OrangeIconFixSata_description" = "Fix OrangeIcon.";
+
+// KernelLapicError
+"TrimEnablerSata_title" = "TrimEnabler Sata";
+"TrimEnablerSata_description" = "Sata TrimEnabler.";
+
+// KernelLapicVersion
+"AICPMPatch_title" = "AICPM Patch";
+"AICPMPatch_description" = "Patch AICPM.";
+
 // ============================================================================
 // Themes
 // ----------------------------------------------------------------------------

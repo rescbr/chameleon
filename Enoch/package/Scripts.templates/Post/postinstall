@@ -77,7 +77,7 @@ fi
 if [[ $( /usr/libexec/PlistBuddy -c "Print bootloader" ${configFile} ) == "true" ]];then
     # if we have installed the bootloader, this is a new log
     echo "NOTE: any Themes or modules you have must be there since this now"
-    echo "      is the boot partition. ACPI tables, SMBios.plist, kernel.plist, kext.plist and the"
+    echo "      is the boot partition. ACPI tables, SMBios.plist, kernel.plist, kexts.plist and the"
     echo "      org.chameleon.Boot.plist (with custom settings for the target"
     echo "      OSX must be in each partition that contain it.)"
     echo "$mainLine"

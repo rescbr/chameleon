@@ -76,14 +76,8 @@ msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid ""
-"Chameleon is a boot loader built using a combination of components which "
-"evolved from the development of David Elliott's fake EFI implementation "
-"added to Apple's boot-132 project."
-msgstr ""
-"Chameleon is a boot loader built using a combination of components which "
-"evolved from the development of David Elliott's fake EFI implementation "
-"added to Apple's boot-132 project."
+msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
+msgstr "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
@@ -97,10 +91,8 @@ msgstr "- Fully customizable GUI to bring some color to the Darwin Bootloader."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid ""
-"- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr ""
-"- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr "- Load a ramdisk to directly boot retail DVDs without additional programs."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
@@ -114,10 +106,8 @@ msgstr "- SMBIOS override to modify the factory SMBIOS values."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid ""
-"- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr ""
-"- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr "- DSDT override to use a modified fixed DSDT which can solve several issues."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
@@ -156,10 +146,8 @@ msgstr "- Memory detection adapted from memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid ""
-"- Automatic P-State &amp; C-State generation for native power management."
-msgstr ""
-"- Automatic P-State &amp; C-State generation for native power management."
+msgid "- Automatic P-State &amp; C-State generation for native power management."
+msgstr "- Automatic P-State &amp; C-State generation for native power management."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:35
@@ -203,12 +191,8 @@ msgstr "read it"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid ""
-"&nbsp;to find out if the installation was successful and keep it for a "
-"record of what was done."
-msgstr ""
-"&nbsp;to find out if the installation was successful and keep it for a "
-"record of what was done."
+msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
+msgstr "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
@@ -468,8 +452,7 @@ msgstr ""
 "Dependencies: none"
 
 #. type: "Resolution_title"
-#: Resources/templates/Localizable.strings:81
-#: Resources/templates/Localizable.strings:899
+#: Resources/templates/Localizable.strings:81 Resources/templates/Localizable.strings:899
 #, no-wrap
 msgid "Resolution"
 msgstr "Resolution"
@@ -1367,8 +1350,7 @@ msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
 msgstr "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "HDAULayoutIDx01_title"
-#: Resources/templates/Localizable.strings:324
-#: Resources/templates/Localizable.strings:430
+#: Resources/templates/Localizable.strings:324 Resources/templates/Localizable.strings:430
 #, no-wrap
 msgid "LayoutID=1"
 msgstr "LayoutID=1"
@@ -1384,8 +1366,7 @@ msgstr ""
 "001 (0x01, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx02_title"
-#: Resources/templates/Localizable.strings:328
-#: Resources/templates/Localizable.strings:434
+#: Resources/templates/Localizable.strings:328 Resources/templates/Localizable.strings:434
 #, no-wrap
 msgid "LayoutID=2"
 msgstr "LayoutID=2"
@@ -1401,8 +1382,7 @@ msgstr ""
 "002 (0x02, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx03_title"
-#: Resources/templates/Localizable.strings:332
-#: Resources/templates/Localizable.strings:438
+#: Resources/templates/Localizable.strings:332 Resources/templates/Localizable.strings:438
 #, no-wrap
 msgid "LayoutID=3"
 msgstr "LayoutID=3"
@@ -1418,8 +1398,7 @@ msgstr ""
 "003 (0x03, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx05_title"
-#: Resources/templates/Localizable.strings:336
-#: Resources/templates/Localizable.strings:442
+#: Resources/templates/Localizable.strings:336 Resources/templates/Localizable.strings:442
 #, no-wrap
 msgid "LayoutID=5"
 msgstr "LayoutID=5"
@@ -1435,8 +1414,7 @@ msgstr ""
 "005 (0x05, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx07_title"
-#: Resources/templates/Localizable.strings:340
-#: Resources/templates/Localizable.strings:446
+#: Resources/templates/Localizable.strings:340 Resources/templates/Localizable.strings:446
 #, no-wrap
 msgid "LayoutID=7"
 msgstr "LayoutID=7"
@@ -1452,8 +1430,7 @@ msgstr ""
 "007 (0x07, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx12_title"
-#: Resources/templates/Localizable.strings:344
-#: Resources/templates/Localizable.strings:450
+#: Resources/templates/Localizable.strings:344 Resources/templates/Localizable.strings:450
 #, no-wrap
 msgid "LayoutID=12"
 msgstr "LayoutID=12"
@@ -1469,8 +1446,7 @@ msgstr ""
 "00C (0x0C, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx32_title"
-#: Resources/templates/Localizable.strings:348
-#: Resources/templates/Localizable.strings:454
+#: Resources/templates/Localizable.strings:348 Resources/templates/Localizable.strings:454
 #, no-wrap
 msgid "LayoutID=32"
 msgstr "LayoutID=32"
@@ -1486,8 +1462,7 @@ msgstr ""
 "020 (0x20, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx40_title"
-#: Resources/templates/Localizable.strings:352
-#: Resources/templates/Localizable.strings:458
+#: Resources/templates/Localizable.strings:352 Resources/templates/Localizable.strings:458
 #, no-wrap
 msgid "LayoutID=40"
 msgstr "LayoutID=40"
@@ -1503,8 +1478,7 @@ msgstr ""
 "028 (0x28, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx65_title"
-#: Resources/templates/Localizable.strings:356
-#: Resources/templates/Localizable.strings:462
+#: Resources/templates/Localizable.strings:356 Resources/templates/Localizable.strings:462
 #, no-wrap
 msgid "LayoutID=65"
 msgstr "LayoutID=65"
@@ -1520,8 +1494,7 @@ msgstr ""
 "041 (0x41, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx99_title"
-#: Resources/templates/Localizable.strings:360
-#: Resources/templates/Localizable.strings:466
+#: Resources/templates/Localizable.strings:360 Resources/templates/Localizable.strings:466
 #, no-wrap
 msgid "LayoutID=99"
 msgstr "LayoutID=99"
@@ -1537,8 +1510,7 @@ msgstr ""
 "063 (0x63, 0x00, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx269_title"
-#: Resources/templates/Localizable.strings:364
-#: Resources/templates/Localizable.strings:470
+#: Resources/templates/Localizable.strings:364 Resources/templates/Localizable.strings:470
 #, no-wrap
 msgid "LayoutID=269"
 msgstr "LayoutID=269"
@@ -1554,8 +1526,7 @@ msgstr ""
 "10D (0x0D, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx387_title"
-#: Resources/templates/Localizable.strings:368
-#: Resources/templates/Localizable.strings:474
+#: Resources/templates/Localizable.strings:368 Resources/templates/Localizable.strings:474
 #, no-wrap
 msgid "LayoutID=387"
 msgstr "LayoutID=387"
@@ -1571,8 +1542,7 @@ msgstr ""
 "183 (0x83, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx388_title"
-#: Resources/templates/Localizable.strings:372
-#: Resources/templates/Localizable.strings:478
+#: Resources/templates/Localizable.strings:372 Resources/templates/Localizable.strings:478
 #, no-wrap
 msgid "LayoutID=388"
 msgstr "LayoutID=388"
@@ -1588,8 +1558,7 @@ msgstr ""
 "184 (0x84, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx389_title"
-#: Resources/templates/Localizable.strings:376
-#: Resources/templates/Localizable.strings:482
+#: Resources/templates/Localizable.strings:376 Resources/templates/Localizable.strings:482
 #, no-wrap
 msgid "LayoutID=389"
 msgstr "LayoutID=389"
@@ -1605,8 +1574,7 @@ msgstr ""
 "185 (0x85, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx392_title"
-#: Resources/templates/Localizable.strings:380
-#: Resources/templates/Localizable.strings:486
+#: Resources/templates/Localizable.strings:380 Resources/templates/Localizable.strings:486
 #, no-wrap
 msgid "LayoutID=392"
 msgstr "LayoutID=392"
@@ -1622,8 +1590,7 @@ msgstr ""
 "188 (0x88, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx398_title"
-#: Resources/templates/Localizable.strings:384
-#: Resources/templates/Localizable.strings:490
+#: Resources/templates/Localizable.strings:384 Resources/templates/Localizable.strings:490
 #, no-wrap
 msgid "LayoutID=398"
 msgstr "LayoutID=398"
@@ -1639,8 +1606,7 @@ msgstr ""
 "18E (0x8E, 0x01, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx662_title"
-#: Resources/templates/Localizable.strings:388
-#: Resources/templates/Localizable.strings:494
+#: Resources/templates/Localizable.strings:388 Resources/templates/Localizable.strings:494
 #, no-wrap
 msgid "LayoutID=662"
 msgstr "LayoutID=662"
@@ -1656,8 +1622,7 @@ msgstr ""
 "296 (0x96, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx663_title"
-#: Resources/templates/Localizable.strings:392
-#: Resources/templates/Localizable.strings:498
+#: Resources/templates/Localizable.strings:392 Resources/templates/Localizable.strings:498
 #, no-wrap
 msgid "LayoutID=663"
 msgstr "LayoutID=663"
@@ -1673,8 +1638,7 @@ msgstr ""
 "297 (0x97, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx664_title"
-#: Resources/templates/Localizable.strings:396
-#: Resources/templates/Localizable.strings:502
+#: Resources/templates/Localizable.strings:396 Resources/templates/Localizable.strings:502
 #, no-wrap
 msgid "LayoutID=664"
 msgstr "LayoutID=664"
@@ -1690,8 +1654,7 @@ msgstr ""
 "298 (0x98, 0x02, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx885_title"
-#: Resources/templates/Localizable.strings:400
-#: Resources/templates/Localizable.strings:506
+#: Resources/templates/Localizable.strings:400 Resources/templates/Localizable.strings:506
 #, no-wrap
 msgid "LayoutID=885"
 msgstr "LayoutID=885"
@@ -1707,8 +1670,7 @@ msgstr ""
 "375 (0x75, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx887_title"
-#: Resources/templates/Localizable.strings:404
-#: Resources/templates/Localizable.strings:510
+#: Resources/templates/Localizable.strings:404 Resources/templates/Localizable.strings:510
 #, no-wrap
 msgid "LayoutID=887"
 msgstr "LayoutID=887"
@@ -1724,8 +1686,7 @@ msgstr ""
 "377 (0x77, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx888_title"
-#: Resources/templates/Localizable.strings:408
-#: Resources/templates/Localizable.strings:514
+#: Resources/templates/Localizable.strings:408 Resources/templates/Localizable.strings:514
 #, no-wrap
 msgid "LayoutID=888"
 msgstr "LayoutID=888"
@@ -1741,8 +1702,7 @@ msgstr ""
 "378 (0x78, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx889_title"
-#: Resources/templates/Localizable.strings:412
-#: Resources/templates/Localizable.strings:518
+#: Resources/templates/Localizable.strings:412 Resources/templates/Localizable.strings:518
 #, no-wrap
 msgid "LayoutID=889"
 msgstr "LayoutID=889"
@@ -1758,8 +1718,7 @@ msgstr ""
 "379 (0x79, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx892_title"
-#: Resources/templates/Localizable.strings:416
-#: Resources/templates/Localizable.strings:522
+#: Resources/templates/Localizable.strings:416 Resources/templates/Localizable.strings:522
 #, no-wrap
 msgid "LayoutID=892"
 msgstr "LayoutID=892"
@@ -1775,8 +1734,7 @@ msgstr ""
 "37C (0x7C, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDx898_title"
-#: Resources/templates/Localizable.strings:420
-#: Resources/templates/Localizable.strings:526
+#: Resources/templates/Localizable.strings:420 Resources/templates/Localizable.strings:526
 #, no-wrap
 msgid "LayoutID=898"
 msgstr "LayoutID=898"
@@ -1792,8 +1750,7 @@ msgstr ""
 "382 (0x82, 0x03, 0x00, 0x00)."
 
 #. type: "HDAULayoutIDxBD7_title"
-#: Resources/templates/Localizable.strings:424
-#: Resources/templates/Localizable.strings:530
+#: Resources/templates/Localizable.strings:424 Resources/templates/Localizable.strings:530
 #, no-wrap
 msgid "LayoutID=1981"
 msgstr "LayoutID=1981"
@@ -3487,119 +3444,179 @@ msgstr "Select one keylayout to use. This will also install the Keylayout module
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
 #, no-wrap
-msgid "Patches"
-msgstr "Patches"
+msgid "Embedded Patcher"
+msgstr "Embedded Patcher"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, no-wrap
-msgid "A selection of options to patch the kernel."
-msgstr "A selection of options to patch the kernel."
+msgid "A selection of options to patch the Kernel and Kexts."
+msgstr "A selection of options to patch the Kernel and Kexts."
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:948
+#: Resources/templates/Localizable.strings:949
 #, no-wrap
-msgid "kernel Patcher"
-msgstr "Kernel Patcher"
+msgid "Embedded Kernel Patch"
+msgstr "Embedded Kernel Patch"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:950
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr "Select one patch for your kernel."
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:952
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "KernelBooter_kexts"
 msgstr "KernelBooter_kexts"
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:954
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr "Re-enable /Extra/Extensions kexts on newer OSes."
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:956
+#: Resources/templates/Localizable.strings:957
 #, no-wrap
 msgid "KernelPm"
 msgstr "KernelPm"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:958
 #, no-wrap
 msgid "Kernel Power Management patch."
 msgstr "Kernel Power Management patch."
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:960
+#: Resources/templates/Localizable.strings:961
 #, no-wrap
 msgid "KernelLapicError"
 msgstr "KernelLapicError"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:962
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr "Remove the Local Apic Error panic."
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:964
+#: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "KernelLapicVersion"
 msgstr "KernelLapicVersion"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:966
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr "Remove the Local Apic Version panic."
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:968
+#: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "KernelHaswell"
 msgstr "KernelHaswell"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:970
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:972
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "KernelcpuFamily"
 msgstr "KernelcpuFamily"
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:974
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:976
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "KernelSSE3"
 msgstr "KernelSSE3"
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:978
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 
+#. type: "kextsPatcher_title"
+#: Resources/templates/Localizable.strings:987
+#, no-wrap
+msgid "Embedded Kexts Patch"
+msgstr "Embedded Kexts Patch"
+
+#. type: "kextsPatcher_description"
+#: Resources/templates/Localizable.strings:988
+#, no-wrap
+msgid "A selection of options to patch kexts."
+msgstr "A selection of options to patch kexts."
+
+#. type: "AppleRTCPatch_title"
+#: Resources/templates/Localizable.strings:991
+#, no-wrap
+msgid "AppleRTC Patch"
+msgstr "AppleRTC Patch"
+
+#. type: "AppleRTCPatch_description"
+#: Resources/templates/Localizable.strings:992
+#, no-wrap
+msgid "Patch AppleRTC."
+msgstr "Patch AppleRTC."
+
+#. type: "OrangeIconFixSata_title"
+#: Resources/templates/Localizable.strings:995
+#, no-wrap
+msgid "OrangeIcon Fix"
+msgstr "OrangeIcon Fix"
+
+#. type: "OrangeIconFixSata_description"
+#: Resources/templates/Localizable.strings:996
+#, no-wrap
+msgid "Fix OrangeIcon."
+msgstr "Fix OrangeIcon."
+
+#. type: "TrimEnablerSata_title"
+#: Resources/templates/Localizable.strings:999
+#, no-wrap
+msgid "TrimEnabler Sata"
+msgstr "TrimEnabler Sata"
+
+#. type: "TrimEnablerSata_description"
+#: Resources/templates/Localizable.strings:1000
+#, no-wrap
+msgid "Sata TrimEnabler."
+msgstr "Sata TrimEnabler."
+
+#. type: "AICPMPatch_title"
+#: Resources/templates/Localizable.strings:1003
+#, no-wrap
+msgid "AICPM Patch"
+msgstr "AICPM Patch"
+
+#. type: "AICPMPatch_description"
+#: Resources/templates/Localizable.strings:1004
+#, no-wrap
+msgid "Patch AICPM."
+msgstr "Patch AICPM."
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:982
+#: Resources/templates/Localizable.strings:1010
 #, no-wrap
 msgid "Themes"
 msgstr "Themes"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:983
+#: Resources/templates/Localizable.strings:1011
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"

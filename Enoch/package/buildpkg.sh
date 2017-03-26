@@ -571,23 +571,105 @@ main ()
 
 # End build Chameleon package
 
-# build Patches packages
 
-    addGroupChoices "Patches"
+# build Options packages
+
+    addGroupChoices "Options"
 
     # ------------------------------------------------------
-    # parse Patches folder to find files of patches options.
+    # parse OptionalSettings folder to find files of boot options.
     # ------------------------------------------------------
-    KernelSettingsFolder="${PKGROOT}/Patches"
+    OptionalSettingsFolder="${PKGROOT}/OptionalSettings"
 
     while IFS= read -r -d '' OptionsFile; do
 
         # Take filename and strip .txt from end and path from front
-        builtKPsList=${OptionsFile%.txt}
-        builtKPsList=${builtKPsList##*/}
-        packagesidentity="${chameleon_package_identity}.kernel.$builtKPsList"
+        builtOptionsList=${OptionsFile%.txt}
+        builtOptionsList=${builtOptionsList##*/}
+        packagesidentity="${chameleon_package_identity}.options.$builtOptionsList"
 
-        echo "================= $builtKPsList ================="
+        echo "================= $builtOptionsList ================="
+
+        # ------------------------------------------------------
+        # Read boot option file into an array.
+        # ------------------------------------------------------
+        availableOptions=() # array to hold the list of boot options, per 'section'.
+        exclusiveFlag=""    # used to indicate list has exclusive options
+        while read textLine; do
+            # ignore lines in the file beginning with a #
+            [[ $textLine = \#* ]] && continue
+            local optionName="" key="" value=""
+            case "$textLine" in
+                Exclusive=[Tt][Rr][Uu][Ee]) exclusiveFlag="--exclusive_zero_or_one_choice" ;;
+                Exclusive=*) continue ;;
+                *@*:*=*)
+                   availableOptions[${#availableOptions[*]}]="$textLine" ;;
+                *) echo "Error: invalid line '$textLine' in file '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+        done < "$OptionsFile"
+
+        addGroupChoices  --parent="Options" $exclusiveFlag "${builtOptionsList}"
+
+        # ------------------------------------------------------
+        # Loop through options in array and process each in turn
+        # ------------------------------------------------------
+        for textLine in "${availableOptions[@]}"; do
+            # split line - taking all before ':' as option name
+            # and all after ':' as key/value
+            type=$( echo "${textLine%%@*}" | tr '[:upper:]' '[:lower:]' )
+            tmp=${textLine#*@}
+            optionName=${tmp%%:*}
+            keyValue=${tmp##*:}
+            key=${keyValue%%=*}
+            value=${keyValue#*=}
+
+            # create folders required for each boot option
+            mkdir -p "${PKG_BUILD_DIR}/$optionName/Root/"
+
+            case "$type" in
+                bool) startSelected="check_chameleon_bool_option('$key','$value')" ;;
+                text) startSelected="check_chameleon_text_option('$key','$value')" ;;
+                list) startSelected="check_chameleon_list_option('$key','$value')" ;;
+                *) echo "Error: invalid type '$type' in line '$textLine' in '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+            recordChameleonOption "$type" "$key" "$value"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/$optionName" \
+                               --subst="optionType=$type"                   \
+                               --subst="optionKey=$key"                     \
+                               --subst="optionValue=$value"                 \
+                               AddOption
+            packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
+            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
+            addChoice --group="${builtOptionsList}"  \
+                --start-selected="$startSelected"    \
+                --pkg-refs="$packageRefId" "${optionName}"
+        done
+
+    done < <( find "${OptionalSettingsFolder}" -depth 1 -type f -name '*.txt' -print0 )
+
+# End build options packages
+
+    addGroupChoices "Patches"
+
+# build Kernel Patches packages
+
+    # -------------------------------------------------------------
+    # parse eKernelPatches folder to find files of patches options.
+    # -------------------------------------------------------------
+    KernelSettingsFolder="${PKGROOT}/eKernelPatches"
+
+    while IFS= read -r -d '' OptionsFile; do
+
+        # Take filename and strip .txt from end and path from front
+        builtKernelPsList=${OptionsFile%.txt}
+        builtKernelPsList=${builtKernelPsList##*/}
+        packagesidentity="${chameleon_package_identity}.kernel.$builtKernelPsList"
+
+        echo "================= $builtKernelPsList ================="
 
         # ------------------------------------------------------
         # Read kernel patcher option file into an array.
@@ -609,7 +691,7 @@ main ()
             esac
         done < "$OptionsFile"
 
-        addGroupChoices  --parent="Patches" $exclusiveFlag "${builtKPsList}"
+        addGroupChoices  --parent="Patches" $exclusiveFlag "${builtKernelPsList}"
 
         # ------------------------------------------------------
         # Loop through options in array and process each in turn
@@ -643,14 +725,95 @@ main ()
                                AddKernelOption
             packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
             buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
-            addChoice --group="${builtKPsList}"  \
+            addChoice --group="${builtKernelPsList}"  \
                 --start-selected="$startSelected"    \
                 --pkg-refs="$packageRefId" "${optionName}"
         done
 
     done < <( find "${KernelSettingsFolder}" -depth 1 -type f -name '*.txt' -print0 )
 
-# End build Patches packages
+# End build Kernel Patches packages
+
+# build Kexts Patches packages
+
+    #addGroupChoices "eKextsPatches"
+
+    # ------------------------------------------------------------
+    # parse eKextsPatches folder to find files of patches options.
+    # ------------------------------------------------------------
+    KextsSettingsFolder="${PKGROOT}/eKextsPatches"
+
+    while IFS= read -r -d '' OptionsFile; do
+
+        # Take filename and strip .txt from end and path from front
+        builtKextsPsList=${OptionsFile%.txt}
+        builtKextsPsList=${builtKextsPsList##*/}
+        packagesidentity="${chameleon_package_identity}.kexts.$builtKextsPsList"
+
+        echo "================= $builtKextsPsList ================="
+
+        # ---------------------------------------------
+        # Read kexts patcher option file into an array.
+        # ---------------------------------------------
+        availableOptions=() # array to hold the list of patches options, per 'section'.
+        exclusiveFlag=""    # used to indicate list has exclusive options
+        while read textLine; do
+            # ignore lines in the file beginning with a #
+            [[ $textLine = \#* ]] && continue
+            local optionName="" key="" value=""
+            case "$textLine" in
+                Exclusive=[Tt][Rr][Uu][Ee]) exclusiveFlag="--exclusive_zero_or_one_choice" ;;
+                Exclusive=*) continue ;;
+                *@*:*=*)
+                   availableOptions[${#availableOptions[*]}]="$textLine" ;;
+                *) echo "Error: invalid line '$textLine' in file '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+        done < "$OptionsFile"
+
+        addGroupChoices  --parent="Patches" $exclusiveFlag "${builtKextsPsList}"
+
+        # ------------------------------------------------------
+        # Loop through options in array and process each in turn
+        # ------------------------------------------------------
+        for textLine in "${availableOptions[@]}"; do
+            # split line - taking all before ':' as option name
+            # and all after ':' as key/value
+            type=$( echo "${textLine%%@*}" | tr '[:upper:]' '[:lower:]' )
+            tmp=${textLine#*@}
+            optionName=${tmp%%:*}
+            keyValue=${tmp##*:}
+            key=${keyValue%%=*}
+            value=${keyValue#*=}
+
+            # create folders required for each boot option
+            mkdir -p "${PKG_BUILD_DIR}/$optionName/Root/"
+
+            case "$type" in
+                bool) startSelected="check_kexts_bool_option('$key','$value')" ;;
+                text) startSelected="check_kexts_text_option('$key','$value')" ;;
+                list) startSelected="check_kexts_list_option('$key','$value')" ;;
+                *) echo "Error: invalid type '$type' in line '$textLine' in '$OptionsFile'" >&2
+                   exit 1
+                   ;;
+            esac
+            recordChameleonOption "$type" "$key" "$value"
+            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/$optionName" \
+                               --subst="optionType=$type"                   \
+                               --subst="optionKey=$key"                     \
+                               --subst="optionValue=$value"                 \
+                               AddKextsOption
+            packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
+            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
+            addChoice --group="${builtKextsPsList}"  \
+                --start-selected="$startSelected"    \
+                --pkg-refs="$packageRefId" "${optionName}"
+        done
+
+    done < <( find "${KextsSettingsFolder}" -depth 1 -type f -name '*.txt' -print0 )
+
+# End build Kexts Patches packages
 
 if [[ "${CONFIG_MODULES}" == 'y' ]];then
 # build Modules package
@@ -976,87 +1139,6 @@ if [[ "${CONFIG_MODULES}" == 'y' ]];then
     fi
 # End build Modules packages
 fi
-
-# build Options packages
-
-    addGroupChoices "Options"
-
-    # ------------------------------------------------------
-    # parse OptionalSettings folder to find files of boot options.
-    # ------------------------------------------------------
-    OptionalSettingsFolder="${PKGROOT}/OptionalSettings"
-
-    while IFS= read -r -d '' OptionsFile; do
-
-        # Take filename and strip .txt from end and path from front
-        builtOptionsList=${OptionsFile%.txt}
-        builtOptionsList=${builtOptionsList##*/}
-        packagesidentity="${chameleon_package_identity}.options.$builtOptionsList"
-
-        echo "================= $builtOptionsList ================="
-
-        # ------------------------------------------------------
-        # Read boot option file into an array.
-        # ------------------------------------------------------
-        availableOptions=() # array to hold the list of boot options, per 'section'.
-        exclusiveFlag=""    # used to indicate list has exclusive options
-        while read textLine; do
-            # ignore lines in the file beginning with a #
-            [[ $textLine = \#* ]] && continue
-            local optionName="" key="" value=""
-            case "$textLine" in
-                Exclusive=[Tt][Rr][Uu][Ee]) exclusiveFlag="--exclusive_zero_or_one_choice" ;;
-                Exclusive=*) continue ;;
-                *@*:*=*)
-                   availableOptions[${#availableOptions[*]}]="$textLine" ;;
-                *) echo "Error: invalid line '$textLine' in file '$OptionsFile'" >&2
-                   exit 1
-                   ;;
-            esac
-        done < "$OptionsFile"
-
-        addGroupChoices  --parent="Options" $exclusiveFlag "${builtOptionsList}"
-
-        # ------------------------------------------------------
-        # Loop through options in array and process each in turn
-        # ------------------------------------------------------
-        for textLine in "${availableOptions[@]}"; do
-            # split line - taking all before ':' as option name
-            # and all after ':' as key/value
-            type=$( echo "${textLine%%@*}" | tr '[:upper:]' '[:lower:]' )
-            tmp=${textLine#*@}
-            optionName=${tmp%%:*}
-            keyValue=${tmp##*:}
-            key=${keyValue%%=*}
-            value=${keyValue#*=}
-
-            # create folders required for each boot option
-            mkdir -p "${PKG_BUILD_DIR}/$optionName/Root/"
-
-            case "$type" in
-                bool) startSelected="check_chameleon_bool_option('$key','$value')" ;;
-                text) startSelected="check_chameleon_text_option('$key','$value')" ;;
-                list) startSelected="check_chameleon_list_option('$key','$value')" ;;
-                *) echo "Error: invalid type '$type' in line '$textLine' in '$OptionsFile'" >&2
-                   exit 1
-                   ;;
-            esac
-            recordChameleonOption "$type" "$key" "$value"
-            addTemplateScripts --pkg-rootdir="${PKG_BUILD_DIR}/$optionName" \
-                               --subst="optionType=$type"                   \
-                               --subst="optionKey=$key"                     \
-                               --subst="optionValue=$value"                 \
-                               AddOption
-            packageRefId=$(getPackageRefId "${packagesidentity}" "${optionName}")
-            buildpackage "$packageRefId" "${optionName}" "${PKG_BUILD_DIR}/${optionName}" "/"
-            addChoice --group="${builtOptionsList}"  \
-                --start-selected="$startSelected"    \
-                --pkg-refs="$packageRefId" "${optionName}"
-        done
-
-    done < <( find "${OptionalSettingsFolder}" -depth 1 -type f -name '*.txt' -print0 )
-
-# End build options packages
 
 if [[ -n "${CONFIG_KEYLAYOUT_MODULE}" ]];then
 # build Keymaps options packages
