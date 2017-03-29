@@ -752,10 +752,10 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
 					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
-					gtf_timings(x, y, freqs[j], &modeline->clock,
-								&modeline->hsyncstart, &modeline->hsyncend,
-								&modeline->hblank, &modeline->vsyncstart,
-								&modeline->vsyncend, &modeline->vblank);
+					gtf_timings(x, y, freqs[j], (void *)&modeline->clock,
+								(void *)&modeline->hsyncstart, (void *)&modeline->hsyncend,
+								(void *)&modeline->hblank, (void *)&modeline->vsyncstart,
+								(void *)&modeline->vsyncend, (void *)&modeline->vblank);
 					
 					if (htotal)
 					{
@@ -794,10 +794,10 @@ void set_mode(vbios_map * map, /*UInt32 mode,*/ UInt32 x, UInt32 y, UInt32 bp, U
 					modeline->x1 = modeline->x2 = (uint16_t)(x-1);
 					modeline->y1 = modeline->y2 = (uint16_t)(y-1);
 					
-					gtf_timings(x, y, freqs[j], &modeline->clock,
-								&modeline->hsyncstart, &modeline->hsyncend,
-								&modeline->hblank, &modeline->vsyncstart,
-								&modeline->vsyncend, &modeline->vblank);
+					gtf_timings(x, y, freqs[j], (void *)&modeline->clock,
+								(void *)&modeline->hsyncstart, (void *)&modeline->hsyncend,
+								(void *)&modeline->hblank, (void *)&modeline->vsyncstart,
+								(void *)&modeline->vsyncend, (void *)&modeline->vblank);
 					if (htotal)
 					{
 						modeline->htotal = (uint16_t)htotal;
