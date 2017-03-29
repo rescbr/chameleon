@@ -925,7 +925,7 @@ void addSMBOemProcessorType(SMBStructPtrs *structPtr)
 	p->header.length	= sizeof(SMBOemProcessorType);
 	p->header.handle	= handle++;
 
-	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)&(p->ProcessorType));
+	setSMBValue(structPtr, numOfSetters - 2 , (returnType *)(void *)&(p->ProcessorType));
 
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorType) + 2);
 	tableLength += sizeof(SMBOemProcessorType) + 2;
@@ -974,7 +974,7 @@ void addSMBOemProcessorBusSpeed(SMBStructPtrs *structPtr)
 	p->header.length	= sizeof(SMBOemProcessorBusSpeed);
 	p->header.handle	= handle++;
 
-	setSMBValue(structPtr, numOfSetters -1, (returnType *)&(p->ProcessorBusSpeed));
+	setSMBValue(structPtr, numOfSetters -1, (returnType *)(void *)&(p->ProcessorBusSpeed));
 
 	structPtr->new = (SMBStructHeader *)((uint8_t *)structPtr->new + sizeof(SMBOemProcessorBusSpeed) + 2);
 	tableLength += sizeof(SMBOemProcessorBusSpeed) + 2;
