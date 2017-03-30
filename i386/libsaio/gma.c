@@ -33,6 +33,7 @@
 	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
 */
 
+#include "config.h"
 #include "libsa.h"
 #include "saio_internal.h"
 #include "bootstruct.h"
@@ -43,14 +44,6 @@
 #include "gma.h"
 #include "vbe.h"
 #include "graphics.h"
-
-#ifndef DEBUG_GMA
-	#define DEBUG_GMA 0
-#endif
-
-#ifndef REPLACE_DEVICE_ID
-	#define REPLACE_DEVICE_ID 0
-#endif
 
 #if DEBUG_GMA
 	#define DBG(x...)	printf(x)
@@ -443,7 +436,7 @@ static intel_gfx_info_t intel_gfx_chipsets[] = {
 	{GMA_SKYLAKE_ULX_GT1,			HD_GRAPHICS },		/* 190E */
 	{GMA_SKYLAKE_ULX_GT2,			HD_GRAPHICS_515 },	/* 191E */
 	{GMA_SKYLAKE_DT_GT2,			HD_GRAPHICS_530 },	/* 1912 */
-	{GMA_SKYLAKE_1921,				HD_GRAPHICS_520 },	/* 1921 */
+	{GMA_SKYLAKE_1921,			HD_GRAPHICS_520 },	/* 1921 */
 	{GMA_SKYLAKE_ULT_GT3_E,			IRIS_540 },		/* 1926 */
 	{GMA_SKYLAKE_ULT_GT3,			HD_GRAPHICS_535 },	/* 1923 */
 	{GMA_SKYLAKE_ULT_GT3_28W,		HD_GRAPHICS_550 },	/* 1927 */

@@ -22,14 +22,11 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
+#include "config.h"
 #include "bootstruct.h"
 #include "libsaio.h"
 #include "sl.h"
 #include "xml.h"
-
-#ifndef DEBUG_XML
-	#define DEBUG_XML 0
-#endif
 
 #if DEBUG_XML
 	#define DBG(x...)	printf(x)
@@ -912,7 +909,7 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 
 //==========================================================================
 // ParseTagData
-static long ParseTagData( char *buffer, TagPtr *tag )
+static long ParseTagData( char *buffer, TagPtr *tag)
 {
 	int		actuallen = 0;
 	long		length = 0;

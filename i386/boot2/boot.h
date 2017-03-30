@@ -206,7 +206,6 @@ uint32_t kernelOSVer; /* boot.c */
 /* Bungo: added this key */
 #define kPrivateData			"PrivateData"			/* smbios_decode.c */
 
-
 /*
  * Flags to the booter or kernel
  */
@@ -263,17 +262,11 @@ extern int usb_loop();
  * graphics.c
  */
 extern void printVBEModeInfo();
-extern void setVideoMode(int mode, int drawgraphics);
+extern void setVideoMode(int mode);
 extern int  getVideoMode();
 extern void spinActivityIndicator();
 extern void clearActivityIndicator();
-extern void drawColorRectangle(
-                               unsigned short x,
-                               unsigned short y,
-                               unsigned short width,
-                               unsigned short height,
-                               unsigned char  colorIndex
-                               );
+extern void setBackgroundColor( uint32_t color );
 extern void drawDataRectangle(
                               unsigned short  x,
                               unsigned short  y,

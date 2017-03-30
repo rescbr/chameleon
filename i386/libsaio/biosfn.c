@@ -40,13 +40,10 @@
     - Added ebiosEjectMedia
  */
 
+#include "config.h"
 #include "bootstruct.h"
 #include "libsaio.h"
 
-
-#ifndef MEMRANGE
-	#define MEMRANGE 0
-#endif
 
 #if MEMRANGE
 	#define DBG(x...)	printf(x)

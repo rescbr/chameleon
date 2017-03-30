@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.3\n"
+"Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-04-26 18:46+0100\n"
 "PO-Revision-Date: 2016-04-26 17:25+0000\n"
@@ -1293,7 +1293,10 @@ msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
-msgstr "Kext assinatura: Introduzido em 10,9, reforçada em 10,10 (assinatura kext necessária para todas as kexts), agora se tornou parte de desenraizada (SIP)."
+msgstr ""
+"Kext assinatura: Introduzido em 10,9, reforçada em 10,10 (assinatura kext "
+"necessária para todas as kexts), agora se tornou parte de desenraizada "
+"(SIP)."
 
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
@@ -1305,7 +1308,9 @@ msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
-msgstr "Proteção do sistema de arquivos: arquivos de sistema importantes são protegidos e não pode ser modificado."
+msgstr ""
+"Proteção do sistema de arquivos: arquivos de sistema importantes são "
+"protegidos e não pode ser modificado."
 
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
@@ -3579,7 +3584,9 @@ msgstr "KernelHaswell"
 #: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
-msgstr "Patch para Haswell  \\\"E\\\"  e support \\\"ULT\\ em sistemas operacionais mais antigos."
+msgstr ""
+"Patch para Haswell  \\\"E\\\"  e support \\\"ULT\\ em sistemas operacionais mais "
+"antigos."
 
 #. type: "KernelcpuFamily_title"
 #: Resources/templates/Localizable.strings:972
@@ -3591,7 +3598,9 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
-msgstr "Corrigir o endereço cpuid_family para remover o _cpuid_set_info _panic e _tsc_init _panic. Para CPUs sem suporte"
+msgstr ""
+"Corrigir o endereço cpuid_family para remover o _cpuid_set_info _panic e "
+"_tsc_init _panic. Para CPUs sem suporte"
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
@@ -3603,7 +3612,9 @@ msgstr "KernelSSE3"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
-msgstr "Patch para permitir mais instruções SSE3 em CPUs mais velhos para executar sistemas operacionais mais recentes."
+msgstr ""
+"Patch para permitir mais instruções SSE3 em CPUs mais velhos para executar "
+"sistemas operacionais mais recentes."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982

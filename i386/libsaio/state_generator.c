@@ -9,6 +9,7 @@
  *
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
@@ -21,16 +22,12 @@
 #include "aml_generator.h"
 #include "state_generator.h"
 
-#ifndef DEBUG_STATE
-#define DEBUG_STATE 0
-#endif
-
 #if DEBUG_STATE==2
 #define DBG(x...)  {printf(x); sleep(1);}
 #elif DEBUG_STATE==1
-#define DBG(x...)  printf(x)
+	#define DBG(x...)  printf(x)
 #else
-#define DBG(x...)  msglog(x)
+	#define DBG(x...)  msglog(x)
 #endif
 
 uint8_t acpi_cpu_count	= 0;

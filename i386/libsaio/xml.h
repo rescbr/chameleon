@@ -115,5 +115,4 @@ long XMLParseFile( char *buffer, TagPtr *dict );
 // ParseTag*
 long    ParseTagBoolean( char *buffer, TagPtr *tag, long type );
 
-
 #endif /* __LIBSAIO_XML_H */

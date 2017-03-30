@@ -165,11 +165,6 @@ Options useful in the org.chameleon.Boot.plist file:
                               if smbios.plist doesn't exist, factory
                               values are kept.
 
-
-  KERNELPlist=<file>        Use an alternate kernel.plist file
-                              (default path: /Extra/Kernel.plist
-                               bt(0,0)/Extra/kernel.plist).
-
   "Scan Single Drive"       Scan the drive only where the booter got loaded from.
     =Yes|No                 Fix rescan issues when using a DVD reader in AHCI mode. 
   Rescan=Yes                Enable CD-ROM rescan mode.

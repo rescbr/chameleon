@@ -410,61 +410,20 @@ char *decodeRLE( const void *rleData, int rleBlocks, int outBytes )
 static int setVESAGraphicsMode( unsigned short width, unsigned short height, unsigned char  bitsPerPixel, unsigned short refreshRate )
 {
 	VBEModeInfoBlock  minfo;
-	unsigned short    mode;
+	unsigned short    mode = 280; // Default to 1024 * 768 * 32 (1920 * 1200 * 32 would be 330)
 	unsigned short    vesaVersion;
 	int               err = errFuncNotSupported;
 
 	do {
 		mode = getVESAModeWithProperties( width, height, bitsPerPixel,
-                                          maColorModeBit             |
-                                          maModeIsSupportedBit       |
-                                          maGraphicsModeBit          |
-                                          maLinearFrameBufferAvailBit,
-                                          0,
-                                          &minfo, &vesaVersion );
+                                          maColorModeBit | maModeIsSupportedBit | maGraphicsModeBit | maLinearFrameBufferAvailBit,
+                                          0, &minfo, &vesaVersion );
 		if ( mode == modeEndOfList )
 		{
 			break;
 		}
 
-//
-// FIXME : generateCRTCTiming() causes crash.
-//
-
-//         if ( (vesaVersion >> 8) >= 3 && refreshRate >= 60 &&
-//              (gBootMode & kBootModeSafe) == 0 )
-//         {
-//             VBECRTCInfoBlock timing;
-//     
-//             // Generate CRTC timing for given refresh rate.
-// 
-//             generateCRTCTiming( minfo.XResolution, minfo.YResolution,
-//                                 refreshRate, kCRTCParamRefreshRate,
-//                                 &timing );
-// 
-//             // Find the actual pixel clock supported by the hardware.
-// 
-//             getVBEPixelClock( mode, &timing.PixelClock );
-// 
-//             // Re-compute CRTC timing based on actual pixel clock.
-// 
-//             generateCRTCTiming( minfo.XResolution, minfo.YResolution,
-//                                 timing.PixelClock, kCRTCParamPixelClock,
-//                                 &timing );
-// 
-//             // Set the video mode and use specified CRTC timing.
-// 
-//             err = setVBEMode( mode | kLinearFrameBufferBit |
-//                               kCustomRefreshRateBit, &timing );
-//         }
-//         else
-//         {
-//             // Set the mode with default refresh rate.
-// 
-//             err = setVBEMode( mode | kLinearFrameBufferBit, NULL );
-//         }
-
-        // Set the mode with default refresh rate.
+		// Set the mode with default refresh rate.
 
 		err = setVBEMode(mode | kLinearFrameBufferBit, NULL);
 
@@ -473,17 +432,27 @@ static int setVESAGraphicsMode( unsigned short width, unsigned short height, uns
 			break;
 		}
 
-        // Set 8-bit color palette.
+		// Is this required for buggy Video BIOS implementations? If so for which adapter?
 
-        if ( minfo.BitsPerPixel == 8 )
-        {
-            VBEPalette palette;
-            setupPalette( &palette, appleClut8 );
-            if ((err = setVBEPalette(palette)) != errSuccess)
-            {
-                break;
-            }
-        }
+		if ( minfo.BitsPerPixel == 8 )
+        	{
+			VBEPalette palette;
+
+			// A switch is needed for the two clut way...
+			if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+			{
+				setupPalette( &palette, AppleLogoBlackClut );
+			}
+			else
+			{
+				setupPalette( &palette, AppleLogoClut );
+			}
+
+			if ((err = setVBEPalette(palette)) != errSuccess)
+			{
+				break;
+			}
+		}
 
 		// Is this required for buggy Video BIOS implementations?
 		// On which adapter?
@@ -512,35 +481,35 @@ static int setVESAGraphicsMode( unsigned short width, unsigned short height, uns
 
 int convertImage( unsigned short width, unsigned short height, const unsigned char *imageData, unsigned char **newImageData )
 {
-    int cnt;
-    unsigned char *img = 0;
-    unsigned short *img16;
-    unsigned long *img32;
+	int index = 0;
+	int size = (width * height); // 16384
+	int depth = VIDEO(depth);
 
-    switch ( VIDEO(depth) ) {
-    case 16 :
-        img16 = malloc(width * height * 2);
-        if ( !img16 ) break;
-        for (cnt = 0; cnt < (width * height); cnt++)
-            img16[cnt] = lookUpCLUTIndex(imageData[cnt], 16);
-        img = (unsigned char *)img16;
-        break;
+	unsigned char *img = 0;
+	unsigned long *img32;
 
-    case 32 :
-        img32 = malloc(width * height * 4);
-        if ( !img32 ) break;
-        for (cnt = 0; cnt < (width * height); cnt++)
-            img32[cnt] = lookUpCLUTIndex(imageData[cnt], 32);
-        img = (unsigned char *)img32;
-        break;
+	switch (depth)
+	{
+		case 32:
+			img32 = malloc(size * 4);
 
-    default :
-        img = malloc(width * height);
-        bcopy(imageData, img, width * height);
-        break;
-    }
-    *newImageData = img;
-    return 0;
+			if (!img32)
+			{
+				break;
+			}
+
+			for (; index < size; index++)
+			{
+				img32[index] = lookUpCLUTIndex(imageData[index]);
+			}
+
+			img = (unsigned char *)img32;
+			break;
+	}
+
+	*newImageData = img;
+
+	return 0;
 }
 
 //==============================================================================
@@ -741,7 +710,7 @@ void blendImage(uint16_t x, uint16_t y, uint16_t width, uint16_t height, uint8_t
 }
 
 //==============================================================================
-
+// ProgressBar
 void drawCheckerBoard()
 {
     uint32_t *vram = (uint32_t *) VIDEO(baseAddr);
@@ -759,39 +728,31 @@ void drawCheckerBoard()
 //==========================================================================
 // LookUpCLUTIndex
 
-unsigned long lookUpCLUTIndex( unsigned char index, unsigned char depth )
+unsigned long lookUpCLUTIndex( unsigned char index )
 {
-	long result;
-
 	long colorIndex = (index * 3);
-	long red   = appleClut8[ colorIndex   ];
-	long green = appleClut8[ colorIndex++ ];
-	long blue  = appleClut8[ colorIndex++ ];
+	long red;
+	long green;
+	long blue;
 
-	switch (depth)
+	if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
 	{
-		case 16 :
-			result = ((red   & 0xF8) << 7) | 
-				((green & 0xF8) << 2) |
-				((blue  & 0xF8) >> 3);
-			result |= (result << 16);
-			break;
-
-		case 32 :
-			result = (red << 16) | (green << 8) | blue;
-			break;
-
-		default :
-			result = index | (index << 8);
-			result |= (result << 16);
-			break;
+		// BlackMode
+		red   = AppleLogoBlackClut[ colorIndex   ];
+		green = AppleLogoBlackClut[ colorIndex++ ];
+		blue  = AppleLogoBlackClut[ colorIndex++ ];
+	}
+	else
+	{
+		red   = AppleLogoClut[ colorIndex   ];
+		green = AppleLogoClut[ colorIndex++ ];
+		blue  = AppleLogoClut[ colorIndex++ ];
 	}
 
-	return result;
+	return (red << 16) | (green << 8) | blue;
 }
 
 //==========================================================================
-// drawColorRectangle
 
 void *stosl(void *dst, long val, long len)
 {
@@ -805,31 +766,22 @@ void *stosl(void *dst, long val, long len)
 
 //==============================================================================
 
-void drawColorRectangle( unsigned short x,
-                                unsigned short y,
-                                unsigned short width,
-                                unsigned short height,
-                                unsigned char  colorIndex )
+void setBackgroundColor( uint32_t color )
 {
-	long	pixelBytes;
-	long	color = lookUpCLUTIndex( colorIndex, VIDEO(depth) );
-	char	*vram;
+	long	pixelBytes = VIDEO(depth) / 8;
+	char	*vram = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) + pixelBytes;
 
-	pixelBytes = VIDEO(depth) / 8;
-	vram       = (char *) VIDEO(baseAddr) + VIDEO(rowBytes) * y + pixelBytes * x;
+	int width = VIDEO(width);
+	int height = VIDEO(height);
 
-	width = MIN(width, VIDEO(width) - x);
-	height = MIN(height, VIDEO(height) - y);
+	int rem = ( pixelBytes * width ) % 4;
+	int length = pixelBytes * width / 4;
+
+	bcopy( &color, vram, rem );
 
 	while ( height-- )
 	{
-		int rem = ( pixelBytes * width ) % 4;
-		if ( rem )
-		{
-			bcopy( &color, vram, rem );
-		}
-
-		stosl( vram + rem, color, pixelBytes * width / 4 );
+		stosl( vram + rem, color, length );
 		vram += VIDEO(rowBytes);
 	}
 }
@@ -850,7 +802,7 @@ void drawDataRectangle( unsigned short  x, unsigned short  y, unsigned short  wi
 
 	while ( height-- )
 	{
-		bcopy( data, vram, drawWidth * pixelBytes );
+		bcopy( data, vram, width * pixelBytes );
 		vram += VIDEO(rowBytes);
 		data += width * pixelBytes;
 	}
@@ -940,8 +892,16 @@ void drawPreview(void *src, uint8_t *saveunder)
 		screen = (uint8_t *) VIDEO (baseAddr);
 		rowBytes = VIDEO (rowBytes);
 
-		// Set the screen to 75% grey.
-		drawColorRectangle(0, 0, VIDEO(width), VIDEO(height), 0x01 /* color index */);
+		if ( ( MacOSVerCurrent >= MacOSVer2Int("10.10") ) && ( FlagBlackOption ) ) // Yosemite and Up!
+		{
+			// BlackMode
+			setBackgroundColor(0xff000000);
+		}
+		else
+		{
+			// Set the screen to 75% grey.
+			setBackgroundColor(0xffbfbfbf);
+		}
 	}
 
 	pixelShift = VIDEO (depth) >> 4;
@@ -1175,42 +1135,28 @@ int initGraphicsMode ()
 //
 // Set the video mode to VGA_TEXT_MODE or GRAPHICS_MODE.
 
-void setVideoMode( int mode, int drawgraphics)
+void setVideoMode( int mode )
 {
 	unsigned long params[4];
-	int           count;
 	int           err = errSuccess;
 
 	if ( mode == GRAPHICS_MODE )
 	{
   		if ( (err = initGraphicsMode()) == errSuccess )
 		{
-			if (gVerboseMode)
-			{
-				// Tell the kernel to use text mode on a linear frame buffer display
-				bootArgs->Video.v_display = FB_TEXT_MODE;
-			}
-			else
-			{
-				bootArgs->Video.v_display = GRAPHICS_MODE;
-			}
+			// Tell the kernel to use text mode on a linear frame buffer display
+			bootArgs->Video.v_display = (gVerboseMode) ? /* 2 */ FB_TEXT_MODE : /* 1 */ GRAPHICS_MODE;
 		}
 	}
 
 	if ( (mode == VGA_TEXT_MODE) || (err != errSuccess) )
 	{
-		count = getNumberArrayFromProperty(kTextModeKey, params, 2);
-		if ( count < 2 )
-		{
-			params[0] = 80;  // Default text mode is 80x25.
-			params[1] = 25;
-		}
+		params[0] = 80;  // Default text mode is 80x25.
+		params[1] = 25;
 
 		setVESATextMode(params[0], params[1], 4);
 		bootArgs->Video.v_display = VGA_TEXT_MODE;
 	}
-
-	currentIndicator = 0;
 }
 
 //==============================================================================

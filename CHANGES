@@ -1,3 +1,6 @@
+- Micky1979 : Added support for Sierra
+- Zenith432 : HDA bus scans and codecs enumeration.
+- Pike R. Alpha : Add support for (LZVN) grey logo.
 - Slice : Added NvidiaSingle
 - cparm : Rock - Paper - Scissors algo
 - Bronya : Improve support for AMD CPU.
@@ -37,9 +40,11 @@ Change to sys.c - Eliminate a dubious recursion in diskScanBootVolumes().  It re
 		Fix mboot.h include, Add ?log command to print out bdmesg without needing Wait=y, Add slightly more debugging for modules.
 - ErmaC : Rename CPU_MODEL_xxx into CPUID_MODEL_xxx follow Apple source name
 - ErmaC : Rename decompress_lzvn function to lzvn_decode follow Apple source name.
+- ErmaC : Add more chameleon UI stuff (default) made by blackosx
 - ErmaC : Split out states generator from acpi_patcher (Credits to Clover Teams)
 - ErmaC : Merged proposed patch by N3 (Boot from vanilla Recovery HD, Installation DMG)
 - bitshoveler : Fix "sed: RE error: illegal byte sequence", which turns out to be from feeding sed a TIFF file (buildpkg.sh)
+- bitshoveler : Remove "-x" option from "ld" command which breaks build under newer Xcode versions (MakeInc.dir)
 - bitshoveler : CacheInit(), CacheRead() prototypes: use u_int32_t instead of long where appropriate (saio_internal.h)
 - bitshoveler : Improved defensiveness against malloc failure (disk.c)
 - bitshoveler : Use u_int32_t instead of long where appropriate (cache.c)

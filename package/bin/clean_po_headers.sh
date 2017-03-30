@@ -10,7 +10,7 @@ for pofile in po/*.po; do
     lang=${pofile##*/}
     lang=${lang%.*}
     gsed -i 's/; charset=CHARSET/; charset=UTF-8/g' $pofile
-    gsed -i 's/^\"Project-Id-Version: PACKAGE VERSION/\"Project-Id-Version: Chameleon 2.3/' $pofile
+    gsed -i 's/^\"Project-Id-Version: PACKAGE VERSION/\"Project-Id-Version: Chameleon 2.4/' $pofile
     gsed -i "s/^\"Language:.*\"/\"Language: $lang\\\n\"/" $pofile
     gsed -i "s/^\"Language-Team:.*\"/\"Language-Team: $lang <$lang@li.org>\\\n\"/" $pofile
 done

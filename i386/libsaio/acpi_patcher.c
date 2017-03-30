@@ -3,6 +3,7 @@
  * 2010 mojodojo, 2012 slice
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "boot.h"
 #include "bootstruct.h"
@@ -14,10 +15,6 @@
 #include "cpu.h"
 #include "aml_generator.h"
 #include "state_generator.h"
-
-#ifndef DEBUG_ACPI
-	#define DEBUG_ACPI 0
-#endif
 
 #if DEBUG_ACPI==2
 	#define DBG(x...)  {printf(x); sleep(1);}

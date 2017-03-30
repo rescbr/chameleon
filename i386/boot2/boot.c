@@ -45,6 +45,7 @@
  * Reworked again by Curtis Galloway (galloway@NeXT.com)
  */
 
+#include "config.h"
 #include "boot.h"
 #include "bootstruct.h"
 #include "fake_efi.h"
@@ -56,13 +57,6 @@
 #include "modules.h"
 #include "device_tree.h"
 
-#ifndef DEBUG_BOOT2
-	#define DEBUG_BOOT2 0
-#endif
-
-#ifndef DEBUG_INTERRUPTS
-	#define DEBUG_INTERRUPTS 0
-#endif
 
 #if DEBUG_BOOT2
 	#define DBG(x...)	printf(x)
@@ -239,7 +233,7 @@ static int ExecKernel(void *binary)
 	// verbose mode.
 	if (gVerboseMode)
 	{
-		setVideoMode(GRAPHICS_MODE, 0);
+		setVideoMode( GRAPHICS_MODE );
 	}
 	else
 	{
@@ -770,7 +764,9 @@ void common_boot(int biosdev)
 				freeFilteredBVChain(bvChain);
 
 				if (gEnableCDROMRescan)
+				{
 					rescanBIOSDevice(gBIOSDev);
+				}
 
 				bvChain = newFilteredBVChain(0x80, 0xFF, allowBVFlags, denyBVFlags, &gDeviceCount);
 				setBootGlobals(bvChain);
@@ -1061,7 +1057,7 @@ void common_boot(int biosdev)
 		// if we are already in graphics-mode,
 		if (getVideoMode() == GRAPHICS_MODE)
 		{
-			setVideoMode(VGA_TEXT_MODE, 0); // switch back to text mode.
+			setVideoMode( VGA_TEXT_MODE ); // switch back to text mode.
 		}
 	}
 

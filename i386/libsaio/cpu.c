@@ -4,15 +4,12 @@
  * Bronya:   2015 Improve AMD support, cleanup and bugfix
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "platform.h"
 #include "cpu.h"
 #include "bootstruct.h"
 #include "boot.h"
-
-#ifndef DEBUG_CPU
-	#define DEBUG_CPU 0
-#endif
 
 #if DEBUG_CPU
 	#define DBG(x...)		printf(x)
@@ -284,7 +281,7 @@ static void post_startup_cpu_fixups(void)
  *
  * -- zenith432, May 22nd, 2016
  */
-void* memcpy_interruptible(void* dst, const void* src, size_t len)
+void *memcpy_interruptible(void *dst, const void *src, size_t len)
 {
 	uint64_t tscFreq, lastTsc;
 	uint32_t eflags, threshold;
@@ -408,11 +405,13 @@ void get_cpuid(PlatformInfo_t *p)
 		 * The BrandString 48 bytes (max), guaranteed to
 		 * be NULL terminated.
 		 */
-		do_cpuid(0x80000002, reg);
+		do_cpuid(0x80000002, reg);          // Processor Brand String
 		memcpy(&str[0], (char *)reg, 16);
-		do_cpuid(0x80000003, reg);
+
+
+		do_cpuid(0x80000003, reg);          // Processor Brand String
 		memcpy(&str[16], (char *)reg, 16);
-		do_cpuid(0x80000004, reg);
+		do_cpuid(0x80000004, reg);          // Processor Brand String
 		memcpy(&str[32], (char *)reg, 16);
 		for (s = str; *s != '\0'; s++)
 		{
@@ -469,6 +468,7 @@ void get_cpuid(PlatformInfo_t *p)
 			break;
 	}
 }
+
 void scan_cpu(PlatformInfo_t *p)
 {
 	verbose("[ CPU INFO ]\n");
@@ -1236,6 +1236,7 @@ void scan_cpu(PlatformInfo_t *p)
 	DBG("\tCores:                   %d\n",		p->CPU.NoCores);		// Cores
 	DBG("\tLogical processor:       %d\n",		p->CPU.NoThreads);		// Logical procesor
 	DBG("\tFeatures:                0x%08x\n",	p->CPU.Features);
+//	DBG("\tMicrocode version:       %d\n",		p->CPU.MCodeVersion);		// CPU microcode version
 
 	verbose("\n");
 #if DEBUG_CPU

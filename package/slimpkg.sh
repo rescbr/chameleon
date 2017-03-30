@@ -353,7 +353,7 @@ makedistribution ()
 	perl -i -p -e "s/%PKGDEV%/${pkgdev}/g" `find "${1}/${packagename}/Resources" -type f`
 
 	stage=${stage/RC/Release Candidate }
-	stage=${stage/FINAL/2.0 Final}
+	stage=${stage/FINAL/2.4 Final}
 	perl -i -p -e "s/%CHAMELEONSTAGE%/${stage}/g" `find "${1}/${packagename}/Resources" -type f`
 
 	find "${1}/${packagename}" -name '.DS_Store' -delete

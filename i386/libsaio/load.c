@@ -37,6 +37,7 @@
 	#define DBG(x...)	msglog(x)
 #endif
 
+// Private functions.
 static long DecodeSegment(long cmdBase, unsigned int*load_addr, unsigned int *load_size);
 static long DecodeUnixThread(long cmdBase, unsigned int *entry);
 static long DecodeSymbolTable(long cmdBase);

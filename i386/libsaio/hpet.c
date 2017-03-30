@@ -6,13 +6,10 @@
  * High Precision Event Timer (HPET)
  */
 
+#include "config.h"
 #include "libsaio.h"
 #include "pci.h"
 #include "hpet.h"
-
-#ifndef DEBUG_HPET
-	#define DEBUG_HPET 0
-#endif
 
 #if DEBUG_HPET
 	#define DBG(x...) printf(x)

@@ -135,6 +135,7 @@ enum
 	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
 	kSMBTypeOemProcessorBusSpeed		=  132, // Processor Bus Speed (Type 132)
 	kSMBTypeOemPlatformFeature		=  133 // Platform Feature (Type 133)
+//	kSMBTypeOemSMCVersion			=  134  // SMC Version (Type 134)
 };
 
 //----------------------------------------------------------------------------------------------------------
@@ -841,11 +842,22 @@ typedef struct SMBOemProcessorBusSpeed
 /* ==============================================
  OEM Platform Feature (Apple Specific - Type 133)
  ================================================ */
-struct SMBOemPlatformFeature
+typedef struct SMBOemPlatformFeature
 {
 	SMB_STRUCT_HEADER			// Type 133
 	SMBWord    PlatformFeature;
 } __attribute__((packed)) SMBOemPlatformFeature;
+
+//----------------------------------------------------------------------------------------------------------
+
+/* =========================================
+ OEM SMC Version (Apple Specific - Type 134)
+ =========================================== */
+typedef struct SMBOemSMCVersion
+{
+	SMB_STRUCT_HEADER			// Type 134
+	SMBWord    SMCVersion;
+} __attribute__((packed)) SMBOemSMCVersion;
 
 //----------------------------------------------------------------------------------------------------------
 

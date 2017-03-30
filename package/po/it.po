@@ -4,7 +4,7 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 msgid ""
 msgstr ""
-"Project-Id-Version: Chameleon 2.3\n"
+"Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-11-02 15:03+0000\n"
 "PO-Revision-Date: 2015-05-23 13:54-0000\n"
@@ -66,9 +66,7 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr ""
-"Pacchetto compilato da: %WHOBUILD%, tradotto in Italiano da: ErmaC, scrax, "
-"Micky1979, Marchrius, Gianfranco Minischetti"
+msgstr "Pacchetto compilato da: %WHOBUILD%, tradotto in Italiano da: ErmaC, scrax, Micky1979, Marchrius, Gianfranco Minischetti"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -77,14 +75,8 @@ msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid ""
-"Chameleon is a boot loader built using a combination of components which "
-"evolved from the development of David Elliott's fake EFI implementation "
-"added to Apple's boot-132 project."
-msgstr ""
-"Chameleon è un boot loader costruito utilizzando una combinazione di "
-"componenti che si sono evoluti dallo sviluppo dell'implementazione del falso "
-"EFI aggiunto al progetto boot-123 di Apple da parte di David Elliott."
+msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
+msgstr "Chameleon è un boot loader costruito utilizzando una combinazione di componenti che si sono evoluti dallo sviluppo dell'implementazione del falso EFI aggiunto al progetto boot-123 di Apple da parte di David Elliott."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
@@ -94,24 +86,17 @@ msgstr "La versione 2 di Chameleon presenta nuove caratteristiche. Ad esempio:"
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr ""
-"- Interfaccia grafica completamente personalizzabile per dare maggiori "
-"colori al Darwin Bootloader."
+msgstr "- Interfaccia grafica completamente personalizzabile per dare maggiori colori al Darwin Bootloader."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid ""
-"- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr ""
-"- Avviare DVD retail semplicemente caricando una immagine ramdisk senza "
-"l'utilizzo di programmi aggiuntivi."
+msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr "- Avviare DVD retail semplicemente caricando una immagine ramdisk senza l'utilizzo di programmi aggiuntivi."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
-msgstr ""
-"- Ibernazione. Godetevi nel risvegliare il vostro Mac OS X con un'immagine "
-"di anteprima."
+msgstr "- Ibernazione. Godetevi nel risvegliare il vostro Mac OS X con un'immagine di anteprima."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
@@ -120,18 +105,13 @@ msgstr "- Sovrascrittura del SMBIOS per personalizzare i valori dell'SMBIOS."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid ""
-"- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr ""
-"- Sovrascrittura della tabella DSDT, potendo selezionare una ottimizzata che "
-"risolve svariate problematiche."
+msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr "- Sovrascrittura della tabella DSDT, potendo selezionare una ottimizzata che risolve svariate problematiche."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
 msgid "- Device Property Injection via device-properties string."
-msgstr ""
-"- Iniezione delle Proprità delle Periferiche con stringhe EFI in device-"
-"properties."
+msgstr "- Iniezione delle Proprità delle Periferiche con stringhe EFI in device-properties."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
@@ -141,8 +121,7 @@ msgstr "- boot0 / boot1h ibrido per dischi partizionati in MBR e GPT."
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:29
 msgid "- Automatic FSB detection code even for recent AMD CPUs."
-msgstr ""
-"- Riconoscimento automatico della frequenza anche sui recenti processori AMD."
+msgstr "- Riconoscimento automatico della frequenza anche sui recenti processori AMD."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:30
@@ -166,8 +145,7 @@ msgstr "- Rivelamento memoria adattato da memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid ""
-"- Automatic P-State &amp; C-State generation for native power management."
+msgid "- Automatic P-State &amp; C-State generation for native power management."
 msgstr "- Generazione automatica dei P-State e C-State."
 
 #. type: Content of: <html><body><p>
@@ -212,12 +190,8 @@ msgstr "leggilo"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid ""
-"&nbsp;to find out if the installation was successful and keep it for a "
-"record of what was done."
-msgstr ""
-"&nbspper vedere se l'installazione é avvenuta con successo e vedere le "
-"operazioni che sono state eseguite."
+msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
+msgstr "&nbspper vedere se l'installazione é avvenuta con successo e vedere le operazioni che sono state eseguite."
 
 # 80%
 #. type: Content of: <html><body><div><p>
@@ -302,6 +276,10 @@ msgid ""
 "Skipping all stages permit you to leave as is already working boot sectors, especially usefull with 4k drives.\n"
 "boot is always copied to the target partition when you are skipping one or more stages."
 msgstr ""
+"Qui è possibile scegliere se ignorare l'installazione del bootloader completamente o parzialmente.\n"
+"Questo può essere utile se si desidera scrivere in Extra, o saltare alcune fasi (0,1 e attivazione della partizione di destinazione).\n"
+"Saltare tutte le fasi ti permette di lasciare come sono i settori di avvio, soprattutto utile con unità 4K.\n"
+"il boot viene sempre copiato nella partizione di destinazione quando si salta una o più fasi."
 
 #. type: "SkipStage0_title"
 #: Resources/templates/Localizable.strings:34
@@ -316,6 +294,8 @@ msgid ""
 "Avoid writing stage 0 to the target disk.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evitare di scrivere stadio 0 sul disco di destinazione.\n"
+"Fase 2 viene sempre copiata/sostituita."
 
 #. type: "SkipStage1_title"
 #: Resources/templates/Localizable.strings:38
@@ -330,6 +310,8 @@ msgid ""
 "Avoid writing stage 1 to the partition boot sector.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Evitare la scrittura della fase 1 per il settore di avvio della partizione.\n"
+"Fase 2 viene sempre copiato/sostituito."
 
 #. type: "SkipActivePartition_title"
 #: Resources/templates/Localizable.strings:42
@@ -345,6 +327,9 @@ msgid ""
 "Some old motherboards have a bad implementation of GPT in bios and they can not find partitions if marked active unger Guid Partition Table.\n"
 "Stage 2 is always copied/replaced."
 msgstr ""
+"Impedisce l'attivazione della partizione di destinazione.\n"
+"Alcune vecchie schede madri non hanno una buona implementazione GPT nel bios e non riescono a trovare le partizioni se contrassegnate attive sotto Guid Partition Table.\n"
+"Fase 2 viene sempre copiato/sostituito."
 
 #. type: "Standard_title"
 #: Resources/templates/Localizable.strings:47
@@ -1275,97 +1260,97 @@ msgstr "Setta il Graphics Mode a 1920x1200x32"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
 msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
-msgstr ""
+msgstr "CRS_ALLOW_UNTRUSTED_KEXTS"
 
 #. type: "Crs1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
-msgstr ""
+msgstr "Firma per gli Kext: introdotta in 10.9, migliorato in 10.10 (la firma per gli kext é necessaria per tutti gli kexts), ora diventato parte del rootless(SIP)."
 
 #. type: "Crs2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_FS"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_FS"
 
 #. type: "Crs2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
-msgstr ""
+msgstr "Protezione del file System: i file di sistema importanti sono protetti e non possono essere modificati."
 
 #. type: "Crs4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
 msgid "CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgstr "CRS_ALLOW_TASK_FOR_PID"
 
 #. type: "Crs4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
 msgid "Disable CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_TASK_FOR_PID"
 
 #. type: "Crs8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
 msgid "CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgstr "CRS_ALLOW_KERNEL_DEBUGGER"
 
 #. type: "Crs8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
 msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_KERNEL_DEBUGGER"
 
 #. type: "Crs16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
 msgid "CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgstr "CRS_ALLOW_APPLE_INTERNAL"
 
 #. type: "Crs16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
 msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_APPLE_INTERNAL"
 
 #. type: "Crs32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_DTRACE"
 
 #. type: "Crs32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
 msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_UNRESTRICTED_DTRACE"
 
 #. type: "Crs64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
 msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgstr "CRS_ALLOW_UNRESTRICTED_NVRAM"
 
 #. type: "Crs64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
 msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_UNRESTRICTED_NVRAM"
 
 #. type: "Crs128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
 msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgstr "CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "Crs128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
 msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgstr "Disattiva CRS_ALLOW_DEVICE_CONFIGURATION"
 
 #. type: "HDAULayoutIDx01_title"
 #: Resources/templates/Localizable.strings:324
@@ -3579,7 +3564,7 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
-msgstr ""
+msgstr "Patch per l'indirizzo cpuid_family per rimuovere _cpuid_set_info _panic e _tsc_init _panic. Per le CPU non supportate"
 
 #. type: "KernelSSE3_title"
 #: Resources/templates/Localizable.strings:976
@@ -3591,7 +3576,7 @@ msgstr "KernelcpuFamily"
 #: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
-msgstr ""
+msgstr "Patch per abilitare ulteriori istruzioni SSE3 sulle vecchie CPU per funzionare su sistemi operativi più recenti."
 
 #. type: "Themes_title"
 #: Resources/templates/Localizable.strings:982
@@ -3618,60 +3603,34 @@ msgstr ""
 #~ msgstr "Scegli un AAPL,ig-platform-id da usare per la tua Intel HD 5000."
 
 #~ msgid "Set 0000260c for Intel HD5000 (Mobile) AAPL,ig-platform-id."
-#~ msgstr ""
-#~ "Imposta l'AAPL,ig-platform-id a 0000260c per schede grafiche Intel HD5000 "
-#~ "(Mobile)."
+#~ msgstr "Imposta l'AAPL,ig-platform-id a 0000260c per schede grafiche Intel HD5000 (Mobile)."
 
 #~ msgid "Install Type"
 #~ msgstr "Tipo di installazione"
 
-#~ msgid ""
-#~ "Choose to perform a new installation or upgrade an existing installation."
-#~ msgstr ""
-#~ "Scegli se fare una nuova installazione o aggiornare una già esistente."
+#~ msgid "Choose to perform a new installation or upgrade an existing installation."
+#~ msgstr "Scegli se fare una nuova installazione o aggiornare una già esistente."
 
 #~ msgid "New Installation"
 #~ msgstr "Nuova Installazione"
 
-#~ msgid ""
-#~ "Backup an existing /Extra folder, if found on the target partition. A new "
-#~ "one will be created if any options are chosen from the installer, other "
-#~ "than the Bootloader."
-#~ msgstr ""
-#~ "Salva una cartella /Extra, se trovata sulla partizione destinazione. Una "
-#~ "nuova verrà creata se scegliete una opzione dall'installer, oltre che al "
-#~ "Bootloader."
+#~ msgid "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader."
+#~ msgstr "Salva una cartella /Extra, se trovata sulla partizione destinazione. Una nuova verrà creata se scegliete una opzione dall'installer, oltre che al Bootloader."
 
 #~ msgid "Upgrade"
 #~ msgstr "Aggiornamento"
 
-#~ msgid ""
-#~ "Merge an existing /Extra folder, if found on the target, with any options "
-#~ "chosen from the installer, other than the Bootloader. The original /Extra "
-#~ "folder will be backed up."
-#~ msgstr ""
-#~ "Fonde una cartella /Extra esistente, se trovata sulla partizione "
-#~ "destinazione, con qualsiasi opzione scelta nell'installer, oltre al "
-#~ "Bootloader."
+#~ msgid "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up."
+#~ msgstr "Fonde una cartella /Extra esistente, se trovata sulla partizione destinazione, con qualsiasi opzione scelta nell'installer, oltre al Bootloader."
 
 #~ msgid "EFI"
 #~ msgstr "Partizione EFI"
 
-#~ msgid ""
-#~ "Install Chameleon's files to the normally hidden EFI system partition "
-#~ "using either boot0 or boot0md depending on your system and without "
-#~ "destroying any existing Windows installation if you have one."
-#~ msgstr ""
-#~ "Installa Chameleon nella partizione EFI (Normalmente nascosta), usando "
-#~ "boot0 o boot0md dipende dal vostro sistema e senza compromettere pre-"
-#~ "esistenti installazioni di Windows(Se voi ne possedete una)."
+#~ msgid "Install Chameleon's files to the normally hidden EFI system partition using either boot0 or boot0md depending on your system and without destroying any existing Windows installation if you have one."
+#~ msgstr "Installa Chameleon nella partizione EFI (Normalmente nascosta), usando boot0 o boot0md dipende dal vostro sistema e senza compromettere pre-esistenti installazioni di Windows(Se voi ne possedete una)."
 
-#~ msgid ""
-#~ "This module permits the user to define the keyboard key mappings. This "
-#~ "module and associated keymaps are installed by default."
-#~ msgstr ""
-#~ "Questo modulo permette all'utente di definire la mappatura della propria "
-#~ "tastiera."
+#~ msgid "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default."
+#~ msgstr "Questo modulo permette all'utente di definire la mappatura della propria tastiera."
 
 #~ msgid "Utilities"
 #~ msgstr "Utilitá"
@@ -3686,9 +3645,7 @@ msgstr ""
 #~ msgstr "Installa il Pannello preferenze di Chameleon."
 
 #~ msgid "Copies an example smbios.plist in /Extra/Configuration."
-#~ msgstr ""
-#~ "Copia o sovrascrive il file smbios.plist in /Extra/Configuration con uno "
-#~ "di esempio"
+#~ msgstr "Copia o sovrascrive il file smbios.plist in /Extra/Configuration con uno di esempio"
 
 #~ msgid "Documentation"
 #~ msgstr "Documentazione"

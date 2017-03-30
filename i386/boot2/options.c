@@ -33,9 +33,9 @@
 #include "modules.h"
 
 #if DEBUG
-#define DBG(x...)	printf(x)
+	#define DBG(x...)	printf(x)
 #else
-#define DBG(x...)	msglog(x)
+	#define DBG(x...)	msglog(x)
 #endif
 
 char		gMacOSVersion[OSVERSTRLEN];
@@ -813,7 +813,7 @@ int getBootOptions(bool firstRun)
 	// ensure we're in graphics mode if gui is setup
 	if (firstRun && gui.initialised && bootArgs->Video.v_display == VGA_TEXT_MODE)
 	{
-		setVideoMode(GRAPHICS_MODE, 0);
+		setVideoMode( GRAPHICS_MODE );
 	}
 
 	// Clear command line boot arguments
@@ -1131,7 +1131,7 @@ int getBootOptions(bool firstRun)
 			{
 				if (bootArgs->Video.v_display != VGA_TEXT_MODE)
 				{
-					setVideoMode(VGA_TEXT_MODE, 0);
+					setVideoMode( VGA_TEXT_MODE );
 
 					setCursorPosition(0, 0, 0);
 					clearScreenRows(0, kScreenLastRow);
@@ -1160,7 +1160,7 @@ int getBootOptions(bool firstRun)
 				else
 				{
 					gui.redraw = true;
-					setVideoMode(GRAPHICS_MODE, 0);
+					setVideoMode( GRAPHICS_MODE );
 					updateVRAM();
                     			updateGraphicBootPrompt();
 				}
