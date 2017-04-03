@@ -180,7 +180,7 @@ static void setupKernelConfigFile(const char *filename)
 
 #if KEXTPATCH_SUPPORT
 // =========================================================================
-// Load the Kext.plist override config file if any
+// Load the Kexts.plist override config file if any
 static void setupKextConfigFile(const char *filename)
 {
 	char		dirSpec[128];
