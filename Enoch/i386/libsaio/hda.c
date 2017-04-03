@@ -856,7 +856,6 @@ bool setup_hda_devprop(pci_dt_t *hda_dev)
 		case HDA_INTEL_SRSPLP:
 		case HDA_INTEL_KABYLAKE_LP:
 		case HDA_INTEL_SRSP:
-		case HDA_INTEL_SRSP:
 		case HDA_INTEL_KABYLAKE:
 		case HDA_INTEL_LEWISBURG1:
 		case HDA_INTEL_LEWISBURG2:
