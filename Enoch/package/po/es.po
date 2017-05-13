@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
-"PO-Revision-Date: 2015-07-12 00:00+0100\n"
+"POT-Creation-Date: 2017-03-26 11:51+0100\n"
+"PO-Revision-Date: 2017-05-12 12:31+0100\n"
 "Last-Translator: FurtiF <msntchat@hotmail.fr>\n"
 "Language-Team: es <es@li.org>\n"
 "Language: es\n"
@@ -26,10 +26,8 @@ msgstr "Enoch"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:23
-#, fuzzy
-#| msgid "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
 msgid "ErmaC's Branch of Chameleon (%CHAMELEONREVISION%)"
-msgstr "Chameleon v%CHAMELEONVERSION% r%CHAMELEONREVISION%"
+msgstr "La rama personalizada de ErmaC basada en Chameleon (%CHAMELEONVERSION%)"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:25
@@ -69,9 +67,7 @@ msgstr "%PKGDEV%"
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:36 Resources/templates/Conclusion.html:30
 msgid "Package built by: %WHOBUILD%, language translated by: blackosx"
-msgstr ""
-"Paquete realizado por:% WHOBUILD%, el idioma traducido por: juanerson e "
-"FurtiF"
+msgstr "Paquete realizado por:% WHOBUILD%, el idioma traducido por: juanerson e FurtiF"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Welcome.html:37 Resources/templates/Conclusion.html:31
@@ -80,42 +76,28 @@ msgstr "Copyright © %CPRYEAR%"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:18
-msgid ""
-"Chameleon is a boot loader built using a combination of components which "
-"evolved from the development of David Elliott's fake EFI implementation "
-"added to Apple's boot-132 project."
-msgstr ""
-"El Bootloader Chameleon es la combinación de varios componentes. Esta basado "
-"en la implementación EFI falsa de David Elliott, incorporada al método "
-"Boot-132, a partir del proyecto de código abierto Darwin de Apple"
+msgid "Chameleon is a boot loader built using a combination of components which evolved from the development of David Elliott's fake EFI implementation added to Apple's boot-132 project."
+msgstr "El Bootloader Chameleon es la combinación de varios componentes. Esta basado en la implementación EFI falsa de David Elliott, incorporada al método Boot-132, a partir del proyecto de código abierto Darwin de Apple"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:20
 msgid "Chameleon v2 is extended with many features. For example:"
-msgstr ""
-"Entre las Novedades en Chameleon v2 se encuentran muchas funciones "
-"extendidas, por ejemplo:"
+msgstr "Entre las Novedades en Chameleon v2 se encuentran muchas funciones extendidas, por ejemplo:"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:22
 msgid "- Fully customizable GUI to bring some color to the Darwin Bootloader."
-msgstr ""
-"- Interfaz GUI totalmente personalizada para brindarle más colorido al Dawin "
-"Bootloader."
+msgstr "- Interfaz GUI totalmente personalizada para brindarle más colorido al Dawin Bootloader."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:23
-msgid ""
-"- Load a ramdisk to directly boot retail DVDs without additional programs."
-msgstr ""
-"- Booteo de DVDs con simplemente cargar una imagen ramdisk sin la ayuda de "
-"programas adicionales."
+msgid "- Load a ramdisk to directly boot retail DVDs without additional programs."
+msgstr "- Booteo de DVDs con simplemente cargar una imagen ramdisk sin la ayuda de programas adicionales."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:24
 msgid "- Hibernation. Enjoy resuming your Mac OS X with a preview image."
-msgstr ""
-"- Hibernación. Disfrute reanudar su MAC OS X con una imagen de muestra."
+msgstr "- Hibernación. Disfrute reanudar su MAC OS X con una imagen de muestra."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:25
@@ -124,11 +106,8 @@ msgstr "- Anulación de SMBIOS, para modificar los valores de fábrica SMBIOS."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:26
-msgid ""
-"- DSDT override to use a modified fixed DSDT which can solve several issues."
-msgstr ""
-"- Anulación de DSDT, para usar un DSDT modificado y arreglado capaz de "
-"resolver varios inconvenientes."
+msgid "- DSDT override to use a modified fixed DSDT which can solve several issues."
+msgstr "- Anulación de DSDT, para usar un DSDT modificado y arreglado capaz de resolver varios inconvenientes."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:27
@@ -138,9 +117,7 @@ msgstr "- Inyección de Propiedades de Dispositivos a través de EFI strings."
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:28
 msgid "- hybrid boot0 / boot1h for MBR and GPT partitioned disks."
-msgstr ""
-"- Permite el arranque de esquemas híbridos boot0 / boot1h, para discos "
-"particionados en MBR y GPT."
+msgstr "- Permite el arranque de esquemas híbridos boot0 / boot1h, para discos particionados en MBR y GPT."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:29
@@ -169,11 +146,8 @@ msgstr "- Detección de Memoria adaptada desde memtest86:&nbsp;"
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:34
-msgid ""
-"- Automatic P-State &amp; C-State generation for native power management."
-msgstr ""
-"- Generación automática de P-States &amp; C-States para gestión de energía "
-"nativa."
+msgid "- Automatic P-State &amp; C-State generation for native power management."
+msgstr "- Generación automática de P-States &amp; C-States para gestión de energía nativa."
 
 #. type: Content of: <html><body><p>
 #: Resources/templates/Description.html:35
@@ -217,12 +191,8 @@ msgstr "léalo"
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:26
-msgid ""
-"&nbsp;to find out if the installation was successful and keep it for a "
-"record of what was done."
-msgstr ""
-"&nbsp;para saber si la instalación fue exitosa y mantener un registro de lo "
-"que se hizo."
+msgid "&nbsp;to find out if the installation was successful and keep it for a record of what was done."
+msgstr "&nbsp;para saber si la instalación fue exitosa y mantener un registro de lo que se hizo."
 
 #. type: Content of: <html><body><div><p>
 #: Resources/templates/Conclusion.html:28
@@ -1285,100 +1255,100 @@ msgstr "1920x1200x32"
 msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "Establecer el Modo de Gráficos en 1920x1200x32"
 
-#. type: "Crs1_title"
+#. type: "Csr1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
-msgstr ""
+msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
+msgstr "CSR_ALLOW_UNTRUSTED_KEXTS"
 
-#. type: "Crs1_description"
+#. type: "Csr1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
 msgstr ""
 
-#. type: "Crs2_title"
+#. type: "Csr2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_FS"
-msgstr ""
+msgid "CSR_ALLOW_UNRESTRICTED_FS"
+msgstr "CSR_ALLOW_UNRESTRICTED_FS"
 
-#. type: "Crs2_description"
+#. type: "Csr2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
 msgstr ""
 
-#. type: "Crs4_title"
+#. type: "Csr4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CRS_ALLOW_TASK_FOR_PID"
-msgstr ""
+msgid "CSR_ALLOW_TASK_FOR_PID"
+msgstr "CSR_ALLOW_TASK_FOR_PID"
 
-#. type: "Crs4_description"
+#. type: "Csr4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CRS_ALLOW_TASK_FOR_PID"
+msgid "Disable CSR_ALLOW_TASK_FOR_PID"
 msgstr ""
 
-#. type: "Crs8_title"
+#. type: "Csr8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr ""
+msgid "CSR_ALLOW_KERNEL_DEBUGGER"
+msgstr "CSR_ALLOW_KERNEL_DEBUGGER"
 
-#. type: "Crs8_description"
+#. type: "Csr8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
-#. type: "Crs16_title"
+#. type: "Csr16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CRS_ALLOW_APPLE_INTERNAL"
-msgstr ""
+msgid "CSR_ALLOW_APPLE_INTERNAL"
+msgstr "CSR_ALLOW_APPLE_INTERNAL"
 
-#. type: "Crs16_description"
+#. type: "Csr16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
+msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
-#. type: "Crs32_title"
+#. type: "Csr32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr ""
+msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgstr "CSR_ALLOW_UNRESTRICTED_DTRACE"
 
-#. type: "Crs32_description"
+#. type: "Csr32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
-#. type: "Crs64_title"
+#. type: "Csr64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr ""
+msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgstr "CSR_ALLOW_UNRESTRICTED_NVRAM"
 
-#. type: "Crs64_description"
+#. type: "Csr64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
-#. type: "Crs128_title"
+#. type: "Csr128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr ""
+msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
+msgstr "CSR_ALLOW_DEVICE_CONFIGURATION"
 
-#. type: "Crs128_description"
+#. type: "Csr128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "HDAULayoutIDx01_title"
@@ -2661,10 +2631,9 @@ msgstr "Establece 06002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelBroadwellx19_title"
 #: Resources/templates/Localizable.strings:684
-#, fuzzy, no-wrap
-#| msgid "00002216"
+#, no-wrap
 msgid "07002216"
-msgstr "00002216"
+msgstr "07002216"
 
 #. type: "IntelBroadwellx19_description"
 #: Resources/templates/Localizable.strings:685
@@ -2675,10 +2644,9 @@ msgstr "Establece 00002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex00_title"
 #: Resources/templates/Localizable.strings:689
-#, fuzzy, no-wrap
-#| msgid "00000e16"
+#, no-wrap
 msgid "0000e019"
-msgstr "00000e16"
+msgstr "0000e019"
 
 #. type: "IntelSkylakex00_description"
 #: Resources/templates/Localizable.strings:690
@@ -2689,10 +2657,9 @@ msgstr "Establece 00000e16 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex01_title"
 #: Resources/templates/Localizable.strings:692
-#, fuzzy, no-wrap
-#| msgid "00001616"
+#, no-wrap
 msgid "00001619"
-msgstr "00001616"
+msgstr "00001619"
 
 #. type: "IntelSkylakex01_description"
 #: Resources/templates/Localizable.strings:693
@@ -2703,10 +2670,9 @@ msgstr "Establece 00001616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex02_title"
 #: Resources/templates/Localizable.strings:695
-#, fuzzy, no-wrap
-#| msgid "00002616"
+#, no-wrap
 msgid "00002619"
-msgstr "00002616"
+msgstr "00002619"
 
 #. type: "IntelSkylakex02_description"
 #: Resources/templates/Localizable.strings:696
@@ -2717,10 +2683,9 @@ msgstr "Establece 00002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex03_title"
 #: Resources/templates/Localizable.strings:698
-#, fuzzy, no-wrap
-#| msgid "00001616"
+#, no-wrap
 msgid "00001b19"
-msgstr "00001616"
+msgstr "00001b19"
 
 #. type: "IntelSkylakex03_description"
 #: Resources/templates/Localizable.strings:699
@@ -2731,10 +2696,9 @@ msgstr "Establece 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex04_title"
 #: Resources/templates/Localizable.strings:701
-#, fuzzy, no-wrap
-#| msgid "00001616"
+#, no-wrap
 msgid "00001219"
-msgstr "00001616"
+msgstr "00001219"
 
 #. type: "IntelSkylakex04_description"
 #: Resources/templates/Localizable.strings:702
@@ -2745,10 +2709,9 @@ msgstr "Establece 00001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex05_title"
 #: Resources/templates/Localizable.strings:704
-#, fuzzy, no-wrap
-#| msgid "01000e16"
+#, no-wrap
 msgid "01000219"
-msgstr "01000e16"
+msgstr "01000219"
 
 #. type: "IntelSkylakex05_description"
 #: Resources/templates/Localizable.strings:705
@@ -2759,10 +2722,9 @@ msgstr "Establece 00002616 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex06_title"
 #: Resources/templates/Localizable.strings:707
-#, fuzzy, no-wrap
-#| msgid "01001e16"
+#, no-wrap
 msgid "01001719"
-msgstr "01001e16"
+msgstr "01001719"
 
 #. type: "IntelSkylakex06_description"
 #: Resources/templates/Localizable.strings:708
@@ -2773,10 +2735,9 @@ msgstr "Establece 01000e16 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex07_title"
 #: Resources/templates/Localizable.strings:710
-#, fuzzy, no-wrap
-#| msgid "01001e16"
+#, no-wrap
 msgid "01001219"
-msgstr "01001e16"
+msgstr "01001219"
 
 #. type: "IntelSkylakex07_description"
 #: Resources/templates/Localizable.strings:711
@@ -2787,10 +2748,9 @@ msgstr "Establece 03001216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex08_title"
 #: Resources/templates/Localizable.strings:713
-#, fuzzy, no-wrap
-#| msgid "01000e16"
+#, no-wrap
 msgid "01003219"
-msgstr "01000e16"
+msgstr "01003219"
 
 #. type: "IntelSkylakex08_description"
 #: Resources/templates/Localizable.strings:714
@@ -2801,10 +2761,9 @@ msgstr "Establece 01001e16 para Intel Broadwell (Mobile) AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex09_title"
 #: Resources/templates/Localizable.strings:716
-#, fuzzy, no-wrap
-#| msgid "02001616"
+#, no-wrap
 msgid "02001619"
-msgstr "02001616"
+msgstr "02001619"
 
 #. type: "IntelSkylakex09_description"
 #: Resources/templates/Localizable.strings:717
@@ -2815,10 +2774,9 @@ msgstr "Establece 02001616 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex10_title"
 #: Resources/templates/Localizable.strings:719
-#, fuzzy, no-wrap
-#| msgid "02002616"
+#, no-wrap
 msgid "02002619"
-msgstr "02002616"
+msgstr "02002619"
 
 #. type: "IntelSkylakex10_description"
 #: Resources/templates/Localizable.strings:720
@@ -2829,10 +2787,9 @@ msgstr "Establece 02002216 para Intel Broadwell AAPL,ig-platform-id."
 
 #. type: "IntelSkylakex11_title"
 #: Resources/templates/Localizable.strings:722
-#, fuzzy, no-wrap
-#| msgid "00001e16"
+#, no-wrap
 msgid "03001e19"
-msgstr "00001e16"
+msgstr "03001e19"
 
 #. type: "IntelSkylakex11_description"
 #: Resources/templates/Localizable.strings:723
@@ -3363,13 +3320,13 @@ msgstr "Opciones de Control"
 msgid "Settings to control how Chameleon works."
 msgstr "Ajustes para controlar cómo funciona Chameleon."
 
-#. type: "CrsActiveConfig_title"
+#. type: "CsrActiveConfig_title"
 #: Resources/templates/Localizable.strings:883
 #, no-wrap
-msgid "CrsActiveConfig"
-msgstr ""
+msgid "CsrActiveConfig"
+msgstr "CsrActiveConfig"
 
-#. type: "CrsActiveConfig_description"
+#. type: "CsrActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
 msgid "System Integrity Protection (SIP)."
@@ -3531,126 +3488,184 @@ msgstr "Selecciona una asignaciones de teclas. Esto también instalará el módu
 #: Resources/templates/Localizable.strings:945
 #, fuzzy, no-wrap
 #| msgid "Kext Patcher"
-msgid "Patches"
+msgid "Embedded Patcher"
 msgstr "Kext Patcher"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
-msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch the Kernel and Kexts."
 msgstr "Una selección de opciones relacionadas con el video."
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:948
+#: Resources/templates/Localizable.strings:949
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
-msgid "kernel Patcher"
+msgid "Embedded Kernel Patch"
 msgstr "Kernel Patcher"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:950
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr ""
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:952
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "KernelBooter_kexts"
-msgstr ""
+msgstr "KernelBooter_kexts"
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:954
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr ""
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:956
-#, fuzzy, no-wrap
-#| msgid "Kernel Patcher"
+#: Resources/templates/Localizable.strings:957
+#, no-wrap
 msgid "KernelPm"
-msgstr "Kernel Patcher"
+msgstr "KernelPm"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:958
 #, fuzzy, no-wrap
 #| msgid "Power Management"
 msgid "Kernel Power Management patch."
 msgstr "Gestión de Energía"
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:960
-#, fuzzy, no-wrap
-#| msgid "Kernel Patcher"
+#: Resources/templates/Localizable.strings:961
+#, no-wrap
 msgid "KernelLapicError"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicError"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:962
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr ""
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:964
-#, fuzzy, no-wrap
-#| msgid "Kernel Patcher"
+#: Resources/templates/Localizable.strings:965
+#, no-wrap
 msgid "KernelLapicVersion"
-msgstr "Kernel Patcher"
+msgstr "KernelLapicVersion"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:966
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr ""
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:968
-#, fuzzy, no-wrap
-#| msgid "Kernel Flags"
+#: Resources/templates/Localizable.strings:969
+#, no-wrap
 msgid "KernelHaswell"
-msgstr "Kernel Flags"
+msgstr "KernelHaswell"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:970
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr ""
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:972
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "KernelcpuFamily"
-msgstr ""
+msgstr "KernelcpuFamily"
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:974
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr ""
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:976
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "KernelSSE3"
-msgstr ""
+msgstr "KernelSSE3"
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:978
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr ""
 
+#. type: "kextsPatcher_title"
+#: Resources/templates/Localizable.strings:987
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Embedded Kexts Patch"
+msgstr "Kext Patcher"
+
+#. type: "kextsPatcher_description"
+#: Resources/templates/Localizable.strings:988
+#, fuzzy, no-wrap
+#| msgid "A selection of options that deal with video."
+msgid "A selection of options to patch kexts."
+msgstr "Una selección de opciones relacionadas con el video."
+
+#. type: "AppleRTCPatch_title"
+#: Resources/templates/Localizable.strings:991
+#, no-wrap
+msgid "AppleRTC Patch"
+msgstr "AppleRTC Patch"
+
+#. type: "AppleRTCPatch_description"
+#: Resources/templates/Localizable.strings:992
+#, no-wrap
+msgid "Patch AppleRTC."
+msgstr ""
+
+#. type: "OrangeIconFixSata_title"
+#: Resources/templates/Localizable.strings:995
+#, no-wrap
+msgid "OrangeIcon Fix"
+msgstr ""
+
+#. type: "OrangeIconFixSata_description"
+#: Resources/templates/Localizable.strings:996
+#, no-wrap
+msgid "Fix OrangeIcon."
+msgstr ""
+
+#. type: "TrimEnablerSata_title"
+#: Resources/templates/Localizable.strings:999
+#, no-wrap
+msgid "TrimEnabler Sata"
+msgstr ""
+
+#. type: "TrimEnablerSata_description"
+#: Resources/templates/Localizable.strings:1000
+#, no-wrap
+msgid "Sata TrimEnabler."
+msgstr ""
+
+#. type: "AICPMPatch_title"
+#: Resources/templates/Localizable.strings:1003
+#, no-wrap
+msgid "AICPM Patch"
+msgstr ""
+
+#. type: "AICPMPatch_description"
+#: Resources/templates/Localizable.strings:1004
+#, no-wrap
+msgid "Patch AICPM."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:982
+#: Resources/templates/Localizable.strings:1010
 #, no-wrap
 msgid "Themes"
 msgstr "Temas"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:983
+#: Resources/templates/Localizable.strings:1011
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -3658,6 +3673,26 @@ msgid ""
 msgstr ""
 "Una colección de Temas de muestra.\n"
 "Puedes encontrar más temas en http://forum.voodooprojects.org/index.php/board,7.0.html"
+
+#, fuzzy
+#~| msgid "Kext Patcher"
+#~ msgid "Patches"
+#~ msgstr "Kext Patcher"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "kernel Patcher"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kext Patcher"
+#~ msgid "Kexts Patcher"
+#~ msgstr "Kext Patcher"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Kernel Patches"
+#~ msgstr "Kernel Patcher"
 
 #, fuzzy
 #~| msgid "Intel Azul AAPL,ig-platform-id"
@@ -3670,42 +3705,23 @@ msgstr ""
 #~ msgid "Install Type"
 #~ msgstr "Tipo de Instalación"
 
-#~ msgid ""
-#~ "Choose to perform a new installation or upgrade an existing installation."
-#~ msgstr ""
-#~ "Realizar una instalación nueva o actualizar una instalación existente del "
-#~ "gestor de arranque (Bootloader)."
+#~ msgid "Choose to perform a new installation or upgrade an existing installation."
+#~ msgstr "Realizar una instalación nueva o actualizar una instalación existente del gestor de arranque (Bootloader)."
 
 #~ msgid "New Installation"
 #~ msgstr "Instalación Nueva"
 
-#~ msgid ""
-#~ "Backup an existing /Extra folder, if found on the target partition. A new "
-#~ "one will be created if any options are chosen from the installer, other "
-#~ "than the Bootloader."
-#~ msgstr ""
-#~ "Realizar Copia de seguridad de una carpeta existente /Extra, si es "
-#~ "encontrada en la partición de destino. Una nueva será creada si se eligen "
-#~ "opciones desde el instalador, aparte del Bootloader en si mismo."
+#~ msgid "Backup an existing /Extra folder, if found on the target partition. A new one will be created if any options are chosen from the installer, other than the Bootloader."
+#~ msgstr "Realizar Copia de seguridad de una carpeta existente /Extra, si es encontrada en la partición de destino. Una nueva será creada si se eligen opciones desde el instalador, aparte del Bootloader en si mismo."
 
 #~ msgid "Upgrade"
 #~ msgstr "Actualización"
 
-#~ msgid ""
-#~ "Merge an existing /Extra folder, if found on the target, with any options "
-#~ "chosen from the installer, other than the Bootloader. The original /Extra "
-#~ "folder will be backed up."
-#~ msgstr ""
-#~ "Combinar una carpeta existente /Extra, si se encuentra en el destino, con "
-#~ "las opciones elegidas a partir de la instalación, aparte del Bootloader "
-#~ "en si mismo."
+#~ msgid "Merge an existing /Extra folder, if found on the target, with any options chosen from the installer, other than the Bootloader. The original /Extra folder will be backed up."
+#~ msgstr "Combinar una carpeta existente /Extra, si se encuentra en el destino, con las opciones elegidas a partir de la instalación, aparte del Bootloader en si mismo."
 
-#~ msgid ""
-#~ "This module permits the user to define the keyboard key mappings. This "
-#~ "module and associated keymaps are installed by default."
-#~ msgstr ""
-#~ "Este módulo permite al usuario definir las asignaciones de teclas del "
-#~ "teclado."
+#~ msgid "This module permits the user to define the keyboard key mappings. This module and associated keymaps are installed by default."
+#~ msgstr "Este módulo permite al usuario definir las asignaciones de teclas del teclado."
 
 #~ msgid "Utilities"
 #~ msgstr "Utilidades"

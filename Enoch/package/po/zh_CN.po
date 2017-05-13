@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
+"POT-Creation-Date: 2017-03-26 11:51+0100\n"
 "PO-Revision-Date: 2015-02-13 18:37-0000\n"
 "Last-Translator: crazybirdy <>\n"
 "Language-Team: zh_CN <zh_CN@li.org>\n"
@@ -1276,100 +1276,100 @@ msgstr "1920x1200x32"
 msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "设置显示器分辨率为 1920x1200x32"
 
-#. type: "Crs1_title"
+#. type: "Csr1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
+msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
 msgstr ""
 
-#. type: "Crs1_description"
+#. type: "Csr1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
 msgstr ""
 
-#. type: "Crs2_title"
+#. type: "Csr2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_FS"
+msgid "CSR_ALLOW_UNRESTRICTED_FS"
 msgstr ""
 
-#. type: "Crs2_description"
+#. type: "Csr2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
 msgstr ""
 
-#. type: "Crs4_title"
+#. type: "Csr4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CRS_ALLOW_TASK_FOR_PID"
+msgid "CSR_ALLOW_TASK_FOR_PID"
 msgstr ""
 
-#. type: "Crs4_description"
+#. type: "Csr4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CRS_ALLOW_TASK_FOR_PID"
+msgid "Disable CSR_ALLOW_TASK_FOR_PID"
 msgstr ""
 
-#. type: "Crs8_title"
+#. type: "Csr8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "CSR_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
-#. type: "Crs8_description"
+#. type: "Csr8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
-#. type: "Crs16_title"
+#. type: "Csr16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CRS_ALLOW_APPLE_INTERNAL"
+msgid "CSR_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
-#. type: "Crs16_description"
+#. type: "Csr16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
+msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
-#. type: "Crs32_title"
+#. type: "Csr32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
-#. type: "Crs32_description"
+#. type: "Csr32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
-#. type: "Crs64_title"
+#. type: "Csr64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
-#. type: "Crs64_description"
+#. type: "Csr64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
-#. type: "Crs128_title"
+#. type: "Csr128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
-#. type: "Crs128_description"
+#. type: "Csr128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "HDAULayoutIDx01_title"
@@ -3354,13 +3354,13 @@ msgstr "控制选项"
 msgid "Settings to control how Chameleon works."
 msgstr "设置控制 Chameleon 的运作方式。"
 
-#. type: "CrsActiveConfig_title"
+#. type: "CsrActiveConfig_title"
 #: Resources/templates/Localizable.strings:883
 #, no-wrap
-msgid "CrsActiveConfig"
+msgid "CsrActiveConfig"
 msgstr ""
 
-#. type: "CrsActiveConfig_description"
+#. type: "CsrActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
 msgid "System Integrity Protection (SIP)."

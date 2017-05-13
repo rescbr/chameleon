@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 13:34+0000\n"
+"POT-Creation-Date: 2017-03-26 11:51+0100\n"
 "PO-Revision-Date: 2015-02-13 18:32-0000\n"
 "Last-Translator: beta992 <beta992@gmail.com>\n"
 "Language-Team: nl <nl@li.org>\n"
@@ -1280,101 +1280,101 @@ msgstr "1920x1200x32"
 msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "Zet de grafische resolutie op 1920x1200x32"
 
-#. type: "Crs1_title"
+#. type: "Csr1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
-msgstr "CRS laat niet ondertekende kexts toe"
+msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
+msgstr "CSR laat niet ondertekende kexts toe"
 
-#. type: "Crs1_description"
+#. type: "Csr1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
 msgstr "Kext ondertekening: geïntroduceerd in 10.9, uitgebreid in 10.10 (kext ondertekening is voor alle kexts vereist), is nu onderdeel van rootless (SIP)"
 
-#. type: "Crs2_title"
+#. type: "Csr2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_FS"
-msgstr "CRS_ALLOW_UNRESTRICTED_FS"
+msgid "CSR_ALLOW_UNRESTRICTED_FS"
+msgstr "CSR_ALLOW_UNRESTRICTED_FS"
 
-#. type: "Crs2_description"
+#. type: "Csr2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
 msgstr "Bestandssysteem beveiliging: belangrijke systeembestanden zijn beveiligd en kunnen niet gewijzigd worden."
 
-#. type: "Crs4_title"
+#. type: "Csr4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CRS_ALLOW_TASK_FOR_PID"
-msgstr "CRS_ALLOW_TASK_FOR_PID"
+msgid "CSR_ALLOW_TASK_FOR_PID"
+msgstr "CSR_ALLOW_TASK_FOR_PID"
 
-#. type: "Crs4_description"
+#. type: "Csr4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CRS_ALLOW_TASK_FOR_PID"
-msgstr "Schakel CRS_ALLOW_TASK_FOR_PID uit"
+msgid "Disable CSR_ALLOW_TASK_FOR_PID"
+msgstr "Schakel CSR_ALLOW_TASK_FOR_PID uit"
 
-#. type: "Crs8_title"
+#. type: "Csr8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr "CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "CSR_ALLOW_KERNEL_DEBUGGER"
+msgstr "CSR_ALLOW_KERNEL_DEBUGGER"
 
-#. type: "Crs8_description"
+#. type: "Csr8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
-msgstr "Schakel CRS_ALLOW_KERNEL_DEBUGGER uit"
+msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
+msgstr "Schakel CSR_ALLOW_KERNEL_DEBUGGER uit"
 
-#. type: "Crs16_title"
+#. type: "Csr16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CRS_ALLOW_APPLE_INTERNAL"
-msgstr "CRS_ALLOW_APPLE_INTERNAL"
+msgid "CSR_ALLOW_APPLE_INTERNAL"
+msgstr "CSR_ALLOW_APPLE_INTERNAL"
 
-#. type: "Crs16_description"
+#. type: "Csr16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
-msgstr "Schakel CRS_ALLOW_APPLE_INTERNAL uit"
+msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
+msgstr "Schakel CSR_ALLOW_APPLE_INTERNAL uit"
 
-#. type: "Crs32_title"
+#. type: "Csr32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr "CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgstr "CSR_ALLOW_UNRESTRICTED_DTRACE"
 
-#. type: "Crs32_description"
+#. type: "Csr32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
-msgstr "Schakel CRS_ALLOW_UNRESTRICTED_DTRACE uit"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
+msgstr "Schakel CSR_ALLOW_UNRESTRICTED_DTRACE uit"
 
-#. type: "Crs64_title"
+#. type: "Csr64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr "CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgstr "CSR_ALLOW_UNRESTRICTED_NVRAM"
 
-#. type: "Crs64_description"
+#. type: "Csr64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
-msgstr "Schakel CRS_ALLOW_UNRESTRICTED_NVRAM uit"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
+msgstr "Schakel CSR_ALLOW_UNRESTRICTED_NVRAM uit"
 
-#. type: "Crs128_title"
+#. type: "Csr128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr "CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
+msgstr "CSR_ALLOW_DEVICE_CONFIGURATION"
 
-#. type: "Crs128_description"
+#. type: "Csr128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
-msgstr "Schakel CRS_ALLOW_DEVICE_CONFIGURATION uit"
+msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
+msgstr "Schakel CSR_ALLOW_DEVICE_CONFIGURATION uit"
 
 #. type: "HDAULayoutIDx01_title"
 #: Resources/templates/Localizable.strings:324
@@ -3332,13 +3332,14 @@ msgstr "Controle Opties"
 msgid "Settings to control how Chameleon works."
 msgstr "Opties gerelateerd aan hoe Chameleon werkt."
 
-#. type: "CrsActiveConfig_title"
+#. type: "CsrActiveConfig_title"
 #: Resources/templates/Localizable.strings:883
-#, no-wrap
-msgid "CrsActiveConfig"
-msgstr "CrsActiveConfig"
+#, fuzzy, no-wrap
+#| msgid "CsrActiveConfig"
+msgid "CsrActiveConfig"
+msgstr "CsrActiveConfig"
 
-#. type: "CrsActiveConfig_description"
+#. type: "CsrActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
 msgid "System Integrity Protection (SIP)."
@@ -3496,120 +3497,185 @@ msgstr "Selecteer een keylayout voor gebruik. Dit installeert ook de Keylayout m
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, no-wrap
-msgid "Patches"
-msgstr "Patches"
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Embedded Patcher"
+msgstr "Kext Patcher"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
-#, no-wrap
-msgid "A selection of options to patch the kernel."
+#, fuzzy, no-wrap
+#| msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch the Kernel and Kexts."
 msgstr "Een selectie aan opties welke te maken hebben met de kernel."
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:948
-#, no-wrap
-msgid "kernel Patcher"
+#: Resources/templates/Localizable.strings:949
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "Embedded Kernel Patch"
 msgstr "Kernel Patcher"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:950
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr "Kies een patch voor je kernel."
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:952
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "KernelBooter_kexts"
 msgstr "KernelBooter_kexts"
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:954
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr "Re-enable /Extra/Extensions kexts voo nieuwere OSes."
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:956
+#: Resources/templates/Localizable.strings:957
 #, no-wrap
 msgid "KernelPm"
 msgstr "KernelPM"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:958
 #, no-wrap
 msgid "Kernel Power Management patch."
 msgstr "Kernel Stroom Beheer patch."
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:960
+#: Resources/templates/Localizable.strings:961
 #, no-wrap
 msgid "KernelLapicError"
 msgstr "KernelLapicError"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:962
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr "Verwijder de Local Apic Error panic."
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:964
+#: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "KernelLapicVersion"
 msgstr "KernelLapicVersion"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:966
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr "Verwijder de Local Apic Versie panic."
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:968
+#: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "KernelHaswell"
 msgstr "KernelHaswell"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:970
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr "Patch voor Haswell \\\"E\\\" en \\\"ULT\\\" support voor oudere OSen."
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:972
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "KernelcpuFamily"
 msgstr "KernelcpuFamily"
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:974
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr "Patch de cpuid_family adres voor het verwijderen van de _cpuid_set_info _panic en _tsc_init _panic. Voor niet ondersteunde CPUs"
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:976
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "KernelSSE3"
 msgstr "KernelSSE3"
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:978
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr "Patch om meer SSE3 instructions aan te zetten op oudere CPUs om nieuwere OSen te kunnen draaien."
 
+#. type: "kextsPatcher_title"
+#: Resources/templates/Localizable.strings:987
+#, fuzzy, no-wrap
+#| msgid "Kext Patcher"
+msgid "Embedded Kexts Patch"
+msgstr "Kext Patcher"
+
+#. type: "kextsPatcher_description"
+#: Resources/templates/Localizable.strings:988
+#, fuzzy, no-wrap
+#| msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch kexts."
+msgstr "Een selectie aan opties welke te maken hebben met de kernel."
+
+#. type: "AppleRTCPatch_title"
+#: Resources/templates/Localizable.strings:991
+#, no-wrap
+msgid "AppleRTC Patch"
+msgstr ""
+
+#. type: "AppleRTCPatch_description"
+#: Resources/templates/Localizable.strings:992
+#, no-wrap
+msgid "Patch AppleRTC."
+msgstr ""
+
+#. type: "OrangeIconFixSata_title"
+#: Resources/templates/Localizable.strings:995
+#, no-wrap
+msgid "OrangeIcon Fix"
+msgstr ""
+
+#. type: "OrangeIconFixSata_description"
+#: Resources/templates/Localizable.strings:996
+#, no-wrap
+msgid "Fix OrangeIcon."
+msgstr ""
+
+#. type: "TrimEnablerSata_title"
+#: Resources/templates/Localizable.strings:999
+#, no-wrap
+msgid "TrimEnabler Sata"
+msgstr ""
+
+#. type: "TrimEnablerSata_description"
+#: Resources/templates/Localizable.strings:1000
+#, no-wrap
+msgid "Sata TrimEnabler."
+msgstr ""
+
+#. type: "AICPMPatch_title"
+#: Resources/templates/Localizable.strings:1003
+#, no-wrap
+msgid "AICPM Patch"
+msgstr ""
+
+#. type: "AICPMPatch_description"
+#: Resources/templates/Localizable.strings:1004
+#, no-wrap
+msgid "Patch AICPM."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:982
+#: Resources/templates/Localizable.strings:1010
 #, no-wrap
 msgid "Themes"
 msgstr "Thema's"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:983
+#: Resources/templates/Localizable.strings:1011
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -3617,6 +3683,27 @@ msgid ""
 msgstr ""
 "Een Collectie van Voorbeeld Thema's\n"
 "Meer thema's kunnen worden gevonden op http://forum.voodooprojects.org/index.php/board,7.0.html"
+
+#~ msgid "Patches"
+#~ msgstr "Patches"
+
+#~ msgid "kernel Patcher"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kext Patcher"
+#~ msgid "Kexts Patcher"
+#~ msgstr "Kext Patcher"
+
+#, fuzzy
+#~| msgid "Select one patch for your kernel."
+#~ msgid "Select patch for your kext."
+#~ msgstr "Kies een patch voor je kernel."
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Kernel Patches"
+#~ msgstr "Kernel Patcher"
 
 #, fuzzy
 #~| msgid "Intel Azul AAPL,ig-platform-id"
