@@ -967,7 +967,7 @@ long LoadMatchedModules( void )
 				snprintf(gFileSpec, 4096, "%s%s", module->executablePath, fileName);
 
 #if FAKESMC_SUPPORT
-        		        if (!strcmp(fileName, "EmbeddedFakeSMC"))
+				if (!strcmp(fileName, "EmbeddedFakeSMC"))
 				{
 					verbose("\t  Loading embedded FakeSMC: ");
 					embedded = malloc(FakeSMC_un_len);
@@ -1531,12 +1531,14 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					case 3: kernelOSVer = 0xA0C0200; break;
 					case 4: kernelOSVer = 0xA0C0300; break;
 					case 5: kernelOSVer = 0xA0C0400; break;
-					default:kernelOSVer = 0xA0C0400; break; //Last known kernel (add here updates)
+					case 6: kernelOSVer = 0xA0C0500; break;
+//					case 7: kernelOSVer = 0xA0C0600; break;
+					default:kernelOSVer = 0xA0C0500; break; //Last known kernel (add here updates)
 				}
 				break;
 			default:
-				kernelOSVer = 0xA0C0400;
-				break; //Last known kernel is Sierra 10.12.4
+				kernelOSVer = 0xA0C0500;
+				break; //Last known kernel is Sierra 10.12.5
 			}
 		}
 		else
@@ -1595,8 +1597,10 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			case 0xA0C0200: gDarwinMajor = 16; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.12.2
 			case 0xA0C0300: gDarwinMajor = 16; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.12.3
 			case 0xA0C0400: gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4
+			case 0xA0C0500: gDarwinMajor = 16; gDarwinMinor =  6; gDarwinRev = 0; break; // 10.12.5
+//			case 0xA0C0600: gDarwinMajor = 16; gDarwinMinor =  x; gDarwinRev = x; break; // 10.12.6
 			// default = last known kernel
-			default:        gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4;
+			default:        gDarwinMajor = 16; gDarwinMinor =  6; gDarwinRev = 0; break; // 10.12.5;
 		}
 	}
 

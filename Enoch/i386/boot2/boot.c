@@ -1341,8 +1341,8 @@ void setupBooterArgs()
 
 // ===============================================================================
 
-		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
-		bootArgs->boot_SMC_plimit	= 0;
+		bootArgs->csrCapabilities		= CSR_VALID_FLAGS;
+		bootArgs->boot_SMC_plimit		= 0;
 	}
 }
 

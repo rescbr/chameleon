@@ -140,6 +140,7 @@ void reserveKernBootStruct(void)
 		bcopy(oldAddr, bootArgs, sizeof(boot_args));
 	}
 
+	// 10.12 and 10.13 new bootArgs?
 }
 
 //==============================================================================
