@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-02 15:03+0000\n"
+"POT-Creation-Date: 2017-03-26 11:51+0100\n"
 "PO-Revision-Date: 2014-11-24 20:12-0000\n"
 "Last-Translator: Желязко <slackjackie@gmail.com>\n"
 "Language-Team: bg <bg@li.org>\n"
@@ -1244,100 +1244,100 @@ msgstr "1920x1200x32"
 msgid "Set Graphics Mode to 1920x1200x32"
 msgstr "Задайте Графичен режим 1920x1200x32"
 
-#. type: "Crs1_title"
+#. type: "Csr1_title"
 #: Resources/templates/Localizable.strings:298
 #, no-wrap
-msgid "CRS_ALLOW_UNTRUSTED_KEXTS"
+msgid "CSR_ALLOW_UNTRUSTED_KEXTS"
 msgstr ""
 
-#. type: "Crs1_description"
+#. type: "Csr1_description"
 #: Resources/templates/Localizable.strings:299
 #, no-wrap
 msgid "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP)."
 msgstr ""
 
-#. type: "Crs2_title"
+#. type: "Csr2_title"
 #: Resources/templates/Localizable.strings:301
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_FS"
+msgid "CSR_ALLOW_UNRESTRICTED_FS"
 msgstr ""
 
-#. type: "Crs2_description"
+#. type: "Csr2_description"
 #: Resources/templates/Localizable.strings:302
 #, no-wrap
 msgid "Filesystem protection: Important system files are protected and cannot be modified."
 msgstr ""
 
-#. type: "Crs4_title"
+#. type: "Csr4_title"
 #: Resources/templates/Localizable.strings:304
 #, no-wrap
-msgid "CRS_ALLOW_TASK_FOR_PID"
+msgid "CSR_ALLOW_TASK_FOR_PID"
 msgstr ""
 
-#. type: "Crs4_description"
+#. type: "Csr4_description"
 #: Resources/templates/Localizable.strings:305
 #, no-wrap
-msgid "Disable CRS_ALLOW_TASK_FOR_PID"
+msgid "Disable CSR_ALLOW_TASK_FOR_PID"
 msgstr ""
 
-#. type: "Crs8_title"
+#. type: "Csr8_title"
 #: Resources/templates/Localizable.strings:307
 #, no-wrap
-msgid "CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "CSR_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
-#. type: "Crs8_description"
+#. type: "Csr8_description"
 #: Resources/templates/Localizable.strings:308
 #, no-wrap
-msgid "Disable CRS_ALLOW_KERNEL_DEBUGGER"
+msgid "Disable CSR_ALLOW_KERNEL_DEBUGGER"
 msgstr ""
 
-#. type: "Crs16_title"
+#. type: "Csr16_title"
 #: Resources/templates/Localizable.strings:310
 #, no-wrap
-msgid "CRS_ALLOW_APPLE_INTERNAL"
+msgid "CSR_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
-#. type: "Crs16_description"
+#. type: "Csr16_description"
 #: Resources/templates/Localizable.strings:311
 #, no-wrap
-msgid "Disable CRS_ALLOW_APPLE_INTERNAL"
+msgid "Disable CSR_ALLOW_APPLE_INTERNAL"
 msgstr ""
 
-#. type: "Crs32_title"
+#. type: "Csr32_title"
 #: Resources/templates/Localizable.strings:313
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "CSR_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
-#. type: "Crs32_description"
+#. type: "Csr32_description"
 #: Resources/templates/Localizable.strings:314
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_DTRACE"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_DTRACE"
 msgstr ""
 
-#. type: "Crs64_title"
+#. type: "Csr64_title"
 #: Resources/templates/Localizable.strings:316
 #, no-wrap
-msgid "CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "CSR_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
-#. type: "Crs64_description"
+#. type: "Csr64_description"
 #: Resources/templates/Localizable.strings:317
 #, no-wrap
-msgid "Disable CRS_ALLOW_UNRESTRICTED_NVRAM"
+msgid "Disable CSR_ALLOW_UNRESTRICTED_NVRAM"
 msgstr ""
 
-#. type: "Crs128_title"
+#. type: "Csr128_title"
 #: Resources/templates/Localizable.strings:319
 #, no-wrap
-msgid "CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "CSR_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
-#. type: "Crs128_description"
+#. type: "Csr128_description"
 #: Resources/templates/Localizable.strings:320
 #, no-wrap
-msgid "Disable CRS_ALLOW_DEVICE_CONFIGURATION"
+msgid "Disable CSR_ALLOW_DEVICE_CONFIGURATION"
 msgstr ""
 
 #. type: "HDAULayoutIDx01_title"
@@ -3185,13 +3185,13 @@ msgstr "Опциите за контрол"
 msgid "Settings to control how Chameleon works."
 msgstr "Настройки, за да контролирате как работи Хамелеон."
 
-#. type: "CrsActiveConfig_title"
+#. type: "CsrActiveConfig_title"
 #: Resources/templates/Localizable.strings:883
 #, no-wrap
-msgid "CrsActiveConfig"
+msgid "CsrActiveConfig"
 msgstr ""
 
-#. type: "CrsActiveConfig_description"
+#. type: "CsrActiveConfig_description"
 #: Resources/templates/Localizable.strings:884
 #, no-wrap
 msgid "System Integrity Protection (SIP)."
@@ -3350,127 +3350,190 @@ msgstr "Изберете един keylayout да се използва. Това
 
 #. type: "Patches_title"
 #: Resources/templates/Localizable.strings:945
-#, no-wrap
-msgid "Patches"
-msgstr ""
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "Embedded Patcher"
+msgstr "Kernel Patcher"
 
 #. type: "Patches_description"
 #: Resources/templates/Localizable.strings:946
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
-msgid "A selection of options to patch the kernel."
+msgid "A selection of options to patch the Kernel and Kexts."
 msgstr "А изборът на опции, които се занимават с видеото."
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:948
+#: Resources/templates/Localizable.strings:949
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
-msgid "kernel Patcher"
+msgid "Embedded Kernel Patch"
 msgstr "Kernel Patcher"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:950
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr ""
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:952
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "KernelBooter_kexts"
 msgstr ""
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:954
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr ""
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:956
+#: Resources/templates/Localizable.strings:957
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelPm"
 msgstr "Kernel Patcher"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:958
 #, fuzzy, no-wrap
 #| msgid "Power Management"
 msgid "Kernel Power Management patch."
 msgstr "Опции на захранването"
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:960
+#: Resources/templates/Localizable.strings:961
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicError"
 msgstr "Kernel Patcher"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:962
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr ""
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:964
+#: Resources/templates/Localizable.strings:965
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
 msgstr "Kernel Patcher"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:966
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr ""
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:968
+#: Resources/templates/Localizable.strings:969
 #, fuzzy, no-wrap
 #| msgid "Kernel Flags"
 msgid "KernelHaswell"
 msgstr "Ядрото опции /Kernel Flags/"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:970
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr ""
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:972
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "KernelcpuFamily"
 msgstr ""
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:974
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr ""
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:976
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "KernelSSE3"
 msgstr ""
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:978
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr ""
 
+#. type: "kextsPatcher_title"
+#: Resources/templates/Localizable.strings:987
+#, fuzzy, no-wrap
+#| msgid "Kernel Patcher"
+msgid "Embedded Kexts Patch"
+msgstr "Kernel Patcher"
+
+#. type: "kextsPatcher_description"
+#: Resources/templates/Localizable.strings:988
+#, fuzzy, no-wrap
+#| msgid "A selection of options that deal with video."
+msgid "A selection of options to patch kexts."
+msgstr "А изборът на опции, които се занимават с видеото."
+
+#. type: "AppleRTCPatch_title"
+#: Resources/templates/Localizable.strings:991
+#, no-wrap
+msgid "AppleRTC Patch"
+msgstr ""
+
+#. type: "AppleRTCPatch_description"
+#: Resources/templates/Localizable.strings:992
+#, no-wrap
+msgid "Patch AppleRTC."
+msgstr ""
+
+#. type: "OrangeIconFixSata_title"
+#: Resources/templates/Localizable.strings:995
+#, no-wrap
+msgid "OrangeIcon Fix"
+msgstr ""
+
+#. type: "OrangeIconFixSata_description"
+#: Resources/templates/Localizable.strings:996
+#, no-wrap
+msgid "Fix OrangeIcon."
+msgstr ""
+
+#. type: "TrimEnablerSata_title"
+#: Resources/templates/Localizable.strings:999
+#, no-wrap
+msgid "TrimEnabler Sata"
+msgstr ""
+
+#. type: "TrimEnablerSata_description"
+#: Resources/templates/Localizable.strings:1000
+#, no-wrap
+msgid "Sata TrimEnabler."
+msgstr ""
+
+#. type: "AICPMPatch_title"
+#: Resources/templates/Localizable.strings:1003
+#, no-wrap
+msgid "AICPM Patch"
+msgstr ""
+
+#. type: "AICPMPatch_description"
+#: Resources/templates/Localizable.strings:1004
+#, no-wrap
+msgid "Patch AICPM."
+msgstr ""
+
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:982
+#: Resources/templates/Localizable.strings:1010
 #, no-wrap
 msgid "Themes"
 msgstr "Теми"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:983
+#: Resources/templates/Localizable.strings:1011
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
@@ -3478,6 +3541,26 @@ msgid ""
 msgstr ""
 "Колекция от теми\n"
 "http://forum.voodooprojects.org/index.php/board,7.0.html"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Patches"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "kernel Patcher"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Kexts Patcher"
+#~ msgstr "Kernel Patcher"
+
+#, fuzzy
+#~| msgid "Kernel Patcher"
+#~ msgid "Kernel Patches"
+#~ msgstr "Kernel Patcher"
 
 #~ msgid ""
 #~ "Merge an existing /Extra folder, if found on the target, with any options "

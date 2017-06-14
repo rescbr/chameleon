@@ -43,6 +43,20 @@
 		}
 	}
 
+	var kextsPlist = null;
+	if (my.target)
+	{
+		var kexts_plist_filenames = new Array( 'kexts.plist' );
+		for ( var i = 0; i &lt; kexts_plist_filenames.length; i++ )
+		{
+			kextsPlist = system.files.plistAtPath( my.target.mountpoint + '/Extra/' + kexts_plist_filenames[i] );
+			if (kextsPlist)
+			{
+				break;
+			}
+		}
+	}
+
 	function installCheckScript()
 	{
 		var obj = system.ioregistry.matchingClass("AppleSMC");

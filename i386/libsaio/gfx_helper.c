@@ -6,7 +6,7 @@
 #include "libsaio.h"
 #include "bootstruct.h"
 #include "xml.h"
-#include "nvidia_helper.h"
+#include "gfx_helper.h"
 #include "pci.h"
 #include "nvidia.h"
 
@@ -116,38 +116,38 @@ void fill_card_list(void)
 	uint32_t	dev_id = 0;
 	uint32_t	subdev_id = 0;
 	uint64_t	VramSize = 0;
-	
+
 	if ((NVDIATag = XMLCastArray(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char *)"NVIDIA"))))
 	{
 		count = XMLTagCount(NVDIATag);
-		
-		for (i=0; i<count; i++) 
+
+		for (i=0; i<count; i++)
 		{
 			TagPtr element = XMLGetElement( NVDIATag, i );
-			if (element) 
+			if (element)
 			{
 				match_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCIPrimaryMatch")); //device-id
 				sub_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCISubDevId")); //sub device-id
 				model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
 				vram_size  = XMLCastString(XMLGetProperty(element, (const char*)"VRam Size"));
-				
+
 				if (match_id)
 				{
 					dev_id = strtoul(match_id, NULL, 16);
 				}
-				
+
 				if (sub_id)
 				{
 					subdev_id = strtoul(sub_id, NULL, 16);
 				}
-				
+
 				if (vram_size)
 				{
 					VramSize = strtoul(vram_size, NULL, 10);
 				}
-				
-				add_card(model_name, dev_id, subdev_id, VramSize);								
+
+				add_card(model_name, dev_id, subdev_id, VramSize);
 			}
-		}	
-	}	
+		}
+	}
 }

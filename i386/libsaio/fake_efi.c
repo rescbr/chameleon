@@ -627,9 +627,9 @@ static void setupEfiDeviceTree(void)
 		DT__AddProperty(efiPlatformNode, CPU_Frequency_prop, sizeof(uint64_t), &Platform.CPU.CPUFrequency);
 	}
 
-	DT__AddProperty(efiPlatformNode,START_POWER_EV, sizeof(STARTUP_POWER_EVENTS), (EFI_UINT8 *) &STARTUP_POWER_EVENTS);
+	DT__AddProperty(efiPlatformNode, START_POWER_EV, sizeof(STARTUP_POWER_EVENTS), (EFI_UINT8 *) &STARTUP_POWER_EVENTS);
 
-	DT__AddProperty(efiPlatformNode,DEV_PATH_SUP, sizeof(DEVICE_PATHS_SUPPORTED), (EFI_UINT8 *) &DEVICE_PATHS_SUPPORTED);
+	DT__AddProperty(efiPlatformNode, DEV_PATH_SUP, sizeof(DEVICE_PATHS_SUPPORTED), (EFI_UINT8 *) &DEVICE_PATHS_SUPPORTED);
 
 	DT__AddProperty(efiPlatformNode, SYSTEM_ID_PROP, UUID_LEN, (EFI_UINT32 *)Platform.UUID);
 
@@ -824,14 +824,15 @@ void setupChosenNode()
 	// Micky1979 : MIMIC booter entry for El Capitan
 	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan
 	{
+
 		verbose("Adding booter spec to the Platform Expert \n");
-		// booter-build-time (Fri May 22 19:06:42 PDT 2015) DP1
-		// booter-build-time (Fri Jul 24 17:39:22 PDT 2015) DP7
+
+		// booter-build-time (Fri Apr 14 16:21:16 PDT 2017) 10.12.5
 		DT__AddProperty(chosenNode, "booter-build-time", sizeof(I386BOOT_BUILDDATE), I386BOOT_BUILDDATE);
-		// booter-name (boot.efi)
-		DT__AddProperty(chosenNode, "booter-name", sizeof("Enoch"), "Enoch");
-		// booter-version (version:295.0.0.1.1) DP1
-		// booter-version (version:304) DP7
+		// booter-name
+		DT__AddProperty(chosenNode, "booter-name", sizeof("Chameleon"), "Chameleon");
+
+		// booter-version (version:324.50.13) 10.12.5
 		DT__AddProperty(chosenNode, "booter-version", sizeof(I386BOOT_CHAMELEONREVISION), I386BOOT_CHAMELEONREVISION);
 	}
 }

@@ -21,15 +21,15 @@
 # B) User can select only one of the options from the list.
 # Set Exclusive=False for A, or Exclusive=True for B.
 #
-Exclusive=False
+Exclusive=True
 # ---------------------------------------------
 # Note: There must be a carriage return at end of last line
 # ---------------------------------------------
-Text@Crs1:CrsActiveConfig=1
-Text@Crs2:CrsActiveConfig=2
-Text@Crs4:CrsActiveConfig=4
-Text@Crs8:CrsActiveConfig=8
-Text@Crs16:CrsActiveConfig=16
-Text@Crs32:CrsActiveConfig=32
-Text@Crs64:CrsActiveConfig=64
-Text@Crs128:CrsActiveConfig=128
+Text@Csr1:CsrActiveConfig=1
+Text@Csr2:CsrActiveConfig=2
+Text@Csr4:CsrActiveConfig=4
+Text@Csr8:CsrActiveConfig=8
+Text@Csr16:CsrActiveConfig=16
+Text@Csr32:CsrActiveConfig=32
+Text@Csr64:CsrActiveConfig=64
+Text@Csr128:CsrActiveConfig=128

@@ -55,7 +55,7 @@
 #include "device_inject.h"
 #include "convert.h"
 #include "nvidia.h"
-#include "nvidia_helper.h"
+#include "gfx_helper.h"
 
 #if DEBUG_NVIDIA
 	#define DBG(x...)	printf(x)

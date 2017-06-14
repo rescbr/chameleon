@@ -295,29 +295,29 @@ Dependencies: none";
 
 // ----------------------------------------------------------------------------
 
-"Crs1_title" = "CRS_ALLOW_UNTRUSTED_KEXTS";
-"Crs1_description" = "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP).";
+"Csr1_title" = "CSR_ALLOW_UNTRUSTED_KEXTS";
+"Csr1_description" = "Kext signing: Introduced in 10.9, enhanced in 10.10 (kext signing required for all kexts), now become part of rootless(SIP).";
 
-"Crs2_title" = "CRS_ALLOW_UNRESTRICTED_FS";
-"Crs2_description" = "Filesystem protection: Important system files are protected and cannot be modified.";
+"Csr2_title" = "CSR_ALLOW_UNRESTRICTED_FS";
+"Csr2_description" = "Filesystem protection: Important system files are protected and cannot be modified.";
 
-"Crs4_title" = "CRS_ALLOW_TASK_FOR_PID";
-"Crs4_description" = "Disable CRS_ALLOW_TASK_FOR_PID";
+"Csr4_title" = "CSR_ALLOW_TASK_FOR_PID";
+"Csr4_description" = "Disable CSR_ALLOW_TASK_FOR_PID";
 
-"Crs8_title" = "CRS_ALLOW_KERNEL_DEBUGGER";
-"Crs8_description" = "Disable CRS_ALLOW_KERNEL_DEBUGGER";
+"Csr8_title" = "CSR_ALLOW_KERNEL_DEBUGGER";
+"Csr8_description" = "Disable CSR_ALLOW_KERNEL_DEBUGGER";
 
-"Crs16_title" = "CRS_ALLOW_APPLE_INTERNAL";
-"Crs16_description" = "Disable CRS_ALLOW_APPLE_INTERNAL";
+"Csr16_title" = "CSR_ALLOW_APPLE_INTERNAL";
+"Csr16_description" = "Disable CSR_ALLOW_APPLE_INTERNAL";
 
-"Crs32_title" = "CRS_ALLOW_UNRESTRICTED_DTRACE";
-"Crs32_description" = "Disable CRS_ALLOW_UNRESTRICTED_DTRACE";
+"Csr32_title" = "CSR_ALLOW_UNRESTRICTED_DTRACE";
+"Csr32_description" = "Disable CSR_ALLOW_UNRESTRICTED_DTRACE";
 
-"Crs64_title" = "CRS_ALLOW_UNRESTRICTED_NVRAM";
-"Crs64_description" = "Disable CRS_ALLOW_UNRESTRICTED_NVRAM";
+"Csr64_title" = "CSR_ALLOW_UNRESTRICTED_NVRAM";
+"Csr64_description" = "Disable CSR_ALLOW_UNRESTRICTED_NVRAM";
 
-"Crs128_title" = "CRS_ALLOW_DEVICE_CONFIGURATION";
-"Crs128_description" = "Disable CRS_ALLOW_DEVICE_CONFIGURATION";
+"Csr128_title" = "CSR_ALLOW_DEVICE_CONFIGURATION";
+"Csr128_description" = "Disable CSR_ALLOW_DEVICE_CONFIGURATION";
 
 // ----------------------------------------------------------------------------
 
@@ -879,9 +879,9 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 "Control_title" = "Control Options";
 "Control_description" = "Settings to control how Chameleon works.";
 
-// CrsActiveConfig
-"CrsActiveConfig_title" = "CrsActiveConfig";
-"CrsActiveConfig_description" = "System Integrity Protection (SIP).";
+// CsrActiveConfig
+"CsrActiveConfig_title" = "CsrActiveConfig";
+"CsrActiveConfig_description" = "System Integrity Protection (SIP).";
 
 // General
 "General_title" = "General Options";
@@ -942,10 +942,11 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 // ----------------------------------------------------------------------------
 
 // Patches
-"Patches_title" = "Patches";
-"Patches_description" = "A selection of options to patch the kernel.";
-// kernel Patcher
-"kernelPatcher_title" = "kernel Patcher";
+"Patches_title" = "Embedded Patcher";
+"Patches_description" = "A selection of options to patch the Kernel and Kexts.";
+
+// enbedded kernel Patcher
+"kernelPatcher_title" = "Embedded Kernel Patch";
 "kernelPatcher_description" = "Select one patch for your kernel.";
 
 // KernelBooter_kexts
@@ -975,6 +976,33 @@ More information by bcc9 here: http://www.insanelymac.com/forum/topic/282989-vtd
 // KernelSSE3
 "KernelSSE3_title" = "KernelSSE3";
 "KernelSSE3_description" = "Patch to enable more SSE3 instructions on older CPUs to run newer OSes.";
+
+// ============================================================================
+// Patches - The follow options are for the internal KextsPatcher
+// In the future here we can add something else regarding any patches made
+// by the bootloader
+// ----------------------------------------------------------------------------
+
+// enbedded Kexts Patcher
+"kextsPatcher_title" = "Embedded Kexts Patch";
+"kextsPatcher_description" = "A selection of options to patch kexts.";
+
+// KernelBooter_kexts
+"AppleRTCPatch_title" = "AppleRTC Patch";
+"AppleRTCPatch_description" = "Patch AppleRTC.";
+
+// KernelPm
+"OrangeIconFixSata_title" = "OrangeIcon Fix";
+"OrangeIconFixSata_description" = "Fix OrangeIcon.";
+
+// KernelLapicError
+"TrimEnablerSata_title" = "TrimEnabler Sata";
+"TrimEnablerSata_description" = "Sata TrimEnabler.";
+
+// KernelLapicVersion
+"AICPMPatch_title" = "AICPM Patch";
+"AICPMPatch_description" = "Patch AICPM.";
+
 // ============================================================================
 // Themes
 // ----------------------------------------------------------------------------

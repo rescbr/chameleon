@@ -495,8 +495,8 @@ static SMBWord structureCount	= 0;
 #define kDefaultMacProFamily				"MacPro" // MacPro's family = "MacPro" not "Mac Pro"
 
 #define kDefaultMacPro					"MacPro3,1"
-#define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0903051113"
-#define kDefaultMacProBIOSReleaseDate			"08/03/2010"
+#define kDefaultMacProBIOSVersion			"    MP31.88Z.006C.B05.0802291410"
+#define kDefaultMacProBIOSReleaseDate			"02/29/08"
 #define kDefaultMacProBoardProduct			"Mac-F42C88C8"
 
 // Mac Pro 4,1 core i7/Xeon
@@ -515,8 +515,8 @@ static SMBWord structureCount	= 0;
 
 // Mac Pro 6,1
 #define kDefaultMacProHaswell				"MacPro6,1"
-#define kDefaultMacProHaswellBIOSVersion		"MP61.88Z.0116.B04.1312061508"
-#define kDefaultMacProHaswellBIOSReleaseDate		"12/06/2013"
+#define kDefaultMacProHaswellBIOSVersion		"MP61.88Z.0116.B25.1702171857"
+#define kDefaultMacProHaswellBIOSReleaseDate		"02/17/2017"
 #define kDefaultMacProHaswellBoardProduct		"Mac-F60DEB81FF30ACF6"
 
 /* ============================================ */

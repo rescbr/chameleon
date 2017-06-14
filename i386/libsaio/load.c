@@ -209,7 +209,6 @@ long DecodeMachO(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			break;
 		}
 
-
 	if (ret != 0)
 	{
 		return -1;

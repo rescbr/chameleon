@@ -100,6 +100,7 @@ long LoadMatchedModules(void);
 
 static long MatchPersonalities(void);
 static long MatchLibraries(void);
+
 #ifdef NOTDEF
 	static ModulePtr FindModule(char *name);
 	static void ThinFatFile(void **loadAddrP, unsigned long *lengthP);
@@ -217,7 +218,8 @@ long LoadDrivers( char *dirSpec )
 			{
 				// Next try a specfic OS version folder ie 10.5
 				sprintf(dirSpecExtra, "bt(0,0)/Extra/%s/", &gMacOSVersion[0]);
-				if (FileLoadDrivers(dirSpecExtra, 0) != 0) {
+				if (FileLoadDrivers(dirSpecExtra, 0) != 0)
+				{
 					// Next we'll try the base
 					strlcpy(dirSpecExtra, "bt(0,0)/Extra/", sizeof(dirSpecExtra));
 					FileLoadDrivers(dirSpecExtra, 0);
@@ -503,7 +505,7 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 	char		*tmpBundlePath = 0;
 	long		ret = -1;
 
-	do{
+	do {
 	// Save the driver path.
         
 	if(name)
@@ -686,7 +688,7 @@ long LoadMatchedModules( void )
 			if ((length != -1) && executableAddr)
 			{
 				// Make make in the image area.
-                
+
 				execute_hook("LoadMatchedModules", module, &length, executableAddr, NULL);
 
 				driverLength = sizeof(DriverInfo) + module->plistLength + length + module->bundlePathLength;
@@ -1153,12 +1155,30 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					case 3: kernelOSVer = 0xA0C0200; break;
 					case 4: kernelOSVer = 0xA0C0300; break;
 					case 5: kernelOSVer = 0xA0C0400; break;
-					default:kernelOSVer = 0xA0C0400; break; //Last known kernel (add here updates)
+					case 6: kernelOSVer = 0xA0C0500; break;
+					case 7: kernelOSVer = 0xA0C0600; break;
+//					case 8: kernelOSVer = 0xA0C0700; break;
+					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
 				}
 				break;
+//			case 17:  /* High Sierra */
+//				switch (gDarwinMinor)
+//				{
+//					case 0: kernelOSVer = 0xA0C0000; break;
+//					case 1: kernelOSVer = 0xA0C0100; break;
+//					case 2: kernelOSVer = 0xA0C0200; break;
+//					case 3: kernelOSVer = 0xA0C0200; break;
+//					case 4: kernelOSVer = 0xA0C0300; break;
+//					case 5: kernelOSVer = 0xA0C0400; break;
+//					case 6: kernelOSVer = 0xA0C0500; break;
+//					case 7: kernelOSVer = 0xA0C0600; break;
+//					case 8: kernelOSVer = 0xA0C0700; break;
+//					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
+//				}
+//				break;
 			default:
-				kernelOSVer = 0xA0C0400;
-				break; //Last known kernel is Sierra 10.12.4
+				kernelOSVer = 0xA0C0600;
+				break; //Last known kernel is Sierra 10.12.6
 			}
 		}
 		else
@@ -1217,8 +1237,13 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			case 0xA0C0200: gDarwinMajor = 16; gDarwinMinor =  3; gDarwinRev = 0; break; // 10.12.2
 			case 0xA0C0300: gDarwinMajor = 16; gDarwinMinor =  4; gDarwinRev = 0; break; // 10.12.3
 			case 0xA0C0400: gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4
+			case 0xA0C0500: gDarwinMajor = 16; gDarwinMinor =  6; gDarwinRev = 0; break; // 10.12.5
+			case 0xA0C0600: gDarwinMajor = 16; gDarwinMinor =  7; gDarwinRev = 0; break; // 10.12.6
+//			case 0xA0C0700: gDarwinMajor = 16; gDarwinMinor =  x; gDarwinRev = x; break; // 10.12.7
+			// High Sierra
+
 			// default = last known kernel
-			default:        gDarwinMajor = 16; gDarwinMinor =  5; gDarwinRev = 0; break; // 10.12.4;
+			default:        gDarwinMajor = 16; gDarwinMinor =  7; gDarwinRev = 0; break; // 10.12.6;
 		}
 	}
 

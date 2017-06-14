@@ -1711,6 +1711,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	char *YosPattern    = "Install%20OS%20X%20Yosemite";
 	char *ECPattern     = "Install%20OS%20X%20El%20Capitan";
 	char *SierraPattern = "Install%20macOS%20Sierra";
+	char *HSierraPattern = "Install%20macOS%20High%20Sierra";
 
 	/*
 	 * Only look for OS Version on HFS+
@@ -1810,6 +1811,12 @@ static bool getOSVersion(BVRef bvr, char *str)
 				fakeOSVersionInt = 12;
 				valid = true;
 			}
+			else if(strstr(val, HSierraPattern))
+			{
+				fakeOSVersion = "10.13";
+				fakeOSVersionInt = 13;
+				valid = true;
+			}
 			else
 			{
 				valid = false;
@@ -1870,8 +1877,11 @@ static bool getOSVersion(BVRef bvr, char *str)
 						case 12:
 							fakeOSVersion = "10.12";
 							break;
+						case 13:
+							fakeOSVersion = "10.13";
+							break;
 						default:
-							fakeOSVersion = "10.12";
+							fakeOSVersion = "10.13";
 							break;
 					}
 
@@ -2220,7 +2230,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 	const char *raw = 0;
 	char* val = 0;
 	int len;
-    
+
 	getValueForKey(kHidePartition, &raw, &len, &bootInfo->chameleonConfig);
 	if(raw)
 	{
@@ -2263,6 +2273,7 @@ BVRef newFilteredBVChain(int minBIOSDev, int maxBIOSDev, unsigned int allowFlags
 
 			// Looking for "Hide Partition" entries in 'hd(x,y)|uuid|"label" hd(m,n)|uuid|"label"' format,
 			// to be able to hide foreign partitions from the boot menu.
+
 			if ( (newBVR->flags & kBVFlagForeignBoot) )
 			{
 				char *start, *next = val;

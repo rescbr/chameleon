@@ -377,7 +377,7 @@ static void updateBootArgs( int key )
 
 //==========================================================================
 
-static const MenuItem * gMenuItems = NULL;
+static const MenuItem *gMenuItems = NULL;
 
 static int   gMenuItemCount;
 static int   gMenuRow;
@@ -1384,7 +1384,7 @@ int processBootOptions()
 		gOverrideKernel = true;
 	}
 
-	// Ermac : Inject "kext-dev-mode=1" if OS X 10.10 is detected
+	// ErmaC: Inject "kext-dev-mode=1" if OS X 10.10 is detected
 	if ( (gMacOSVersion[3] == '1') && (gMacOSVersion[4] == '0') ) // OS X is 10.10
 	{
 		verbose("Added: kext-dev-mode=1\n");

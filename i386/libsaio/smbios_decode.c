@@ -574,13 +574,13 @@ void decodeOemProcessorBusSpeed(SMBStructHeader *structHeader)
 //-------------------------------------------------------------------------------------------------------------------------
 // Apple Specific  (Type 133)
 //-------------------------------------------------------------------------------------------------------------------------
-//void decodeOemPlatformFeature(SMBStructHeader *structHeader)
-//{
-//	printHeader(structHeader);
-//	DBG("Apple specific Platform Feature\n");
-//	DBG("\t%s\n", ((SMBOemPlatformFeature *)structHeader)->PlatformFeature);
-//	DBG("\n");
-//}
+void decodeOemPlatformFeature(SMBStructHeader *structHeader)
+{
+	printHeader(structHeader);
+	DBG("Apple specific Platform Feature\n");
+	DBG("\t%s\n", ((SMBOemPlatformFeature *)structHeader)->PlatformFeature);
+	DBG("\n");
+}
 
 //-------------------------------------------------------------------------------------------------------------------------
 // Specific (Type 134)

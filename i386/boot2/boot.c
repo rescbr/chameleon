@@ -1155,8 +1155,8 @@ void setupBooterArgs()
 
 // ===============================================================================
 
-		bootArgs->csrCapabilities	= CSR_VALID_FLAGS;
-		bootArgs->boot_SMC_plimit	= 0;
+		bootArgs->csrCapabilities		= CSR_VALID_FLAGS;
+		bootArgs->boot_SMC_plimit		= 0;
 	}
 }
 
@@ -1252,7 +1252,8 @@ unsigned long Adler32(unsigned char *buf, long len)
 	unsigned long s2 = 0; // (adler >> 16) & 0xffff;
 	unsigned long result;
 
-	while (len > 0) {
+	while (len > 0)
+	{
 		k = len < NMAX ? len : NMAX;
 		len -= k;
 		while (k >= 16)
