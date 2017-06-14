@@ -681,8 +681,8 @@ int loadSystemConfig(config_file_t *config)
 	// Micky1979, the order is important
 	char *dirspec[] = {
 		"/com.apple.recovery.boot/com.apple.Boot.plist",			// OS X Recovery
+		"/macOS Install Data/Locked Files/Boot Files/com.apple.Boot.plist",	// macOS Upgrade (10.12)+
 		"/macOS Install Data/com.apple.Boot.plist",				// macOS Upgrade (10.12)
-		"/macOS Install Data/Locked Files/Boot Files/com.apple.Boot.plist",	// macOS Upgrade (10.12)
 		"/OS X Install Data/com.apple.Boot.plist",				// OS X Upgrade (10.8+)
 		"/Mac OS X Install Data/com.apple.Boot.plist",				// OS X Upgrade (Lion 10.7)
 		"/.IABootFiles/com.apple.Boot.plist",					// OS X Installer

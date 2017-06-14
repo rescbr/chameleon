@@ -30,6 +30,7 @@
 #include "libsaio.h"
 
 // OS X Versions
+#define HSIERRA         checkOSVersion("10.13") // High Sierra
 #define SIERRA          checkOSVersion("10.12") // Sierra
 #define ELCAPITAN       checkOSVersion("10.11") // El Capitan
 #define YOSEMITE        checkOSVersion("10.10") // Yosemite

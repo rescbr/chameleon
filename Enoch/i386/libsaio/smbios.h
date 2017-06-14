@@ -134,8 +134,8 @@ enum
 	kSMBTypeMemorySPD			=  130, // MemorySPD (TYPE 130)
 	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
 	kSMBTypeOemProcessorBusSpeed		=  132, // Processor Bus Speed (Type 132)
-	kSMBTypeOemPlatformFeature		=  133 // Platform Feature (Type 133)
-//	kSMBTypeOemSMCVersion			=  134  // SMC Version (Type 134)
+	kSMBTypeOemPlatformFeature		=  133, // Platform Feature (Type 133)
+	kSMBTypeOemSMCVersion			=  134  // SMC Version (Type 134)
 };
 
 //----------------------------------------------------------------------------------------------------------

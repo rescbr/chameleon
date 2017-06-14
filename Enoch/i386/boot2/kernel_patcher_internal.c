@@ -644,7 +644,14 @@ bool patch_pm_init(void *kernelData) // KernelPatchPm
 		{
 			(*((UInt64 *)Ptr)) = 0x0000000000000000ULL;
 			verbose("\tKernel power management patch 10.12 DP1 found and patched\n");
-			return TRUE;
+			return true;
+		}
+		// PMheart: change for 10.13 DP1 17A264c
+		else if (0x00004000000000E2ULL == (*((UInt64 *)Ptr)))
+		{
+			(*((UInt64 *)Ptr)) = 0x0000000000000000ULL;
+			verbose("\tKernel power management patch 10.13 DP1 found and patched\n");
+			return true;
 		}
 		Ptr += 16;
 	}
@@ -905,25 +912,48 @@ bool patch_lapic_init_64(void *kernelData)  // KernelLapicPatch_64
 		}
 		// sherlocks: 10.12.DP1
 		else if (KernelLapicError
-                 && (bytes[i+0]       == 0x65
-                     && bytes[i+1]    == 0x8B
-                     && bytes[i+2]    == 0x0C
-                     && bytes[i+3]    == 0x25
-                     && bytes[i+4]    == 0x1C
-                     && bytes[i+5]    == 0x00
-                     && bytes[i+6]    == 0x00
-                     && bytes[i+7]    == 0x00
-                     && bytes[i+1409] == 0x65
-                     && bytes[i+1410] == 0x8B
-                     && bytes[i+1411] == 0x0C
-                     && bytes[i+1412] == 0x25
-                     && bytes[i+1413] == 0x1C
-                     && bytes[i+1414] == 0x00
-                     && bytes[i+1415] == 0x00
-                     && bytes[i+1416] == 0x00))
+			&& (bytes[i+0]   == 0x65
+			&& bytes[i+1]    == 0x8B
+			&& bytes[i+2]    == 0x0C
+			&& bytes[i+3]    == 0x25
+			&& bytes[i+4]    == 0x1C
+			&& bytes[i+5]    == 0x00
+			&& bytes[i+6]    == 0x00
+			&& bytes[i+7]    == 0x00
+			&& bytes[i+1409] == 0x65
+			&& bytes[i+1410] == 0x8B
+			&& bytes[i+1411] == 0x0C
+			&& bytes[i+1412] == 0x25
+			&& bytes[i+1413] == 0x1C
+			&& bytes[i+1414] == 0x00
+			&& bytes[i+1415] == 0x00
+			&& bytes[i+1416] == 0x00))
 		{
 			patchLocation = i+1398;
 			DBG("\tFound Sierra Lapic panic at 0x%08X\n", (unsigned int)patchLocation);
+			break;
+		}
+		// sherlocks: 10.13.DP1
+		else if (KernelLapicError
+			&& (bytes[i+0]   == 0x65
+			&& bytes[i+1]    == 0x8B
+			&& bytes[i+2]    == 0x0C
+			&& bytes[i+3]    == 0x25
+			&& bytes[i+4]    == 0x1C
+			&& bytes[i+5]    == 0x00
+			&& bytes[i+6]    == 0x00
+			&& bytes[i+7]    == 0x00
+			&& bytes[i+1407] == 0x65
+			&& bytes[i+1408] == 0x8B
+			&& bytes[i+1409] == 0x0C
+			&& bytes[i+1410] == 0x25
+			&& bytes[i+1411] == 0x1C
+			&& bytes[i+1412] == 0x00
+			&& bytes[i+1413] == 0x00
+			&& bytes[i+1414] == 0x00))
+		{
+			patchLocation = i+1396;
+			DBG("\tFound High Sierra Lapic panic at 0x%08X\n", (unsigned int)patchLocation);
 			break;
 		}
 	}
@@ -1312,6 +1342,35 @@ void patch_BooterExtensions_64(void *kernelData)
 	Bytes = (UInt8 *)kernelData;
 	PatchApplied = false;
 
+	// High Sierra onward, need to use 10.12 instead of 10.13. kernel bug?
+	if (kernelOSVer >= MacOSVer2Int("10.12"))
+	{
+		for (Index = 0; Index < 0x1000000; ++Index)
+		{
+			if (Bytes[Index]	     == 0xE8
+				&& Bytes[Index + 1]  == 0x25
+				&& Bytes[Index + 2]  == 0x00
+				&& Bytes[Index + 3]  == 0x00
+				&& Bytes[Index + 4]  == 0x00
+				&& Bytes[Index + 5]  == 0xEB
+				&& Bytes[Index + 6]  == 0x05
+				&& Bytes[Index + 7]  == 0xE8
+				&& Bytes[Index + 8]  == 0x7E
+				&& Bytes[Index + 9]  == 0x05
+				&& Bytes[Index + 10] == 0x00
+				&& Bytes[Index + 11] == 0x00)
+			{
+				Bytes[Index + 5] = 0x90;
+				Bytes[Index + 6] = 0x90;
+				count++;
+
+				verbose("\tFound High Sierra EXT pattern: patched!\n");
+				PatchApplied = true;
+				break;
+			}
+		}
+	}
+
 	// Sierra onward
 	if (kernelOSVer >= MacOSVer2Int("10.12"))
 	{
@@ -1340,6 +1399,33 @@ void patch_BooterExtensions_64(void *kernelData)
 				count++;
 
 				verbose("\tFound Sierra SIP pattern: patched!\n");
+				PatchApplied = true;
+				break;
+			}
+			// High Sierra onward, need to use 10.12 instead of 10.13. kernel bug?
+			if ((kernelOSVer >= MacOSVer2Int("10.12"))
+				&& (Bytes[Index]     == 0xC3
+				&& Bytes[Index + 1]  == 0x48
+				&& Bytes[Index + 2]  == 0x85
+				&& Bytes[Index + 3]  == 0xDB
+				&& Bytes[Index + 4]  == 0x74
+				&& Bytes[Index + 5]  == 0x69
+				&& Bytes[Index + 6]  == 0x48
+				&& Bytes[Index + 7]  == 0x8B
+				&& Bytes[Index + 8]  == 0x03
+				&& Bytes[Index + 9]  == 0x48
+				&& Bytes[Index + 10] == 0x89
+				&& Bytes[Index + 11] == 0xDF
+				&& Bytes[Index + 12] == 0xFF
+				&& Bytes[Index + 13] == 0x50
+				&& Bytes[Index + 14] == 0x28
+				&& Bytes[Index + 15] == 0x48))
+			{
+				Bytes[Index + 4] = 0xEB;
+				Bytes[Index + 5] = 0x12;
+				count++;
+
+				verbose("\tFound High Sierra SIP pattern: patched!\n");
 				PatchApplied = true;
 				break;
 			}

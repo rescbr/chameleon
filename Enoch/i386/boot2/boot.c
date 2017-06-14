@@ -1302,7 +1302,7 @@ void setupBooterArgs()
 	}
 
 	// OS X El Capitan 10.11
-	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan and Sierra!
+	if ( MacOSVerCurrent >= MacOSVer2Int("10.11") ) // El Capitan, Sierra and High Sierra!
 	{
 		// ErmaC
 		verbose("\n");
@@ -1317,7 +1317,7 @@ void setupBooterArgs()
 		if (isRecoveryHD || isInstaller || isOSXUpgrade || isMacOSXUpgrade)
 		{
 			// SIP can be controlled with or without FileNVRAM.kext (Pike R. Alpha)
-			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot);
+			bootArgs->flags	|=	(kBootArgsFlagCSRActiveConfig + kBootArgsFlagCSRConfigMode + kBootArgsFlagCSRBoot + kBootArgsFlagInstallUI);
 		}
 		else
 		{
