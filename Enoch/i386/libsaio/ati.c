@@ -104,9 +104,9 @@ static card_config_t card_configs[] = {
 	{"Maguro",	1},
 	{"MaguroS",	6},
 	/* AMD8000Controller */
+	{"Exmoor",	6},
 	{"Baladi",      6},
 	/* AMD9000Controller */
-	{"Exmoor",	6},
 	{"MalteseS",	1},
 	{"Lagotto",	4},
 	{"GreyhoundS",	1},
@@ -114,14 +114,23 @@ static card_config_t card_configs[] = {
 	{"Basset",	4},
 	{"Greyhound",	6},
 	{"Labrador",	6},
+	/* AMD9300Controller */
+	{"FlueveSWIP",	4},
 	/* AMD9500Controller */
-	{"Elqui",	5},
 	{"Acre",	3},
-	{"Berbice",	5},
-	{"Caroni",	5},
-	{"Florin",	6},
 	{"Dayman",	6},
-	{"Guariba",	6}
+	{"Guariba",	6},
+	{"Huallaga", 3},
+	{"Orinoco", 5},
+	/* AMD9510Controller */
+	{"Berbice",	5},
+	/* AMD9515Controller */
+	{"Mazaruni", 5},
+	{"Longavi", 5},
+	/* AMD9520Controller */
+	{"Elqui",	5},
+	{"Caroni",	5},
+	{"Florin",	6}
 };
 
 static radeon_card_info_t radeon_cards[] = {
@@ -259,6 +268,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6763,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon E6460 Series",	kHydrilla	},
 	{ 0x6768,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 6400M Series",	kHydrilla	},
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 6400 Series",	kBulrushes	},
+  	{ 0x6771,	0x00000000, CHIP_FAMILY_CAICOS, "AMD Radeon HD 8490",		kBulrushes	},
 	{ 0x6772,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7400A Series",	kBulrushes	},
 	{ 0x6778,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7000 Series",	kBulrushes	},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 6450/7450/8450/R5 230",	kBulrushes	},
@@ -325,7 +335,19 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6985, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
 	{ 0x6986, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
 	{ 0x6987, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
+	{ 0x6995, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
 	{ 0x699F, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
+
+	// Vega 10
+	{ 0x6860,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6861,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6862,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6863,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6864,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6867,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x6868,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x686C,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
+	{ 0x687F,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
 
 	// PITCAIRN
 	{ 0x6800,	0x00000000, CHIP_FAMILY_PITCAIRN,	"AMD Radeon HD 7970M",	kBuri	}, // Mobile
@@ -916,6 +938,9 @@ static const char *chip_family_name[] = {
 	"Ellesmere",
 	"Baffin",
 	"Greenland",
+	"Vega10",
+//	"Vega11",
+//	"Navi",
 	""
 };
 

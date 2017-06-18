@@ -8,9 +8,9 @@
 #include "bootstruct.h"
 
 #if DEBUG_PCIROOT
-#define DBG(x...)  printf(x)
+	#define DBG(x...)  printf(x)
 #else
-#define DBG(x...)
+	#define DBG(x...)
 #endif
 
 static int rootuid = 10; //value means function wasnt ran yet

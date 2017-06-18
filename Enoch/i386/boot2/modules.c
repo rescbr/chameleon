@@ -16,11 +16,11 @@
 #ifdef CONFIG_MODULES
 
 #if CONFIG_MODULE_DEBUG
-#define DBG(x...)	printf(x)
-#define DBGPAUSE()	getchar()
+	#define DBG(x...)	printf(x)
+	#define DBGPAUSE()	getchar()
 #else
-#define DBG(x...)
-#define DBGPAUSE()
+	#define DBG(x...)
+	#define DBGPAUSE()
 #endif
 
 static inline void		rebase_location(UInt32 *location, char *base, int type);

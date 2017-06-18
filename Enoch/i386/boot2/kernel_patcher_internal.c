@@ -743,15 +743,28 @@ bool patch_lapic_version_init_64(void *kernelData)  // KernelLapicVersionPatch_6
 			verbose("\tFound Yosemite Lapic Version panic at 0x%08X\n", (unsigned int)patchLocation);
 			break;
 		}
-		// Bronya: El Capitan 10.11 Lapic Version
+		// Bronya: El Capitan 10.11 Lapic Version/10.12/10.13
 		else if (bytes[i + 0] == 0xff
 			&& bytes[i + 1]   == 0x50
 			&& bytes[i + 2]   == 0x08
 			&& bytes[i + 38]  == 0x31
 			&& bytes[i + 39]  == 0xc0)
 		{
-			patchLocation = i + 40;
-			verbose("\tFound El Capitan Lapic Version panic at 0x%08X\n", (unsigned int)patchLocation);
+			patchLocation = i + 40;	
+
+			if (kernelOSVer >= MacOSVer2Int("10.13") && kernelOSVer < MacOSVer2Int("10.14"))
+			{
+				verbose("\tFound High Sierra Lapic Version panic at 0x%08X\n", (unsigned int)patchLocation);
+			}
+			else if (kernelOSVer >= MacOSVer2Int("10.12") && kernelOSVer < MacOSVer2Int("10.13"))
+			{
+				verbose("\tFound Sierra Lapic Version panic at 0x%08X\n", (unsigned int)patchLocation);
+			}
+			else
+			{
+				verbose("\tFound El Capitan Lapic Version panic at 0x%08X\n", (unsigned int)patchLocation);
+			}
+			
 			break;
 		}
 	}
@@ -1343,68 +1356,13 @@ void patch_BooterExtensions_64(void *kernelData)
 	PatchApplied = false;
 
 	// High Sierra onward, need to use 10.12 instead of 10.13. kernel bug?
+	// if (kernelOSVer >= MacOSVer2Int("10.13") && kernelOSVer < MacOSVer2Int("10.14"))
 	if (kernelOSVer >= MacOSVer2Int("10.12"))
 	{
 		for (Index = 0; Index < 0x1000000; ++Index)
 		{
-			if (Bytes[Index]	     == 0xE8
-				&& Bytes[Index + 1]  == 0x25
-				&& Bytes[Index + 2]  == 0x00
-				&& Bytes[Index + 3]  == 0x00
-				&& Bytes[Index + 4]  == 0x00
-				&& Bytes[Index + 5]  == 0xEB
-				&& Bytes[Index + 6]  == 0x05
-				&& Bytes[Index + 7]  == 0xE8
-				&& Bytes[Index + 8]  == 0x7E
-				&& Bytes[Index + 9]  == 0x05
-				&& Bytes[Index + 10] == 0x00
-				&& Bytes[Index + 11] == 0x00)
-			{
-				Bytes[Index + 5] = 0x90;
-				Bytes[Index + 6] = 0x90;
-				count++;
-
-				verbose("\tFound High Sierra EXT pattern: patched!\n");
-				PatchApplied = true;
-				break;
-			}
-		}
-	}
-
-	// Sierra onward
-	if (kernelOSVer >= MacOSVer2Int("10.12"))
-	{
-		for (Index = 0; Index < 0x1000000; ++Index)
-		{
-			if ((kernelOSVer >= MacOSVer2Int("10.12"))
-				&& (Bytes[Index]     == 0xC3
-				&& Bytes[Index + 1]  == 0x48
-				&& Bytes[Index + 2]  == 0x85
-				&& Bytes[Index + 3]  == 0xDB
-				&& Bytes[Index + 4]  == 0x74
-				&& Bytes[Index + 5]  == 0x71
-				&& Bytes[Index + 6]  == 0x48
-				&& Bytes[Index + 7]  == 0x8B
-				&& Bytes[Index + 8]  == 0x03
-				&& Bytes[Index + 9]  == 0x48
-				&& Bytes[Index + 10] == 0x89
-				&& Bytes[Index + 11] == 0xDF
-				&& Bytes[Index + 12] == 0xFF
-				&& Bytes[Index + 13] == 0x50
-				&& Bytes[Index + 14] == 0x28
-				&& Bytes[Index + 15] == 0x48))
-			{
-				Bytes[Index + 4] = 0xEB;
-				Bytes[Index + 5] = 0x12;
-				count++;
-
-				verbose("\tFound Sierra SIP pattern: patched!\n");
-				PatchApplied = true;
-				break;
-			}
-			// High Sierra onward, need to use 10.12 instead of 10.13. kernel bug?
-			if ((kernelOSVer >= MacOSVer2Int("10.12"))
-				&& (Bytes[Index]     == 0xC3
+			// High Sierra
+			if (Bytes[Index]         == 0xC3
 				&& Bytes[Index + 1]  == 0x48
 				&& Bytes[Index + 2]  == 0x85
 				&& Bytes[Index + 3]  == 0xDB
@@ -1419,110 +1377,70 @@ void patch_BooterExtensions_64(void *kernelData)
 				&& Bytes[Index + 12] == 0xFF
 				&& Bytes[Index + 13] == 0x50
 				&& Bytes[Index + 14] == 0x28
-				&& Bytes[Index + 15] == 0x48))
+				&& Bytes[Index + 15] == 0x48)
 			{
 				Bytes[Index + 4] = 0xEB;
 				Bytes[Index + 5] = 0x12;
 				count++;
 
 				verbose("\tFound High Sierra SIP pattern: patched!\n");
+
+				if (PatchApplied)
+				{
+					break;
+				}
+
 				PatchApplied = true;
-				break;
 			}
 		}
 	}
 
-	if (kernelOSVer >= MacOSVer2Int("10.12"))
+	// Sierra
+	if (kernelOSVer >= MacOSVer2Int("10.12") && kernelOSVer < MacOSVer2Int("10.13"))
 	{
 		for (Index = 0; Index < 0x1000000; ++Index)
 		{
-			if (Bytes[Index]	     == 0xE8
-				&& Bytes[Index + 1]  == 0x25
-				&& Bytes[Index + 2]  == 0x00
-				&& Bytes[Index + 3]  == 0x00
-				&& Bytes[Index + 4]  == 0x00
-				&& Bytes[Index + 5]  == 0xEB
-				&& Bytes[Index + 6]  == 0x05
-				&& Bytes[Index + 7]  == 0xE8
-				&& Bytes[Index + 8]  == 0xCE
-				&& Bytes[Index + 9]  == 0x02
-				&& Bytes[Index + 10] == 0x00
-				&& Bytes[Index + 11] == 0x00)
+			// High Sierra
+			if (Bytes[Index]         == 0xC3
+				&& Bytes[Index + 1]  == 0x48
+				&& Bytes[Index + 2]  == 0x85
+				&& Bytes[Index + 3]  == 0xDB
+				&& Bytes[Index + 4]  == 0x74
+				&& Bytes[Index + 5]  == 0x71
+				&& Bytes[Index + 6]  == 0x48
+				&& Bytes[Index + 7]  == 0x8B
+				&& Bytes[Index + 8]  == 0x03
+				&& Bytes[Index + 9]  == 0x48
+				&& Bytes[Index + 10] == 0x89
+				&& Bytes[Index + 11] == 0xDF
+				&& Bytes[Index + 12] == 0xFF
+				&& Bytes[Index + 13] == 0x50
+				&& Bytes[Index + 14] == 0x28
+				&& Bytes[Index + 15] == 0x48)
 			{
-				Bytes[Index + 5] = 0x90;
-				Bytes[Index + 6] = 0x90;
+				Bytes[Index + 4] = 0xEB;
+				Bytes[Index + 5] = 0x12;
 				count++;
 
-				verbose("\tFound Sierra EXT (Yosemite) pattern: patched!\n");
+				verbose("\tFound Sierra SIP pattern: patched!\n");
+
+				if (PatchApplied)
+				{
+					break;
+				}
+
 				PatchApplied = true;
-				break;
 			}
 		}
 	}
 
-	if (kernelOSVer <= MacOSVer2Int("10.12.3"))
-	{
-		for (Index = 0; Index < 0x1000000; ++Index)
-		{
-			if (Bytes[Index]	     == 0xE8
-				&& Bytes[Index + 1]  == 0x25
-				&& Bytes[Index + 2]  == 0x00
-				&& Bytes[Index + 3]  == 0x00
-				&& Bytes[Index + 4]  == 0x00
-				&& Bytes[Index + 5]  == 0xEB
-				&& Bytes[Index + 6]  == 0x05
-				&& Bytes[Index + 7]  == 0xE8
-				&& Bytes[Index + 8]  == 0x7E
-				&& Bytes[Index + 9]  == 0x05
-				&& Bytes[Index + 10] == 0x00
-				&& Bytes[Index + 11] == 0x00)
-			{
-				Bytes[Index + 5] = 0x90;
-				Bytes[Index + 6] = 0x90;
-				count++;
-
-				verbose("\tFound Sierra EXT (<= 10.12.4) pattern: patched!\n");
-				PatchApplied = true;
-				break;
-			}
-		}
-	}
-
-	if (kernelOSVer >= MacOSVer2Int("10.12.4"))
-	{
-		for (Index = 0; Index < 0x1000000; ++Index)
-		{
-			if (Bytes[Index]	     == 0xE8
-				&& Bytes[Index + 1]  == 0x25
-				&& Bytes[Index + 2]  == 0x00
-				&& Bytes[Index + 3]  == 0x00
-				&& Bytes[Index + 4]  == 0x00
-				&& Bytes[Index + 5]  == 0xEB
-				&& Bytes[Index + 6]  == 0x05
-				&& Bytes[Index + 7]  == 0xE8
-				&& Bytes[Index + 8]  == 0x9E
-				&& Bytes[Index + 9]  == 0x05
-				&& Bytes[Index + 10] == 0x00
-				&& Bytes[Index + 11] == 0x00)
-			{
-				Bytes[Index + 5] = 0x90;
-				Bytes[Index + 6] = 0x90;
-				count++;
-
-				verbose("\tFound Sierra (> = 10.12.4) EXT pattern: patched!\n");
-				PatchApplied = true;
-				break;
-			}
-		}
-	}
-
-	// El Capitan/Yosemite
+	// Yosemite/El Capitan
 	if (kernelOSVer >= MacOSVer2Int("10.10") && kernelOSVer < MacOSVer2Int("10.12"))
 	{
 		for (Index = 0; Index < 0x1000000; ++Index)
 		{
 			// El Capitan
-			if (Bytes[Index]	     == 0xC3
+			if (Bytes[Index]         == 0xC3
 				&& Bytes[Index + 1]  == 0x48
 				&& Bytes[Index + 2]  == 0x85
 				&& Bytes[Index + 3]  == 0xDB
@@ -1559,31 +1477,45 @@ void patch_BooterExtensions_64(void *kernelData)
 
 				PatchApplied = true;
 			}
-			// Yosemite and El Capitan
-			if ((kernelOSVer >= MacOSVer2Int("10.10") && kernelOSVer < MacOSVer2Int("10.12"))
-				&& (Bytes[Index]     == 0xE8
+		}
+	}
+
+	// Yosemite onward.
+	// Yosemite/EL Capitan/Sierra/High Sierra
+	// if (kernelOSVer >= MacOSVer2Int("10.10") && kernelOSVer < MacOSVer2Int("10.14"))
+	if (kernelOSVer >= MacOSVer2Int("10.10"))
+	{
+
+		for (Index = 0; Index < 0x1000000; ++Index)
+		{
+			if (Bytes[Index]         == 0xE8
 				&& Bytes[Index + 1]  == 0x25
 				&& Bytes[Index + 2]  == 0x00
 				&& Bytes[Index + 3]  == 0x00
 				&& Bytes[Index + 4]  == 0x00
 				&& Bytes[Index + 5]  == 0xEB
 				&& Bytes[Index + 6]  == 0x05
-				&& Bytes[Index + 7]  == 0xE8
-				&& Bytes[Index + 8]  == 0xCE
-				&& Bytes[Index + 9]  == 0x02
-				&& Bytes[Index + 10] == 0x00
-				&& Bytes[Index + 11] == 0x00))
+				&& Bytes[Index + 7]  == 0xE8)
 			{
 				Bytes[Index + 5] = 0x90;
 				Bytes[Index + 6] = 0x90;
 				count++;
-				if (kernelOSVer < MacOSVer2Int("10.11"))
-                {
-					verbose("\tFound Yosemite EXT pattern: patched!\n");
+				
+				if (kernelOSVer >= MacOSVer2Int("10.13") && kernelOSVer < MacOSVer2Int("10.14"))
+				{
+					verbose("\tFound High Sierra EXT pattern: patched!\n");
+				}
+				else if (kernelOSVer >= MacOSVer2Int("10.12") && kernelOSVer < MacOSVer2Int("10.13"))
+				{
+					verbose("\tFound Sierra EXT pattern: patched!\n");
+				}
+				else if (kernelOSVer >= MacOSVer2Int("10.11") && kernelOSVer < MacOSVer2Int("10.12"))
+				{
+					verbose("\tFound EL Capitan EXT pattern: patched!\n");
 				}
 				else
 				{
-					verbose("\tFound EL Capitan EXT pattern: patched!\n");
+					verbose("\tFound Yosemite EXT pattern: patched!\n");
 				}
 
 				if (PatchApplied)
@@ -1602,7 +1534,7 @@ void patch_BooterExtensions_64(void *kernelData)
 
 		for (Index = 0; Index < 0x1000000; ++Index)
 		{
-			if (Bytes[Index]	     == 0xC6
+			if (Bytes[Index]         == 0xC6
 				&& Bytes[Index + 1]  == 0xE8
 				&& Bytes[Index + 2]  == 0x30
 				&& Bytes[Index + 3]  == 0x00
@@ -1647,7 +1579,7 @@ void patch_BooterExtensions_64(void *kernelData)
 				&& Bytes[Index + 9] == 0xDF)
 			{
 				Bytes[Index + 5] = 0x90;
-					Bytes[Index + 6] = 0x90;
+				Bytes[Index + 6] = 0x90;
 				count++;
 
 				verbose("\tFound Lion EXT pattern: patched!\n");

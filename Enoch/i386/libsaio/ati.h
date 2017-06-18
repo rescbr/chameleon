@@ -92,13 +92,14 @@ typedef enum {
 	CHIP_FAMILY_PITCAIRN,
 	CHIP_FAMILY_VERDE,
 	CHIP_FAMILY_OLAND,
+	/* Sea Islands */
 	CHIP_FAMILY_HAINAN,
 	CHIP_FAMILY_BONAIRE,
 	CHIP_FAMILY_KAVERI,
 	CHIP_FAMILY_KABINI,
 	CHIP_FAMILY_HAWAII,
-	/* ... */
 	CHIP_FAMILY_MULLINS,
+	/* Volcanic Islands */
 	CHIP_FAMILY_TOPAZ,
 	CHIP_FAMILY_AMETHYST,
 	CHIP_FAMILY_TONGA,
@@ -108,6 +109,7 @@ typedef enum {
 	CHIP_FAMILY_ELLESMERE, /* Polaris 10 */
 	CHIP_FAMILY_BAFFIN,   /* Polaris 11 */
 	CHIP_FAMILY_GREENLAND, /* Polaris 12 */
+	CHIP_FAMILY_VEGA10,   /* Vega 10 */
 	CHIP_FAMILY_LAST
 } ati_chip_family_t;
 
@@ -199,9 +201,9 @@ typedef enum {
 	kMaguro,
 	kMaguroS,
 	/* AMD8000Controller */
+	kExmoor,
 	kBaladi,
 	/* AMD9000Controller */
-	kExmoor,
 	kMalteseS,
 	kLagotto,
 	kGreyhoundS,
@@ -209,14 +211,23 @@ typedef enum {
 	kBasset,
 	kGreyhound,
 	kLabrador,
+	/* AMD9300Controller */
+	kFleuveSWIP,
 	/* AMD9500Controller */
-	kElqui,
 	kAcre,
-	kBerbice,
-	kCaroni,
-	kFlorin,
 	kDayman,
 	kGuariba,
+	kHuallaga,
+	kOrinoco,
+	/* AMD9510Controller*/
+	kBerbice,
+	/* AMD9515Controller */
+	kMazaruni,
+	kLongavi,
+	/* AMD9520Controller */
+	kElqui,
+	kCaroni,
+	kFlorin,
 	kCfgEnd
 } config_name_t;
 
