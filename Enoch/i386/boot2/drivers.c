@@ -1537,6 +1537,21 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
 				}
 				break;
+//			case 17:  /* High Sierra */
+//				switch (gDarwinMinor)
+//				{
+//					case 0: kernelOSVer = 0xA0C0000; break;
+//					case 1: kernelOSVer = 0xA0C0100; break;
+//					case 2: kernelOSVer = 0xA0C0200; break;
+//					case 3: kernelOSVer = 0xA0C0200; break;
+//					case 4: kernelOSVer = 0xA0C0300; break;
+//					case 5: kernelOSVer = 0xA0C0400; break;
+//					case 6: kernelOSVer = 0xA0C0500; break;
+//					case 7: kernelOSVer = 0xA0C0600; break;
+//					case 8: kernelOSVer = 0xA0C0700; break;
+//					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
+//				}
+//				break;
 			default:
 				kernelOSVer = 0xA0C0600;
 				break; //Last known kernel is Sierra 10.12.6

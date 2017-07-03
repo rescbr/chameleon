@@ -835,8 +835,13 @@ void setupChosenNode()
 
 		// booter-build-time (Fri Apr 14 16:21:16 PDT 2017) 10.12.5
 		DT__AddProperty(chosenNode, "booter-build-time", sizeof(I386BOOT_BUILDDATE), I386BOOT_BUILDDATE);
+
 		// booter-name
-		DT__AddProperty(chosenNode, "booter-name", sizeof("Enoch"), "Enoch");
+		static EFI_UINT8 const booterName[] =
+		{
+			0x45, 0x6E, 0x6F, 0x63, 0x68, 0x00
+		};
+		DT__AddProperty(chosenNode, "booter-name", sizeof(booterName), (EFI_UINT8*) &booterName);
 
 		// booter-version (version:324.50.13) 10.12.5
 		DT__AddProperty(chosenNode, "booter-version", sizeof(I386BOOT_CHAMELEONREVISION), I386BOOT_CHAMELEONREVISION);

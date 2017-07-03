@@ -270,14 +270,14 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6770,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 6400 Series",	kBulrushes	},
   	{ 0x6771,	0x00000000, CHIP_FAMILY_CAICOS, "AMD Radeon HD 8490",		kBulrushes	},
 	{ 0x6772,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7400A Series",	kBulrushes	},
-	{ 0x6778,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7000 Series",	kBulrushes	},
+	{ 0x6778,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7470",	kBulrushes	},
 	{ 0x6779,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 6450/7450/8450/R5 230",	kBulrushes	},
 	{ 0x677B,	0x00000000, CHIP_FAMILY_CAICOS,	"AMD Radeon HD 7400 Series",	kBulrushes	},
 
 	// TAHITI
 	//Framebuffers: Aji - 4 Desktop, Buri - 4 Mobile, Chutoro - 5 Mobile,  Dashimaki - 4, IkuraS - HMDI
 	// Ebi - 5 Mobile, Gari - 5 M, Futomaki - 4 D, Hamachi - 4 D, OPM - 6 Server, Ikura - 6
-	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kIkuraS		},
+	{ 0x6780,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD FirePro W9000",	kIkuraS		},
 	{ 0x6784,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x6788,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD Radeon HD 7900 Series",	kFutomaki	},
 	{ 0x678A,	0x00000000, CHIP_FAMILY_TAHITI,	"AMD FirePro W8000",		kFutomaki	},
@@ -299,7 +299,7 @@ static radeon_card_info_t radeon_cards[] = {
 //	{ 0x67A9,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 //	{ 0x67AA,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 	{ 0x67B0,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290X",           kBaladi	},
-	{ 0x67B1,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290",            kBaladi	},
+	{ 0x67B1,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 290/390",            kBaladi	},
 //	{ 0x67B8,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
 	{ 0x67B9,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon R9 200",            kFutomaki	},
 //	{ 0x67BA,	0x00000000, CHIP_FAMILY_HAWAII,	"AMD Radeon",            kFutomaki	},
@@ -327,7 +327,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x67E9, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
 	{ 0x67EB, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
 	{ 0x67EF, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon RX460",             kAcre },
-	{ 0x67FF, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon Polaris 11",        kNull },
+	{ 0x67FF, 0x00000000, CHIP_FAMILY_BAFFIN, "AMD Radeon RX560",        kNull },
 
 	// Polaris 12
 	{ 0x6980, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
@@ -336,7 +336,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x6986, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
 	{ 0x6987, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
 	{ 0x6995, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
-	{ 0x699F, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon Polaris 12",        kNull },
+	{ 0x699F, 0x00000000, CHIP_FAMILY_GREENLAND, "AMD Radeon RX550",        kNull },
 
 	// Vega 10
 	{ 0x6860,	0x00000000, CHIP_FAMILY_VEGA10,		"AMD Radeon Vega 10",        kNull },
@@ -511,7 +511,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x7181, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Desktop ",	kCaretta	},
 	{ 0x7183, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Desktop ",	kCaretta	},
 	{ 0x7186, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Mobile ",	kCaretta	},
-	{ 0x7187, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Desktop ",	kCaretta	},
+	{ 0x7187, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD1900 ",	kCaretta	},
 	{ 0x7188, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD2300 Mobile ",	kCaretta	},
 	{ 0x718A, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Mobile ",	kCaretta	},
 	{ 0x718B, 0x00000000, CHIP_FAMILY_RV515, "ATI Radeon HD Mobile ",	kCaretta	},
@@ -636,7 +636,7 @@ static radeon_card_info_t radeon_cards[] = {
 	{ 0x9452,	0x00000000, CHIP_FAMILY_RV770,	"AMD FireStream 9250",	kMotmot		},
 	{ 0x9456,	0x00000000, CHIP_FAMILY_RV770,	"ATI FirePro V8700 (FireGL)",	kMotmot		},
 	{ 0x945A,	0x00000000, CHIP_FAMILY_RV770,	"ATI Mobility Radeon HD 4870",	kMotmot		},
-	{ 0x9460,	0x00000000, CHIP_FAMILY_RV770,	"ATI Radeon HD 4800 Series",	kMotmot		},
+	{ 0x9460,	0x00000000, CHIP_FAMILY_RV770,	"ATI Radeon HD 4890",	kMotmot		},
 	{ 0x9462,	0x00000000, CHIP_FAMILY_RV770,	"ATI Radeon HD 4800 Series",	kMotmot		},
 //	{ 0x946A,	0x00000000, CHIP_FAMILY_RV770,	"ATI Mobility Radeon",	kMotmot		},
 //	{ 0x946B,	0x00000000, CHIP_FAMILY_RV770,	"ATI Mobility Radeon",	kMotmot		},

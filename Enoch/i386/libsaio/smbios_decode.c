@@ -655,9 +655,9 @@ void decodeSMBIOSTable(SMBEntryPoint *eps)
 			//	break;
 
 			/* Skip all Apple Specific Structures */
-			// case kSMBTypeFirmwareVolume: // Type 128
+			case kSMBTypeFirmwareVolume: // Type 128
 			// case kSMBTypeMemorySPD: // Type 130
-			//	break;
+				break;
 
 			case kSMBTypeOemProcessorType: // Type 131
 				decodeOemProcessorType(structHeader);

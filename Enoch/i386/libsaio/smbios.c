@@ -130,7 +130,7 @@
 /* ==========================================
  OEM Platform SMC (Apple Specific - Type 134)
  ============================================ */
-//#define kSMBOemSMCKey                     "SMoemsmc"
+//#define kSMBOemSMCKey					"SMoemsmc"
 
 
 /* ==================================================*/
