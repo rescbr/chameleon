@@ -652,12 +652,12 @@ long LoadDriverPList( char *dirSpec, char *name, long bundleType )
 // LoadMatchedModules
 long LoadMatchedModules( void )
 {
-	TagPtr		  prop;
-	ModulePtr	  module;
-	char		  *fileName, segName[32];
-	DriverInfoPtr driver;
-	long		  length, driverAddr, driverLength;
-	void		  *executableAddr = 0;
+	TagPtr	prop;
+	ModulePtr	module;
+	char		*fileName, segName[32];
+	DriverInfoPtr	driver;
+	long		length, driverAddr, driverLength;
+	void		*executableAddr = 0;
 
 	module = gModuleHead;
 
@@ -678,7 +678,7 @@ long LoadMatchedModules( void )
 					length = LoadFile(gFileSpec);
 					executableAddr = (void *)kLoadAddr;
 				}
-//				printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
+//		printf("%s length = %d addr = 0x%x\n", gFileSpec, length, driverModuleAddr); getchar();
 			}
 			else
 			{
@@ -1249,10 +1249,6 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 
 	// Notify modules that the kernel has been decompressed, thinned and is about to be decoded
 	execute_hook("DecodeKernel", (void *)binary, NULL, NULL, NULL);
-
-/* ================================================================ */
-
-	// Entry point
 
 /* ================================================================ */
 

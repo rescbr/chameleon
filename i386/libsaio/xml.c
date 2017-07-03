@@ -592,25 +592,6 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 		}
 	}
 
-
-	/***** false ****/
-	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
-	{
-		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
-	}
-
-	/***** true ****/
-	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
-	{
-		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
-	}
-
-	/***** plist ****/
-
-
-	/***** dict ****/
-
-
 	/***** data ****/
 	else if (!strncmp(tagName, kXMLTagData, sizeof(kXMLTagData)))
 	{
@@ -631,6 +612,19 @@ long XMLParseNextTag( char *buffer, TagPtr *tag )
 	{
 		length = ParseTagDate(buffer + pos, tag);
 	}
+
+	/***** false ****/
+	else if (!strncmp(tagName, kXMLTagFalse, sizeof(kXMLTagFalse)))
+	{
+		length = ParseTagBoolean(buffer + pos, tag, kTagTypeFalse);
+	}
+
+	/***** true ****/
+	else if (!strncmp(tagName, kXMLTagTrue, sizeof(kXMLTagTrue)))
+	{
+		length = ParseTagBoolean(buffer + pos, tag, kTagTypeTrue);
+	}
+
 	/***** array ****/
 	else if (!strncmp(tagName, kXMLTagArray, sizeof(kXMLTagArray) ))
 	{
@@ -911,10 +905,11 @@ static long ParseTagInteger( char *buffer, TagPtr *tag )
 // ParseTagData
 static long ParseTagData( char *buffer, TagPtr *tag)
 {
-	int		actuallen = 0;
-	long		length = 0;
+	//int		actuallen = 0;
+	int     	len = 0;
+	long    	length = 0;
 	TagPtr		tmpTag;
-	char		*string;
+	char		*tmpString;
 
 	length = FixDataMatchingTag(buffer, kXMLTagData);
 	if (length == -1)
@@ -927,18 +922,14 @@ static long ParseTagData( char *buffer, TagPtr *tag)
 	{
 		return -1;
 	}
-
-	//printf("ParseTagData unimplimented\n");
-	//printf("Data: %s\n", buffer);
-	//	getchar();
-
-	string = BASE64Decode(buffer, strlen(buffer), &actuallen);
+	tmpString = NewSymbol(buffer);
 	tmpTag->type = kTagTypeData;
-	tmpTag->string = string;
+	tmpTag->string = tmpString;
+	tmpTag->data = (UInt8 *)BASE64Decode(buffer, strlen(buffer), &len);
+	tmpTag->dataLen = len;
 
 	tmpTag->tag = NULL;
-	tmpTag->offset = actuallen; // buffer_start ? buffer - buffer_start: 0;
-
+	tmpTag->offset = /* actuallen; */ buffer_start ? buffer - buffer_start: 0;
 	tmpTag->tagNext = NULL;
 
 	*tag = tmpTag;
@@ -1106,6 +1097,8 @@ static TagPtr NewTag( void )
 		{
 			tag[cnt].type = kTagTypeNone;
 			tag[cnt].string = 0;
+			tag[cnt].data = 0;
+			tag[cnt].dataLen = 0;
 			tag[cnt].tag = 0;
 			tag[cnt].tagNext = tag + cnt + 1;
 		}
@@ -1141,6 +1134,8 @@ void XMLFreeTag( TagPtr tag )
 	// Clear and free the tag.
 	tag->type = kTagTypeNone;
 	tag->string = NULL;
+	tag->data = NULL;
+	tag->dataLen = 0;
 	tag->tag = NULL;
 	tag->offset = 0;
 	tag->tagNext = gTagsFree;
@@ -1182,6 +1177,7 @@ static char *NewSymbol( char *string )
 		if (symbol == NULL)
 		{
 			stop("NULL symbol!");
+			return NULL;
 		}
 
 		// Set the symbol's data.

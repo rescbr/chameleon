@@ -829,6 +829,7 @@ void setupChosenNode()
 
 		// booter-build-time (Fri Apr 14 16:21:16 PDT 2017) 10.12.5
 		DT__AddProperty(chosenNode, "booter-build-time", sizeof(I386BOOT_BUILDDATE), I386BOOT_BUILDDATE);
+
 		// booter-name
 		DT__AddProperty(chosenNode, "booter-name", sizeof("Chameleon"), "Chameleon");
 

@@ -256,9 +256,9 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	if (((long *)cmdBase)[0] == LC_SEGMENT_64)
 	{
 		struct segment_command_64 *segCmd;
-		segCmd = (struct segment_command_64 *)cmdBase;
-		vmaddr = (segCmd->vmaddr & 0x3fffffff);
-		vmsize = segCmd->vmsize;
+		segCmd   = (struct segment_command_64 *)cmdBase;
+		vmaddr   = (segCmd->vmaddr & 0x3fffffff);
+		vmsize   = segCmd->vmsize;
 		fileaddr = (gBinaryAddress + segCmd->fileoff);
 		filesize = segCmd->filesize;
 		segname = segCmd->segname;
@@ -274,10 +274,10 @@ static long DecodeSegment(long cmdBase, unsigned int *load_addr, unsigned int *l
 	{
 		struct segment_command *segCmd;
 
-		segCmd = (struct segment_command *)cmdBase;
+		segCmd   = (struct segment_command *)cmdBase;
 
-		vmaddr = (segCmd->vmaddr & 0x3fffffff);
-		vmsize = segCmd->vmsize;
+		vmaddr   = (segCmd->vmaddr & 0x3fffffff);
+		vmsize   = segCmd->vmsize;
 		fileaddr = (gBinaryAddress + segCmd->fileoff);
 		filesize = segCmd->filesize;
 		segname = segCmd->segname;

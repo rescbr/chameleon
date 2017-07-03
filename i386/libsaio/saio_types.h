@@ -61,6 +61,8 @@ typedef struct Tag
 {
 	long		type;
 	char		*string;
+	uint8_t		*data;
+	long		dataLen;
 	long		offset;
 	struct Tag *tag;
 	struct Tag *tagNext;
