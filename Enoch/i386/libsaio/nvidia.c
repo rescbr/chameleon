@@ -2472,6 +2472,14 @@ bool setup_nvidia_devprop(pci_dt_t *nvda_dev)
 	}
 	/************************ End Audio *************************/
 
+	/************************ NvidiaNoEFI ***********************/
+	doit = false;
+	if(getBoolForKey(kNvidiaNoEFI, &doit, &bootInfo->chameleonConfig) && doit)
+	{
+		devprop_add_value(device, "NVDA,noEFI", (uint8_t *)"true", 5);
+	}
+	/************************ End NvidiaNoEFI *************************/
+
 	if (getBoolForKey(kVBIOS, &doit, &bootInfo->chameleonConfig) && doit)
 	{
 		devprop_add_value(device, "vbios", rom, (nvBiosOveride > 0) ? nvBiosOveride : (rom[2] * 512));

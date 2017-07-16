@@ -157,8 +157,8 @@
 		3696B2121A1D2DB5004272A6 /* ntfs_private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs_private.h; sourceTree = "<group>"; };
 		3696B2131A1D2DB5004272A6 /* ntfs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = ntfs.c; sourceTree = "<group>"; };
 		3696B2141A1D2DB5004272A6 /* ntfs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ntfs.h; sourceTree = "<group>"; };
-		3696B2151A1D2DB5004272A6 /* nvidia_helper.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia_helper.c; sourceTree = "<group>"; };
-		3696B2161A1D2DB5004272A6 /* nvidia_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia_helper.h; sourceTree = "<group>"; };
+		3696B2151A1D2DB5004272A6 /* gfx_helper.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = gfx_helper.c; sourceTree = "<group>"; };
+		3696B2161A1D2DB5004272A6 /* gfx_helper.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = gfx_helper.h; sourceTree = "<group>"; };
 		3696B2171A1D2DB5004272A6 /* nvidia.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nvidia.c; sourceTree = "<group>"; };
 		3696B2181A1D2DB5004272A6 /* nvidia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nvidia.h; sourceTree = "<group>"; };
 		3696B2191A1D2DB5004272A6 /* openbsd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = openbsd.c; sourceTree = "<group>"; };
@@ -342,6 +342,10 @@
 		52DF7A2F17EDFA5900A88D32 /* kernel_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = kernel_patcher.h; path = KernelPatcher/kernel_patcher.h; sourceTree = "<group>"; };
 		52DF7A3017EDFA5900A88D32 /* KernelPatcher.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = KernelPatcher.dylib; path = KernelPatcher/KernelPatcher.dylib; sourceTree = "<group>"; };
 		52DF7A3117EDFA5900A88D32 /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; name = Makefile; path = KernelPatcher/Makefile; sourceTree = "<group>"; };
+		54D082B71ECC8C760077DB8D /* FakeSMC.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeSMC.h; sourceTree = "<group>"; };
+		54D082B81ECC8C860077DB8D /* FakeSMCInfo.plist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FakeSMCInfo.plist.h; sourceTree = "<group>"; };
+		54D082B91ECC8CA90077DB8D /* kernel_patcher_internal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kernel_patcher_internal.c; sourceTree = "<group>"; };
+		54D082BA1ECC8CBB0077DB8D /* kernel_patcher_internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kernel_patcher_internal.h; sourceTree = "<group>"; };
 		54EE60B01E83478900D682EB /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
 		6DBAFD1813B0D4590047ED33 /* _structs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _structs.h; sourceTree = "<group>"; };
 		6DBAFD1913B0D4590047ED33 /* _types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _types.h; sourceTree = "<group>"; };
@@ -1416,14 +1420,8 @@
 		B4B3DE7F15B8E914002FAA73 /* zh_TW */ = {isa = PBXFileReference; lastKnownFileType = wrapper.rtfd; name = zh_TW; path = Welcome.rtfd; sourceTree = "<group>"; };
 		E51057BF1BD174E0002FC0A7 /* IntelBdw.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelBdw.txt; path = OptionalSettings/IntelBdw.txt; sourceTree = "<group>"; };
 		E51057C01BD174FE002FC0A7 /* IntelSkl.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = IntelSkl.txt; path = OptionalSettings/IntelSkl.txt; sourceTree = "<group>"; };
-		E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */ = {isa = PBXFileReference; lastKnownFileType = text; name = CrsActiveConfig.txt; path = OptionalSettings/CrsActiveConfig.txt; sourceTree = "<group>"; };
-		E511B6D21D187A3D00600004 /* config.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = config.h; sourceTree = "<group>"; };
-		E5B3BF4F1B45C86F0063920E /* kernel_patcher.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = kernel_patcher.c; sourceTree = "<group>"; };
-		E5B3BF501B45C86F0063920E /* kernel_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = kernel_patcher.h; sourceTree = "<group>"; };
 		E5B3BF511B45C8810063920E /* sse3_5_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sse3_5_patcher.h; sourceTree = "<group>"; };
 		E5B3BF521B45C8810063920E /* sse3_patcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = sse3_patcher.h; sourceTree = "<group>"; };
-		E5EDE7221BC2F10A008602AF /* DriverFileNVRAM_bin.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DriverFileNVRAM_bin.h; sourceTree = "<group>"; };
-		E5EDE7231BC2F10A008602AF /* DriverFileNVRAM_Info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DriverFileNVRAM_Info.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -1615,7 +1613,6 @@
 			children = (
 				36B83692167832FC00314162 /* Audio.txt */,
 				36AB75E514BD095E005B8045 /* Control.txt */,
-				E51057C11BD17514002FC0A7 /* CrsActiveConfig.txt */,
 				36AB75E614BD095E005B8045 /* General.txt */,
 				36CF786716A0DD3D00EE5DC1 /* HDAULayout.txt */,
 				36B836941678330900314162 /* HDEFLayout.txt */,
@@ -3304,19 +3301,18 @@
 				3617E24817503A9300AE753C /* boot2.s */,
 				54EE60B01E83478900D682EB /* config.h */,
 				3617E24917503A9300AE753C /* Cconfig */,
-				E5EDE7221BC2F10A008602AF /* DriverFileNVRAM_bin.h */,
-				E5EDE7231BC2F10A008602AF /* DriverFileNVRAM_Info.h */,
 				3617E24A17503A9300AE753C /* drivers.c */,
+				54D082B71ECC8C760077DB8D /* FakeSMC.h */,
+				54D082B81ECC8C860077DB8D /* FakeSMCInfo.plist.h */,
 				3617E24B17503A9300AE753C /* graphic_utils.c */,
 				3617E24C17503A9300AE753C /* graphic_utils.h */,
 				3617E24D17503A9300AE753C /* graphics.c */,
 				3617E24E17503A9300AE753C /* graphics.h */,
 				3617E24F17503A9300AE753C /* gui.c */,
 				3617E25017503A9300AE753C /* gui.h */,
+				54D082B91ECC8CA90077DB8D /* kernel_patcher_internal.c */,
+				54D082BA1ECC8CBB0077DB8D /* kernel_patcher_internal.h */,
 				3617E25117503A9300AE753C /* IOHibernatePrivate.h */,
-				E5B3BF4F1B45C86F0063920E /* kernel_patcher.c */,
-				E5B3BF501B45C86F0063920E /* kernel_patcher.h */,
-				E50528B51B93E0FE001EFF67 /* kext_patcher.c */,
 				3608A84D1A42F33500602D1C /* lzvn.c */,
 				3617E25417503A9300AE753C /* lzss.c */,
 				3617E25517503A9300AE753C /* Makefile */,
@@ -3456,8 +3452,8 @@
 				3696B2121A1D2DB5004272A6 /* ntfs_private.h */,
 				3696B2131A1D2DB5004272A6 /* ntfs.c */,
 				3696B2141A1D2DB5004272A6 /* ntfs.h */,
-				3696B2151A1D2DB5004272A6 /* nvidia_helper.c */,
-				3696B2161A1D2DB5004272A6 /* nvidia_helper.h */,
+				3696B2151A1D2DB5004272A6 /* gfx_helper.c */,
+				3696B2161A1D2DB5004272A6 /* gfx_helper.h */,
 				3696B2171A1D2DB5004272A6 /* nvidia.c */,
 				3696B2181A1D2DB5004272A6 /* nvidia.h */,
 				3696B2191A1D2DB5004272A6 /* openbsd.c */,
@@ -4124,7 +4120,7 @@
 		08FB7793FE84155DC02AAC07 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0620;
+				LastUpgradeCheck = 0830;
 			};
 			buildConfigurationList = 1DEB919308733D9F0010E9CD /* Build configuration list for PBXProject "Enoch" */;
 			compatibilityVersion = "Xcode 6.3";
@@ -4806,7 +4802,24 @@
 		1DEB919408733D9F0010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = macosx;
@@ -4816,7 +4829,23 @@
 		1DEB919508733D9F0010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				SDKROOT = macosx;
 			};
