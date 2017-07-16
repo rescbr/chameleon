@@ -137,6 +137,9 @@
 #define kUseIntelHDMI			"UseIntelHDMI"		/* ati.c && nvidia.c && gma.c */
 #define kNvidiaSingle			"NvidiaSingle"		/* nvidia.c */
 
+/* FredWst: added this key */
+#define kNvidiaNoEFI			"NvidiaNoEFI"		/* nvidia.c */
+
 /* Signal64: added this key */
 #define kLegacyOff			"USBLegacyOff"		/* usb.c */
 

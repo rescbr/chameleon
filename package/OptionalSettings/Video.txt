@@ -36,3 +36,4 @@ Bool@EnableBacklight:EnableBacklight=Yes
 Bool@EnableDualLink:EnableDualLink=Yes
 Bool@NvidiaGeneric:NvidiaGeneric=Yes
 Bool@NvidiaSingle:NvidiaSingle=No
+Bool@NvidiaNoEFI:NvidiaNoEFI=Yes
