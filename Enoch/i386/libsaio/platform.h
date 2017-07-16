@@ -345,6 +345,7 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 
 #define MSR_AMD_MPERF			0x000000E7
 #define MSR_AMD_APERF			0x000000E8
+#define AMD_PSTATE0_STS			0xC0010064
 
 #define DEFAULT_FSB			100000          /* for now, hardcoding 100MHz for old CPUs */
 

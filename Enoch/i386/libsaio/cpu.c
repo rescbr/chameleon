@@ -1112,6 +1112,7 @@ void scan_cpu(PlatformInfo_t *p)
 				uint64_t cpuMult;
 				uint64_t divisor = 0;
 				uint64_t did;
+
 				uint64_t fid;
 
 				cofvid  = rdmsr64(K10_COFVID_STATUS);
@@ -1128,6 +1129,28 @@ void scan_cpu(PlatformInfo_t *p)
 
 				cpuMultN2 = (cofvid & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
+				/****** Addon END ******/
+			}
+				break;
+
+			case 0x17: /*** Bronya: For AMD Family 17h Ryzen ***/
+			{
+				uint64_t cpuMult;
+				uint64_t CpuDfsId;
+				uint64_t CpuFid;
+
+				uint64_t prfsts = 0;
+
+				prfsts = rdmsr64(AMD_PSTATE0_STS);
+
+				CpuDfsId = bitfield(prfsts, 13, 8);
+				CpuFid = bitfield(prfsts, 7, 0);
+
+				cpuMult = (CpuFid  / CpuDfsId) * 2;
+
+				cpuMultN2 = (prfsts & (uint64_t)bit(0));
+				currdiv = cpuMultN2;
+
 				/****** Addon END ******/
 			}
 				break;
