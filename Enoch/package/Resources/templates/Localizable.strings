@@ -784,7 +784,7 @@ Dependencies: none";
 "NvidiaSingle_description" = "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default).";
 
 "NvidiaNoEFI_title" = "NvidiaNoEFI=Yes";
-"NvidiaNoEFI_description" = "Inject value NVDA,noEFI to true.":
+"NvidiaNoEFI_description" = "Inject value NVDA,noEFI to true.";
 
 // ----------------------------------------------------------------------------
 // Boot options - KERNEL FLAGS

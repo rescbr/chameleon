@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Chameleon 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-26 11:51+0100\n"
+"POT-Creation-Date: 2017-08-08 00:06+0100\n"
 "PO-Revision-Date: 2015-02-13 18:38-0000\n"
 "Last-Translator: crazybirdy <>\n"
 "Language-Team: zh_TW <zh_TW@li.org>\n"
@@ -470,7 +470,7 @@ msgstr ""
 
 #. type: "Resolution_title"
 #: Resources/templates/Localizable.strings:81
-#: Resources/templates/Localizable.strings:899
+#: Resources/templates/Localizable.strings:902
 #, no-wrap
 msgid "Resolution"
 msgstr "解析度"
@@ -3062,74 +3062,87 @@ msgstr ""
 msgid "If you have two cards Nvidia and wants to inject only first one then you can set this parameter (enabled by default)."
 msgstr ""
 
+#. type: "NvidiaNoEFI_title"
+#: Resources/templates/Localizable.strings:786
+#, fuzzy, no-wrap
+#| msgid "UseNvidiaROM=Yes"
+msgid "NvidiaNoEFI=Yes"
+msgstr "UseNvidiaROM=Yes"
+
+#. type: "NvidiaNoEFI_description"
+#: Resources/templates/Localizable.strings:787
+#, no-wrap
+msgid "Inject value NVDA,noEFI to true."
+msgstr ""
+
 #. type: "Verbose_title"
-#: Resources/templates/Localizable.strings:790
+#: Resources/templates/Localizable.strings:793
 #, no-wrap
 msgid "Verbose Mode"
 msgstr "-v 記錄模式"
 
 #. type: "Verbose_description"
-#: Resources/templates/Localizable.strings:791
+#: Resources/templates/Localizable.strings:794
 #, no-wrap
 msgid "Turns on verbose logging and allows you to see messages from both Chameleon and the OS X kernel at boot time. Essential for troubleshooting."
 msgstr "使用 (-v) 記錄模式登入，允許你在螢幕上讀取 變色龍 和 OS X 內核 兩者在開機時產生的紀錄訊息。這是在開機時排除問題的基本用法。"
 
 #. type: "Singleusermode_title"
-#: Resources/templates/Localizable.strings:793
+#: Resources/templates/Localizable.strings:796
 #, no-wrap
 msgid "Single User Mode"
 msgstr "-s 單一使用者模式"
 
 #. type: "Singleusermode_description"
-#: Resources/templates/Localizable.strings:794
+#: Resources/templates/Localizable.strings:797
 #, no-wrap
 msgid "A troubleshooting option used for booting into OS X's BSD/Unix command line."
 msgstr "使用 (-s) 單一使用者模式登入，在排除問題時，可於在開機使用 (-s) 進入 OS X 的 BSD/Unix 命令模式。"
 
 #. type: "Ignorecaches_title"
-#: Resources/templates/Localizable.strings:796
+#: Resources/templates/Localizable.strings:799
 #, no-wrap
 msgid "Ignore Caches"
 msgstr "-f 忽略 Caches"
 
 #. type: "Ignorecaches_description"
-#: Resources/templates/Localizable.strings:797
+#: Resources/templates/Localizable.strings:800
 #, no-wrap
 msgid "Not an option that's needed for everyday booting, but it can be useful if you want OS X to load all files from it's system folders, rather than relying on it's pre-built caches."
 msgstr "使用 (-f) 忽略 Caches 模式登入，並非每日開機必備的的選項，但可經由忽略預製的 Caches ，以使 OS X 可以重新載入所有位於系統目錄的 kext 檔案。"
 
 #. type: "Npci_title"
-#: Resources/templates/Localizable.strings:799
+#: Resources/templates/Localizable.strings:802
 #, no-wrap
 msgid "npci=0x2000"
 msgstr "npci=0x2000"
 
 #. type: "Npci_description"
-#: Resources/templates/Localizable.strings:800
+#: Resources/templates/Localizable.strings:803
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x2000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "可在某些系統上排除 'PCI configuration begin' 的錯誤。0x2000 是 kIOPCIConfiguratorPFM64 flag，可在 IOPCIFamily 的 source code 中找到相關訊息。"
 
 #. type: "Npci3_title"
-#: Resources/templates/Localizable.strings:802
+#: Resources/templates/Localizable.strings:805
 #, no-wrap
 msgid "npci=0x3000"
 msgstr "npci=0x3000"
 
 #. type: "Npci3_description"
-#: Resources/templates/Localizable.strings:803
+#: Resources/templates/Localizable.strings:806
 #, no-wrap
 msgid "For overcoming a hang at 'PCI configuration begin' on some systems. 0x3000 is the kIOPCIConfiguratorPFM64 flag, as seen in the IOPCIFamily source code."
 msgstr "可在某些系統上排除 'PCI configuration begin' 的錯誤。0x3000 是 kIOPCIConfiguratorPFM64 flag，可在 IOPCIFamily 的 source code 中找到相關訊息。"
 
 #. type: "WaitingRootDevice_title"
-#: Resources/templates/Localizable.strings:805
+#: Resources/templates/Localizable.strings:808
 #, no-wrap
 msgid "ahcidisk=1 debug=8"
 msgstr "ahcidisk=1 debug=8"
 
 #. type: "WaitingRootDevice_description"
-#: Resources/templates/Localizable.strings:806
+#: Resources/templates/Localizable.strings:809
 #, no-wrap
 msgid ""
 "Info here: Waiting for root device when kernel cache used only with some disks +FIX\n"
@@ -3141,25 +3154,25 @@ msgstr ""
 "http://www.insanelymac.com/forum/topic/280062-waiting-for-root-device-when-kernel-cache-used-only-with-some-disks-fix/"
 
 #. type: "Darkwake_title"
-#: Resources/templates/Localizable.strings:810
+#: Resources/templates/Localizable.strings:813
 #, no-wrap
 msgid "darkwake=0"
 msgstr "darkwake=0"
 
 #. type: "Darkwake_description"
-#: Resources/templates/Localizable.strings:811
+#: Resources/templates/Localizable.strings:814
 #, no-wrap
 msgid "Lion only. Disables the 'low power wake' feature which can sometimes leave the screen black after wake from sleep."
 msgstr "Lion 專用。停用 'low power wake' 的功能，在螢幕睡眠喚醒之後，有時可能會發生螢幕黑屏的狀況。"
 
 #. type: "NvdaDrv1_title"
-#: Resources/templates/Localizable.strings:813
+#: Resources/templates/Localizable.strings:816
 #, no-wrap
 msgid "nvda_drv=1"
 msgstr "nvda_drv=1"
 
 #. type: "NvdaDrv1_description"
-#: Resources/templates/Localizable.strings:814
+#: Resources/templates/Localizable.strings:817
 #, no-wrap
 msgid ""
 "It introduces a new Preference Pane under System Preferences that allows you to enable the Nvidia Web Driver.\n"
@@ -3173,37 +3186,37 @@ msgstr ""
 "歸功於 meklort 及 Rampage Dev 的發現。"
 
 #. type: "kext-dev-mode1_title"
-#: Resources/templates/Localizable.strings:819
+#: Resources/templates/Localizable.strings:822
 #, no-wrap
 msgid "kext-dev-mode=1"
 msgstr "kext-dev-mode=1"
 
 #. type: "kext-dev-mode1_description"
-#: Resources/templates/Localizable.strings:820
+#: Resources/templates/Localizable.strings:823
 #, no-wrap
 msgid "In Yosemite Developer Previews, unsigned or improperly signed kexts will not be loaded. To use unsigned kexts during development, this strict check can be disabled by adding a 'kext-dev-mode=1' boot arg."
 msgstr "Yosemite Developer Previews 不加載未簽署或不當簽署的 kexts，加入 kext-dev-mode=1 參數後，即可取消此嚴格限制，並可使用未簽署的 kexts。"
 
 #. type: "rootless0_title"
-#: Resources/templates/Localizable.strings:822
+#: Resources/templates/Localizable.strings:825
 #, no-wrap
 msgid "rootless=0"
 msgstr ""
 
 #. type: "rootless0_description"
-#: Resources/templates/Localizable.strings:823
+#: Resources/templates/Localizable.strings:826
 #, no-wrap
 msgid "Rootless is a new feature introduced in OS X 10.11 (El Capitan), and it disallows modifying system files. To by-passing this restriction, this strict feature can be disabled by adding a 'rootless=0' boot arg. ('rootless=1' enable it)"
 msgstr ""
 
 #. type: "Dart0_title"
-#: Resources/templates/Localizable.strings:825
+#: Resources/templates/Localizable.strings:828
 #, no-wrap
 msgid "dart=0"
 msgstr "dart=0"
 
 #. type: "Dart0_description"
-#: Resources/templates/Localizable.strings:826
+#: Resources/templates/Localizable.strings:829
 #, no-wrap
 msgid ""
 "Avoiding the DMAR processing causing by VT-d function in Osx (Virtualization).\n"
@@ -3213,499 +3226,499 @@ msgstr ""
 "詳情參考 bcc9 說明: http://www.insanelymac.com/forum/topic/282989-vtd0-fault-after-1082-google-hasnt-heard-of-it-any-help/#entry1867000"
 
 #. type: "mac-de_title"
-#: Resources/templates/Localizable.strings:833
+#: Resources/templates/Localizable.strings:836
 #, no-wrap
 msgid "German Mac Keyboard"
 msgstr "德語 Mac 鍵盤佈局"
 
 #. type: "mac-de_description"
-#: Resources/templates/Localizable.strings:834
+#: Resources/templates/Localizable.strings:837
 #, no-wrap
 msgid "Use the keyboard layout for a German Mac keyboard"
 msgstr "使用德國的 Mac 鍵盤的鍵盤佈局"
 
 #. type: "mac-es_title"
-#: Resources/templates/Localizable.strings:836
+#: Resources/templates/Localizable.strings:839
 #, no-wrap
 msgid "Spanish Mac Keyboard"
 msgstr "西班牙語 Mac 鍵盤佈局"
 
 #. type: "mac-es_description"
-#: Resources/templates/Localizable.strings:837
+#: Resources/templates/Localizable.strings:840
 #, no-wrap
 msgid "Use the keyboard layout for a Spanish Mac keyboard"
 msgstr "使用西班牙的 Mac 鍵盤的鍵盤佈局"
 
 #. type: "mac-fr_title"
-#: Resources/templates/Localizable.strings:839
+#: Resources/templates/Localizable.strings:842
 #, no-wrap
 msgid "French Mac Keyboard"
 msgstr "法語 Mac 鍵盤佈局"
 
 #. type: "mac-fr_description"
-#: Resources/templates/Localizable.strings:840
+#: Resources/templates/Localizable.strings:843
 #, no-wrap
 msgid "Use the keyboard layout for a French Mac keyboard"
 msgstr "使用法國的 Mac 鍵盤的鍵盤佈局"
 
 #. type: "mac-it_title"
-#: Resources/templates/Localizable.strings:842
+#: Resources/templates/Localizable.strings:845
 #, no-wrap
 msgid "Italian Mac Keyboard"
 msgstr "意大利語 Mac 鍵盤佈局"
 
 #. type: "mac-it_description"
-#: Resources/templates/Localizable.strings:843
+#: Resources/templates/Localizable.strings:846
 #, no-wrap
 msgid "Use the keyboard layout for an Italian Mac keyboard"
 msgstr "使用意大利的 Mac 鍵盤的鍵盤佈局"
 
 #. type: "mac-se_title"
-#: Resources/templates/Localizable.strings:845
+#: Resources/templates/Localizable.strings:848
 #, no-wrap
 msgid "Swedish Mac Keyboard"
 msgstr "瑞典語 Mac 鍵盤佈局"
 
 #. type: "mac-se_description"
-#: Resources/templates/Localizable.strings:846
+#: Resources/templates/Localizable.strings:849
 #, no-wrap
 msgid "Use the keyboard layout for a Swedish Mac keyboard"
 msgstr "使用瑞典的 Mac 鍵盤的鍵盤佈局"
 
 #. type: "pc-fr_title"
-#: Resources/templates/Localizable.strings:848
+#: Resources/templates/Localizable.strings:851
 #, no-wrap
 msgid "French PC Keyboard"
 msgstr "法語 PC 鍵盤佈局"
 
 #. type: "pc-fr_description"
-#: Resources/templates/Localizable.strings:849
+#: Resources/templates/Localizable.strings:852
 #, no-wrap
 msgid "Use the keyboard layout for a French PC keyboard"
 msgstr "使用法國的 PC 鍵盤的鍵盤佈局"
 
 #. type: "Embed_title"
-#: Resources/templates/Localizable.strings:856
+#: Resources/templates/Localizable.strings:859
 #, no-wrap
 msgid "Embed"
 msgstr "內崁主題"
 
 #. type: "Embed_description"
-#: Resources/templates/Localizable.strings:857
+#: Resources/templates/Localizable.strings:860
 #, no-wrap
 msgid "A smaller simple version of the new default theme used when building a version of Chameleon which requires an embedded theme."
 msgstr "Embed：小而簡單且可於編譯 boot 時，內崁在 Chameleon 裡的主題。"
 
 #. type: "Legacy_title"
-#: Resources/templates/Localizable.strings:859
+#: Resources/templates/Localizable.strings:862
 #, no-wrap
 msgid "Legacy"
 msgstr "傳統主題"
 
 #. type: "Legacy_description"
-#: Resources/templates/Localizable.strings:860
+#: Resources/templates/Localizable.strings:863
 #, no-wrap
 msgid "Chameleon's original default theme introduced for v2.0 RC1"
 msgstr "Legacy：Chameleon v2.0 RC1 的原始預設主題。"
 
 #. type: "Default_title"
-#: Resources/templates/Localizable.strings:862
+#: Resources/templates/Localizable.strings:865
 #, no-wrap
 msgid "Standard"
 msgstr "標準安裝"
 
 #. type: "Default_description"
-#: Resources/templates/Localizable.strings:863
+#: Resources/templates/Localizable.strings:866
 #, no-wrap
 msgid "Chameleon default theme introduced for v2.0 RC5"
 msgstr "Default：Chameleon v2.0 RC5 的新版預設主題。"
 
 #. type: "Bullet_title"
-#: Resources/templates/Localizable.strings:865
+#: Resources/templates/Localizable.strings:868
 #, no-wrap
 msgid "Bullet"
 msgstr "子彈主題"
 
 #. type: "Bullet_description"
-#: Resources/templates/Localizable.strings:866
+#: Resources/templates/Localizable.strings:869
 #, no-wrap
 msgid "A lovely simple theme by NoSmokingBandit from April 2009."
 msgstr "Bullet：來自 NoSmokingBandit 2009.4 的一個小巧可愛的子彈主題。"
 
 #. type: "Audio_title"
-#: Resources/templates/Localizable.strings:875
+#: Resources/templates/Localizable.strings:878
 #, no-wrap
 msgid "Audio"
 msgstr "音效卡選項"
 
 #. type: "Audio_description"
-#: Resources/templates/Localizable.strings:876
+#: Resources/templates/Localizable.strings:879
 #, no-wrap
 msgid "A selection of options that deal with audio."
 msgstr "設定 Audio 音效卡的選項。"
 
 #. type: "Control_title"
-#: Resources/templates/Localizable.strings:879
+#: Resources/templates/Localizable.strings:882
 #, no-wrap
 msgid "Control Options"
 msgstr "控制選項"
 
 #. type: "Control_description"
-#: Resources/templates/Localizable.strings:880
+#: Resources/templates/Localizable.strings:883
 #, no-wrap
 msgid "Settings to control how Chameleon works."
 msgstr "設定控制 Chameleon 的運作方式。"
 
 #. type: "CsrActiveConfig_title"
-#: Resources/templates/Localizable.strings:883
+#: Resources/templates/Localizable.strings:886
 #, no-wrap
 msgid "CsrActiveConfig"
 msgstr ""
 
 #. type: "CsrActiveConfig_description"
-#: Resources/templates/Localizable.strings:884
+#: Resources/templates/Localizable.strings:887
 #, no-wrap
 msgid "System Integrity Protection (SIP)."
 msgstr ""
 
 #. type: "General_title"
-#: Resources/templates/Localizable.strings:887
+#: Resources/templates/Localizable.strings:890
 #, no-wrap
 msgid "General Options"
 msgstr "一般選項"
 
 #. type: "General_description"
-#: Resources/templates/Localizable.strings:888
+#: Resources/templates/Localizable.strings:891
 #, no-wrap
 msgid "Choose from a selection of base options."
 msgstr "選取一些基本的選項。"
 
 #. type: "KernelFlags_title"
-#: Resources/templates/Localizable.strings:891
+#: Resources/templates/Localizable.strings:894
 #, no-wrap
 msgid "Kernel Flags"
 msgstr "內核參數"
 
 #. type: "KernelFlags_description"
-#: Resources/templates/Localizable.strings:892
+#: Resources/templates/Localizable.strings:895
 #, no-wrap
 msgid "Choose from a selection of kernel flags."
 msgstr "選取有關 kernel flags 的各種內核參數設定。"
 
 #. type: "PowerManagement_title"
-#: Resources/templates/Localizable.strings:895
+#: Resources/templates/Localizable.strings:898
 #, no-wrap
 msgid "Power Management"
 msgstr "電源管理"
 
 #. type: "PowerManagement_description"
-#: Resources/templates/Localizable.strings:896
+#: Resources/templates/Localizable.strings:899
 #, no-wrap
 msgid "A selection of options that deal with power management and speedstep."
 msgstr "一些設定電源管理和 speedstep 的選項。"
 
 #. type: "Resolution_description"
-#: Resources/templates/Localizable.strings:900
+#: Resources/templates/Localizable.strings:903
 #, no-wrap
 msgid "Set one resolution to use."
 msgstr "設定選用一個解析度。"
 
 #. type: "HDEFLayout_title"
-#: Resources/templates/Localizable.strings:903
+#: Resources/templates/Localizable.strings:906
 #, no-wrap
 msgid "HDEF Layout"
 msgstr "音效卡 HDA 選項"
 
 #. type: "HDEFLayout_description"
-#: Resources/templates/Localizable.strings:904
+#: Resources/templates/Localizable.strings:907
 #, no-wrap
 msgid "Set one HDEF Layout ID to use for your HDA controller."
 msgstr "設定音效卡 HDA controller 的 HDEF Layout ID。"
 
 #. type: "HDAULayout_title"
-#: Resources/templates/Localizable.strings:907
+#: Resources/templates/Localizable.strings:910
 #, no-wrap
 msgid "HDAU Layout"
 msgstr "音效卡 HDMI 選項"
 
 #. type: "HDAULayout_description"
-#: Resources/templates/Localizable.strings:908
+#: Resources/templates/Localizable.strings:911
 #, no-wrap
 msgid "Set one HDAU Layout ID to use for your HDMi controller."
 msgstr "設定音效卡 HDMI controller 的 HDAU Layout ID。"
 
 #. type: "IntelCapri_title"
-#: Resources/templates/Localizable.strings:911
+#: Resources/templates/Localizable.strings:914
 #, no-wrap
 msgid "Intel Capri AAPL,ig-platform-id"
 msgstr "Intel Capri AAPL,ig-platform-id"
 
 #. type: "IntelCapri_description"
-#: Resources/templates/Localizable.strings:912
+#: Resources/templates/Localizable.strings:915
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel HD4000."
 msgstr "設定一個 Intel HD4000 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "IntelAzul_title"
-#: Resources/templates/Localizable.strings:915
+#: Resources/templates/Localizable.strings:918
 #, no-wrap
 msgid "Intel Azul AAPL,ig-platform-id"
 msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelAzul_description"
-#: Resources/templates/Localizable.strings:916
+#: Resources/templates/Localizable.strings:919
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgstr "設定一個 Intel Haswell 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "IntelBdw_title"
-#: Resources/templates/Localizable.strings:919
+#: Resources/templates/Localizable.strings:922
 #, no-wrap
 msgid "Intel Bdw AAPL,ig-platform-id"
 msgstr "Intel Bdw AAPL,ig-platform-id"
 
 #. type: "IntelBdw_description"
-#: Resources/templates/Localizable.strings:920
+#: Resources/templates/Localizable.strings:923
 #, no-wrap
 msgid "Set one AAPL,ig-platform-id to use for your Intel Broadwell."
 msgstr "設定一個 Intel Broadwell 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "IntelSkl_title"
-#: Resources/templates/Localizable.strings:923
+#: Resources/templates/Localizable.strings:926
 #, fuzzy, no-wrap
 #| msgid "Intel Azul AAPL,ig-platform-id"
 msgid "Intel Skl AAPL,ig-platform-id"
 msgstr "Intel Azul AAPL,ig-platform-id"
 
 #. type: "IntelSkl_description"
-#: Resources/templates/Localizable.strings:924
+#: Resources/templates/Localizable.strings:927
 #, fuzzy, no-wrap
 #| msgid "Set one AAPL,ig-platform-id to use for your Intel Haswell."
 msgid "Set one AAPL,ig-platform-id to use for your Intel Skylake."
 msgstr "設定一個 Intel Haswell 顯示卡的 AAPL,ig-platform-id。"
 
 #. type: "HDEFPinConfiguration_title"
-#: Resources/templates/Localizable.strings:927
+#: Resources/templates/Localizable.strings:930
 #, no-wrap
 msgid "HDEF PinConfiguration"
 msgstr "HDEF PinConfiguration"
 
 #. type: "HDEFPinConfiguration_description"
-#: Resources/templates/Localizable.strings:928
+#: Resources/templates/Localizable.strings:931
 #, no-wrap
 msgid "Set one HDEF PinConfiguration to use."
 msgstr "設定選用一個 HDEF PinConfiguration。"
 
 #. type: "Video_title"
-#: Resources/templates/Localizable.strings:931
+#: Resources/templates/Localizable.strings:934
 #, no-wrap
 msgid "Video"
 msgstr "顯示卡選項"
 
 #. type: "Video_description"
-#: Resources/templates/Localizable.strings:932
+#: Resources/templates/Localizable.strings:935
 #, no-wrap
 msgid "A selection of options that deal with video."
 msgstr "一些設定顯示卡的選項。"
 
 #. type: "Keymaps_title"
-#: Resources/templates/Localizable.strings:935
+#: Resources/templates/Localizable.strings:938
 #, no-wrap
 msgid "KeyLayout"
 msgstr "鍵盤佈局"
 
 #. type: "Keymaps_description"
-#: Resources/templates/Localizable.strings:936
+#: Resources/templates/Localizable.strings:939
 #, no-wrap
 msgid "Select one keylayout to use. This will also install the Keylayout module and keymaps."
 msgstr "設定選用一個鍵盤佈局。將會安裝鍵盤佈局模組與鍵盤映射文件。"
 
 #. type: "Patches_title"
-#: Resources/templates/Localizable.strings:945
+#: Resources/templates/Localizable.strings:948
 #, fuzzy, no-wrap
 #| msgid "Kext Patcher"
 msgid "Embedded Patcher"
 msgstr "Kext Patcher"
 
 #. type: "Patches_description"
-#: Resources/templates/Localizable.strings:946
+#: Resources/templates/Localizable.strings:949
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch the Kernel and Kexts."
 msgstr "一些設定顯示卡的選項。"
 
 #. type: "kernelPatcher_title"
-#: Resources/templates/Localizable.strings:949
+#: Resources/templates/Localizable.strings:952
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "Embedded Kernel Patch"
 msgstr "Kernel Patcher"
 
 #. type: "kernelPatcher_description"
-#: Resources/templates/Localizable.strings:950
+#: Resources/templates/Localizable.strings:953
 #, no-wrap
 msgid "Select one patch for your kernel."
 msgstr ""
 
 #. type: "KernelBooter_kexts_title"
-#: Resources/templates/Localizable.strings:953
+#: Resources/templates/Localizable.strings:956
 #, no-wrap
 msgid "KernelBooter_kexts"
 msgstr ""
 
 #. type: "KernelBooter_kexts_description"
-#: Resources/templates/Localizable.strings:954
+#: Resources/templates/Localizable.strings:957
 #, no-wrap
 msgid "Re-enable /Extra/Extensions kexts on newer OSes."
 msgstr ""
 
 #. type: "KernelPm_title"
-#: Resources/templates/Localizable.strings:957
+#: Resources/templates/Localizable.strings:960
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelPm"
 msgstr "Kernel Patcher"
 
 #. type: "KernelPm_description"
-#: Resources/templates/Localizable.strings:958
+#: Resources/templates/Localizable.strings:961
 #, fuzzy, no-wrap
 #| msgid "Power Management"
 msgid "Kernel Power Management patch."
 msgstr "電源管理"
 
 #. type: "KernelLapicError_title"
-#: Resources/templates/Localizable.strings:961
+#: Resources/templates/Localizable.strings:964
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicError"
 msgstr "Kernel Patcher"
 
 #. type: "KernelLapicError_description"
-#: Resources/templates/Localizable.strings:962
+#: Resources/templates/Localizable.strings:965
 #, no-wrap
 msgid "Remove the Local Apic Error panic."
 msgstr ""
 
 #. type: "KernelLapicVersion_title"
-#: Resources/templates/Localizable.strings:965
+#: Resources/templates/Localizable.strings:968
 #, fuzzy, no-wrap
 #| msgid "Kernel Patcher"
 msgid "KernelLapicVersion"
 msgstr "Kernel Patcher"
 
 #. type: "KernelLapicVersion_description"
-#: Resources/templates/Localizable.strings:966
+#: Resources/templates/Localizable.strings:969
 #, no-wrap
 msgid "Remove the Local Apic Version panic."
 msgstr ""
 
 #. type: "KernelHaswell_title"
-#: Resources/templates/Localizable.strings:969
+#: Resources/templates/Localizable.strings:972
 #, fuzzy, no-wrap
 #| msgid "Kernel Flags"
 msgid "KernelHaswell"
 msgstr "內核參數"
 
 #. type: "KernelHaswell_description"
-#: Resources/templates/Localizable.strings:970
+#: Resources/templates/Localizable.strings:973
 #, no-wrap
 msgid "Patch for Haswell \\\"E\\\" and \\\"ULT\\\" support on older OSes."
 msgstr ""
 
 #. type: "KernelcpuFamily_title"
-#: Resources/templates/Localizable.strings:973
+#: Resources/templates/Localizable.strings:976
 #, no-wrap
 msgid "KernelcpuFamily"
 msgstr ""
 
 #. type: "KernelcpuFamily_description"
-#: Resources/templates/Localizable.strings:974
+#: Resources/templates/Localizable.strings:977
 #, no-wrap
 msgid "Patch the cpuid_family address to remove the _cpuid_set_info _panic and _tsc_init _panic. For unsupported CPUs"
 msgstr ""
 
 #. type: "KernelSSE3_title"
-#: Resources/templates/Localizable.strings:977
+#: Resources/templates/Localizable.strings:980
 #, no-wrap
 msgid "KernelSSE3"
 msgstr ""
 
 #. type: "KernelSSE3_description"
-#: Resources/templates/Localizable.strings:978
+#: Resources/templates/Localizable.strings:981
 #, no-wrap
 msgid "Patch to enable more SSE3 instructions on older CPUs to run newer OSes."
 msgstr ""
 
 #. type: "kextsPatcher_title"
-#: Resources/templates/Localizable.strings:987
+#: Resources/templates/Localizable.strings:990
 #, fuzzy, no-wrap
 #| msgid "Kext Patcher"
 msgid "Embedded Kexts Patch"
 msgstr "Kext Patcher"
 
 #. type: "kextsPatcher_description"
-#: Resources/templates/Localizable.strings:988
+#: Resources/templates/Localizable.strings:991
 #, fuzzy, no-wrap
 #| msgid "A selection of options that deal with video."
 msgid "A selection of options to patch kexts."
 msgstr "一些設定顯示卡的選項。"
 
 #. type: "AppleRTCPatch_title"
-#: Resources/templates/Localizable.strings:991
+#: Resources/templates/Localizable.strings:994
 #, no-wrap
 msgid "AppleRTC Patch"
 msgstr ""
 
 #. type: "AppleRTCPatch_description"
-#: Resources/templates/Localizable.strings:992
+#: Resources/templates/Localizable.strings:995
 #, no-wrap
 msgid "Patch AppleRTC."
 msgstr ""
 
 #. type: "OrangeIconFixSata_title"
-#: Resources/templates/Localizable.strings:995
+#: Resources/templates/Localizable.strings:998
 #, no-wrap
 msgid "OrangeIcon Fix"
 msgstr ""
 
 #. type: "OrangeIconFixSata_description"
-#: Resources/templates/Localizable.strings:996
+#: Resources/templates/Localizable.strings:999
 #, no-wrap
 msgid "Fix OrangeIcon."
 msgstr ""
 
 #. type: "TrimEnablerSata_title"
-#: Resources/templates/Localizable.strings:999
+#: Resources/templates/Localizable.strings:1002
 #, no-wrap
 msgid "TrimEnabler Sata"
 msgstr ""
 
 #. type: "TrimEnablerSata_description"
-#: Resources/templates/Localizable.strings:1000
+#: Resources/templates/Localizable.strings:1003
 #, no-wrap
 msgid "Sata TrimEnabler."
 msgstr ""
 
 #. type: "AICPMPatch_title"
-#: Resources/templates/Localizable.strings:1003
+#: Resources/templates/Localizable.strings:1006
 #, no-wrap
 msgid "AICPM Patch"
 msgstr ""
 
 #. type: "AICPMPatch_description"
-#: Resources/templates/Localizable.strings:1004
+#: Resources/templates/Localizable.strings:1007
 #, no-wrap
 msgid "Patch AICPM."
 msgstr ""
 
 #. type: "Themes_title"
-#: Resources/templates/Localizable.strings:1010
+#: Resources/templates/Localizable.strings:1013
 #, no-wrap
 msgid "Themes"
 msgstr "主題選項"
 
 #. type: "Themes_description"
-#: Resources/templates/Localizable.strings:1011
+#: Resources/templates/Localizable.strings:1014
 #, no-wrap
 msgid ""
 "A collection of sample themes\n"
