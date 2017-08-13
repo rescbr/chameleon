@@ -12,7 +12,7 @@
 
 /*
  
- NVIDIA card injection usage e.g (to be placed in the boot.plist): 
+ NVIDIA and ATI card injection usage e.g (to be placed in the boot.plist): 
  
  <key>NVIDIA</key>
 	<array>
@@ -49,7 +49,19 @@
  .
  .
 	</array>
- 
+
+ <key>ATI</key>
+	<array>
+		<dict>
+			<key>Chipset Name</key>
+			<string>ATI RADEON HD6670</string>
+			<key>IOPCIPrimaryMatch</key>
+			<string>0x10026758</string>
+			<key>VRam Size</key>
+			<string>2048</string>
+		</dict>
+	</array>
+
  */
 
 cardList_t *cardList = NULL;
@@ -109,6 +121,7 @@ void fill_card_list(void)
 {
 	unsigned int	i, count;
 	TagPtr		NVDIATag;
+	TagPtr		ATITag;
 	char		*model_name = NULL;
 	char		*match_id = NULL;
 	char		*sub_id = NULL;
@@ -150,4 +163,39 @@ void fill_card_list(void)
 			}
 		}
 	}
+
+	if ((ATITag = XMLCastArray(XMLGetProperty(bootInfo->chameleonConfig.dictionary, (const char *)"ATI"))))
+	{
+		count = XMLTagCount(ATITag);
+
+		for (i=0; i<count; i++)
+		{
+			TagPtr element = XMLGetElement( NVDIATag, i );
+			if (element)
+			{
+				match_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCIPrimaryMatch")); //device-id
+				sub_id   = XMLCastString(XMLGetProperty(element, (const char*)"IOPCISubDevId")); //sub device-id
+				model_name  = XMLCastString(XMLGetProperty(element, (const char*)"Chipset Name"));
+				vram_size  = XMLCastString(XMLGetProperty(element, (const char*)"VRam Size"));
+
+				if (match_id)
+				{
+					dev_id = strtoul(match_id, NULL, 16);
+				}
+
+				if (sub_id)
+				{
+					subdev_id = strtoul(sub_id, NULL, 16);
+				}
+
+				if (vram_size)
+				{
+					VramSize = strtoul(vram_size, NULL, 10);
+				}
+
+				add_card(model_name, dev_id, subdev_id, VramSize);
+			}
+		}
+	}
+
 }
