@@ -639,6 +639,13 @@ bool patch_pm_init(void *kernelData) // KernelPatchPm
 			verbose("\tKernel power management patch 10.11(data3) found and patched\n");
 			return true;
 		}
+		//rehabman: change for 10.11.6 security update 2017-003 15G1611
+		else if (0x00001b90000000E2ULL == (*((UInt64 *)Ptr)))
+		{
+			(*((UInt64 *)Ptr)) = 0x0000000000000000ULL;
+			verbose("\tKernel power management patch 10.11.6(2017-003 15G1611)(data3) found and patched\n");
+			return true;
+		}
 		// sherlocks: change for 10.12 DP1
 		else if (0x00003390000000E2ULL == (*((UInt64 *)Ptr)))
 		{
@@ -946,7 +953,7 @@ bool patch_lapic_init_64(void *kernelData)  // KernelLapicPatch_64
 			DBG("\tFound Sierra Lapic panic at 0x%08X\n", (unsigned int)patchLocation);
 			break;
 		}
-		// sherlocks: 10.13.DP1
+		// PMheart: 10.13.DP1
 		else if (KernelLapicError
 			&& (bytes[i+0]   == 0x65
 			&& bytes[i+1]    == 0x8B
@@ -1951,6 +1958,7 @@ unsigned int AppleRTC_Patch(void *data, UInt32 DriverSize, UInt32 StartLocation)
     
     return count;
 }
+
 // ===================================
 // (Clover)
 // Patching AppleIntelCPUPowerManagement
@@ -2040,6 +2048,7 @@ unsigned int trimEnablerSata(void *data, UInt32 DriverSize, UInt32 StartLocation
     
     return count;
 }
+
 // ===================================
 // Patching AppleAHCIPort to fix orange icon (Sata only)
 unsigned int patch_AppleAHCIPort_OrangeFix(void *data, UInt32 DriverSize, UInt32 StartLocation)
@@ -2057,6 +2066,7 @@ unsigned int patch_AppleAHCIPort_OrangeFix(void *data, UInt32 DriverSize, UInt32
     
     return count;
 }
+
 // ===================================
 // (Micky1979)
 // Patching NVDAStartupWeb
