@@ -77,7 +77,7 @@ Options useful in the org.chameleon.Boot.plist file:
   BlackMode=Yes|No        The new BlackMode loads the white Apple logo,
                              instead of the gray Apple logo, on a black background (disabled by default).
 
-  CsrActiveConfig=<value> Set CsrActiveConfig for OS 10.11.x, range 0..127 (default 0x67)
+  CsrActiveConfig=<value> Set CsrActiveConfig for OS 10.11.x, range 0..255 (default 0x67)
 
   PciRoot=<value>         Use an alternate value for PciRoot (default value 0).
 
