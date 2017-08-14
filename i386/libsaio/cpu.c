@@ -21,11 +21,30 @@
 
 clock_frequency_info_t gPEClockFrequencyInfo;
 
-static __unused uint64_t rdtsc32(void)
+//static __unused uint64_t rdtsc32(void)
+//{
+//	unsigned int lo,hi;
+//	__asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
+//	return ((uint64_t)hi << 32) | lo;
+//}
+
+uint64_t getCycles(void)
 {
-	unsigned int lo,hi;
-	__asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));
-	return ((uint64_t)hi << 32) | lo;
+#if defined(__ARM_ARCH_7A__)
+    uint32_t r;
+    asm volatile("mrc p15, 0, %0, c9, c13, 0\t\n" : "=r" (r)); /* Read PMCCNTR       */
+    return ((uint64_t)r) << 6;                                 /* 1 tick = 64 clocks */
+#elif defined(__x86_64__)
+    unsigned a, d;
+    asm volatile("rdtsc" : "=a" (a), "=d" (d));
+    return ((uint64_t)a) | (((uint64_t)d) << 32);
+#elif defined(__i386__)
+    uint64_t ret;
+    asm volatile("rdtsc": "=A" (ret));
+    return ret;
+#else
+    return 0;
+#endif
 }
 
 /*
@@ -71,10 +90,10 @@ restart:
 	attempts++;
 	enable_PIT2();		// turn on PIT2
 	set_PIT2(0);		// reset timer 2 to be zero
-	latchTime = rdtsc32();	// get the time stamp to time
+	latchTime = getCycles();	// get the time stamp to time
 	latchTime = get_PIT2(&timerValue) - latchTime; // time how long this takes
 	set_PIT2(SAMPLE_CLKS_INT);	// set up the timer for (almost) 1/20th a second
-	saveTime = rdtsc32();	// now time how long a 20th a second is...
+	saveTime = getCycles();	// now time how long a 20th a second is...
 	get_PIT2(&lastValue);
 	get_PIT2(&lastValue);	// read twice, first value may be unreliable
 	do {
@@ -129,9 +148,9 @@ static uint64_t __unused measure_tsc_frequency(void)
 	{
 		enable_PIT2();
 		set_PIT2_mode0(CALIBRATE_LATCH);
-		tscStart = rdtsc64();
+		tscStart = getCycles();
 		pollCount = poll_PIT2_gate();
-		tscEnd = rdtsc64();
+		tscEnd = getCycles();
 		/* The poll loop must have run at least a few times for accuracy */
 		if (pollCount <= 1)
 		{
@@ -330,18 +349,18 @@ void *memcpy_interruptible(void *dst, const void *src, size_t len)
 	 * Do the work
 	 */
 	offset = 0;
-	lastTsc = rdtsc64();
+	lastTsc = getCycles();
 	do
 	{
 		(void) memcpy((char*) dst + offset, (const char*) src + offset, chunk);
 		offset += (ptrdiff_t) chunk;
 		len -= chunk;
-		if ((rdtsc64() - lastTsc) < threshold)
+		if ((getCycles() - lastTsc) < threshold)
 		{
 			continue;
 		}
 		(void) readKeyboardStatus();	// visit real-mode
-		lastTsc = rdtsc64();
+		lastTsc = getCycles();
 	}
 	while (len > chunk);
 	if (len)
@@ -375,7 +394,6 @@ void get_cpuid(PlatformInfo_t *p)
 	char		str[128];
 	uint32_t	reg[4];
 	char		*s			= 0;
-
 
 	do_cpuid(0x00000000, p->CPU.CPUID[CPUID_0]); // MaxFn, Vendor
 	do_cpuid(0x00000001, p->CPU.CPUID[CPUID_1]); // Signature, stepping, features
@@ -448,6 +466,7 @@ void get_cpuid(PlatformInfo_t *p)
 			do_cpuid(0x80000005, p->CPU.CPUID[CPUID_85]); // TLB/Cache/Prefetch
 			do_cpuid(0x80000006, p->CPU.CPUID[CPUID_86]); // TLB/Cache/Prefetch
 			do_cpuid(0x80000008, p->CPU.CPUID[CPUID_88]);
+			do_cpuid(0x8000001E, p->CPU.CPUID[CPUID_81E]);
 
 			break;
 
@@ -492,12 +511,12 @@ void scan_cpu(PlatformInfo_t *p)
 
 	uint8_t		bus_ratio_max		= 0;
 	uint8_t		bus_ratio_min		= 0;
-	uint8_t		currdiv			= 0;
-	uint8_t		currcoef		= 0;
+	uint32_t	currdiv			= 0;
+	uint32_t	currcoef		= 0;
 	uint8_t		maxdiv			= 0;
 	uint8_t		maxcoef			= 0;
-	uint8_t		pic0_mask;
-	uint8_t		cpuMultN2		= 0;
+	uint8_t		pic0_mask		= 0;
+	uint32_t	cpuMultN2		= 0;
 
 	const char	*newratio;
 
@@ -685,8 +704,30 @@ void scan_cpu(PlatformInfo_t *p)
 		case CPUID_VENDOR_AMD:
 		{
 			post_startup_cpu_fixups();
-			cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
-			threads_per_core = cores_per_package;
+
+			if (p->CPU.ExtFamily < 0x8)
+			{
+				cores_per_package = bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1;
+				//threads_per_core = cores_per_package;
+			}
+			else
+
+			// Bronya : test for SMT
+			// Properly calculate number of cores on AMD Zen
+			// TODO: Check MSR for SMT
+			if (p->CPU.ExtFamily >= 0x8)
+			{
+				uint64_t cores = 0;
+				uint64_t logical = 0;
+
+				cores = bitfield(p->CPU.CPUID[CPUID_81E][ebx], 7, 0); // cores
+				logical = bitfield(p->CPU.CPUID[CPUID_81E][ebx], 15, 8) + 1; // 2
+
+				cores_per_package = (bitfield(p->CPU.CPUID[CPUID_88][ecx], 7, 0) + 1) / logical; //8 cores
+
+				//threads_per_core = cores_per_package;
+
+			}
 
 			if (cores_per_package == 0)
 			{
@@ -739,11 +780,6 @@ void scan_cpu(PlatformInfo_t *p)
 		p->CPU.Features |= CPU_FEATURE_SSE42;
 	}
 
-	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0)
-	{
-		p->CPU.Features |= CPU_FEATURE_EM64T;
-	}
-
 	if ((bit(5) & p->CPU.CPUID[CPUID_1][3]) != 0)
 	{
 		p->CPU.Features |= CPU_FEATURE_MSR;
@@ -752,6 +788,11 @@ void scan_cpu(PlatformInfo_t *p)
 	if ((p->CPU.NoThreads > p->CPU.NoCores))
 	{
 		p->CPU.Features |= CPU_FEATURE_HTT;
+	}
+
+	if ((bit(29) & p->CPU.CPUID[CPUID_81][3]) != 0)
+	{
+		p->CPU.Features |= CPU_FEATURE_EM64T;
 	}
 
 	pic0_mask = inb(0x21U);
@@ -799,11 +840,11 @@ void scan_cpu(PlatformInfo_t *p)
 				case CPUID_MODEL_SKYLAKE_S:
 /* --------------------------------------------------------- */
 					msr = rdmsr64(MSR_PLATFORM_INFO);
-					DBG("msr(%d): platform_info %08x\n", __LINE__, bitfield(msr, 31, 0));
+					DBG("msr(%d): platform_info %08llx\n", __LINE__, bitfield(msr, 31, 0));
 					bus_ratio_max = bitfield(msr, 15, 8);
 					bus_ratio_min = bitfield(msr, 47, 40); //valv: not sure about this one (Remarq.1)
 					msr = rdmsr64(MSR_FLEX_RATIO);
-					DBG("msr(%d): flex_ratio %08x\n", __LINE__, bitfield(msr, 31, 0));
+					DBG("msr(%d): flex_ratio %08llx\n", __LINE__, bitfield(msr, 31, 0));
 					if (bitfield(msr, 16, 16))
 					{
 						flex_ratio = bitfield(msr, 15, 8);
@@ -820,7 +861,7 @@ void scan_cpu(PlatformInfo_t *p)
 							// Clear bit 16 (evidently the presence bit)
 							wrmsr64(MSR_FLEX_RATIO, (msr & 0xFFFFFFFFFFFEFFFFULL));
 							msr = rdmsr64(MSR_FLEX_RATIO);
-							DBG("CPU: Unusable flex ratio detected. Patched MSR now %08x\n", bitfield(msr, 31, 0));
+							DBG("CPU: Unusable flex ratio detected. Patched MSR now %08llx\n", bitfield(msr, 31, 0));
 						}
 						else
 						{
@@ -891,7 +932,7 @@ void scan_cpu(PlatformInfo_t *p)
 
 			default:
 				msr = rdmsr64(MSR_IA32_PERF_STATUS);
-				DBG("msr(%d): ia32_perf_stat 0x%08x\n", __LINE__, bitfield(msr, 31, 0));
+				DBG("msr(%d): ia32_perf_stat 0x%08llx\n", __LINE__, bitfield(msr, 31, 0));
 				currcoef = bitfield(msr, 12, 8);  // Bungo: reverted to 2263 state because of wrong old CPUs freq. calculating
 				// Non-integer bus ratio for the max-multi
 				maxdiv = bitfield(msr, 46, 46);
@@ -956,12 +997,12 @@ void scan_cpu(PlatformInfo_t *p)
 			{
 				uint64_t fidvid = 0;
 				uint64_t cpuMult;
-				uint64_t fid;
+				uint64_t cpuFid;
 
-				fidvid = rdmsr64(K8_FIDVID_STATUS);
-				fid = bitfield(fidvid, 5, 0);
+				fidvid = rdmsr64(AMD_K8_PERF_STS);
+				cpuFid = bitfield(fidvid, 5, 0);
 
-				cpuMult = (fid + 8) / 2;
+				cpuMult = (cpuFid + 0x8) * 10 / 2;
 				currcoef = cpuMult;
 
 				cpuMultN2 = (fidvid & (uint64_t)bit(0));
@@ -972,25 +1013,26 @@ void scan_cpu(PlatformInfo_t *p)
 
 			case 0x10: /*** AMD Family 10h ***/
 			{
-				uint64_t cofvid = 0;
+
+				uint64_t prfsts = 0;
 				uint64_t cpuMult;
 				uint64_t divisor = 0;
-				uint64_t did;
-				uint64_t fid;
+				uint64_t cpuDid;
+				uint64_t cpuFid;
 
-				cofvid  = rdmsr64(K10_COFVID_STATUS);
-				did = bitfield(cofvid, 8, 6);
-				fid = bitfield(cofvid, 5, 0);
-				if (did == 0) divisor = 2;
-				else if (did == 1) divisor = 4;
-				else if (did == 2) divisor = 8;
-				else if (did == 3) divisor = 16;
-				else if (did == 4) divisor = 32;
+				prfsts  = rdmsr64(AMD_COFVID_STS);
+				cpuDid = bitfield(prfsts, 8, 6);
+				cpuFid = bitfield(prfsts, 5, 0);
+				if (cpuDid == 0) divisor = 2;
+				else if (cpuDid == 1) divisor = 4;
+				else if (cpuDid == 2) divisor = 8;
+				else if (cpuDid == 3) divisor = 16;
+				else if (cpuDid == 4) divisor = 32;
 
-				cpuMult = (fid + 16) / divisor;
+				cpuMult = ((cpuFid + 0x10) * 10) / (2^cpuDid);
 				currcoef = cpuMult;
 
-				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				cpuMultN2 = (prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
 
 				/****** Addon END ******/
@@ -999,25 +1041,26 @@ void scan_cpu(PlatformInfo_t *p)
 
 			case 0x11: /*** AMD Family 11h ***/
 			{
-				uint64_t cofvid = 0;
+
+				uint64_t prfsts;
 				uint64_t cpuMult;
 				uint64_t divisor = 0;
-				uint64_t did;
-				uint64_t fid;
+				uint64_t cpuDid;
+				uint64_t cpuFid;
 
-				cofvid  = rdmsr64(K10_COFVID_STATUS);
-				did = bitfield(cofvid, 8, 6);
-				fid = bitfield(cofvid, 5, 0);
-				if (did == 0) divisor = 2;
-				else if (did == 1) divisor = 4;
-				else if (did == 2) divisor = 8;
-				else if (did == 3) divisor = 16;
-				else if (did == 4) divisor = 32;
+				prfsts  = rdmsr64(AMD_COFVID_STS);
 
-				cpuMult = (fid + 8) / divisor;
+				cpuDid = bitfield(prfsts, 8, 6);
+				cpuFid = bitfield(prfsts, 5, 0);
+				if (cpuDid == 0) divisor = 2;
+				else if (cpuDid == 1) divisor = 4;
+				else if (cpuDid == 2) divisor = 8;
+				else if (cpuDid == 3) divisor = 16;
+				else if (cpuDid == 4) divisor = 0;
+				cpuMult = ((cpuFid + 0x8) * 10 ) / divisor;
 				currcoef = cpuMult;
 
-				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				cpuMultN2 = (prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
 
 				/****** Addon END ******/
@@ -1029,7 +1072,7 @@ void scan_cpu(PlatformInfo_t *p)
 				// 8:4 CpuFid: current CPU core frequency ID
 				// 3:0 CpuDid: current CPU core divisor ID
 				uint64_t prfsts,CpuFid,CpuDid;
-				prfsts = rdmsr64(K10_COFVID_STATUS);
+				prfsts = rdmsr64(AMD_COFVID_STS);
 
 				CpuDid = bitfield(prfsts, 3, 0) ;
 				CpuFid = bitfield(prfsts, 8, 4) ;
@@ -1047,7 +1090,7 @@ void scan_cpu(PlatformInfo_t *p)
 					case 8: divisor = 16; break;
 					default: divisor = 1; break;
 				}
-				currcoef = (CpuFid + 0x10) / divisor;
+				currcoef = ((CpuFid + 0x10) * 10) / divisor;
 
 				cpuMultN2 = (prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
@@ -1061,17 +1104,17 @@ void scan_cpu(PlatformInfo_t *p)
 				// 8:4: current CPU core divisor ID most significant digit
 				// 3:0: current CPU core divisor ID least significant digit
 				uint64_t prfsts;
-				prfsts = rdmsr64(K10_COFVID_STATUS);
+				prfsts = rdmsr64(AMD_COFVID_STS);
 
 				uint64_t CpuDidMSD,CpuDidLSD;
 				CpuDidMSD = bitfield(prfsts, 8, 4) ;
 				CpuDidLSD  = bitfield(prfsts, 3, 0) ;
 
-				uint64_t frequencyId = 0x10;
-				currcoef = (frequencyId + 0x10) /
+				uint64_t frequencyId = tscFreq/Mega;
+				currcoef = (((frequencyId + 5) / 100) + 0x10) * 10 /
 					(CpuDidMSD + (CpuDidLSD  * 0.25) + 1);
 				currdiv = ((CpuDidMSD) + 1) << 2;
-				currdiv += bitfield(msr, 3, 0);
+				currdiv += bitfield(prfsts, 3, 0);
 
 				cpuMultN2 = (prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
@@ -1083,70 +1126,42 @@ void scan_cpu(PlatformInfo_t *p)
 			case 0x06: /*** AMD Family 06h ***/
 			{
 
-				uint64_t cofvid = 0;
+				uint64_t prfsts = 0;
 				uint64_t cpuMult;
-				uint64_t divisor = 0;
-				uint64_t did;
-				uint64_t fid;
+				//uint64_t divisor = 0;
+				uint64_t cpuDid;
+				uint64_t cpuFid;
 
-				cofvid  = rdmsr64(K10_COFVID_STATUS);
-				did = bitfield(cofvid, 8, 6);
-				fid = bitfield(cofvid, 5, 0);
-				if (did == 0) divisor = 2;
-				else if (did == 1) divisor = 4;
-				else if (did == 2) divisor = 8;
-				else if (did == 3) divisor = 16;
-				else if (did == 4) divisor = 32;
+				prfsts  = rdmsr64(AMD_COFVID_STS);
+				cpuDid = bitfield(prfsts, 8, 6);
+				cpuFid = bitfield(prfsts, 5, 0);
 
-				cpuMult = (fid + 16) / divisor;
+				cpuMult = ((cpuFid + 0x10) * 10) / (2^cpuDid);
 				currcoef = cpuMult;
 
-				cpuMultN2 = (cofvid & (uint64_t)bit(0));
+				cpuMultN2 = (prfsts & 0x01) * 1;//(prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
 			}
 				break;
 
 			case 0x16: /*** AMD Family 16h kabini ***/
 			{
-				uint64_t cofvid = 0;
+				uint64_t prfsts = 0;
 				uint64_t cpuMult;
 				uint64_t divisor = 0;
-				uint64_t did;
+				uint64_t cpuDid;
+				uint64_t cpuFid;
+				prfsts  = rdmsr64(AMD_COFVID_STS);
+				cpuDid = bitfield(prfsts, 8, 6);
+				cpuFid = bitfield(prfsts, 5, 0);
+				if (cpuDid == 0) divisor = 1;
+				else if (cpuDid == 1) divisor = 2;
+				else if (cpuDid == 2) divisor = 4;
+				else if (cpuDid == 3) divisor = 8;
+				else if (cpuDid == 4) divisor = 16;
 
-				uint64_t fid;
-
-				cofvid  = rdmsr64(K10_COFVID_STATUS);
-				did = bitfield(cofvid, 8, 6);
-				fid = bitfield(cofvid, 5, 0);
-				if (did == 0) divisor = 1;
-				else if (did == 1) divisor = 2;
-				else if (did == 2) divisor = 4;
-				else if (did == 3) divisor = 8;
-				else if (did == 4) divisor = 16;
-
-				cpuMult = (fid + 16) / divisor;
+				cpuMult = ((cpuFid + 0x10) * 10) / divisor;
 				currcoef = cpuMult;
-
-				cpuMultN2 = (cofvid & (uint64_t)bit(0));
-				currdiv = cpuMultN2;
-				/****** Addon END ******/
-			}
-				break;
-
-			case 0x17: /*** Bronya: For AMD Family 17h Ryzen ***/
-			{
-				uint64_t cpuMult;
-				uint64_t CpuDfsId;
-				uint64_t CpuFid;
-
-				uint64_t prfsts = 0;
-
-				prfsts = rdmsr64(AMD_PSTATE0_STS);
-
-				CpuDfsId = bitfield(prfsts, 13, 8);
-				CpuFid = bitfield(prfsts, 7, 0);
-
-				cpuMult = (CpuFid  / CpuDfsId) * 2;
 
 				cpuMultN2 = (prfsts & (uint64_t)bit(0));
 				currdiv = cpuMultN2;
@@ -1155,24 +1170,48 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 				break;
 
+			case 0x17: /*** AMD Family 17h Ryzen ***/
+			{
+				uint64_t cpuMult;
+				uint64_t CpuDfsId;
+				uint64_t CpuFid;
+				uint64_t fid = 0;
+				uint64_t prfsts = 0;
+
+				prfsts = rdmsr64(AMD_PSTATE0_STS);
+
+				CpuDfsId = bitfield(prfsts, 13, 8);
+				CpuFid = bitfield(prfsts, 7, 0);
+
+				cpuMult = (CpuFid * 10 / CpuDfsId) * 2;
+
+				currcoef = cpuMult;
+
+				fid = (int)(cpuMult / 10);
+
+				uint8_t fdiv = cpuMult - (fid * 10);
+				if (fdiv > 0) {
+					currdiv = 1;
+				}
+
+				/****** Addon END ******/
+			}
+				break;
+
 			default:
 			{
-				typedef unsigned long long vlong;
-				uint64_t prfsts;
-				prfsts = rdmsr64(K10_COFVID_STATUS);
-				uint64_t r;
-				vlong hz;
-				r = (prfsts>>6) & 0x07;
-				hz = (((prfsts & 0x3f)+0x10)*100000000ll)/(1<<r);
-
-				currcoef = hz / (200 * Mega);
+				currcoef = tscFreq / (200 * Mega);
 			}
 		}
+
+		#define nya(x) x/10,x%10
 
 		if (currcoef)
 		{
 			if (currdiv)
 			{
+				currcoef = nya(currcoef);
+
 				busFrequency = ((tscFreq * 2) / ((currcoef * 2) + 1));
 				busFCvtt2n = ((1 * Giga) << 32) / busFrequency;
 				tscFCvtt2n = busFCvtt2n * 2 / (1 + (2 * currcoef));
@@ -1182,6 +1221,8 @@ void scan_cpu(PlatformInfo_t *p)
 			}
 			else
 			{
+				currcoef = nya(currcoef);
+
 				busFrequency = (tscFreq / currcoef);
 				busFCvtt2n = ((1 * Giga) << 32) / busFrequency;
 				tscFCvtt2n = busFCvtt2n / currcoef;

@@ -157,7 +157,6 @@ static int ExecKernel(void *binary)
 // ===============================================================================
 
 	gMacOSVersion[0] = 0;
-	// TODO identify sierra as macOS
 	verbose("Booting on %s %s (%s)\n", (MacOSVerCurrent < MacOSVer2Int("10.8")) ? "Mac OS X" : (MacOSVerCurrent < MacOSVer2Int("10.12")) ? "OS X" : "macOS", gBootVolume->OSFullVer, gBootVolume->OSBuildVer );
 
 	setupBooterArgs();
@@ -420,7 +419,20 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// for 10.10 and 10.11
 			if (isOSXUpgrade)
 			{
-				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", "/OS X Install Data/");
+				if ( MacOSVerCurrent >= MacOSVer2Int("10.13") )
+				{
+					snprintf(kernelCacheFile, sizeof(kernelCacheFile),
+ 						"%sprelinkedkernel",
+						"/macOS Install Data/Locked Files/Boot Files/");
+				}
+				else
+				{
+					snprintf(kernelCacheFile,
+						sizeof(kernelCacheFile),
+						"%sprelinkedkernel",
+						"/OS X Install Data/");
+				}
+
 			}
 			else if (isInstaller)
 			{
@@ -488,17 +500,25 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		}
 		else if (isOSXUpgrade)
 		{
-			strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
+			strncpy(kernelCachePath,
+				"/macOS Install Data/Locked Files/Boot Files/prelinkedkernel",
+				sizeof(kernelCachePath) );
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
-				strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+				strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
-				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					ret = -1;
+					strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+					if ((flags & kFileTypeMask) != kFileTypeFlat)
+					{
+						ret = -1;
+					}
 				}
 			}
 		}
@@ -1149,11 +1169,11 @@ void setupBooterArgs()
 		}
 		else
 		{
-			bootArgs->flags		|= kBootArgsFlagCSRActiveConfig;
+			bootArgs->flags	|= kBootArgsFlagCSRActiveConfig;
 		}
 
-		// Set limit to 7bit
-		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 127) )
+		// Set limit to 8bit
+		if ( getIntForKey(kCsrActiveConfig, &csrValue, &bootInfo->chameleonConfig) && (csrValue >= 0 && csrValue <= 255) )
 		{
 			bootArgs->csrActiveConfig	= csrValue;
 			csrInfo(csrValue, 1);
@@ -1178,30 +1198,32 @@ void setupBooterArgs()
 // ErmaC
 void csrInfo(int csrValue, bool custom)
 {
-	int mask = 0x20;
+#define CSR_BITS 0x080
+
+	int mask = CSR_BITS;
 	verbose("System Integrity Protection status: %s ", (csrValue == 0) ? "enabled":"disabled");
-	verbose("(%s Configuration).\nCsrActiveConfig = 0x%02x (", custom ? "Custom":"Default", csrValue);
+	verbose("(%s Configuration).\nCsrActiveConfig = 0x%02X (", custom ? "Custom":"Default", csrValue);
 
 	// Display integer number into binary using bitwise operator
-	((csrValue & 0x20) == 0) ? verbose("0"): verbose("1");
+	((csrValue & 0x020) == 0) ? verbose("0"): verbose("1");
 	while (mask != 0)
 	{
 		( ((csrValue & mask) == 0) ? verbose("0"): verbose("1") );
-		mask = mask >> 1;
+		mask = mask >> 1; // Right Shift
 	}
 	verbose(")\n");
 	if (csrValue != 0)
 	{
 		verbose("\nConfiguration:\n");
-		verbose("Kext Signing: %s\n", ((csrValue & 0x01) == 0) ? "enabled":"disabled");           /* (1 << 0) Allow untrusted kexts */
-		verbose("Filesystem Protections: %s\n", ((csrValue & 0x02) == 0) ? "enabled":"disabled"); /* (1 << 1) Allow unrestricted file system. */
-		verbose("Task for PID: %s\n", ((csrValue & 0x04) == 0) ? "enabled":"disabled");           /* (1 << 2) */
-		verbose("Debugging Restrictions: %s\n", ((csrValue & 0x08) == 0) ? "enabled":"disabled"); /* (1 << 3) */
-		verbose("Apple Internal: %s\n", ((csrValue & 0x10) == 0) ? "enabled":"disabled");         /* (1 << 4) */
-		verbose("DTrace Restrictions: %s\n", ((csrValue & 0x20) == 0) ? "enabled":"disabled");    /* (1 << 5) Allow unrestricted dtrace */
-		verbose("NVRAM Protections: %s\n", ((csrValue & 0x40) == 0) ? "enabled":"disabled");      /* (1 << 6) Allow unrestricted NVRAM */
-//		verbose("DEVICE configuration: %s\n", ((csrValue & 0x80) == 0) ? "enabled":"disabled");   /* (1 << 7) Allow device configuration */
-//		verbose("Disable BaseSystem Verification: %s\n", ((csrValue & 0x100) == 0) ? "enabled":"disabled");   /* (1 << 8) Disable BaseSystem Verification */
+		verbose("Kext Signing: %s\n", ((csrValue & 0x001) == 0) ? "enabled":"disabled");           /* (1 << 0) Allow untrusted kexts */
+		verbose("Filesystem Protections: %s\n", ((csrValue & 0x002) == 0) ? "enabled":"disabled"); /* (1 << 1) Allow unrestricted file system. */
+		verbose("Task for PID: %s\n", ((csrValue & 0x004) == 0) ? "enabled":"disabled");           /* (1 << 2) */
+		verbose("Debugging Restrictions: %s\n", ((csrValue & 0x008) == 0) ? "enabled":"disabled"); /* (1 << 3) */
+		verbose("Apple Internal: %s\n", ((csrValue & 0x010) == 0) ? "enabled":"disabled");         /* (1 << 4) */
+		verbose("DTrace Restrictions: %s\n", ((csrValue & 0x020) == 0) ? "enabled":"disabled");    /* (1 << 5) Allow unrestricted dtrace */
+		verbose("NVRAM Protections: %s\n", ((csrValue & 0x040) == 0) ? "enabled":"disabled");      /* (1 << 6) Allow unrestricted NVRAM */
+		verbose("Device configuration: %s\n", ((csrValue & 0x080) == 0) ? "enabled":"disabled");   /* (1 << 7) Allow device configuration */
+		verbose("BaseSystem Verification: %s\n", ((csrValue & 0x100) == 0) ? "enabled":"disabled");   /* (1 << 8) Allow any Recovery OS */
 	}
 	verbose("\n");
 }

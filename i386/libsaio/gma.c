@@ -29,7 +29,7 @@
 	http://forum.voodooprojects.org/index.php/topic,1029.0.html
 
 	Original Intel HDx000 code from valv
-	Intel Ivy Bridge, Haswell and Broadwell code from ErmaC:
+	Intel Ivy Bridge, Haswell, Broadwell and Skylake code from ErmaC:
 	- http://www.insanelymac.com/forum/topic/288241-intel-hd4000-inject-aaplig-platform-id/
 */
 
