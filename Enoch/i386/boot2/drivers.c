@@ -1240,7 +1240,8 @@ static long ParseXML( char *buffer, ModulePtr *module, TagPtr *personalities, bo
 	required = XMLGetProperty(moduleDict, kPropOSBundleRequired);
 
 	// if forceKextToLoad is true, the kext will be force to load even if OSBundleRequired has value set to "Safe Boot" instead of "Root"
-	if (!forceKextToLoad) {
+	if (!forceKextToLoad)
+	{
 		if ( (required == 0) || (required->type != kTagTypeString) || !strncmp(required->string, "Safe Boot", sizeof("Safe Boot")))
 		{
 			XMLFreeTag(moduleDict);

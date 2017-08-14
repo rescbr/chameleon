@@ -1401,7 +1401,10 @@ int processBootOptions()
 
 		loadConfigFile(caBp, &ocBplist);
 		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
-		addBootArg(rval);
+
+		if (rval) {
+			addBootArg(rval);
+		}
 	}
 
 	// Micky1979 (Vanilla Installer)
@@ -1416,7 +1419,10 @@ int processBootOptions()
 
 		loadConfigFile(caBp, &ocBplist);
 		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
-		addBootArg(rval);
+
+		if (rval) {
+			addBootArg(rval);
+		}
 	}
 
 	// Micky1979 (old Vanilla upgrade)
@@ -1430,21 +1436,41 @@ int processBootOptions()
 
 		loadConfigFile(caBp, &ocBplist);
 		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
-		addBootArg(rval);
+
+		if (rval) {
+			addBootArg(rval);
+		}
 	}
 
 	// Micky1979 (new Vanilla upgrade)
-	if (gBootVolume->OSisMacOSXUpgrade)
+	if (gBootVolume->OSisOSXUpgrade)
 	{
 		const char	*rval = 0;
 		config_file_t ocBplist;
 		char  caBp[2048];
+		bool found = false;
+		snprintf(caBp, sizeof(caBp), "/macOS Install Data/Locked Files/Boot Files/com.apple.Boot.plist");
 
-		snprintf(caBp, sizeof(caBp), "/OS X Install Data/com.apple.Boot.plist");
+		if (!loadConfigFile(caBp, &ocBplist))
+		{
+			found = true;
+		}
 
-		loadConfigFile(caBp, &ocBplist);
-		rval = getStringForKey(kKernelFlagsKey, &ocBplist);
-		addBootArg(rval);
+		if (!found) {
+			snprintf(caBp, sizeof(caBp), "/OS X Install Data/com.apple.Boot.plist");
+
+			if (!loadConfigFile(caBp, &ocBplist))
+			{
+				found = true;
+			}
+		}
+
+		if (found) {
+			rval = getStringForKey(kKernelFlagsKey, &ocBplist);
+			if (rval) {
+				addBootArg(rval);
+			}
+		}
 	}
 
 	cntRemaining = BOOT_STRING_LEN - 2;  // save 1 for NULL, 1 for space

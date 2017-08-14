@@ -489,7 +489,20 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			// for 10.10 and 10.11
 			if (isOSXUpgrade)
 			{
-				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%sprelinkedkernel", "/OS X Install Data/");
+				if ( MacOSVerCurrent >= MacOSVer2Int("10.13") )
+				{
+					snprintf(kernelCacheFile, sizeof(kernelCacheFile),
+ 						"%sprelinkedkernel",
+						"/macOS Install Data/Locked Files/Boot Files/");
+				}
+				else
+				{
+					snprintf(kernelCacheFile,
+						sizeof(kernelCacheFile),
+						"%sprelinkedkernel",
+						"/OS X Install Data/");
+				}
+
 			}
 			else if (isInstaller)
 			{
@@ -557,17 +570,25 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		}
 		else if (isOSXUpgrade)
 		{
-			strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
+			strncpy(kernelCachePath,
+				"/macOS Install Data/Locked Files/Boot Files/prelinkedkernel",
+				sizeof(kernelCachePath) );
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
-				strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+				strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
-				if ((flags & kFileTypeMask) != kFileTypeFlat)
+				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					ret = -1;
+					strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
+
+					if ((flags & kFileTypeMask) != kFileTypeFlat)
+					{
+						ret = -1;
+					}
 				}
 			}
 		}

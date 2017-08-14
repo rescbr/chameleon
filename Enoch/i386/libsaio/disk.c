@@ -1712,6 +1712,7 @@ static bool getOSVersion(BVRef bvr, char *str)
 	char *ECPattern     = "Install%20OS%20X%20El%20Capitan";
 	char *SierraPattern = "Install%20macOS%20Sierra";
 	char *HSierraPattern = "Install%20macOS%20High%20Sierra";
+	char *HSierraPatternB   = "Install%20macOS%2010.13";
 
 	/*
 	 * Only look for OS Version on HFS+
@@ -1812,6 +1813,12 @@ static bool getOSVersion(BVRef bvr, char *str)
 				valid = true;
 			}
 			else if(strstr(val, HSierraPattern))
+			{
+				fakeOSVersion = "10.13";
+				fakeOSVersionInt = 13;
+				valid = true;
+			}
+			else if(strstr(val, HSierraPatternB))
 			{
 				fakeOSVersion = "10.13";
 				fakeOSVersionInt = 13;
@@ -1932,9 +1939,32 @@ static bool getOSVersion(BVRef bvr, char *str)
 			strncpy( bvr->OSBuildVer, "UPGRADE", strlen("UPGRADE") );
 			return true;
 		}
-		else
+	}
+
+	if (!valid)
+	{
+		len = 0; val = 0;
+		/*
+		 * Not valid? 10.13 and newer use "/macOS Install Data" folder..
+		 * and we have /macOS Install Data/Locked Files/Boot Files/SystemVersion.plist... thanks Apple!
+		 * NOTE: the stage 2 of this installation is already bootable (aug 13 2017)
+		 */
+		snprintf(dirSpec, sizeof(dirSpec),
+			"hd(%d,%d)/macOS Install Data/Locked Files/Boot Files/SystemVersion.plist",
+		BIOS_DEV_UNIT(bvr),
+		bvr->part_no);
+		if (!loadConfigFile(dirSpec, &configFile))
 		{
-			valid = false;
+			if  (getValueForKey(kProductVersion, &val, &len, &configFile))
+			{
+				// Copy the complete value into OSFullVer
+				strncpy( bvr->OSFullVer, val, len );
+				bvr->OSFullVer[len] = '\0';   /* null character manually added */
+
+				bvr->OSisOSXUpgrade = true;
+				strncpy( bvr->OSBuildVer, "UPGRADE", strlen("UPGRADE") );
+				return true;
+			}
 		}
 	}
 
