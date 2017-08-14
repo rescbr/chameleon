@@ -27,7 +27,8 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define CPUID_86			10
 #define CPUID_87			11
 #define CPUID_88			12
-#define CPUID_MAX			13
+#define CPUID_81E			13
+#define CPUID_MAX			14
 
 #define CPUID_MODEL_ANY			0x00
 #define CPUID_MODEL_UNKNOWN		0x01
@@ -337,15 +338,15 @@ extern void dumpPhysAddr(const char * title, void * a, int len);
 #define MSR_K7_CLK_CTL			0xC001001b
 #define MSR_K7_FID_VID_CTL		0xC0010041
 
-#define K8_FIDVID_STATUS		0xC0010042
-#define K10_COFVID_LIMIT		0xC0010061	// max enabled p-state (msr >> 4) & 7
-#define K10_COFVID_CONTROL		0xC0010062	// switch to p-state
-#define K10_PSTATE_STATUS		0xC0010064
-#define K10_COFVID_STATUS		0xC0010071	// current p-state (msr >> 16) & 7
+#define AMD_K8_PERF_STS 0xC0010042
+#define AMD_PSTATE_LIMIT 0xC0010061 // max enabled p-state (msr >> 4) & 7
+#define AMD_PSTATE_CONTROL 0xC0010062 // switch to p-state
+#define AMD_PSTATE0_STS 0xC0010064
+#define AMD_COFVID_STS 0xC0010071 // current p-state (msr >> 16) & 7
 
 #define MSR_AMD_MPERF			0x000000E7
 #define MSR_AMD_APERF			0x000000E8
-#define AMD_PSTATE0_STS			0xC0010064
+
 
 #define DEFAULT_FSB			100000          /* for now, hardcoding 100MHz for old CPUs */
 
