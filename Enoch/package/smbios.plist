@@ -75,6 +75,10 @@
 	<key>SMmempart_4</key>
 	<string>0x48594D503131325336344350362D59352020</string>
 
+	<key>SMfirmwarefeatures</key>
+	<string>0xE907F537</string>
+	<key>SMfirmwarefeaturesmask</key>
+	<string>0xFFFFFFFF</string>
 </dict>
 </plist>
 <!--
