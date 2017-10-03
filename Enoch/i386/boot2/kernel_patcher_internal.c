@@ -167,7 +167,7 @@ void patch_kernel_64(void *kernelData, u_int32_t uncompressed_size) // KernelPat
 
 		// Determine location of _cpuid_set_info _panic call for reference
 		// basically looking for info_p->cpuid_model = bitfield32(reg[eax],  7,  4);
-		for (i=0; i<0x1000000; i++)
+		for (i = 0; i < 0x1000000; i++)
 		{
 			if (bytes[i + 0]    == 0xC7
 				&& bytes[i + 1] == 0x05
@@ -808,7 +808,7 @@ bool patch_lapic_version_init_64(void *kernelData)  // KernelLapicVersionPatch_6
 // Lapic Error Panic 64
 bool patch_lapic_init_64(void *kernelData)  // KernelLapicPatch_64
 {
-	// Credits to donovan6000 and sherlocks for providing the lapic kernel patch source used to build this function
+	// Credits to donovan6000 and Sherlocks for providing the lapic kernel patch source used to build this function
 
 	UInt8       *bytes = (UInt8 *)kernelData;
 	UInt32      patchLocation = 0;
@@ -907,7 +907,7 @@ bool patch_lapic_init_64(void *kernelData)  // KernelLapicPatch_64
 			verbose("\tFound Yosemite Lapic panic at 0x%08X\n", (unsigned int)patchLocation);
 			break;
 		}
-		// sherlocks: 10.11.DB1
+		// Sherlocks: 10.11.DP1
 		else if (KernelLapicError
 			&& (bytes[i + 0]   == 0x65
 			&& bytes[i + 1]    == 0x8B
@@ -930,7 +930,7 @@ bool patch_lapic_init_64(void *kernelData)  // KernelLapicPatch_64
 			verbose("\tFound El Capitan Lapic panic at 0x%08X\n", (unsigned int)patchLocation);
 			break;
 		}
-		// sherlocks: 10.12.DP1
+		// Sherlocks: 10.12.DP1
 		else if (KernelLapicError
 			&& (bytes[i+0]   == 0x65
 			&& bytes[i+1]    == 0x8B
@@ -2126,12 +2126,12 @@ void patch_prelinked_kexts(void *kernelData,
     UInt32 prelinkDictStartLocation = 0;
     UInt32 prelinkDictEndLocation = 0;
     
-    
+
     if (bootInfo->kextConfig.dictionary)
     {
-        KextsPatches = XMLGetProperty(bootInfo->kextConfig.dictionary, (const char*)"KextsPatches");
+	KextsPatches = XMLGetProperty(bootInfo->kextConfig.dictionary, (const char*)"KextsPatches");
     }
-    
+
     verbose("[ KEXTS PATCHER START ]\n");
     //int lessBytes = (int)((uncompressed_size/3)*2); // speedup, the _PrelinkInfoDictionary should not be 1/3 of entire cache!
     for (Index = 0/*lessBytes*/; Index < uncompressed_size; ++Index)
@@ -2184,7 +2184,7 @@ void patch_prelinked_kexts(void *kernelData,
             break;
         }
     }
-  
+
     if (prelinkDictStartLocation)
     {
         for (Index = prelinkDictStartLocation; Index < uncompressed_size; ++Index)
@@ -2206,7 +2206,7 @@ void patch_prelinked_kexts(void *kernelData,
                 && Bytes[Index + 13] == 0x00)
             {
                 Count++;
-                
+
                 if ((Count = 2))
                 {
                     canPatchKexts = true;
@@ -2225,7 +2225,7 @@ void patch_prelinked_kexts(void *kernelData,
         memcpy(prelinkDic, Bytes+prelinkDictStartLocation, prelinkDictSize);
         TagPtr prelinkInfoPtr = NULL;
         XMLParseFile( (char *)prelinkDic, &prelinkInfoPtr );
-        
+
         if (prelinkInfoPtr)
         {
             TagPtr prelinkInfoDictionary = XMLGetProperty(prelinkInfoPtr, "_PrelinkInfoDictionary");
@@ -2241,30 +2241,30 @@ void patch_prelinked_kexts(void *kernelData,
                 if (sub && XMLIsDict(sub))
                 {
                     char* execPath = XMLCastString(XMLGetProperty(sub, (const char*)"CFBundleExecutable"));
-                    
+
                     if (execPath != NULL)
                     {
                         UInt32 kextSize = XMLCastInteger(XMLGetProperty(sub, (const char*)"_PrelinkExecutableSize"));
                         UInt32 kextAddr = XMLCastInteger(XMLGetProperty(sub, (const char*)"_PrelinkExecutableSourceAddr"));
-                        
+
 
                         if (kextAddr && kextSize)
                         {
                             // adjust binary address location
                             kextAddr -= prelinkTextVmaddr;
                             kextAddr += prelinkTextFileOff;
-                            
+
                             DBG("\t[%d] found exec:%s (size = %u, kextAddr = 0x%X [vmaddr = 0x%X fileoff = 0x%X])\n", count, execPath,
                                 (unsigned int)kextSize, (unsigned int)kextAddr, (unsigned int)prelinkTextVmaddr, (unsigned int)prelinkTextFileOff);
-                            
+
                             if (!strcmp(execPath, "FakeSMC"))
                             {
                                 FakeSMCLoaded = true;
                             }
-                            
+
 				// chameleon patches
 				patchBooterDefinedKext(execPath, kernelData, kextSize, kextAddr);
-                            
+
                             // user's defined
                             if (KextsPatches && XMLIsDict(KextsPatches))
                             {
@@ -2274,14 +2274,14 @@ void patch_prelinked_kexts(void *kernelData,
                                                            execPath,
                                                            KextsPatches);
                             }
-                            
+
 #if DEBUG_KERNEL
                             getchar();
 #endif
                         }
                     }
                 }
-                
+
                 count --;
             }
         }

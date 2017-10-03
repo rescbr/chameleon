@@ -41,39 +41,39 @@
 
 	<key>SMchassisassettag</key>
 	<string>Pro-Enclosure</string>
-        <key>SMexternalclock</key>
-        <string>133</string>
-        <key>SMmaximalclock</key>
-        <string>3000</string>
+	<key>SMexternalclock</key>
+	<string>133</string>
+	<key>SMmaximalclock</key>
+	<string>3000</string>
 
-        <key>SMmemtype</key>
-        <string>24</string>
-        <key>SMmemspeed</key>
-        <string>1600</string>
-        <key>SMmemmanufacturer_1</key>
-        <string>0xAD00000000000000</string>
-        <key>SMmemserial_1</key>
-        <string>0x00001020</string>
-        <key>SMmempart_1</key>
-        <string>0x48594D503131325336344350362D59352020</string>
-        <key>SMmemmanufacturer_2</key>
-        <string>0xAD00000000000000</string>
-        <key>SMmemserial_2</key>
-        <string>0x00003021</string>
-        <key>SMmempart_2</key>
-        <string>0x48594D503131325336344350362D59352020</string>
-        <key>SMmemmanufacturer_3</key>
-        <string>0xAD00000000000000</string>
-        <key>SMmemserial_3</key>
-        <string>0x00003021</string>
-        <key>SMmempart_3</key>
-        <string>0x48594D503131325336344350362D59352020</string>
-        <key>SMmemmanufacturer_4</key>
-        <string>0xAD00000000000000</string>
-        <key>SMmemserial_4</key>
-        <string>0x00003021</string>
-        <key>SMmempart_4</key>
-        <string>0x48594D503131325336344350362D59352020</string>
+	<key>SMmemtype</key>
+	<string>24</string>
+	<key>SMmemspeed</key>
+	<string>1600</string>
+	<key>SMmemmanufacturer_1</key>
+	<string>0xAD00000000000000</string>
+	<key>SMmemserial_1</key>
+	<string>0x00001020</string>
+	<key>SMmempart_1</key>
+	<string>0x48594D503131325336344350362D59352020</string>
+	<key>SMmemmanufacturer_2</key>
+	<string>0xAD00000000000000</string>
+	<key>SMmemserial_2</key>
+	<string>0x00003021</string>
+	<key>SMmempart_2</key>
+	<string>0x48594D503131325336344350362D59352020</string>
+	<key>SMmemmanufacturer_3</key>
+	<string>0xAD00000000000000</string>
+	<key>SMmemserial_3</key>
+	<string>0x00003021</string>
+	<key>SMmempart_3</key>
+	<string>0x48594D503131325336344350362D59352020</string>
+	<key>SMmemmanufacturer_4</key>
+	<string>0xAD00000000000000</string>
+	<key>SMmemserial_4</key>
+	<string>0x00003021</string>
+	<key>SMmempart_4</key>
+	<string>0x48594D503131325336344350362D59352020</string>
 
 </dict>
 </plist>
