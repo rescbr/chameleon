@@ -23,8 +23,10 @@
 #ifndef __LIBSAIO_SMBIOS_H
 #define __LIBSAIO_SMBIOS_H
 
-/* Based on System Management BIOS Reference Specification v2.4 */
-// http://dmtf.org/standards/smbios
+//
+// Based on System Management BIOS Reference Specification v3.1.1
+// https://www.dmtf.org/standards/smbios
+//
 
 typedef uint8_t  SMBString;
 typedef uint8_t  SMBByte;
@@ -32,6 +34,11 @@ typedef uint16_t SMBWord;
 typedef uint32_t SMBDWord;
 typedef uint64_t SMBQWord;
 
+
+
+//
+// SMBIOS 2.1 (32-bit) Entry Point
+//
 typedef struct DMIEntryPoint
 {
     SMBByte    anchor[5];
@@ -55,13 +62,17 @@ typedef struct SMBEntryPoint
     DMIEntryPoint dmi;
 } __attribute__((packed)) SMBEntryPoint;
 
-/* Header common to all SMBIOS structures */
+
+
+//
+// Structure header format
+// Each SMBIOS structure begins with a four-byte header
+//
 typedef struct SMBStructHeader
 {
 	SMBByte	type;
 	SMBByte	length;
 	SMBWord	handle;
-//	SMBByte	*data;
 } __attribute__((packed)) SMBStructHeader;
 
 #define SMB_STRUCT_HEADER  SMBStructHeader header;
@@ -79,28 +90,44 @@ typedef struct SMBAnchor
 #define SMB_ANCHOR_RESET(x)		\
 	bzero(x, sizeof(typedef struct SMBAnchor));
 
-/* ======================= SMBIOS structure types. ======================= */
+
+
+//
+// SMBIOS structure types.
+// The following structures are requiered:
+//   - BIOS Information (Type 0)
+//   - System Information (Type 1)
+//   - System Enclosure (Type 3)
+//   - Processor Information (Type 4)
+//   - Cache Information (Type 7)
+//   - System Slots (Type 9)
+//   - Physical Memory Array (Type 16)
+//   - Memory Device (Type 17)
+//   - Memory Array Mapped Address (Type 19)
+//   - System Boot Information (Type 32)
+//
+
 enum
 {
-	kSMBTypeBIOSInformation			=  0, // BIOS information (Type 0)
-	kSMBTypeSystemInformation		=  1, // System Information (Type 1)
-	kSMBTypeBaseBoard			=  2, // BaseBoard Information (Type 2)
-	kSMBTypeSystemEnclosure			=  3, // System Chassis Information (Type 3)
-	kSMBTypeProcessorInformation		=  4, // Processor Information (Type 4)
+	kSMBTypeBIOSInformation         =  0, // BIOS information (Type 0)
+	kSMBTypeSystemInformation       =  1, // System Information (Type 1)
+	kSMBTypeBaseBoard               =  2, // BaseBoard Information (Type 2)
+	kSMBTypeSystemEnclosure         =  3, // System Chassis Information (Type 3)
+	kSMBTypeProcessorInformation    =  4, // Processor Information (Type 4)
 	// Memory Controller Information (Type 5) Obsolete
-	kSMBTypeMemoryModule			=  6, // Memory Module Information (Type 6) Obsolete
-	kSMBTypeCacheInformation		=  7, // Cache Information (Type 7)
+	// Memory Module Information (Type 6) Obsolete
+	kSMBTypeCacheInformation        =  7, // Cache Information (Type 7)
 	// Port Connector Information (Type 8)
-	kSMBTypeSystemSlot			=  9, // System Slots (Type 9)
+	kSMBTypeSystemSlot              =  9, // System Slots (Type 9)
 	// On Board Devices Information (Type 10) Obsolete
-	kSMBOEMStrings			=  11 ,// OEM Strings (Type 11)
+	kSMBOEMStrings                  =  11,// OEM Strings (Type 11)
 	// System Configuration Options (Type 12)
 	// BIOS Language Information (Type 13)
 	// Group Associations (Type 14)
 	// System Event Log (Type 15)
-	kSMBTypePhysicalMemoryArray		=  16, // Physical Memory Array (Type 16)
-	kSMBTypeMemoryDevice			=  17, // Memory Device (Type 17)
-	kSMBType32BitMemoryErrorInfo		=  18, // 32-Bit Memory Error Information (Type 18)
+	kSMBTypePhysicalMemoryArray     =  16, // Physical Memory Array (Type 16)
+	kSMBTypeMemoryDevice            =  17, // Memory Device (Type 17)
+	kSMBType32BitMemoryErrorInfo    =  18, // 32-Bit Memory Error Information (Type 18)
 	// Memory Array Mapped Address (Type 19)
 	// Memory Device Mapped Address (Type 20)
 	// Built-in Pointing Device (Type 21)
@@ -115,7 +142,7 @@ enum
 	// Out-of-Band Remote Access (Type 30)
 	// Boot Integrity Service (BIS) Entry Point (Type 31)
 	// System Boot Information (Type 32)
-	kSMBType64BitMemoryErrorInfo		=  33, // 64-Bit Memory Error Information (Type 33)
+	kSMBType64BitMemoryErrorInfo    =  33, // 64-Bit Memory Error Information (Type 33)
 	// Managment Device (Type 34)
 	// Managment Device Component (Type 35)
 	// Management Device Threshold Data (Type 36)
@@ -127,29 +154,34 @@ enum
 	// Management Controlle Host Interface (Type 42)
 
 	// Inactive (Type 126)
-	kSMBTypeEndOfTable			=  127, // End-of-Table (Type 127)
+	kSMBTypeEndOfTable              =  127, // End-of-Table (Type 127)
 
 	// Apple Specific Structures
-	kSMBTypeFirmwareVolume			=  128, // FirmwareVolume (TYPE 128)
-	kSMBTypeMemorySPD			=  130, // MemorySPD (TYPE 130)
-	kSMBTypeOemProcessorType		=  131, // Processor Type (Type 131)
-	kSMBTypeOemProcessorBusSpeed		=  132, // Processor Bus Speed (Type 132)
-	kSMBTypeOemPlatformFeature		=  133, // Platform Feature (Type 133)
-	kSMBTypeOemSMCVersion			=  134  // SMC Version (Type 134)
+	kSMBTypeFirmwareVolume          =  128, // FirmwareVolume (TYPE 128)
+	kSMBTypeMemorySPD               =  130, // MemorySPD (TYPE 130)
+	kSMBTypeOemProcessorType        =  131, // Processor Type (Type 131)
+	kSMBTypeOemProcessorBusSpeed    =  132, // Processor Bus Speed (Type 132)
+	kSMBTypeOemPlatformFeature      =  133, // Platform Feature (Type 133)
+	kSMBTypeOemSMCVersion           =  134  // SMC Version (Type 134)
 };
+
+
 
 //----------------------------------------------------------------------------------------------------------
 // Struct - BIOS Information (Type 0), Apple uses 24 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBBIOSInformation
 {
-    SMB_STRUCT_HEADER
+    SMB_STRUCT_HEADER               // Type 0
     SMBString  vendor;              // BIOS vendor name
     SMBString  version;             // BIOS version
     SMBWord    startSegment;        // BIOS segment start
-    SMBString  releaseDate;         // BIOS release date
+    SMBString  releaseDate;         // BIOS release date (mm/dd/yy or mm/dd/yyyy)
     SMBByte    romSize;             // BIOS ROM Size (n); 64K * (n+1) bytes
     SMBQWord   characteristics;     // supported BIOS functions
-    // Bungo
+    
+    // Bungo - 2.4+ spec (6 bytes)
     SMBByte    characteristicsExt1; // BIOS characteristics extension byte 1
     SMBByte    characteristicsExt2; // BIOS characteristics extension byte 2
     SMBByte    releaseMajor;        // BIOS release (major)
@@ -158,12 +190,18 @@ typedef struct SMBBIOSInformation
     SMBByte    ECreleaseMinor;      // Embedded Controller firmware release (minor)
 } __attribute__((packed)) SMBBIOSInformation;
 
+// TODO: Add constants for BIOS characteristics bits (Section 7.1.1, table 7)
+// TODO: Add constants for BIOS characteristics extenstion bytes (Section 7.1.2, table 8+9)
+
+
 //----------------------------------------------------------------------------------------------------------
 // Struct - System Information (Type 1), Apple uses 27 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBSystemInformation
 {
     // 2.0+ spec (8 bytes)
-    SMB_STRUCT_HEADER
+    SMB_STRUCT_HEADER               // Type 1
     SMBString  manufacturer;
     SMBString  productName;
     SMBString  version;
@@ -176,14 +214,38 @@ typedef struct SMBSystemInformation
     SMBString  family;
 } __attribute__((packed)) SMBSystemInformation;
 
+// TODO: Add enum for wake-up type field (Section 7.2.2, table 12)
+
+
 //----------------------------------------------------------------------------------------------------------
-// Base Board (or Module) Information (Type 2)
+// Base Board (or Module) Information (Type 2), Apple uses 16 bytes length
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBBaseBoard
+{
+    SMB_STRUCT_HEADER                     // Type 2
+    SMBString	manufacturer;
+    SMBString	product;
+    SMBString	version;
+    SMBString	serialNumber;
+    SMBString	assetTag;                 // Bungo: renamed from assetTagNumber folowing convention
+    SMBByte     featureFlags;             // Collection of flag that identify features of this baseboard
+    SMBString	locationInChassis;
+    SMBWord     chassisHandle;
+    SMBByte     boardType;			      // Type of board, numeration value from BASE_BOARD_TYPE.
+    SMBByte     numberOfContainedHandles;
+    // 0 - 255 contained handles go here but we do not include
+    // them in our structure. Be careful to use numberOfContainedHandles
+    // times sizeof(SMBWord) when computing the actual record size,
+    // if you need it.
+    SMBByte     containedObjectHandles;
+} __attribute__((packed)) SMBBaseBoard;
 
 // Base Board - Board Type.
 // Values for SMBBaseBoard.boardType
 typedef enum
 {
-    kSMBBaseBoardUnknown               = 0x01,	// Unknow
+    kSMBBaseBoardUnknown               = 0x01,	// Unknown
     kSMBBaseBoardOther                 = 0x02,	// Other
     kSMBBaseBoardServerBlade           = 0x03,	// Server Blade
     kSMBBaseBoardConnectivitySwitch    = 0x04,	// Connectivity Switch
@@ -191,428 +253,412 @@ typedef enum
     kSMBBaseBoardProcessorModule       = 0x06,	// Processor Module
     kSMBBaseBoardIOModule              = 0x07,	// I/O Module
     kSMBBaseBoardMemoryModule          = 0x08,	// Memory Module
-    kSMBBaseBoardDaughter              = 0x09,	// Daughter Board
+    kSMBBaseBoardDaughter              = 0x09,	// Daughter board
     kSMBBaseBoardMotherboard           = 0x0A,	// Motherboard (includes processor, memory, and I/O)
     kSMBBaseBoardProcessorMemoryModule = 0x0B,	// Processor/Memory Module
     kSMBBaseBoardProcessorIOModule     = 0x0C,	// Processor/IO Module
     kSMBBaseBoardInterconnect          = 0x0D	// Interconnect board
 } BASE_BOARD_TYPE;
 
-// Struct - Base Board (or Module) Information (Type 2), Apple uses 16 bytes length
-typedef struct SMBBaseBoard
-{
-	SMB_STRUCT_HEADER               // Type 2
-	SMBString	manufacturer;
-	SMBString	product;
-	SMBString	version;
-	SMBString	serialNumber;
-	SMBString	assetTag;			// Bungo: renamed from assetTagNumber folowing convention
-	SMBByte     featureFlags;			// Collection of flag that identify features of this baseboard
-	SMBString	locationInChassis;
-	SMBWord     chassisHandle;
-	SMBByte     boardType;				// Type of board, numeration value from BASE_BOARD_TYPE.
-	SMBByte     numberOfContainedHandles;
-	// 0 - 255 contained handles go here but we do not include
-	// them in our structure. Be careful to use numberOfContainedHandles
-	// times sizeof(SMBWord) when computing the actual record size,
-	// if you need it.
-	SMBByte     containedObjectHandles;
-} __attribute__((packed)) SMBBaseBoard;
+// TODO: Add constants to identify the baseboard feature flags
+
 
 //----------------------------------------------------------------------------------------------------------
-// System Enclosure (Type 3)
+// System Enclosure or Chassis (Type 3), Apple uses 21 bytes length
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBSystemEnclosure
+{
+	SMB_STRUCT_HEADER                   // Type 3
+	SMBString  manufacturer;
+	SMBByte    chassisType;             // System Enclosure Indicator
+	SMBString  version;                 // Board Number?
+	SMBString  serialNumber;
+	SMBString  assetTag;                // Bungo: renamed from assetTagNumber folowing convention
+	SMBByte    bootupState;             // State of enclosure when when it was last booted
+	SMBByte    powerSupplyState;        // State of enclosure's power supply when last booted
+	SMBByte    thermalState;            // Thermal state of the enclosure when last booted
+	SMBByte    securityStatus;          // Physical security status of the enclosure when last booted
+	SMBDWord   oemDefined;              // OEM- or BIOS vendor-specific information
+	SMBByte    height;                  // Height of the enclosure, in 'U's
+	SMBByte    numberOfPowerCords;      // Number of power cords associated with the enclosure or chassis
+	SMBByte    containedElementCount;   // Number of Contained Element record that follow, in the range 0 to 255
+	SMBByte    containedElementRecord;  // Byte leght of each Contained Element record that follow, in the range 0 to 255
+    //	SMBByte    containedElements;   // Elements, possibly defined by other SMBIOS structures present in chassis
+    // 2.7+
+    //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number
+} __attribute__((packed)) SMBSystemEnclosure;
+
 
 // Bungo: values for SMBSystemEnclosure.chassisType
+// MinusZwei: renamed enum values and added new values from later specs
 typedef enum {
-    kSMBchassisOther                    = 0x01,
-    kSMBchassisUnknown                  = 0x02,
-    kSMBchassisDesktop                  = 0x03,
-    kSMBchassisLPDesktop                = 0x04,
-    kSMBchassisPizzaBox                 = 0x05,
-    kSMBchassisMiniTower                = 0x06,
-    kSMBchassisTower                    = 0x07,
-    kSMBchassisPortable                 = 0x08,
-    kSMBchassisLaptop                   = 0x09,
-    kSMBchassisNotebook                 = 0x0A,
-    kSMBchassisHandHeld                 = 0x0B,
-    kSMBchassisDockingStation           = 0x0C,
-    kSMBchassisAllInOne                 = 0x0D,
-    kSMBchassisSubNotebook              = 0x0E,
-    // ... fill up if needed ;-)
-    kSMBchassisLunchBox                 = 0x10,
-    kSMBchassisMainServer               = 0x11,
-    // ... fill up if needed ;-)
-    kSMBchassisBlade                    = 0x1C,
-    kSMBchassisBladeEnclosing           = 0x1D
-} MISC_CHASSIS_TYPE;
+    kSMBChassisTypeOther             = 0x01,  // Other
+    kSMBChassisTypeUnknown           = 0x02,  // Unknown
+    kSMBChassisTypeDesktop           = 0x03,  // Desktop
+    kSMBChassisTypeLowProfileDesktop = 0x04,  // Low Profile Desktop
+    kSMBChassisTypePizzaBox          = 0x05,  // Pizza Box
+    kSMBChassisTypeMiniTower         = 0x06,  // Mini Tower
+    kSMBChassisTypeTower             = 0x07,  // Tower
+    kSMBChassisTypePortable          = 0x08,  // Portable
+    kSMBChassisTypeLaptop            = 0x09,  // Laptop
+    kSMBChassisTypeNotebook          = 0x0A,  // Notebook
+    kSMBChassisTypeHandHeld          = 0x0B,  // Hand Held
+    kSMBChassisTypeDockingStation    = 0x0C,  // Docking Station
+    kSMBChassisTypeAllInOne          = 0x0D,  // All in One
+    kSMBChassisTypeSubNotebook       = 0x0E,  // Sub Notebook
+    kSMBChassisTypeSpaceSaving       = 0x0F,  // Space-saving
+    kSMBChassisTypeLunchBox          = 0x10,  // Lunch Box
+    kSMBChassisTypeMainServer        = 0x11,  // Main Server Chassis
+    kSMBChassisTypeExpansion         = 0x12,  // Expansion Chassis
+    kSMBChassisTypeSubChassis        = 0x13,  // SubChassis
+    kSMBChassisTypeBusExpansion      = 0x14,  // Bus Expansion Chassis
+    kSMBChassisTypePeripheral        = 0x15,  // Peripheral Chassis
+    kSMBChassisTypeRAID              = 0x16,  // RAID Chassis
+    kSMBChassisTypeRackMount         = 0x17,  // Rack Mount Chassis
+    kSMBChassisTypeSealedCase        = 0x18,  // Sealed-case PC
+    kSMBChassisTypeMultiSystem       = 0x19,  // Multi-system chassis
+    kSMBChassisTypeCompactPCI        = 0x1A,  // Compact PCI
+    kSMBChassisTypeAdvancedTCA       = 0x1B,  // Advanced TCA
+    kSMBChassisTypeBlade             = 0x1C,  // Blade
+    kSMBChassisTypeBladeEnclosing    = 0x1D,  // Blade Enclosure
+    kSMBChassisTypeTablet            = 0x1E,  // Tablet
+    kSMBChassisTypeConvertible       = 0x1F,  // Convertible
+    kSMBChassisTypeDetachable        = 0x20,  // Detachable
+    kSMBChassisTypeIoTGateway        = 0x21,  // IoT Gateway
+    kSMBChassisTypeEmbeddedPC        = 0x22,  // Embedded PC
+    kSMBChassisTypeMiniPC            = 0x23,  // Mini PC
+    kSMBChassisTypeStickPC           = 0x24   // Stick PC
+} SYSTEM_ENCLOSURE_CHASSIS_TYPE;
 
 // System Enclosure or Chassis States.
 // values for SMBSystemEnclosure.bootupState
 // values for SMBSystemEnclosure.powerSupplyState
 // values for SMBSystemEnclosure.thermalState
 typedef enum {
-    kSMBChassisStateOther           = 0x01,
-    kSMBChassisStateUnknown         = 0x02,
-    kSMBChassisStateSafe            = 0x03,
-    kSMBChassisStateWarning         = 0x04,
-    kSMBChassisStateCritical        = 0x05,
-    kSMBChassisStateNonRecoverable  = 0x06
-} MISC_CHASSIS_STATE;
+    kSMBChassisStateOther           = 0x01,  // Other
+    kSMBChassisStateUnknown         = 0x02,  // Unknown
+    kSMBChassisStateSafe            = 0x03,  // Safe
+    kSMBChassisStateWarning         = 0x04,  // Warning
+    kSMBChassisStateCritical        = 0x05,  // Critical
+    kSMBChassisStateNonRecoverable  = 0x06   // Non-recoverable
+} SYSTEM_ENCLOSURE_CHASSIS_STATE;
 
 // System Enclosure or Chassis Security Status.
 // values for SMBSystemEnclosure.securityStatus
 typedef enum {
-    kSMBChassisSecurityStatusOther                          = 0x01,
-    kSMBChassisSecurityStatusUnknown                        = 0x02,
-    kSMBChassisSecurityStatusNone                           = 0x03,
-    kSMBChassisSecurityStatusExternalInterfaceLockedOut     = 0x04,
-    kSMBChassisSecurityStatusExternalInterfaceLockedEnabled = 0x05
-} MISC_CHASSIS_SECURITY_STATE;
+    kSMBChassisSecurityStatusOther                          = 0x01,  // Other
+    kSMBChassisSecurityStatusUnknown                        = 0x02,  // Unknown
+    kSMBChassisSecurityStatusNone                           = 0x03,  // None
+    kSMBChassisSecurityStatusExternalInterfaceLockedOut     = 0x04,  // External interface locked out
+    kSMBChassisSecurityStatusExternalInterfaceLockedEnabled = 0x05   // External interface enabled
+} SYSTEM_ENCLOSURE_CHASSIS_SECURITY_STATE;
 
-// Struct - System Enclosure (Type 3), Apple uses 21 bytes length
-typedef struct SMBSystemEnclosure
-{
-	SMB_STRUCT_HEADER               // Type 3
-	SMBString  manufacturer;
-	SMBByte    chassisType;		// System Enclosure Indicator
-	SMBString  version;		// Board Number?
-	SMBString  serialNumber;
-	SMBString  assetTag;		// Bungo: renamed from assetTagNumber folowing convention
-	SMBByte    bootupState;		// State of enclosure when when it was last booted
-	SMBByte    powerSupplyState;	// State of enclosure's power supply when last booted
-	SMBByte    thermalState;	// Thermal state of the enclosure when last booted
-	SMBByte    securityStatus;	// Physical security status of the enclosure when last booted
-	SMBDWord   oemDefined;		// OEM- or BIOS vendor-specific information
-	SMBByte    height;		// Height of the enclosure, in 'U's
-	SMBByte    numberOfPowerCords;	// Number of power cords associated with the enclosure or chassis
-	SMBByte    containedElementCount;	// Number of Contained Element record that follow, in the range 0 to 255
-	SMBByte    containedElementRecord;	// Byte leght of each Contained Element record that follow, in the range 0 to 255
-    //	SMBByte    containedElements;	// Elements, possibly defined by other SMBIOS structures present in chassis
-    // 2.7+
-    //	SMBString  skuNumber;		// Number of null-terminated string describing the chassis or enclosure SKU number
-} __attribute__((packed)) SMBSystemEnclosure;
 
 //----------------------------------------------------------------------------------------------------------
-// Processor Information (Type 4)
+// Processor Information (Type 4), Apple uses 35 bytes length
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBProcessorInformation
+{
+    // 2.0+ spec (26 bytes)
+    SMB_STRUCT_HEADER               // Type 4
+    SMBString  socketDesignation;
+    SMBByte    processorType;       // The enumeration value from PROCESSOR_TYPE.
+    SMBByte    processorFamily;     // The enumeration value from PROCESSOR_FAMILY.
+    SMBString  manufacturer;
+    SMBQWord   processorID;         // based on CPUID
+    SMBString  processorVersion;
+    SMBByte    voltage;             // bit7 cleared indicate legacy mode
+    SMBWord    externalClock;       // external clock in MHz
+    SMBWord    maximumClock;        // max internal clock in MHz
+    SMBWord    currentClock;        // current internal clock in MHz
+    SMBByte    status;
+    SMBByte    processorUpgrade;    // The enumeration value from PROCESSOR_UPGRADE.
+    // 2.1+ spec (32 bytes)
+    SMBWord    L1CacheHandle;
+    SMBWord    L2CacheHandle;
+    SMBWord    L3CacheHandle;
+    // 2.3+ spec (35 bytes)
+    SMBString  serialNumber;
+    SMBString  assetTag;
+    SMBString  partNumber;
+    // 2.5+ spec (40 bytes)  Apple still uses 2.4 spec
+    //  SMBByte    coreCount;
+    //  SMBByte    coreEnabled;
+    //  SMBByte    threadCount;
+    //	SMBWord    processorCharacteristics;
+    // 2.6+ spec (42 bytes)
+    //	SMBWord    processorFamily2;
+} __attribute__((packed)) SMBProcessorInformation;
+
 #define kSMBProcessorInformationMinSize     26
 
 // Processor Information - Processor Type.
 // Values for SMBProcessorInformation.processorType
 typedef enum
 {
-	kSMBprocessorTypeOther          = 0x01,
-	kSMBprocessorTypeUnknown        = 0x02,
-	kSMBprocessorTypeCPU            = 0x03,
-	kSMBprocessorTypeMPU            = 0x04,
-	kSMBprocessorTypeDSP            = 0x05,
-	kSMBprocessorTypeGPU            = 0x06
-} PROCESSOR_TYPE_DATA;
+	kSMBProcessorTypeOther   = 0x01,  // Other
+	kSMBProcessorTypeUnknown = 0x02,  // Unknown
+	kSMBProcessorTypeCPU     = 0x03,  // Central Processor
+    kSMBProcessorTypeMPU     = 0x04,  // Math Processor
+	kSMBProcessorTypeDSP     = 0x05,  // DSP Processor
+	kSMBProcessorTypeGPU     = 0x06   // Video Processor
+} PROCESSOR_TYPE;
 
 // Processor Information - Processor Family.
 // Values for SMBProcessorInformation.processorFamily
 typedef enum {
-    kSMBprocessorFamilyOther                  = 0x01,
-    kSMBprocessorFamilyUnknown                = 0x02,
-    kSMBprocessorFamily8086                   = 0x03,
-    kSMBprocessorFamily80286                  = 0x04,
-    kSMBprocessorFamilyIntel386               = 0x05,
-    kSMBprocessorFamilyIntel486               = 0x06,
-    kSMBprocessorFamily8087                   = 0x07,
-    kSMBprocessorFamily80287                  = 0x08,
-    kSMBprocessorFamily80387                  = 0x09,
-    kSMBprocessorFamily80487                  = 0x0A,
-    kSMBprocessorFamilyPentium                = 0x0B,
-    kSMBprocessorFamilyPentiumPro             = 0x0C,
-    kSMBprocessorFamilyPentiumII              = 0x0D,
-    kSMBprocessorFamilyPentiumMMX             = 0x0E,
-    kSMBprocessorFamilyCeleron                = 0x0F,
-    kSMBprocessorFamilyPentiumIIXeon          = 0x10,
-    kSMBprocessorFamilyPentiumIII             = 0x11,
-    kSMBprocessorFamilyM1                     = 0x12,
-    kSMBprocessorFamilyM2                     = 0x13,
-    kSMBprocessorFamilyIntelCeleronM          = 0x14,
-    kSMBprocessorFamilyIntelPentium4Ht        = 0x15,
-    kSMBprocessorFamilyM1Reserved4            = 0x16,
-    kSMBprocessorFamilyM1Reserved5            = 0x17,
-    kSMBprocessorFamilyAmdDuron               = 0x18,
-    kSMBprocessorFamilyK5                     = 0x19,
-    kSMBprocessorFamilyK6                     = 0x1A,
-    kSMBprocessorFamilyK6_2                   = 0x1B,
-    kSMBprocessorFamilyK6_3                   = 0x1C,
-    kSMBprocessorFamilyAmdAthlon              = 0x1D,
-    kSMBprocessorFamilyAmd29000               = 0x1E,
-    kSMBprocessorFamilyK6_2Plus               = 0x1F,
-    kSMBprocessorFamilyPowerPC                = 0x20,
-    kSMBprocessorFamilyPowerPC601             = 0x21,
-    kSMBprocessorFamilyPowerPC603             = 0x22,
-    kSMBprocessorFamilyPowerPC603Plus         = 0x23,
-    kSMBprocessorFamilyPowerPC604             = 0x24,
-    kSMBprocessorFamilyPowerPC620             = 0x25,
-    kSMBprocessorFamilyPowerPCx704            = 0x26,
-    kSMBprocessorFamilyPowerPC750             = 0x27,
-    kSMBprocessorFamilyIntelCoreDuo           = 0x28,
-    kSMBprocessorFamilyIntelCoreDuoMobile     = 0x29,
-    kSMBprocessorFamilyIntelCoreSoloMobile    = 0x2A,
-    kSMBprocessorFamilyIntelAtom              = 0x2B,
-    kSMBprocessorFamilyAlpha3                 = 0x30,
-    kSMBprocessorFamilyAlpha21064             = 0x31,
-    kSMBprocessorFamilyAlpha21066             = 0x32,
-    kSMBprocessorFamilyAlpha21164             = 0x33,
-    kSMBprocessorFamilyAlpha21164PC           = 0x34,
-    kSMBprocessorFamilyAlpha21164a            = 0x35,
-    kSMBprocessorFamilyAlpha21264             = 0x36,
-    kSMBprocessorFamilyAlpha21364             = 0x37,
-    kSMBprocessorFamilyAmdTurionIIUltraDualCoreMobileM    = 0x38,
-    kSMBprocessorFamilyAmdTurionIIDualCoreMobileM         = 0x39,
-    kSMBprocessorFamilyAmdAthlonIIDualCoreM   = 0x3A,
-    kSMBprocessorFamilyAmdOpteron6100Series   = 0x3B,
-    kSMBprocessorFamilyAmdOpteron4100Series   = 0x3C,
-    kSMBprocessorFamilyAmdOpteron6200Series   = 0x3D,
-    kSMBprocessorFamilyAmdOpteron4200Series   = 0x3E,
-    kSMBprocessorFamilyMips                   = 0x40,
-    kSMBprocessorFamilyMIPSR4000              = 0x41,
-    kSMBprocessorFamilyMIPSR4200              = 0x42,
-    kSMBprocessorFamilyMIPSR4400              = 0x43,
-    kSMBprocessorFamilyMIPSR4600              = 0x44,
-    kSMBprocessorFamilyMIPSR10000             = 0x45,
-    kSMBprocessorFamilyAmdCSeries             = 0x46,
-    kSMBprocessorFamilyAmdESeries             = 0x47,
-    kSMBprocessorFamilyAmdSSeries             = 0x48,
-    kSMBprocessorFamilyAmdGSeries             = 0x49,
-    kSMBprocessorFamilySparc                  = 0x50,
-    kSMBprocessorFamilySuperSparc             = 0x51,
-    kSMBprocessorFamilymicroSparcII           = 0x52,
-    kSMBprocessorFamilymicroSparcIIep         = 0x53,
-    kSMBprocessorFamilyUltraSparc             = 0x54,
-    kSMBprocessorFamilyUltraSparcII           = 0x55,
-    kSMBprocessorFamilyUltraSparcIIi          = 0x56,
-    kSMBprocessorFamilyUltraSparcIII          = 0x57,
-    kSMBprocessorFamilyUltraSparcIIIi         = 0x58,
-    kSMBprocessorFamily68040                  = 0x60,
-    kSMBprocessorFamily68xxx                  = 0x61,
-    kSMBprocessorFamily68000                  = 0x62,
-    kSMBprocessorFamily68010                  = 0x63,
-    kSMBprocessorFamily68020                  = 0x64,
-    kSMBprocessorFamily68030                  = 0x65,
-    kSMBprocessorFamilyHobbit                 = 0x70,
-    kSMBprocessorFamilyCrusoeTM5000           = 0x78,
-    kSMBprocessorFamilyCrusoeTM3000           = 0x79,
-    kSMBprocessorFamilyEfficeonTM8000         = 0x7A,
-    kSMBprocessorFamilyWeitek                 = 0x80,
-    kSMBprocessorFamilyItanium                = 0x82,
-    kSMBprocessorFamilyAmdAthlon64            = 0x83,
-    kSMBprocessorFamilyAmdOpteron             = 0x84,
-    kSMBprocessorFamilyAmdSempron             = 0x85,
-    kSMBprocessorFamilyAmdTurion64Mobile      = 0x86,
-    kSMBprocessorFamilyDualCoreAmdOpteron     = 0x87,
-    kSMBprocessorFamilyAmdAthlon64X2DualCore  = 0x88,
-    kSMBprocessorFamilyAmdTurion64X2Mobile    = 0x89,
-    kSMBprocessorFamilyQuadCoreAmdOpteron     = 0x8A,
-    kSMBprocessorFamilyThirdGenerationAmdOpteron = 0x8B,
-    kSMBprocessorFamilyAmdPhenomFxQuadCore    = 0x8C,
-    kSMBprocessorFamilyAmdPhenomX4QuadCore    = 0x8D,
-    kSMBprocessorFamilyAmdPhenomX2DualCore    = 0x8E,
-    kSMBprocessorFamilyAmdAthlonX2DualCore    = 0x8F,
-    kSMBprocessorFamilyPARISC                 = 0x90,
-    kSMBprocessorFamilyPaRisc8500             = 0x91,
-    kSMBprocessorFamilyPaRisc8000             = 0x92,
-    kSMBprocessorFamilyPaRisc7300LC           = 0x93,
-    kSMBprocessorFamilyPaRisc7200             = 0x94,
-    kSMBprocessorFamilyPaRisc7100LC           = 0x95,
-    kSMBprocessorFamilyPaRisc7100             = 0x96,
-    kSMBprocessorFamilyV30                    = 0xA0,
-    kSMBprocessorFamilyQuadCoreIntelXeon3200Series  = 0xA1,
-    kSMBprocessorFamilyDualCoreIntelXeon3000Series  = 0xA2,
-    kSMBprocessorFamilyQuadCoreIntelXeon5300Series  = 0xA3,
-    kSMBprocessorFamilyDualCoreIntelXeon5100Series  = 0xA4,
-    kSMBprocessorFamilyDualCoreIntelXeon5000Series  = 0xA5,
-    kSMBprocessorFamilyDualCoreIntelXeonLV          = 0xA6,
-    kSMBprocessorFamilyDualCoreIntelXeonULV         = 0xA7,
-    kSMBprocessorFamilyDualCoreIntelXeon7100Series  = 0xA8,
-    kSMBprocessorFamilyQuadCoreIntelXeon5400Series  = 0xA9,
-    kSMBprocessorFamilyQuadCoreIntelXeon            = 0xAA,
-    kSMBprocessorFamilyDualCoreIntelXeon5200Series  = 0xAB,
-    kSMBprocessorFamilyDualCoreIntelXeon7200Series  = 0xAC,
-    kSMBprocessorFamilyQuadCoreIntelXeon7300Series  = 0xAD,
-    kSMBprocessorFamilyQuadCoreIntelXeon7400Series  = 0xAE,
-    kSMBprocessorFamilyMultiCoreIntelXeon7400Series = 0xAF,
-    kSMBprocessorFamilyPentiumIIIXeon         = 0xB0,
-    kSMBprocessorFamilyPentiumIIISpeedStep    = 0xB1,
-    kSMBprocessorFamilyPentium4               = 0xB2,
-    kSMBprocessorFamilyIntelXeon              = 0xB3,
-    kSMBprocessorFamilyAS400                  = 0xB4,
-    kSMBprocessorFamilyIntelXeonMP            = 0xB5,
-    kSMBprocessorFamilyAMDAthlonXP            = 0xB6,
-    kSMBprocessorFamilyAMDAthlonMP            = 0xB7,
-    kSMBprocessorFamilyIntelItanium2          = 0xB8,
-    kSMBprocessorFamilyIntelPentiumM          = 0xB9,
-    kSMBprocessorFamilyIntelCeleronD          = 0xBA,
-    kSMBprocessorFamilyIntelPentiumD          = 0xBB,
-    kSMBprocessorFamilyIntelPentiumEx         = 0xBC,
-    kSMBprocessorFamilyIntelCoreSolo          = 0xBD,  ///< SMBIOS spec 2.6 correct this value
-    kSMBprocessorFamilyReserved               = 0xBE,
-    kSMBprocessorFamilyIntelCore2             = 0xBF,
-    kSMBprocessorFamilyIntelCore2Solo         = 0xC0,
-    kSMBprocessorFamilyIntelCore2Extreme      = 0xC1,
-    kSMBprocessorFamilyIntelCore2Quad         = 0xC2,
-    kSMBprocessorFamilyIntelCore2ExtremeMobile = 0xC3,
-    kSMBprocessorFamilyIntelCore2DuoMobile    = 0xC4,
-    kSMBprocessorFamilyIntelCore2SoloMobile   = 0xC5,
-    kSMBprocessorFamilyIntelCoreI7            = 0xC6,
-    kSMBprocessorFamilyDualCoreIntelCeleron   = 0xC7,
-    kSMBprocessorFamilyIBM390                 = 0xC8,
-    kSMBprocessorFamilyG4                     = 0xC9,
-    kSMBprocessorFamilyG5                     = 0xCA,
-    kSMBprocessorFamilyG6                     = 0xCB,
-    kSMBprocessorFamilyzArchitectur           = 0xCC,
-    kSMBprocessorFamilyIntelCoreI5            = 0xCD,
-    kSMBprocessorFamilyIntelCoreI3            = 0xCE,
-    kSMBprocessorFamilyViaC7M                 = 0xD2,
-    kSMBprocessorFamilyViaC7D                 = 0xD3,
-    kSMBprocessorFamilyViaC7                  = 0xD4,
-    kSMBprocessorFamilyViaEden                = 0xD5,
-    kSMBprocessorFamilyMultiCoreIntelXeon           = 0xD6,
-    kSMBprocessorFamilyDualCoreIntelXeon3Series     = 0xD7,
-    kSMBprocessorFamilyQuadCoreIntelXeon3Series     = 0xD8,
-    kSMBprocessorFamilyViaNano                      = 0xD9,
-    kSMBprocessorFamilyDualCoreIntelXeon5Series     = 0xDA,
-    kSMBprocessorFamilyQuadCoreIntelXeon5Series     = 0xDB,
-    kSMBprocessorFamilyDualCoreIntelXeon7Series     = 0xDD,
-    kSMBprocessorFamilyQuadCoreIntelXeon7Series     = 0xDE,
-    kSMBprocessorFamilyMultiCoreIntelXeon7Series    = 0xDF,
-    kSMBprocessorFamilyMultiCoreIntelXeon3400Series = 0xE0,
-    kSMBprocessorFamilyEmbeddedAmdOpteronQuadCore   = 0xE6,
-    kSMBprocessorFamilyAmdPhenomTripleCore          = 0xE7,
-    kSMBprocessorFamilyAmdTurionUltraDualCoreMobile = 0xE8,
-    kSMBprocessorFamilyAmdTurionDualCoreMobile      = 0xE9,
-    kSMBprocessorFamilyAmdAthlonDualCore            = 0xEA,
-    kSMBprocessorFamilyAmdSempronSI                 = 0xEB,
-    kSMBprocessorFamilyAmdPhenomII                  = 0xEC,
-    kSMBprocessorFamilyAmdAthlonII                  = 0xED,
-    kSMBprocessorFamilySixCoreAmdOpteron            = 0xEE,
-    kSMBprocessorFamilyAmdSempronM                  = 0xEF,
-    kSMBprocessorFamilyi860                   = 0xFA,
-    kSMBprocessorFamilyi960                   = 0xFB,
-    kSMBprocessorFamilyIndicatorFamily2       = 0xFE,
-    kSMBprocessorFamilyReserved1              = 0xFF
-} PROCESSOR_FAMILY_DATA;
+    kSMBProcessorFamilyOther                           = 0x01,
+    kSMBProcessorFamilyUnknown                         = 0x02,
+    kSMBProcessorFamily8086                            = 0x03,
+    kSMBProcessorFamily80286                           = 0x04,
+    kSMBProcessorFamilyIntel386                        = 0x05,
+    kSMBProcessorFamilyIntel486                        = 0x06,
+    kSMBProcessorFamily8087                            = 0x07,
+    kSMBProcessorFamily80287                           = 0x08,
+    kSMBProcessorFamily80387                           = 0x09,
+    kSMBProcessorFamily80487                           = 0x0A,
+    kSMBProcessorFamilyPentium                         = 0x0B,
+    kSMBProcessorFamilyPentiumPro                      = 0x0C,
+    kSMBProcessorFamilyPentiumII                       = 0x0D,
+    kSMBProcessorFamilyPentiumMMX                      = 0x0E,
+    kSMBProcessorFamilyCeleron                         = 0x0F,
+    kSMBProcessorFamilyPentiumIIXeon                   = 0x10,
+    kSMBProcessorFamilyPentiumIII                      = 0x11,
+    kSMBProcessorFamilyM1                              = 0x12,
+    kSMBProcessorFamilyM2                              = 0x13,
+    kSMBProcessorFamilyIntelCeleronM                   = 0x14,
+    kSMBProcessorFamilyIntelPentium4Ht                 = 0x15,
+    kSMBProcessorFamilyM1Reserved4                     = 0x16,
+    kSMBProcessorFamilyM1Reserved5                     = 0x17,
+    kSMBProcessorFamilyAmdDuron                        = 0x18,
+    kSMBProcessorFamilyK5                              = 0x19,
+    kSMBProcessorFamilyK6                              = 0x1A,
+    kSMBProcessorFamilyK6_2                            = 0x1B,
+    kSMBProcessorFamilyK6_3                            = 0x1C,
+    kSMBProcessorFamilyAmdAthlon                       = 0x1D,
+    kSMBProcessorFamilyAmd29000                        = 0x1E,
+    kSMBProcessorFamilyK6_2Plus                        = 0x1F,
+    kSMBProcessorFamilyPowerPC                         = 0x20,
+    kSMBProcessorFamilyPowerPC601                      = 0x21,
+    kSMBProcessorFamilyPowerPC603                      = 0x22,
+    kSMBProcessorFamilyPowerPC603Plus                  = 0x23,
+    kSMBProcessorFamilyPowerPC604                      = 0x24,
+    kSMBProcessorFamilyPowerPC620                      = 0x25,
+    kSMBProcessorFamilyPowerPCx704                     = 0x26,
+    kSMBProcessorFamilyPowerPC750                      = 0x27,
+    kSMBProcessorFamilyIntelCoreDuo                    = 0x28,
+    kSMBProcessorFamilyIntelCoreDuoMobile              = 0x29,
+    kSMBProcessorFamilyIntelCoreSoloMobile             = 0x2A,
+    kSMBProcessorFamilyIntelAtom                       = 0x2B,
+    kSMBProcessorFamilyAlpha3                          = 0x30,
+    kSMBProcessorFamilyAlpha21064                      = 0x31,
+    kSMBProcessorFamilyAlpha21066                      = 0x32,
+    kSMBProcessorFamilyAlpha21164                      = 0x33,
+    kSMBProcessorFamilyAlpha21164PC                    = 0x34,
+    kSMBProcessorFamilyAlpha21164a                     = 0x35,
+    kSMBProcessorFamilyAlpha21264                      = 0x36,
+    kSMBProcessorFamilyAlpha21364                      = 0x37,
+    kSMBProcessorFamilyAmdTurionIIUltraDualCoreMobileM = 0x38,
+    kSMBProcessorFamilyAmdTurionIIDualCoreMobileM      = 0x39,
+    kSMBProcessorFamilyAmdAthlonIIDualCoreM            = 0x3A,
+    kSMBProcessorFamilyAmdOpteron6100Series            = 0x3B,
+    kSMBProcessorFamilyAmdOpteron4100Series            = 0x3C,
+    kSMBProcessorFamilyAmdOpteron6200Series            = 0x3D,
+    kSMBProcessorFamilyAmdOpteron4200Series            = 0x3E,
+    kSMBProcessorFamilyMips                            = 0x40,
+    kSMBProcessorFamilyMIPSR4000                       = 0x41,
+    kSMBProcessorFamilyMIPSR4200                       = 0x42,
+    kSMBProcessorFamilyMIPSR4400                       = 0x43,
+    kSMBProcessorFamilyMIPSR4600                       = 0x44,
+    kSMBProcessorFamilyMIPSR10000                      = 0x45,
+    kSMBProcessorFamilyAmdCSeries                      = 0x46,
+    kSMBProcessorFamilyAmdESeries                      = 0x47,
+    kSMBProcessorFamilyAmdSSeries                      = 0x48,
+    kSMBProcessorFamilyAmdGSeries                      = 0x49,
+    kSMBProcessorFamilySparc                           = 0x50,
+    kSMBProcessorFamilySuperSparc                      = 0x51,
+    kSMBProcessorFamilymicroSparcII                    = 0x52,
+    kSMBProcessorFamilymicroSparcIIep                  = 0x53,
+    kSMBProcessorFamilyUltraSparc                      = 0x54,
+    kSMBProcessorFamilyUltraSparcII                    = 0x55,
+    kSMBProcessorFamilyUltraSparcIIi                   = 0x56,
+    kSMBProcessorFamilyUltraSparcIII                   = 0x57,
+    kSMBProcessorFamilyUltraSparcIIIi                  = 0x58,
+    kSMBProcessorFamily68040                           = 0x60,
+    kSMBProcessorFamily68xxx                           = 0x61,
+    kSMBProcessorFamily68000                           = 0x62,
+    kSMBProcessorFamily68010                           = 0x63,
+    kSMBProcessorFamily68020                           = 0x64,
+    kSMBProcessorFamily68030                           = 0x65,
+    kSMBProcessorFamilyHobbit                          = 0x70,
+    kSMBProcessorFamilyCrusoeTM5000                    = 0x78,
+    kSMBProcessorFamilyCrusoeTM3000                    = 0x79,
+    kSMBProcessorFamilyEfficeonTM8000                  = 0x7A,
+    kSMBProcessorFamilyWeitek                          = 0x80,
+    kSMBProcessorFamilyItanium                         = 0x82,
+    kSMBProcessorFamilyAmdAthlon64                     = 0x83,
+    kSMBProcessorFamilyAmdOpteron                      = 0x84,
+    kSMBProcessorFamilyAmdSempron                      = 0x85,
+    kSMBProcessorFamilyAmdTurion64Mobile               = 0x86,
+    kSMBProcessorFamilyDualCoreAmdOpteron              = 0x87,
+    kSMBProcessorFamilyAmdAthlon64X2DualCore           = 0x88,
+    kSMBProcessorFamilyAmdTurion64X2Mobile             = 0x89,
+    kSMBProcessorFamilyQuadCoreAmdOpteron              = 0x8A,
+    kSMBProcessorFamilyThirdGenerationAmdOpteron       = 0x8B,
+    kSMBProcessorFamilyAmdPhenomFxQuadCore             = 0x8C,
+    kSMBProcessorFamilyAmdPhenomX4QuadCore             = 0x8D,
+    kSMBProcessorFamilyAmdPhenomX2DualCore             = 0x8E,
+    kSMBProcessorFamilyAmdAthlonX2DualCore             = 0x8F,
+    kSMBProcessorFamilyPARISC                          = 0x90,
+    kSMBProcessorFamilyPaRisc8500                      = 0x91,
+    kSMBProcessorFamilyPaRisc8000                      = 0x92,
+    kSMBProcessorFamilyPaRisc7300LC                    = 0x93,
+    kSMBProcessorFamilyPaRisc7200                      = 0x94,
+    kSMBProcessorFamilyPaRisc7100LC                    = 0x95,
+    kSMBProcessorFamilyPaRisc7100                      = 0x96,
+    kSMBProcessorFamilyV30                             = 0xA0,
+    kSMBProcessorFamilyQuadCoreIntelXeon3200Series     = 0xA1,
+    kSMBProcessorFamilyDualCoreIntelXeon3000Series     = 0xA2,
+    kSMBProcessorFamilyQuadCoreIntelXeon5300Series     = 0xA3,
+    kSMBProcessorFamilyDualCoreIntelXeon5100Series     = 0xA4,
+    kSMBProcessorFamilyDualCoreIntelXeon5000Series     = 0xA5,
+    kSMBProcessorFamilyDualCoreIntelXeonLV             = 0xA6,
+    kSMBProcessorFamilyDualCoreIntelXeonULV            = 0xA7,
+    kSMBProcessorFamilyDualCoreIntelXeon7100Series     = 0xA8,
+    kSMBProcessorFamilyQuadCoreIntelXeon5400Series     = 0xA9,
+    kSMBProcessorFamilyQuadCoreIntelXeon               = 0xAA,
+    kSMBProcessorFamilyDualCoreIntelXeon5200Series     = 0xAB,
+    kSMBProcessorFamilyDualCoreIntelXeon7200Series     = 0xAC,
+    kSMBProcessorFamilyQuadCoreIntelXeon7300Series     = 0xAD,
+    kSMBProcessorFamilyQuadCoreIntelXeon7400Series     = 0xAE,
+    kSMBProcessorFamilyMultiCoreIntelXeon7400Series    = 0xAF,
+    kSMBProcessorFamilyPentiumIIIXeon                  = 0xB0,
+    kSMBProcessorFamilyPentiumIIISpeedStep             = 0xB1,
+    kSMBProcessorFamilyPentium4                        = 0xB2,
+    kSMBProcessorFamilyIntelXeon                       = 0xB3,
+    kSMBProcessorFamilyAS400                           = 0xB4,
+    kSMBProcessorFamilyIntelXeonMP                     = 0xB5,
+    kSMBProcessorFamilyAMDAthlonXP                     = 0xB6,
+    kSMBProcessorFamilyAMDAthlonMP                     = 0xB7,
+    kSMBProcessorFamilyIntelItanium2                   = 0xB8,
+    kSMBProcessorFamilyIntelPentiumM                   = 0xB9,
+    kSMBProcessorFamilyIntelCeleronD                   = 0xBA,
+    kSMBProcessorFamilyIntelPentiumD                   = 0xBB,
+    kSMBProcessorFamilyIntelPentiumEx                  = 0xBC,
+    kSMBProcessorFamilyIntelCoreSolo                   = 0xBD,  ///< SMBIOS spec 2.6 correct this value
+    kSMBProcessorFamilyReserved                        = 0xBE,
+    kSMBProcessorFamilyIntelCore2                      = 0xBF,
+    kSMBProcessorFamilyIntelCore2Solo                  = 0xC0,
+    kSMBProcessorFamilyIntelCore2Extreme               = 0xC1,
+    kSMBProcessorFamilyIntelCore2Quad                  = 0xC2,
+    kSMBProcessorFamilyIntelCore2ExtremeMobile         = 0xC3,
+    kSMBProcessorFamilyIntelCore2DuoMobile             = 0xC4,
+    kSMBProcessorFamilyIntelCore2SoloMobile            = 0xC5,
+    kSMBProcessorFamilyIntelCoreI7                     = 0xC6,
+    kSMBProcessorFamilyDualCoreIntelCeleron            = 0xC7,
+    kSMBProcessorFamilyIBM390                          = 0xC8,
+    kSMBProcessorFamilyG4                              = 0xC9,
+    kSMBProcessorFamilyG5                              = 0xCA,
+    kSMBProcessorFamilyG6                              = 0xCB,
+    kSMBProcessorFamilyzArchitectur                    = 0xCC,
+    kSMBProcessorFamilyIntelCoreI5                     = 0xCD,
+    kSMBProcessorFamilyIntelCoreI3                     = 0xCE,
+    kSMBProcessorFamilyViaC7M                          = 0xD2,
+    kSMBProcessorFamilyViaC7D                          = 0xD3,
+    kSMBProcessorFamilyViaC7                           = 0xD4,
+    kSMBProcessorFamilyViaEden                         = 0xD5,
+    kSMBProcessorFamilyMultiCoreIntelXeon              = 0xD6,
+    kSMBProcessorFamilyDualCoreIntelXeon3Series        = 0xD7,
+    kSMBProcessorFamilyQuadCoreIntelXeon3Series        = 0xD8,
+    kSMBProcessorFamilyViaNano                         = 0xD9,
+    kSMBProcessorFamilyDualCoreIntelXeon5Series        = 0xDA,
+    kSMBProcessorFamilyQuadCoreIntelXeon5Series        = 0xDB,
+    kSMBProcessorFamilyDualCoreIntelXeon7Series        = 0xDD,
+    kSMBProcessorFamilyQuadCoreIntelXeon7Series        = 0xDE,
+    kSMBProcessorFamilyMultiCoreIntelXeon7Series       = 0xDF,
+    kSMBProcessorFamilyMultiCoreIntelXeon3400Series    = 0xE0,
+    kSMBProcessorFamilyEmbeddedAmdOpteronQuadCore      = 0xE6,
+    kSMBProcessorFamilyAmdPhenomTripleCore             = 0xE7,
+    kSMBProcessorFamilyAmdTurionUltraDualCoreMobile    = 0xE8,
+    kSMBProcessorFamilyAmdTurionDualCoreMobile         = 0xE9,
+    kSMBProcessorFamilyAmdAthlonDualCore               = 0xEA,
+    kSMBProcessorFamilyAmdSempronSI                    = 0xEB,
+    kSMBProcessorFamilyAmdPhenomII                     = 0xEC,
+    kSMBProcessorFamilyAmdAthlonII                     = 0xED,
+    kSMBProcessorFamilySixCoreAmdOpteron               = 0xEE,
+    kSMBProcessorFamilyAmdSempronM                     = 0xEF,
+    kSMBProcessorFamilyi860                            = 0xFA,
+    kSMBProcessorFamilyi960                            = 0xFB,
+    kSMBProcessorFamilyIndicatorFamily2                = 0xFE,
+    kSMBProcessorFamilyReserved1                       = 0xFF
+} PROCESSOR_FAMILY;
 
 // Processor Information - Processor Upgrade.
 // Values for SMBProcessorInformation.processorUpgrade
 typedef enum {
-    kSMBprocessorUpgradeOther         = 0x01,
-    kSMBprocessorUpgradeUnknown       = 0x02,
-    kSMBprocessorUpgradeDaughterBoard = 0x03,
-    kSMBprocessorUpgradeZIFSocket     = 0x04,
-    kSMBprocessorUpgradePiggyBack     = 0x05, ///< Replaceable.
-    kSMBprocessorUpgradeNone          = 0x06,
-    kSMBprocessorUpgradeLIFSocket     = 0x07,
-    kSMBprocessorUpgradeSlot1         = 0x08,
-    kSMBprocessorUpgradeSlot2         = 0x09,
-    kSMBprocessorUpgrade370PinSocket  = 0x0A,
-    kSMBprocessorUpgradeSlotA         = 0x0B,
-    kSMBprocessorUpgradeSlotM         = 0x0C,
-    kSMBprocessorUpgradeSocket423     = 0x0D,
-    kSMBprocessorUpgradeSocketA       = 0x0E, ///< Socket 462.
-    kSMBprocessorUpgradeSocket478     = 0x0F,
-    kSMBprocessorUpgradeSocket754     = 0x10,
-    kSMBprocessorUpgradeSocket940     = 0x11,
-    kSMBprocessorUpgradeSocket939     = 0x12,
-    kSMBprocessorUpgradeSocketmPGA604 = 0x13,
-    kSMBprocessorUpgradeSocketLGA771  = 0x14,
-    kSMBprocessorUpgradeSocketLGA775  = 0x15,
-    kSMBprocessorUpgradeSocketS1      = 0x16,
-    kSMBprocessorUpgradeAM2           = 0x17,
-    kSMBprocessorUpgradeF1207         = 0x18,
-    kSMBprocessorUpgradeSocketLGA1366 = 0x19,
-    kSMBprocessorUpgradeSocketG34     = 0x1A,
-    kSMBprocessorUpgradeSocketAM3     = 0x1B,
-    kSMBprocessorUpgradeSocketC32     = 0x1C,
-    kSMBprocessorUpgradeSocketLGA1156 = 0x1D,
-    kSMBprocessorUpgradeSocketLGA1567 = 0x1E,
-    kSMBprocessorUpgradeSocketPGA988A = 0x1F,
-    kSMBprocessorUpgradeSocketBGA1288 = 0x20,
-    kSMBprocessorUpgradeSocketrPGA988B = 0x21,
-    kSMBprocessorUpgradeSocketBGA1023 = 0x22,
-    kSMBprocessorUpgradeSocketBGA1224 = 0x23,
-    kSMBprocessorUpgradeSocketBGA1155 = 0x24,
-    kSMBprocessorUpgradeSocketLGA1356 = 0x25,
-    kSMBprocessorUpgradeSocketLGA2011 = 0x26,
-    kSMBprocessorUpgradeSocketFS1     = 0x27,
-    kSMBprocessorUpgradeSocketFS2     = 0x28,
-    kSMBprocessorUpgradeSocketFM1     = 0x29,
-    kSMBprocessorUpgradeSocketFM2     = 0x2A
+    kSMBProcessorUpgradeOther           = 0x01,  // Other
+    kSMBProcessorUpgradeUnknown         = 0x02,  // Unknown
+    kSMBProcessorUpgradeDaughterBoard   = 0x03,  // Daughter Board
+    kSMBProcessorUpgradeZIFSocket       = 0x04,  // ZIF Socket
+    kSMBProcessorUpgradePiggyBack       = 0x05,  // Replaceable Piggy Back
+    kSMBProcessorUpgradeNone            = 0x06,  // None
+    kSMBProcessorUpgradeLIFSocket       = 0x07,  // LIF Socket
+    kSMBProcessorUpgradeSlot1           = 0x08,  // Slot 1
+    kSMBProcessorUpgradeSlot2           = 0x09,  // Slot 2
+    kSMBProcessorUpgrade370PinSocket    = 0x0A,  // 370-pin socket
+    kSMBProcessorUpgradeSlotA           = 0x0B,  // Slot A
+    kSMBProcessorUpgradeSlotM           = 0x0C,  // Slot M
+    kSMBProcessorUpgradeSocket423       = 0x0D,  // Socket 423
+    kSMBProcessorUpgradeSocketA         = 0x0E,  // Socket A (Socket 462)
+    kSMBProcessorUpgradeSocket478       = 0x0F,  // Socket 478
+    kSMBProcessorUpgradeSocket754       = 0x10,  // Socket 754
+    kSMBProcessorUpgradeSocket940       = 0x11,  // Socket 940
+    kSMBProcessorUpgradeSocket939       = 0x12,  // Socket 939
+    kSMBProcessorUpgradeSocketmPGA604   = 0x13,  // Socket mPGA604
+    kSMBProcessorUpgradeSocketLGA771    = 0x14,  // Socket LGA771
+    kSMBProcessorUpgradeSocketLGA775    = 0x15,  // Socket LGA775
+    kSMBProcessorUpgradeSocketS1        = 0x16,  // Socket S1
+    kSMBProcessorUpgradeAM2             = 0x17,  // Socket AM2
+    kSMBProcessorUpgradeF1207           = 0x18,  // Socket F (1207)
+    kSMBProcessorUpgradeSocketLGA1366   = 0x19,  // Socket LGA1366
+    kSMBProcessorUpgradeSocketG34       = 0x1A,  // Socket G34
+    kSMBProcessorUpgradeSocketAM3       = 0x1B,  // Socket AM3
+    kSMBProcessorUpgradeSocketC32       = 0x1C,  // Socket C32
+    kSMBProcessorUpgradeSocketLGA1156   = 0x1D,  // Socket LGA1156
+    kSMBProcessorUpgradeSocketLGA1567   = 0x1E,  // Socket LGA1567
+    kSMBProcessorUpgradeSocketPGA988A   = 0x1F,  // Socket PGA988A
+    kSMBProcessorUpgradeSocketBGA1288   = 0x20,  // Socket BGA1288
+    kSMBProcessorUpgradeSocketrPGA988B  = 0x21,  // Socket rPGA988B
+    kSMBProcessorUpgradeSocketBGA1023   = 0x22,  // Socket BGA1023
+    kSMBProcessorUpgradeSocketBGA1224   = 0x23,  // Socket BGA1224
+    kSMBProcessorUpgradeSocketBGA1155   = 0x24,  // Socket LGA1155
+    kSMBProcessorUpgradeSocketLGA1356   = 0x25,  // Socket LGA1356
+    kSMBProcessorUpgradeSocketLGA2011   = 0x26,  // Socket LGA2011
+    kSMBProcessorUpgradeSocketFS1       = 0x27,  // Socket FS1
+    kSMBProcessorUpgradeSocketFS2       = 0x28,  // Socket FS2
+    kSMBProcessorUpgradeSocketFM1       = 0x29,  // Socket FM1
+    kSMBProcessorUpgradeSocketFM2       = 0x2A,  // Socket FM2
+    kSMBProcessorUpgradeSocketLGA2011_3 = 0x2B,  // Socket LGA2011-3
+    kSMBProcessorUpgradeSocketLGA1356_3 = 0x2C,  // Socket LGA1356-3
+    kSMBProcessorUpgradeSocketLGA1150   = 0x2D,  // Socket LGA1150
+    kSMBProcessorUpgradeSocketBGA1168   = 0x2E,  // Socket BGA1168
+    kSMBProcessorUpgradeSocketBGA1234   = 0x2F,  // Socket BGA1234
+    kSMBProcessorUpgradeSocketBGA1364   = 0x30,  // Socket BGA1364
+    kSMBProcessorUpgradeSocketAM4       = 0x31,  // Socket AM4
+    kSMBProcessorUpgradeSocketLGA1151   = 0x32,  // Socket LGA1151
+    kSMBProcessorUpgradeSocketBGA1356   = 0x33,  // Socket BGA1356
+    kSMBProcessorUpgradeSocketBGA1440   = 0x34,  // Socket BGA1440
+    kSMBProcessorUpgradeSocketBGA1515   = 0x35,  // Socket BGA1515
+    kSMBProcessorUpgradeSocketLGA3647_1 = 0x36   // Socket LGA3647-1
 } PROCESSOR_UPGRADE;
 
-// Struct - Processor Information (Type 4), Apple uses 35 bytes length
-typedef struct SMBProcessorInformation
-{
-	// 2.0+ spec (26 bytes)
-	SMB_STRUCT_HEADER               // Type 4
-	SMBString  socketDesignation;
-	SMBByte    processorType;       // The enumeration value from PROCESSOR_TYPE_DATA.
-	SMBByte    processorFamily;     // The enumeration value from PROCESSOR_FAMILY_DATA.
-	SMBString  manufacturer;
-	SMBQWord   processorID;         // based on CPUID
-	SMBString  processorVersion;
-	SMBByte    voltage;             // bit7 cleared indicate legacy mode
-	SMBWord    externalClock;       // external clock in MHz
-	SMBWord    maximumClock;        // max internal clock in MHz
-	SMBWord    currentClock;        // current internal clock in MHz
-	SMBByte    status;
-	SMBByte    processorUpgrade;    // The enumeration value from PROCESSOR_UPGRADE.
-	// 2.1+ spec (32 bytes)
-	SMBWord    L1CacheHandle;
-	SMBWord    L2CacheHandle;
-	SMBWord    L3CacheHandle;
-	// 2.3+ spec (35 bytes)
-	SMBString  serialNumber;
-	SMBString  assetTag;
-	SMBString  partNumber;
-	// 2.5+ spec (40 bytes)  Apple still uses 2.4 spec
-	SMBByte    coreCount;
-	SMBByte    coreEnabled;
-	SMBByte    threadCount;
-//	SMBWord    processorFuncSupport;
-	// 2.6+ spec (42 bytes)
-//	SMBWord    processorFamily2;
-} __attribute__((packed)) SMBProcessorInformation;
-
-//----------------------------------------------------------------------------------------------------------
-// Struct - Memory Controller Information (Type 5) Obsolete since SMBIOS version 2.1
-typedef struct SMBMemoryControllerInfo {
-	SMB_STRUCT_HEADER 
-	SMBByte			errorDetectingMethod;
-	SMBByte			errorCorrectingCapability;
-	SMBByte			supportedInterleave;
-	SMBByte			currentInterleave;
-	SMBByte			maxMemoryModuleSize;
-	SMBWord			supportedSpeeds;
-	SMBWord			supportedMemoryTypes;
-	SMBByte			memoryModuleVoltage;
-	SMBByte			numberOfMemorySlots;
-} __attribute__((packed)) SMBMemoryControllerInfo;
-
-//----------------------------------------------------------------------------------------------------------
-// Struct - Memory Module Information (Type 6) Obsolete since SMBIOS version 2.1
-typedef struct SMBMemoryModule
-{
-    SMB_STRUCT_HEADER               // Type 6
-    SMBString  socketDesignation;
-    SMBByte    bankConnections;
-    SMBByte    currentSpeed;
-    SMBWord    currentMemoryType;
-    SMBByte    installedSize;
-    SMBByte    enabledSize;
-    SMBByte    errorStatus;
-} __attribute__((packed)) SMBMemoryModule;
-
-#define kSMBMemoryModuleSizeNotDeterminable 0x7D
-#define kSMBMemoryModuleSizeNotEnabled      0x7E
-#define kSMBMemoryModuleSizeNotInstalled    0x7F
 
 //----------------------------------------------------------------------------------------------------------
 // Struct - Cache Information (Type 7), Apple uses 19 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBCacheInformation
 {
     SMB_STRUCT_HEADER               // Type 7
@@ -628,8 +674,11 @@ typedef struct SMBCacheInformation
     SMBByte    associativity;
 } __attribute__((packed)) SMBCacheInformation;
 
+
 //----------------------------------------------------------------------------------------------------------
 // Struct - System Slots (Type 9), Apple uses 13 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBSystemSlot
 {
     // 2.0+ spec (12 bytes)
@@ -649,16 +698,35 @@ typedef struct SMBSystemSlot
 //	SMBByte		deviceFunctionNumber;
 } __attribute__((packed)) SMBSystemSlot;
 
+
 //----------------------------------------------------------------------------------------------------------
 // Struct - OEM Strings (Type 11), Apple uses 5 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBOEMStrings
 {
 	SMB_STRUCT_HEADER               // Type 11
 	SMBByte		count;		// number of strings
 } __attribute__((packed)) SMBOEMStrings;
 
+
 //----------------------------------------------------------------------------------------------------------
-// Physical Memory Array (Type 16)
+// Physical Memory Array (Type 16), Apple uses 15 bytes length
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBPhysicalMemoryArray
+{
+    // 2.1+ spec (15 bytes)
+    SMB_STRUCT_HEADER               // Type 16
+    SMBByte    physicalLocation;    // physical location
+    SMBByte    arrayUse;            // the use for the memory array, The enumeration value from MEMORY_ARRAY_USE.
+    SMBByte    errorCorrection;     // error correction/detection method, The enumeration value from MEMORY_ERROR_CORRECTION.
+    SMBDWord   maximumCapacity;     // maximum memory capacity in kilobytes
+    SMBWord    errorHandle;         // handle of a previously detected error
+    SMBWord    numMemoryDevices;    // number of memory slots or sockets
+    // 2.7+ spec
+    //	SMBQWord   extMaximumCapacity;	// maximum memory capacity in bytes
+} __attribute__((packed)) SMBPhysicalMemoryArray;
 
 // Physical Memory Array - Use.
 // Values for SMBPhysicalMemoryArray.arrayUse
@@ -686,23 +754,11 @@ typedef enum
     kSMBMemoryArrayErrorCorrectionTypeCRC           = 0x07
 } MEMORY_ERROR_CORRECTION;
 
-// Struct - Physical Memory Array (Type 16), Apple uses 15 bytes length
-typedef struct SMBPhysicalMemoryArray
-{
-	// 2.1+ spec (15 bytes)
-	SMB_STRUCT_HEADER               // Type 16
-	SMBByte    physicalLocation;    // physical location
-	SMBByte    arrayUse;            // the use for the memory array, The enumeration value from MEMORY_ARRAY_USE.
-	SMBByte    errorCorrection;     // error correction/detection method, The enumeration value from MEMORY_ERROR_CORRECTION.
-	SMBDWord   maximumCapacity;     // maximum memory capacity in kilobytes
-	SMBWord    errorHandle;         // handle of a previously detected error
-	SMBWord    numMemoryDevices;    // number of memory slots or sockets
-	// 2.7+ spec
-    //	SMBQWord   extMaximumCapacity;	// maximum memory capacity in bytes
-} __attribute__((packed)) SMBPhysicalMemoryArray;
 
 //----------------------------------------------------------------------------------------------------------
 // Struct - Memory Device (Type 17), Apple uses 27 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 typedef struct SMBMemoryDevice
 {
 	// 2.1+ spec (21 bytes)
@@ -735,42 +791,58 @@ typedef struct SMBMemoryDevice
 //	SMBWord    configuredVolt;
 } __attribute__((packed)) SMBMemoryDevice;
 
-//----------------------------------------------------------------------------------------------------------
 
+//----------------------------------------------------------------------------------------------------------
 // Struct - Memory Array Mapped Address (Type 19), Apple uses 15 bytes length
-//typedef struct SMBMemoryArrayMappedAddress
-//{
+//----------------------------------------------------------------------------------------------------------
+
+#if 0
+typedef struct SMBMemoryArrayMappedAddress
+{
     // 2.1+ spec
-//	SMB_STRUCT_HEADER               // Type 19
-//	SMBDWord   startingAddress;
-//	SMBDWord   endingAddress;
-//	SMBWord    arrayHandle;
-//	SMBByte    partitionWidth;
-	// 2.7+ spec
-//	SMBQWord   extStartAddress;
-//	SMBQWord   extEndAddress;
-//} __attribute__((packed)) SMBMemoryArrayMappedAddress;
+	SMB_STRUCT_HEADER               // Type 19
+	SMBDWord   startingAddress;
+	SMBDWord   endingAddress;
+	SMBWord    arrayHandle;
+	SMBByte    partitionWidth;
+    // 2.7+ spec
+	SMBQWord   extStartAddress;
+	SMBQWord   extEndAddress;
+} __attribute__((packed)) SMBMemoryArrayMappedAddress;
+#endif
+
 
 //----------------------------------------------------------------------------------------------------------
-
 // Struct - Memory Device Mapped Address (Type 20)
-//typedef struct SMBMemoryDeviceMappedAddress
-//{
-	// 2.1+ spec
-//	SMB_STRUCT_HEADER               // Type 20
-//	SMBDWord   startingAddress;
-//	SMBDWord   endingAddress;
-//	SMBWord    arrayHandle;
-//	SMBByte    partitionRowPosition;
-//	SMBByte    interleavePosition;
-//	SMBByte    interleaveDataDepth;
-	// 2.7+ spec
-//	SMBQWord   extStartAddress;
-//	SMBQWord   extEndAddress;
-//} __attribute__((packed)) SMBMemoryDeviceMappedAddress;
+//----------------------------------------------------------------------------------------------------------
+
+#if 0
+typedef struct SMBMemoryDeviceMappedAddress
+{
+    // 2.1+ spec
+	SMB_STRUCT_HEADER               // Type 20
+	SMBDWord   startingAddress;
+	SMBDWord   endingAddress;
+	SMBWord    arrayHandle;
+	SMBByte    partitionRowPosition;
+	SMBByte    interleavePosition;
+	SMBByte    interleaveDataDepth;
+    // 2.7+ spec
+	SMBQWord   extStartAddress;
+	SMBQWord   extEndAddress;
+} __attribute__((packed)) SMBMemoryDeviceMappedAddress;
+#endif
+
+
+
+//
+// Apple Specific structures
+//
 
 //----------------------------------------------------------------------------------------------------------
-// Firmware Volume Description (Apple Specific - Type 128)
+// Firmware Volume Description (Apple Specific - Type 128), Apple uses 88 bytes length
+//----------------------------------------------------------------------------------------------------------
+
 enum
 {
 	FW_REGION_RESERVED   = 0,
@@ -789,7 +861,6 @@ typedef struct FW_REGION_INFO
 	SMBDWord   EndAddress;
 } __attribute__((packed)) FW_REGION_INFO;
 
-// Struct - Firmware Volume Description (Apple Specific - Type 128), Apple uses 88 bytes length
 typedef struct SMBFirmwareVolume
 {
 	SMB_STRUCT_HEADER			// Type 128
@@ -801,11 +872,11 @@ typedef struct SMBFirmwareVolume
 	FW_REGION_INFO    FlashMap[   NUM_FLASHMAP_ENTRIES ];
 } __attribute__((packed)) SMBFirmwareVolume;
 
+
+//----------------------------------------------------------------------------------------------------------
+// Memory SPD Data (Apple Specific - Type 130)
 //----------------------------------------------------------------------------------------------------------
 
-/* ===========================================
- Memory SPD Data   (Apple Specific - Type 130)
- ============================================= */
 typedef struct SMBMemorySPD
 {
 	SMB_STRUCT_HEADER			// Type 130
@@ -815,57 +886,106 @@ typedef struct SMBMemorySPD
 	SMBWord           Data[1];
 } __attribute__((packed)) SMBMemorySPD;
 
+
+//----------------------------------------------------------------------------------------------------------
+// OEM Processor Type (Apple Specific - Type 131)
 //----------------------------------------------------------------------------------------------------------
 
-/* ============================================
- OEM Processor Type (Apple Specific - Type 131)
- ============================================== */
 typedef struct SMBOemProcessorType
 {
 	SMB_STRUCT_HEADER			// Type131
 	SMBWord    ProcessorType;
 } __attribute__((packed)) SMBOemProcessorType;
 
+
+//----------------------------------------------------------------------------------------------------------
+// OEM Processor Bus Speed (Apple Specific - Type 132)
 //----------------------------------------------------------------------------------------------------------
 
-/* =================================================
- OEM Processor Bus Speed (Apple Specific - Type 132)
- =================================================== */
 typedef struct SMBOemProcessorBusSpeed
 {
 	SMB_STRUCT_HEADER			// Type 132
 	SMBWord    ProcessorBusSpeed;		// MT/s unit
 } __attribute__((packed)) SMBOemProcessorBusSpeed;
 
+
+//----------------------------------------------------------------------------------------------------------
+// OEM Platform Feature (Apple Specific - Type 133)
 //----------------------------------------------------------------------------------------------------------
 
-/* ==============================================
- OEM Platform Feature (Apple Specific - Type 133)
- ================================================ */
 typedef struct SMBOemPlatformFeature
 {
 	SMB_STRUCT_HEADER			// Type 133
 	SMBWord    PlatformFeature;
 } __attribute__((packed)) SMBOemPlatformFeature;
 
+
+//----------------------------------------------------------------------------------------------------------
+// OEM SMC Version (Apple Specific - Type 134)
 //----------------------------------------------------------------------------------------------------------
 
-/* =========================================
- OEM SMC Version (Apple Specific - Type 134)
- =========================================== */
 typedef struct SMBOemSMCVersion
 {
 	SMB_STRUCT_HEADER			// Type 134
 	SMBWord    SMCVersion;
 } __attribute__((packed)) SMBOemSMCVersion;
 
+
+
+//
+// Obsolete SMBIOS structures
+//
+
+//----------------------------------------------------------------------------------------------------------
+// Struct - Memory Controller Information (Type 5) Obsolete since SMBIOS version 2.1
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBMemoryControllerInfo {
+    SMB_STRUCT_HEADER
+    SMBByte			errorDetectingMethod;
+    SMBByte			errorCorrectingCapability;
+    SMBByte			supportedInterleave;
+    SMBByte			currentInterleave;
+    SMBByte			maxMemoryModuleSize;
+    SMBWord			supportedSpeeds;
+    SMBWord			supportedMemoryTypes;
+    SMBByte			memoryModuleVoltage;
+    SMBByte			numberOfMemorySlots;
+} __attribute__((packed)) SMBMemoryControllerInfo;
+
+
+//----------------------------------------------------------------------------------------------------------
+// Struct - Memory Module Information (Type 6) Obsolete since SMBIOS version 2.1
+//----------------------------------------------------------------------------------------------------------
+
+typedef struct SMBMemoryModule
+{
+    SMB_STRUCT_HEADER               // Type 6
+    SMBString  socketDesignation;
+    SMBByte    bankConnections;
+    SMBByte    currentSpeed;
+    SMBWord    currentMemoryType;
+    SMBByte    installedSize;
+    SMBByte    enabledSize;
+    SMBByte    errorStatus;
+} __attribute__((packed)) SMBMemoryModule;
+
+#define kSMBMemoryModuleSizeNotDeterminable 0x7D
+#define kSMBMemoryModuleSizeNotEnabled      0x7E
+#define kSMBMemoryModuleSizeNotInstalled    0x7F
+
+
+
 //----------------------------------------------------------------------------------------------------------
 
 #define SMBIOS_ORIGINAL		0
 #define SMBIOS_PATCHED		1
 
+
 extern void *getSmbios(int which);
+
 extern void readSMBIOSInfo(SMBEntryPoint *eps);
+
 extern void setupSMBIOSTable(void);
 
 extern void decodeSMBIOSTable(SMBEntryPoint *eps);

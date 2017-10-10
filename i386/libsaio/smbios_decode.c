@@ -339,7 +339,7 @@ void decodeSystemEnclosure(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	DBG("Chassis Information\n");
 	DBG("\tManufacturer: %s\n", SMBStringForField(structHeader, ((SMBSystemEnclosure *)structHeader)->manufacturer, neverMask));
-	if ((((SMBSystemEnclosure *)structHeader)->chassisType < kSMBchassisOther) || (((SMBSystemEnclosure *)structHeader)->chassisType > kSMBchassisBladeEnclosing)) {
+	if ((((SMBSystemEnclosure *)structHeader)->chassisType < kSMBChassisTypeOther) || (((SMBSystemEnclosure *)structHeader)->chassisType > kSMBChassisTypeBladeEnclosing)) {
 		DBG("\tType: %s\n", OutOfSpecStr);
 	} else {
 		DBG("\tType: %s\n", SMBChassisTypes[(((SMBSystemEnclosure *)structHeader)->chassisType - 1)]);
@@ -370,7 +370,7 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 	printHeader(structHeader);
 	DBG("Processor Information\n");
 	DBG("\tSocket Designation: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->socketDesignation, neverMask));
-	if ((((SMBProcessorInformation *)structHeader)->processorType < kSMBprocessorTypeOther) || (((SMBProcessorInformation *)structHeader)->processorType > kSMBprocessorTypeGPU)) {
+	if ((((SMBProcessorInformation *)structHeader)->processorType < kSMBProcessorTypeOther) || (((SMBProcessorInformation *)structHeader)->processorType > kSMBProcessorTypeGPU)) {
 		DBG("\tType: %s\n", OutOfSpecStr);
 	} else {
 		DBG("\tType: %s\n", SMBProcessorTypes[((SMBProcessorInformation *)structHeader)->processorType - 1]);
@@ -400,20 +400,25 @@ void decodeProcessorInformation(SMBStructHeader *structHeader)
 	DBG("\tSerial Number: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->serialNumber, privateData));
 	DBG("\tAsset Tag: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->assetTag, neverMask));
 	DBG("\tPart Number: %s\n", SMBStringForField(structHeader, ((SMBProcessorInformation *)structHeader)->partNumber, neverMask));
-	if(((SMBProcessorInformation *)structHeader)->coreCount != 0)
-	{
-		DBG("\tCore Count: %d\n", ((SMBProcessorInformation *)structHeader)->coreCount);
-	}
 
-	if(((SMBProcessorInformation *)structHeader)->coreEnabled != 0)
-	{
-		DBG("\tCore Enabled: %d\n", ((SMBProcessorInformation *)structHeader)->coreEnabled);
-	}
-
-	if(((SMBProcessorInformation *)structHeader)->threadCount != 0)
-	{
-		DBG("\tThread Count: %d\n", ((SMBProcessorInformation *)structHeader)->threadCount);
-	}
+//
+// TODO: Check the size before printing this information.
+// Keep in mind that Apple does not use this info, and only uses a 35 bytes struct
+//
+//	if(((SMBProcessorInformation *)structHeader)->coreCount != 0)
+//	{
+//		DBG("\tCore Count: %d\n", ((SMBProcessorInformation *)structHeader)->coreCount);
+//	}
+//
+//	if(((SMBProcessorInformation *)structHeader)->coreEnabled != 0)
+//	{
+//		DBG("\tCore Enabled: %d\n", ((SMBProcessorInformation *)structHeader)->coreEnabled);
+//	}
+//
+//	if(((SMBProcessorInformation *)structHeader)->threadCount != 0)
+//	{
+//		DBG("\tThread Count: %d\n", ((SMBProcessorInformation *)structHeader)->threadCount);
+//	}
 // Characteristics:
 //	DBG("\tProcessor Family 2: %d\n", ((SMBProcessorInformation *)structHeader)->processorFamily2);
 	DBG("\n");
