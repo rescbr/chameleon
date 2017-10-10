@@ -956,8 +956,8 @@ static long ParseTagDate( char *buffer, TagPtr *tag )
 		return -1;
 	}
 
-	printf("ParseTagDate unimplimented\n");
-	getchar();
+//	printf("ParseTagDate unimplimented\n");
+//	getchar();
 
 	tmpTag->type = kTagTypeDate;
 	tmpTag->string = NULL;
