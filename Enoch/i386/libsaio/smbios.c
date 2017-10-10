@@ -581,7 +581,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultSystemInfo.family         = kDefaultMacBookProFamily;
 			defaultBaseBoard.product         = kDefaultMacBookProBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
-			defaultChassis.chassisType       = kSMBchassisUnknown;
+			defaultChassis.chassisType       = kSMBChassisTypeUnknown;
 		}
 		else
 		{
@@ -591,7 +591,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 			defaultSystemInfo.family         = kDefaultMacBookFamily;
 			defaultBaseBoard.product         = kDefaultMacBookBoardProduct;
 			defaultBaseBoard.boardType       = kSMBBaseBoardMotherboard;
-			defaultChassis.chassisType       = kSMBchassisUnknown;
+			defaultChassis.chassisType       = kSMBChassisTypeUnknown;
 		}
 	}
 	else
@@ -605,7 +605,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 				defaultSystemInfo.family        = kDefaultMacMiniFamily;
 				defaultBaseBoard.product        = kDefaultMacMiniBoardProduct;
 				defaultBaseBoard.boardType      = kSMBBaseBoardUnknown;
-				defaultChassis.chassisType      = kSMBchassisLPDesktop;
+				defaultChassis.chassisType      = kSMBChassisTypeLowProfileDesktop;
 				break;
 
 			case 2:
@@ -615,7 +615,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 				defaultSystemInfo.family        = kDefaultMacFamily;  // iMac8,1 family = Mac
 				defaultBaseBoard.product        = kDefaultiMacBoardProduct;
 				defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
-				defaultChassis.chassisType      = kSMBchassisAllInOne;
+				defaultChassis.chassisType      = kSMBChassisTypeAllInOne;
 				break;
 			default:
 			{
@@ -634,7 +634,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultSystemInfo.family		= kDefaultiMacFamily;
 								defaultBaseBoard.product        = kDefaultiMacNehalemBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
-								defaultChassis.chassisType      = kSMBchassisAllInOne;
+								defaultChassis.chassisType      = kSMBChassisTypeAllInOne;
 								break;
 
 							case CPUID_MODEL_SANDYBRIDGE:		// Intel Core i3, i5, i7 LGA1155 (32nm)
@@ -645,7 +645,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultSystemInfo.family        = kDefaultiMacFamily;
 								defaultBaseBoard.product        = kDefaultiMacSandyBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
-								defaultChassis.chassisType      = kSMBchassisAllInOne;
+								defaultChassis.chassisType      = kSMBChassisTypeAllInOne;
 								break;
 
 							case CPUID_MODEL_NEHALEM:		// Intel Core i7, Xeon W35xx, Xeon X55xx, Xeon E55xx LGA1366 (45nm)
@@ -657,7 +657,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProNehalemBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
-								defaultChassis.chassisType      = kSMBchassisTower;
+								defaultChassis.chassisType      = kSMBChassisTypeTower;
 								break;
 
 							case CPUID_MODEL_WESTMERE:		// Intel Core i7, Xeon X56xx, Xeon E56xx, Xeon W36xx LGA1366 (32nm) 6 Core
@@ -671,7 +671,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProWestmereBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardProcessorMemoryModule;
-								defaultChassis.chassisType      = kSMBchassisTower;
+								defaultChassis.chassisType      = kSMBChassisTypeTower;
 								break;
 
 							default:
@@ -681,7 +681,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 								defaultSystemInfo.family	= kDefaultMacProFamily;
 								defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 								defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
-								defaultChassis.chassisType      = kSMBchassisUnknown;
+								defaultChassis.chassisType      = kSMBChassisTypeUnknown;
 								break;
 						}
 						break;
@@ -693,7 +693,7 @@ void setDefaultSMBData(void)  // Bungo: setting data from real Macs
 						defaultSystemInfo.family	= kDefaultMacProFamily;
 						defaultBaseBoard.product        = kDefaultMacProBoardProduct;
 						defaultBaseBoard.boardType      = kSMBBaseBoardMotherboard;
-						defaultChassis.chassisType      = kSMBchassisUnknown;
+						defaultChassis.chassisType      = kSMBChassisTypeUnknown;
 						break;
 				}
 				break;
@@ -1430,17 +1430,17 @@ void readSMBIOSInfo(SMBEntryPoint *eps)
 			case kSMBTypeSystemEnclosure: // Bungo: determine platform type
 				switch (((SMBSystemEnclosure *)structHeader)->chassisType)
 				{
-					case kSMBchassisPortable:
-					case kSMBchassisLaptop:
-					case kSMBchassisNotebook:
-					case kSMBchassisHandHeld:
-					case kSMBchassisSubNotebook:
+					case kSMBChassisTypePortable:
+					case kSMBChassisTypeLaptop:
+					case kSMBChassisTypeNotebook:
+					case kSMBChassisTypeHandHeld:
+					case kSMBChassisTypeSubNotebook:
 						PlatformType = 2; // notebook (MacBooks/Pros)
 						break;
-					case kSMBchassisMiniTower:
-					case kSMBchassisTower:
-					case kSMBchassisBlade:
-					case kSMBchassisBladeEnclosing:
+					case kSMBChassisTypeMiniTower:
+					case kSMBChassisTypeTower:
+					case kSMBChassisTypeBlade:
+					case kSMBChassisTypeBladeEnclosing:
 						PlatformType = 3; // workstation (Mac Pro, Xserve)
 						break;
 					default:
