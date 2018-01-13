@@ -422,9 +422,12 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 				{
 					snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kMLionInstallerDataFolder);
 				}
-
+				else if ( MacOSVerCurrent > MacOSVer2Int("10.12") && MacOSVerCurrent < MacOSVer2Int("10.14") )
+				{
+					snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kHSierraInstallerDataFolder);
+				}
 			}
-			else  if (isRecoveryHD)
+			else if (isRecoveryHD)
 			{
 				snprintf(kernelCacheFile, sizeof(kernelCacheFile), "%skernelcache", kDefaultCacheRecoveryHD);
 			}
