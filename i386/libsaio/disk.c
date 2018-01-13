@@ -1705,14 +1705,14 @@ static bool getOSVersion(BVRef bvr, char *str)
 	const char *fakeOSVersion;
 	int fakeOSVersionInt;
 	// our pattern: avoiding to use full path. this help if the app is named as Beta or DP..
-	char *LionPattern   = "Install%20Mac%20OS%20X%20Lion";
-	char *MLPattern     = "Install%20OS%20X%20Mountain%20Lion";
-	char *MavPattern    = "Install%20OS%20X%20Mavericks";
-	char *YosPattern    = "Install%20OS%20X%20Yosemite";
-	char *ECPattern     = "Install%20OS%20X%20El%20Capitan";
-	char *SierraPattern = "Install%20macOS%20Sierra";
-	char *HSierraPattern = "Install%20macOS%20High%20Sierra";
-	char *HSierraPatternB   = "Install%20macOS%2010.13";
+	char *LionPattern	= "Install%20Mac%20OS%20X%20Lion";	// Install Mac OS Lion
+	char *MLPattern		= "Install%20OS%20X%20Mountain%20Lion";	// Install OS X Mountain Lion
+	char *MavPattern	= "Install%20OS%20X%20Mavericks";	// Install OS X Mavericks
+	char *YosPattern	= "Install%20OS%20X%20Yosemite";	// Install OS X Yosemite
+	char *ECPattern		= "Install%20OS%20X%20El%20Capitan";	// Install OS X El Capitan
+	char *SierraPattern	= "Install%20macOS%20Sierra";		// Install macOS Sierra
+	char *HSierraPattern	= "Install%20macOS%20High%20Sierra";	// Install macOS High Sierra
+	char *HSierraPatternB	= "Install%20macOS%2010.13";		// Install macOS 10.13
 
 	/*
 	 * Only look for OS Version on HFS+
