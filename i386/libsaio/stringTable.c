@@ -364,6 +364,26 @@ bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 	const char *key_val;
 	int size;
     
+	// looking for real boolean (<true/> or <false/>)
+	// if is a boolean tag, return immediately
+	TagPtr entry = XMLGetProperty(config->dictionary,key);
+
+	if(XMLIsBoolean(entry))
+	{
+		int value = XMLCastBoolean(entry);
+		if (value) {
+			*result_val = true;
+			return true;
+		}
+		else
+		{
+			*result_val = false;
+			return false;
+		}
+	}
+
+	// check if is a boolean as "string" (Yes/No)
+	// (IMHO this should be deprecated soon)
 	if (getValueForKey(key, &key_val, &size, config))
 	{
 		if ((size >= 1) && (key_val[0] == 'Y' || key_val[0] == 'y'))
@@ -381,39 +401,61 @@ bool getBoolForKey(const char *key, bool *result_val, config_file_t *config)
 
 bool getIntForKey(const char *key, int *value, config_file_t *config)
 {
-	const char *val;
-	int size, sum;
-	bool negative = false;
+	const char *string = NULL;
+	int         size   = 0;
     
-	if (getValueForKey(key, &val, &size, config))
+	if (getValueForKey(key, &string, &size, config))
 	{
 		if (size)
 		{
-			if (*val == '-')
-			{
-				negative = true;
-				val++;
-				size--;
+			char               *end  = NULL;
+			unsigned long long  nres = 0;
+			long long           sres = 0;
+
+			/*
+			 * strtouq is used here to properly detect any overflow and still
+			 * accepting extreme values like INT_MIN and UINT_MAX.
+			 */
+			nres = strtouq(string, &end, 0);
+
+			/*
+			 * basic error and over/overflow detection.
+			 * needed since strtouq() basically always return something.
+			 */
+			if (end == string) {
+				// no digits found
+				return false;
+			} else if (nres == UQUAD_MAX) {
+				// overflow occured: value is too large.
+				return false;
 			}
-			
-			for (sum = 0; size > 0; size--)
-			{
-				if (*val < '0' || *val > '9')
-				{
-					return false;
-				}
-				
-				sum = (sum * 10) + (*val++ - '0');
+
+			/*
+			 * Now we make sure that the signed value or unsigned positive
+			 * value can be stored in a 32-bit integer.
+			 */
+			sres = (long long)nres;
+
+			if (sres < INT_MIN) {
+				// signed int underflow:
+				// if the value is negative, it must be signed, and therefore
+				// cannot be less than INT_MAX.
+				return false;
+			} else if (sres > UINT_MAX) {
+				// unsigned int overflow:
+				// when reading 32 hex values, the output value is way above
+				// INT_MAX and should be treated as an unsigned int value.
+				return false;
 			}
-			
-			if (negative)
-			{
-				sum = -sum;
+
+			if (value != NULL) {
+				*value = (int)sres;
 			}
-			*value = sum;
+
 			return true;
 		}
 	}
+
 	return false;
 }
 /*
