@@ -1538,24 +1538,24 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
 				}
 				break;
-//			case 17:  /* High Sierra */
-//				switch (gDarwinMinor)
-//				{
-//					case 0: kernelOSVer = 0xA0C0000; break;
-//					case 1: kernelOSVer = 0xA0C0100; break;
-//					case 2: kernelOSVer = 0xA0C0200; break;
+			case 17:  /* High Sierra */
+				switch (gDarwinMinor)
+				{
+					case 0: kernelOSVer = 0xA0D0000; break;
+					case 1: kernelOSVer = 0xA0D0100; break;
+//					case 2: kernelOSVer = 0xA0D0200; break; // 17.2.0
 //					case 3: kernelOSVer = 0xA0C0200; break;
 //					case 4: kernelOSVer = 0xA0C0300; break;
 //					case 5: kernelOSVer = 0xA0C0400; break;
 //					case 6: kernelOSVer = 0xA0C0500; break;
 //					case 7: kernelOSVer = 0xA0C0600; break;
 //					case 8: kernelOSVer = 0xA0C0700; break;
-//					default:kernelOSVer = 0xA0C0600; break; //Last known kernel (add here updates)
-//				}
-//				break;
+					default:kernelOSVer = 0xA0D0100; break; //Last known kernel (add here updates)
+				}
+				break;
 			default:
-				kernelOSVer = 0xA0C0600;
-				break; //Last known kernel is Sierra 10.12.6
+				kernelOSVer = 0xA0D0100;
+				break; //Last known kernel is Sierra 10.13.1
 			}
 		}
 		else
@@ -1618,9 +1618,11 @@ long DecodeKernel(void *binary, entry_t *rentry, char **raddr, int *rsize)
 			case 0xA0C0600: gDarwinMajor = 16; gDarwinMinor =  7; gDarwinRev = 0; break; // 10.12.6
 //			case 0xA0C0700: gDarwinMajor = 16; gDarwinMinor =  x; gDarwinRev = x; break; // 10.12.7
 			// High Sierra
+			case 0xA0D0000: gDarwinMajor = 17; gDarwinMinor =  0; gDarwinRev = 0; break; // 10.13
+			case 0xA0D0100: gDarwinMajor = 17; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.13.1
 
 			// default = last known kernel
-			default:        gDarwinMajor = 16; gDarwinMinor =  7; gDarwinRev = 0; break; // 10.12.6;
+			default:        gDarwinMajor = 17; gDarwinMinor =  1; gDarwinRev = 0; break; // 10.13.1;
 		}
 	}
 

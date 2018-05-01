@@ -57,6 +57,9 @@
 // Mountain Lion installer ??
 #define kMLionInstallerDataFolder	"/OS X Install Data/"
 
+// High Sierra ??
+#define kHSierraInstallerDataFolder	"/macOS Install Data/"
+
 // Installer new
 #define kDefaultCacheInstallerNew	"/.IABootFiles/"
 
