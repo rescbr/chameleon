@@ -869,6 +869,10 @@ static BVRef newGPTBVRef( int biosdev,
 		bvr->description        = getDescriptionFunc;
 		bvr->type               = type;
 		bvr->bv_free            = bvFreeFunc;
+        
+        //changed where the flags are set, just to be sure
+        bvr->flags |= bvrFlags;
+
 		// FIXME: UCS-2 -> UTF-8 the name
 		strlcpy(bvr->name, "----", DPISTRLEN);
 		if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)part->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)part->ent_type) == 0) )
@@ -918,10 +922,6 @@ static BVRef newGPTBVRef( int biosdev,
 		}
 	}
 
-	if ( bvr )
-	{
-		bvr->flags |= bvrFlags;
-	}
 
 	return bvr;
 }
@@ -1542,20 +1542,23 @@ static BVRef diskScanGPTBootVolumes(int biosdev, int *countPtr)
 			if ( (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) || (efi_guid_compare(&GPT_HFS_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) )
 			{
 				bvrFlags = (efi_guid_compare(&GPT_BOOT_GUID, (EFI_GUID const*)gptMap->ent_type) == 0) ? kBVFlagBooter : 0;
-				bvr = newGPTBVRef(biosdev,
-				gptID,
-				gptMap->ent_lba_start,
-				gptMap,
-				HFSInitPartition,
-				HFSLoadFile,
-				HFSReadFile,
-				HFSGetDirEntry,
-				HFSGetFileBlock,
-				HFSGetUUID,
-				HFSGetDescription,
-				HFSFree,
-				0,
-				kBIOSDevTypeHardDrive, bvrFlags);
+				bvr = newGPTBVRef(
+                                    biosdev,    // int biosdev
+                                    gptID,      // int partno
+                                    gptMap->ent_lba_start,  //uint blkoff
+                                    gptMap, //const gpt_ent* part
+                                    HFSInitPartition, //FSInit initFunc
+                                    HFSLoadFile, //FSLoadFile loadFunc
+                                    HFSReadFile, //FSReadFile readFunc
+                                    HFSGetDirEntry, //FSGetDirEntry getdirFunc
+                                    HFSGetFileBlock, //FSGetFileBlock getBlockFunc
+                                    HFSGetUUID, //FSGetUUID getUUIDFunc
+                                    HFSGetDescription, //BVGetDescription getDescriptionFunc
+                                    HFSFree, //BVFree bvFreeFunc
+                                    0, //int probe
+                                    kBIOSDevTypeHardDrive, //int type
+                                    bvrFlags //uint bvrFlags
+                                  );
 			}
 
 			// zef - foreign OS support

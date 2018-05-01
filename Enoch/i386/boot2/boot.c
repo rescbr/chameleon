@@ -524,16 +524,20 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	// Check if the kernel cache file exists
 	ret = -1;
 
+    verbose("Volume flags %d\n", gBootVolume->flags);
 	if (gBootVolume->flags & kBVFlagBooter)
 	{
+        verbose("Volume is booter\n");
 		if (isRecoveryHD)
 		{
 			strncpy(kernelCachePath, "/com.apple.recovery.boot/prelinkedkernel", sizeof(kernelCachePath) );
+            verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
 				strncpy(kernelCachePath, "/com.apple.recovery.boot/kernelcache", sizeof(kernelCachePath) );
+                verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 				if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -545,11 +549,13 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		else if (isInstaller)
 		{
 			strncpy(kernelCachePath, "/.IABootFiles/prelinkedkernel", sizeof(kernelCachePath) );
+            verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
 				strncpy(kernelCachePath, "/.IABootFiles/kernelcache", sizeof(kernelCachePath) );
+                verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 				if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -561,6 +567,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		else if (isMacOSXUpgrade)
 		{
 			strncpy(kernelCachePath, "/Mac OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+            verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -573,16 +580,19 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 			strncpy(kernelCachePath,
 				"/macOS Install Data/Locked Files/Boot Files/prelinkedkernel",
 				sizeof(kernelCachePath) );
+            verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
 				strncpy(kernelCachePath, "/OS X Install Data/prelinkedkernel", sizeof(kernelCachePath) );
+                verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
 					strncpy(kernelCachePath, "/OS X Install Data/kernelcache", sizeof(kernelCachePath) );
+                    verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 					if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -594,16 +604,24 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 		}
 		else
 		{
-			snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile);
+            char skipSlash = 0;
+            if(kernelCacheFile[0] == '/') {
+                skipSlash = 1;
+            }
+            
+			snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.P/%s", kernelCacheFile + skipSlash);
+            verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 			ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 			if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 			{
-				snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.R/%s", kernelCacheFile);
+				snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.R/%s", kernelCacheFile + skipSlash);
+                verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 				ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 				if ((ret == -1) || ((flags & kFileTypeMask) != kFileTypeFlat))
 				{
-					snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.S/%s", kernelCacheFile);
+					snprintf(kernelCachePath, sizeof(kernelCachePath), "/com.apple.boot.S/%s", kernelCacheFile + skipSlash);
+                    verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 					ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 					if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -619,6 +637,7 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	if (ret == -1)
 	{
 		strlcpy(kernelCachePath, kernelCacheFile, sizeof(kernelCachePath));
+        verbose("Trying Kernel Cache path %s\n", kernelCachePath);
 		ret = GetFileInfo(NULL, kernelCachePath, &flags, &cachetime);
 
 		if ((flags & kFileTypeMask) != kFileTypeFlat)
@@ -630,7 +649,8 @@ long LoadKernelCache(const char *cacheFile, void **binary)
 	// Exit if kernel cache file wasn't found
 	if (ret == -1)
 	{
-		DBG("No Kernel Cache File '%s' found\n", kernelCacheFile);
+		//DBG("No Kernel Cache File '%s' found\n", kernelCacheFile);
+        verbose("No Kernel Cache File '%s' found\n", kernelCacheFile);
 		return -1;
 	}
 
